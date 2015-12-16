@@ -1,0 +1,3 @@
+class SettingsPane extends JPanel {
+    
+}
