@@ -8,18 +8,18 @@ import java.nio.ByteBuffer;
 /**
  * Created by Netdex on 12/18/2015.
  */
-public class DocumentInsertMessage extends Message {
+public class DocumentInsertMessage extends DocumentMessage {
 
     private char c;
     private int lineNumber;
     private int idx;
 
-    public DocumentInsertMessage(){
-        super(MessageType.DOCUMENT_INSERT_CHARACTER);
+    public DocumentInsertMessage() {
+        super(DocumentMessageType.CHARACTER_INSERT);
     }
 
     public DocumentInsertMessage(char c, int lineNumber, int idx) {
-        super(MessageType.DOCUMENT_INSERT_CHARACTER);
+        super(DocumentMessageType.CHARACTER_INSERT);
         this.c = c;
         this.lineNumber = lineNumber;
         this.idx = idx;

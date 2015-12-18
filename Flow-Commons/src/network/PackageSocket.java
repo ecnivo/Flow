@@ -47,7 +47,7 @@ public class PackageSocket extends Socket {
 
     private static int byteArrToInteger(byte[] arr) {
         if (arr.length != 4)
-            throw new IllegalArgumentException("ARRAY LENGTH MUST BE 4");
+            throw new IllegalArgumentException("Byte array size is not 4");
         return (arr[0] << 24) & 0xff000000 |
                 (arr[1] << 16) & 0x00ff0000 |
                 (arr[2] << 8) & 0x0000ff00 |

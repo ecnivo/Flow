@@ -1,9 +1,11 @@
 package struct;
 
+import message.DocumentDeleteMessage;
+import message.DocumentInsertMessage;
+import message.DocumentMessage;
 import network.CorruptedParcelableException;
 import network.Parcelable;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -19,6 +21,7 @@ public class Document implements Parcelable {
     public Document(String id) {
         this.id = id;
         this.lines = new ArrayList<>();
+        lines.add("");
     }
 
     /**
@@ -32,16 +35,17 @@ public class Document implements Parcelable {
         if (lineNumber >= lines.size() || lineNumber < 0)
             throw new ArrayIndexOutOfBoundsException("Line number is out of range");
         String line = lines.get(lineNumber);
-        if (idx < 0 || idx >= line.length())
+        if (idx < 0 || idx > line.length())
             throw new ArrayIndexOutOfBoundsException("Index in line is out of range");
         if (c == '\n') {
             String oldLine = line.substring(0, idx);
             String newLine = line.substring(idx);
             lines.set(lineNumber, oldLine);
             lines.add(lineNumber + 1, newLine);
-        } else
+        } else {
             line = line.substring(0, idx) + c + line.substring(idx);
-        lines.set(lineNumber, line);
+            lines.set(lineNumber, line);
+        }
     }
 
     /**
@@ -66,16 +70,38 @@ public class Document implements Parcelable {
      * @return All the lines in the document as a string
      */
     public String getDocumentText() {
-        return lines.toString();
+        return id + "\n" + lines.toString().replace(",", "\n");
+    }
+
+    public String getLine(int lineNumber) {
+        return lines.get(lineNumber);
+    }
+
+    public void executeMessage(DocumentMessage message) {
+        DocumentMessage.DocumentMessageType type = message.getDocumentMessageType();
+        if (type == DocumentMessage.DocumentMessageType.CHARACTER_INSERT) {
+            DocumentInsertMessage dim = (DocumentInsertMessage) message;
+            this.insert(dim.getCharacter(), dim.getLineNumber(), dim.getIndex());
+        } else if (type == DocumentMessage.DocumentMessageType.CHARACTER_DELETE) {
+            DocumentDeleteMessage dem = (DocumentDeleteMessage) message;
+            this.delete(dem.getLineNumber(), dem.getIndex());
+        }
     }
 
     @Override
     public byte[] serialize() {
+        byte[] idBuffer = id.getBytes();
+        byte[][] lineBuffer = new byte[lines.size()][];
+        int size = idBuffer.length + 4 + 4;
+        for (int i = 0; i < lines.size(); i++) {
+            lineBuffer[i] = lines.get(i).getBytes();
+            size += lineBuffer[i].length + 4;
+        }
+
         // Allocate a reasonably sized buffer
-        ByteBuffer buffer = ByteBuffer.allocate(65536);
+        ByteBuffer buffer = ByteBuffer.allocate(size);
 
         // Add the size of the ID and the ID itself into the buffer
-        byte[] idBuffer = id.getBytes();
         buffer.putInt(idBuffer.length);
         buffer.put(idBuffer);
 
@@ -83,9 +109,6 @@ public class Document implements Parcelable {
         buffer.putInt(lines.size());
 
         // Add the size of each line and the lines into the buffer
-        byte[][] lineBuffer = new byte[lines.size()][];
-        for (int i = 0; i < lines.size(); i++)
-            lineBuffer[i] = lines.get(i).getBytes();
         for (int i = 0; i < lineBuffer.length; i++) {
             buffer.putInt(lineBuffer[i].length);
             buffer.put(lineBuffer[i]);

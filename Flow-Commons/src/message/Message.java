@@ -14,12 +14,11 @@ public abstract class Message implements Parcelable {
         this.type = type;
     }
 
-    public MessageType getMessageType(){
+    public MessageType getMessageType() {
         return type;
     }
 
-    static enum MessageType {
-        DOCUMENT_INSERT_CHARACTER,
-        DOCUMENT_DELETE_CHARACTER;
+    public static enum MessageType {
+        DOCUMENT_MESSAGE;
     }
 }

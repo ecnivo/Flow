@@ -8,17 +8,17 @@ import java.nio.ByteBuffer;
 /**
  * Created by Netdex on 12/18/2015.
  */
-public class DocumentDeleteMessage extends Message {
+public class DocumentDeleteMessage extends DocumentMessage {
 
     private int lineNumber;
     private int idx;
 
     public DocumentDeleteMessage() {
-        super(MessageType.DOCUMENT_DELETE_CHARACTER);
+        super(DocumentMessageType.CHARACTER_DELETE);
     }
 
-    public DocumentDeleteMessage(int lineNumber, int idx){
-        super(MessageType.DOCUMENT_DELETE_CHARACTER);
+    public DocumentDeleteMessage(int lineNumber, int idx) {
+        super(DocumentMessageType.CHARACTER_DELETE);
         this.lineNumber = lineNumber;
         this.idx = idx;
     }

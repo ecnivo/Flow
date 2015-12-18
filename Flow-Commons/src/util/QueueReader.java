@@ -1,9 +1,7 @@
 package util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -21,7 +19,7 @@ public class QueueReader {
     }
 
 
-    public byte[] peek(int len){
+    public byte[] peek(int len) {
         try {
             byte[] buf = new byte[len];
             is.read(buf);
