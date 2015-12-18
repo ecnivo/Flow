@@ -1,8 +1,8 @@
 package login;
 
-public class NewUserScreen {
+public class NewUserPane {
 
-	public NewUserScreen() {
+	public NewUserPane() {
 		// TODO Auto-generated constructor stub
 	}
 }
