@@ -18,5 +18,5 @@ public interface Parcelable {
      * @param data The byte representation of this parcelable
      * @return The parcelable constructed from the byte representation
      */
-    public Parcelable deserialize(byte[] data);
+    public Parcelable deserialize(byte[] data) throws CorruptedParcelableException;
 }

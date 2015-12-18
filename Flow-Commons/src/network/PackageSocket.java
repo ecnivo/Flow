@@ -23,13 +23,14 @@ public class PackageSocket extends Socket {
     }
 
     public void sendParcelable(Parcelable parcelable) throws IOException {
-        byte[] data= parcelable.serialize();
+        byte[] data = parcelable.serialize();
         byte[] dataLen = intToByteArr(data.length);
         os.write(dataLen);
         os.write(data);
         os.flush();
     }
-    public Parcelable receiveParcelable(Parcelable template) throws IOException {
+
+    public Parcelable receiveParcelable(Parcelable template) throws IOException, CorruptedParcelableException {
         byte[] dataLen = new byte[4];
         is.read(dataLen);
         int len = byteArrToInteger(dataLen);
@@ -38,7 +39,7 @@ public class PackageSocket extends Socket {
         return template.deserialize(data);
     }
 
-    private static byte[] intToByteArr(int integer){
+    private static byte[] intToByteArr(int integer) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(integer);
         return b.array();
