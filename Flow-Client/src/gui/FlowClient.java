@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.CardLayout;
 import java.io.File;
 import java.io.IOException;
 
@@ -8,13 +7,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import editing.EditPane;
-import settings.SettingsPane;
-
 public class FlowClient extends JFrame {
-
-	private EditPane clientPanel;
-	private SettingsPane settings;
 
 	public static void main(String[] args) {
 		new FlowClient();
@@ -37,13 +30,7 @@ public class FlowClient extends JFrame {
 					JOptionPane.ERROR_MESSAGE);
 		}
 
-		this.getContentPane().setLayout(new CardLayout());
-
-		clientPanel = new EditPane();
-		this.getContentPane().add(clientPanel);
-
-		settings = new SettingsPane();
-		this.getContentPane().add(settings);
+		this.add(new PanelManager());
 
 		this.setResizable(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
