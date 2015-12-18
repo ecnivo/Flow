@@ -14,6 +14,7 @@ public class LoginPane extends JPanel {
 	public LoginPane() {
 		this.setLayout(null);
 
+		txtFlow = new JTextField();
 		txtFlow.setText("FLOW");
 		txtFlow.setBounds(160, 21, 101, 22);
 		this.add(txtFlow);

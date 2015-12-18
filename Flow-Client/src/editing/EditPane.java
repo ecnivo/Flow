@@ -16,10 +16,10 @@ public class EditPane extends JPanel {
 		DocTree tree = new DocTree();
 		this.add(tree, BorderLayout.WEST);
 
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		EditConsole editConsole = new EditConsole();
-		splitPane.add(editConsole);
+		CollabsList collabsList = new CollabsList();
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				editConsole, collabsList);
 		this.add(splitPane, BorderLayout.EAST);
 	}
 }

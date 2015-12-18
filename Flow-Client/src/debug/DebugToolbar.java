@@ -1,7 +1,11 @@
 package debug;
 
-public class DebugToolbar {
-public DebugToolbar() {
-	// TODO Auto-generated constructor stub
-}
+import java.awt.FlowLayout;
+
+import javax.swing.JPanel;
+
+public class DebugToolbar extends JPanel {
+	public DebugToolbar() {
+		this.setLayout(new FlowLayout());
+	}
 }

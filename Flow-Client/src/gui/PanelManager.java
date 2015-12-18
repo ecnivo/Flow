@@ -6,17 +6,7 @@ import javax.swing.JPanel;
 
 import login.LoginPane;
 import settings.SettingsPane;
-import editing.EditConsole;
 import editing.EditPane;
-
-import javax.swing.JTextField;
-import javax.swing.JButton;
-
-import java.awt.BorderLayout;
-
-import javax.swing.JEditorPane;
-import javax.swing.JTree;
-import javax.swing.JSplitPane;
 
 public class PanelManager extends JPanel {
 	private EditPane editPanel;
