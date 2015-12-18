@@ -1,3 +1,5 @@
+package network;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,6 +12,7 @@ import java.nio.ByteBuffer;
 public class PackageSocket extends Socket {
 
     private Socket socket;
+
     private OutputStream os;
     private InputStream is;
 
