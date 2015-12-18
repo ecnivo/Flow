@@ -1,11 +1,9 @@
 package debug;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
 import editing.EditArea;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class DebugPane extends JPanel {
 	DebugConsole debugConsole;

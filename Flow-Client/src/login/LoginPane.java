@@ -1,64 +1,35 @@
 package login;
 
-import gui.PanelManager;
-
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 public class LoginPane extends JPanel {
-	private JTextField txtFlow;
 	private JTextField txtUsername;
-	private JTextField txtPassword;
-	private JTextField txtUsername_1;
-	private JTextField txtPassword_1;
 	private JButton newAccountButton;
 	private JButton loginButton;
 	private AuthenticationPanelManager authPanMan;
+	private JLabel lblUsername;
+	private JLabel lblPassword;
+	private JPasswordField passwordField;
 
 	public LoginPane(AuthenticationPanelManager authPanMan) {
 		this.authPanMan = authPanMan;
 		this.setLayout(null);
 
-		txtFlow = new JTextField();
-		txtFlow.setText("FLOW");
-		txtFlow.setBounds(160, 21, 101, 22);
-		this.add(txtFlow);
-
 		txtUsername = new JTextField();
+		txtUsername.setToolTipText("Your Flow username");
 		txtUsername.setText("Username");
-		txtUsername.setBounds(167, 84, 86, 20);
+		txtUsername.setBounds(165, 91, 165, 20);
 		this.add(txtUsername);
 		txtUsername.setColumns(10);
 
-		txtPassword = new JTextField();
-		txtPassword.setText("Password");
-		txtPassword.setBounds(168, 128, 86, 20);
-		this.add(txtPassword);
-		txtPassword.setColumns(10);
-
-		txtUsername_1 = new JTextField();
-		txtUsername_1.setText("USERNAME");
-		txtUsername_1.setBounds(163, 54, 86, 20);
-		this.add(txtUsername_1);
-		txtUsername_1.setColumns(10);
-
-		txtPassword_1 = new JTextField();
-		txtPassword_1.setText("PASSWORD");
-		txtPassword_1.setBounds(163, 106, 86, 20);
-		this.add(txtPassword_1);
-		txtPassword_1.setColumns(10);
-
 		loginButton = new JButton("Login");
-		loginButton.setBounds(160, 159, 89, 23);
+		loginButton.setBounds(165, 183, 89, 23);
 		this.add(loginButton);
 
-		newAccountButton = new JButton("No Account? Create one!");
-		newAccountButton.setBounds(163, 217, 140, 46);
+		newAccountButton = new JButton("<html>No Account?<br>Create one!</html>");
+		newAccountButton.setBounds(165, 243, 140, 37);
 		newAccountButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -67,6 +38,19 @@ public class LoginPane extends JPanel {
 			}
 		});
 		this.add(newAccountButton);
+
+		lblUsername = new JLabel("Username");
+		lblUsername.setBounds(165, 64, 165, 16);
+		add(lblUsername);
+
+		lblPassword = new JLabel("Password");
+		lblPassword.setBounds(165, 127, 165, 16);
+		add(lblPassword);
+
+		passwordField = new JPasswordField();
+		passwordField.setToolTipText("Your Flow password");
+		passwordField.setBounds(165, 154, 165, 20);
+		add(passwordField);
 
 	}
 

@@ -1,25 +1,30 @@
 package login;
 
-import java.awt.CardLayout;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 public class AuthenticationPanelManager extends JPanel {
 
 	private LoginPane loginPane;
 	private CreateAccountPane createAccountPane;
 
+	private CardLayout layout;
+
 	public AuthenticationPanelManager() {
-		this.setLayout(new CardLayout());
+		super();
+		layout = new CardLayout();
+		this.setLayout(layout);
 
 		loginPane = new LoginPane(this);
 		createAccountPane = new CreateAccountPane();
 
 		this.add(loginPane, "loginPane");
 		this.add(createAccountPane, "createAccountPane");
+
+		layout.show(this, "loginPane");
 	}
 
 	public void switchToCreate() {
-
+		layout.show(this, "createAccountPane");
 	}
 }

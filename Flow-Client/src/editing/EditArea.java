@@ -1,9 +1,12 @@
 package editing;
 
-import javax.swing.JEditorPane;
+import javax.swing.*;
 
+/**
+ * Created by Vince on 2015-12-18.
+ */
 public class EditArea extends JEditorPane {
-	public EditArea() {
-		// TODO Auto-generated constructor stub
-	}
+    EditArea() {
+
+    }
 }
