@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 
 import javax.swing.JPanel;
 
+import login.AuthenticationPanelManager;
 import login.LoginPane;
 import settings.SettingsPane;
 import editing.EditPane;
@@ -11,14 +12,16 @@ import editing.EditPane;
 public class PanelManager extends JPanel {
 	private EditPane editPanel;
 	private SettingsPane settingsPanel;
-	private LoginPane loginPanel;
+	private AuthenticationPanelManager loginAuthPanel;
+	private CardLayout layout;
 
 	public PanelManager() {
-		this.setLayout(new CardLayout());
+		layout = new CardLayout();
+		this.setLayout(layout);
 
-		loginPanel = new LoginPane();
-		this.add(loginPanel, "loginPanel");
-		
+		loginAuthPanel = new AuthenticationPanelManager();
+		this.add(loginAuthPanel, "loginPanel");
+
 		editPanel = new EditPane();
 		this.add(editPanel, "editPanel");
 

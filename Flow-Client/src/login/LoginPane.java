@@ -1,6 +1,12 @@
 package login;
 
+import gui.PanelManager;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -10,8 +16,12 @@ public class LoginPane extends JPanel {
 	private JTextField txtPassword;
 	private JTextField txtUsername_1;
 	private JTextField txtPassword_1;
+	private JButton newAccountButton;
+	private JButton loginButton;
+	private AuthenticationPanelManager authPanMan;
 
-	public LoginPane() {
+	public LoginPane(AuthenticationPanelManager authPanMan) {
+		this.authPanMan = authPanMan;
 		this.setLayout(null);
 
 		txtFlow = new JTextField();
@@ -43,13 +53,24 @@ public class LoginPane extends JPanel {
 		this.add(txtPassword_1);
 		txtPassword_1.setColumns(10);
 
-		JButton btnLogin = new JButton("Login");
-		btnLogin.setBounds(160, 159, 89, 23);
-		this.add(btnLogin);
+		loginButton = new JButton("Login");
+		loginButton.setBounds(160, 159, 89, 23);
+		this.add(loginButton);
 
-		JButton btnNoAccountCreate = new JButton("No Account? Create one!");
-		btnNoAccountCreate.setBounds(163, 217, 140, 46);
-		this.add(btnNoAccountCreate);
+		newAccountButton = new JButton("No Account? Create one!");
+		newAccountButton.setBounds(163, 217, 140, 46);
+		newAccountButton.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				LoginPane.this.switchToNewAccount();
+			}
+		});
+		this.add(newAccountButton);
+
+	}
+
+	private void switchToNewAccount() {
+		this.authPanMan.switchToCreate();
 	}
 }
