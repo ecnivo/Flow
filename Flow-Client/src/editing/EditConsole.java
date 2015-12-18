@@ -1,6 +1,8 @@
 package editing;
 
-public class EditConsole {
+import javax.swing.JPanel;
+
+public class EditConsole extends JPanel {
 
 	public EditConsole() {
 		// TODO Auto-generated constructor stub
