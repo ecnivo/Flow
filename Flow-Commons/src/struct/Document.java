@@ -70,7 +70,10 @@ public class Document implements Parcelable {
      * @return All the lines in the document as a string
      */
     public String getDocumentText() {
-        return id + "\n" + lines.toString().replace(",", "\n");
+        String str = "";
+        for(String s : lines)
+            str += s + '\n';
+        return str;
     }
 
     public String getLine(int lineNumber) {
