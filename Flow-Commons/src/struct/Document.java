@@ -72,7 +72,7 @@ public class Document implements Parcelable {
     @Override
     public byte[] serialize() {
         // Allocate a reasonably sized buffer
-        ByteBuffer buffer = ByteBuffer.allocate(65535);
+        ByteBuffer buffer = ByteBuffer.allocate(65536);
 
         // Add the size of the ID and the ID itself into the buffer
         byte[] idBuffer = id.getBytes();
@@ -97,23 +97,20 @@ public class Document implements Parcelable {
     public Parcelable deserialize(byte[] data) throws CorruptedParcelableException {
         try {
             ByteBuffer buffer = ByteBuffer.wrap(data);
-            int idx = 0;
 
             // Read in the ID
-            int idBufferSize = buffer.get(idx += 4);
+            int idBufferSize = buffer.getInt();
             byte[] idBuffer = new byte[idBufferSize];
-            buffer.get(idBuffer, idx, idBufferSize);
-            idx += idBufferSize;
+            buffer.get(idBuffer);
             this.id = new String(idBuffer);
 
             // Read in all the lines
-            int lineCount = buffer.getInt(idx += 4);
+            int lineCount = buffer.getInt();
             this.lines.clear();
             for (int i = 0; i < lineCount; i++) {
-                int lineLength = buffer.get(idx += 4);
+                int lineLength = buffer.getInt();
                 byte[] lineBuffer = new byte[lineLength];
-                buffer.get(lineBuffer, idx, lineLength);
-                idx += lineLength;
+                buffer.get(lineBuffer);
                 this.lines.add(new String(lineBuffer));
             }
             return this;
