@@ -3,7 +3,7 @@ package struct;
 import message.DocumentDeleteMessage;
 import message.DocumentInsertMessage;
 import message.DocumentMessage;
-import network.CorruptedParcelableException;
+import network.MalformedParcelableException;
 import network.Parcelable;
 
 import java.nio.ByteBuffer;
@@ -151,7 +151,7 @@ public class Document implements Parcelable {
     }
 
     @Override
-    public Parcelable deserialize(byte[] data) throws CorruptedParcelableException {
+    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
         try {
             ByteBuffer buffer = ByteBuffer.wrap(data);
 
@@ -170,9 +170,12 @@ public class Document implements Parcelable {
                 buffer.get(lineBuffer);
                 this.lines.add(new String(lineBuffer));
             }
-            return this;
+
+            byte[] remaining = new byte[buffer.remaining()];
+            buffer.get(remaining);
+            return remaining;
         } catch (Exception e) {
-            throw new CorruptedParcelableException();
+            throw new MalformedParcelableException();
         }
     }
 }

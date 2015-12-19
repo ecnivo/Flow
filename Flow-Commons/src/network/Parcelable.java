@@ -16,7 +16,7 @@ public interface Parcelable {
      * Creates a parcelable from a series of bytes
      *
      * @param data The byte representation of this parcelable
-     * @return The parcelable constructed from the byte representation
+     * @return Data that was unparsed, left for subclasses to finish parsing
      */
-    public Parcelable deserialize(byte[] data) throws CorruptedParcelableException;
+    public byte[] deserialize(byte[] data) throws MalformedParcelableException;
 }

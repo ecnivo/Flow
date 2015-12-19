@@ -1,6 +1,6 @@
 package message;
 
-import network.CorruptedParcelableException;
+import network.MalformedParcelableException;
 import network.Parcelable;
 
 import java.nio.ByteBuffer;
@@ -27,7 +27,9 @@ public class DocumentInsertMessage extends DocumentMessage {
 
     @Override
     public byte[] serialize() {
-        ByteBuffer buffer = ByteBuffer.allocate(9);
+        byte[] header = super.serialize();
+        ByteBuffer buffer = ByteBuffer.allocate(header.length + 2 + 4 + 4);
+        buffer.put(header);
         buffer.putChar(c);
         buffer.putInt(lineNumber);
         buffer.putInt(idx);
@@ -35,12 +37,16 @@ public class DocumentInsertMessage extends DocumentMessage {
     }
 
     @Override
-    public Parcelable deserialize(byte[] data) throws CorruptedParcelableException {
+    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
+        data = super.deserialize(data);
         ByteBuffer buffer = ByteBuffer.wrap(data);
         this.c = buffer.getChar();
         this.lineNumber = buffer.getInt();
         this.idx = buffer.getInt();
-        return this;
+
+        byte[] remaining = new byte[buffer.remaining()];
+        buffer.get(remaining);
+        return remaining;
     }
 
     public char getCharacter() {

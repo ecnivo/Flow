@@ -1,6 +1,6 @@
 package message;
 
-import network.CorruptedParcelableException;
+import network.MalformedParcelableException;
 import network.Parcelable;
 
 import java.nio.ByteBuffer;
@@ -25,18 +25,24 @@ public class DocumentDeleteMessage extends DocumentMessage {
 
     @Override
     public byte[] serialize() {
-        ByteBuffer buffer = ByteBuffer.allocate(8);
+        byte[] header = super.serialize();
+        ByteBuffer buffer = ByteBuffer.allocate(header.length + 4 + 4);
+        buffer.put(header);
         buffer.putInt(lineNumber);
         buffer.putInt(idx);
         return buffer.array();
     }
 
     @Override
-    public Parcelable deserialize(byte[] data) throws CorruptedParcelableException {
+    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
+        data = super.deserialize(data);
         ByteBuffer buffer = ByteBuffer.wrap(data);
         this.lineNumber = buffer.getInt();
         this.idx = buffer.getInt();
-        return this;
+
+        byte[] remaining = new byte[buffer.remaining()];
+        buffer.get(remaining);
+        return remaining;
     }
 
     public int getLineNumber() {

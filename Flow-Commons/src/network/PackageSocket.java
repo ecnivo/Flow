@@ -1,5 +1,7 @@
 package network;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,13 +32,13 @@ public class PackageSocket extends Socket {
         os.flush();
     }
 
-    public Parcelable receiveParcelable(Parcelable template) throws IOException, CorruptedParcelableException {
+    public Parcelable receiveParcelable() throws IOException, MalformedParcelableException {
         byte[] dataLen = new byte[4];
         is.read(dataLen);
         int len = byteArrToInteger(dataLen);
         byte[] data = new byte[len];
         is.read(data);
-        return template.deserialize(data);
+        throw new NotImplementedException();
     }
 
     private static byte[] intToByteArr(int integer) {
