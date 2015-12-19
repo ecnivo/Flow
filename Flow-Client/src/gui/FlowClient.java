@@ -11,6 +11,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class FlowClient extends JFrame {
 
+    private PanelManager manager;
+
     public static void main(String[] args) throws ClassNotFoundException,
 	    InstantiationException, IllegalAccessException,
 	    UnsupportedLookAndFeelException {
@@ -31,14 +33,13 @@ public class FlowClient extends JFrame {
 		    JOptionPane.ERROR_MESSAGE);
 	}
 
-	// Sets size and location
-	this.setSize(1200, 500);
-	this.setLocation(50, 50);
-
-	this.add(new PanelManager());
+	manager = new PanelManager();
+	this.add(manager);
 
 	this.setResizable(true);
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	this.setSize(1200, 500);
+	this.setLocation(50, 50);
 	this.pack();
 	this.setVisible(true);
     }

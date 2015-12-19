@@ -31,4 +31,8 @@ public class PanelManager extends JPanel {
     public void switchToEditor() {
 	layout.show(this, "editPanel");
     }
+    
+    protected void updatePositions(int width, int height) {
+	// TODO update login and auth positions
+    }
 }

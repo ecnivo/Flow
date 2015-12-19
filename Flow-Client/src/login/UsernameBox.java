@@ -40,7 +40,7 @@ public class UsernameBox extends JTextField {
 	    public void mouseClicked(MouseEvent e) {
 		if (!UsernameBox.this.contains(e.getX(), e.getY())
 			&& (UsernameBox.this.getText().equals(DEFAULT_TEXT) || UsernameBox.this
-				.getText().equals(""))) {
+				.getText().trim().equals(""))) {
 		    UsernameBox.this.setForeground(Color.GRAY);
 		    UsernameBox.this.setText(DEFAULT_TEXT);
 		} else {
