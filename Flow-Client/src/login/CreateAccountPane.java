@@ -10,6 +10,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.BoxLayout;
+import java.awt.Component;
+import javax.swing.Box;
+import java.awt.Dimension;
 
 public class CreateAccountPane extends JPanel {
     private AuthenticationPanelManager manager;
@@ -18,39 +22,51 @@ public class CreateAccountPane extends JPanel {
     private JLabel passwordPrompt;
     private JPasswordField passwordEntry;
     private JButton newAccountButton;
-    private static final int HEIGHT = 26;
-    private static final int WIDTH = 128;
-    private int xPos = (int) (CreateAccountPane.this.getWidth() / 2 - WIDTH / 2);
+    private Component verticalStrut;
+    private Component verticalStrut_1;
+    private Component verticalStrut_2;
+    private Component verticalStrut_3;
 
     public CreateAccountPane(AuthenticationPanelManager manager) {
 	this.manager = manager;
-	setLayout(null);
+	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	
+	verticalStrut_3 = Box.createVerticalStrut(20);
+	add(verticalStrut_3);
 
 	JLabel title = new JLabel("New Account");
+	title.setAlignmentX(Component.CENTER_ALIGNMENT);
 	title.setFont(new Font("Tahoma", Font.BOLD, 14));
-	title.setBounds(xPos, 40, WIDTH, HEIGHT);
 	add(title);
+	
+	verticalStrut = Box.createVerticalStrut(20);
+	add(verticalStrut);
 
 	usernamePrompt = new JLabel(
-		"<html>Username<br>(you cannot change this!)</html>");
-	usernamePrompt.setBounds(xPos, 78, WIDTH, HEIGHT);
+		"Username (you cannot change this!)");
+	usernamePrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
 	add(usernamePrompt);
 
 	usernameEntry = new UsernameBox();
-	usernameEntry.setBounds(xPos, 113, WIDTH, HEIGHT);
+	usernameEntry.setPreferredSize(new Dimension(128, 24));
+	usernameEntry.setMaximumSize(new Dimension(128, 24));
 	add(usernameEntry);
+	
+	verticalStrut_1 = Box.createVerticalStrut(20);
+	add(verticalStrut_1);
 
 	passwordPrompt = new JLabel("Password");
-	passwordPrompt.setBounds(xPos, 162, WIDTH, HEIGHT);
+	passwordPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
 	add(passwordPrompt);
 
 	passwordEntry = new JPasswordField();
+	passwordEntry.setMaximumSize(new Dimension(128, 24));
+	passwordEntry.setPreferredSize(new Dimension(128, 24));
 	passwordEntry.setToolTipText("The password for Flow");
-	passwordEntry.setBounds(xPos, 187, WIDTH, HEIGHT);
 	add(passwordEntry);
 
 	newAccountButton = new JButton("Sign Up!");
-	newAccountButton.setBounds(xPos, 240, 86, 23);
+	newAccountButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 	newAccountButton.addActionListener(new ActionListener() {
 
 	    @Override
@@ -60,34 +76,9 @@ public class CreateAccountPane extends JPanel {
 		CreateAccountPane.this.manager.switchToEditor();
 	    }
 	});
+	
+	verticalStrut_2 = Box.createVerticalStrut(20);
+	add(verticalStrut_2);
 	add(newAccountButton);
-
-	addComponentListener(new ComponentListener() {
-
-	    @Override
-	    public void componentShown(ComponentEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void componentResized(ComponentEvent e) {
-		xPos = (int) (CreateAccountPane.this.getWidth() / 2 - WIDTH / 2);
-		usernamePrompt.setLocation(xPos, 78);
-		usernameEntry.setLocation(xPos, 162);
-		passwordPrompt.setLocation(xPos, 187);
-		newAccountButton.setLocation(xPos, 240);
-		repaint();
-	    }
-
-	    @Override
-	    public void componentMoved(ComponentEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void componentHidden(ComponentEvent e) {
-		// nothing
-	    }
-	});
     }
 }

@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,8 +39,12 @@ public class FlowClient extends JFrame {
 
 	this.setResizable(true);
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	this.setSize(1200, 500);
-	this.setLocation(50, 50);
+	this.setSize((int) (Toolkit.getDefaultToolkit().getScreenSize()
+		.getWidth() * 0.8), (int) (Toolkit.getDefaultToolkit()
+		.getScreenSize().getHeight() * 0.8));
+	this.setLocation((int) (Toolkit.getDefaultToolkit().getScreenSize()
+		.getWidth() * 0.1), (int) (Toolkit.getDefaultToolkit()
+		.getScreenSize().getHeight() * 0.1));
 	this.pack();
 	this.setVisible(true);
     }

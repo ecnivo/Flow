@@ -5,12 +5,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JTextField;
+import java.awt.Dimension;
 
 public class UsernameBox extends JTextField {
 
     private static final String DEFAULT_TEXT = "Username";
 
     public UsernameBox() {
+    	setPreferredSize(new Dimension(128, 32));
 	this.setToolTipText("Your Flow username");
 	this.setText(DEFAULT_TEXT);
 	this.setForeground(Color.GRAY);
