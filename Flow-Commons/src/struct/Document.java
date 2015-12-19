@@ -24,6 +24,9 @@ public class Document implements Parcelable {
         lines.add("");
     }
 
+    public String getID(){
+        return id;
+    }
     /**
      * Insert a character at line number at index
      *
