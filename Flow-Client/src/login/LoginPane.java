@@ -1,60 +1,70 @@
 package login;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+
 public class LoginPane extends JPanel {
-	private JTextField txtUsername;
-	private JButton newAccountButton;
-	private JButton loginButton;
-	private AuthenticationPanelManager authPanMan;
-	private JLabel lblUsername;
-	private JLabel lblPassword;
-	private JPasswordField passwordField;
+    private AuthenticationPanelManager authPanMan;
 
-	public LoginPane(AuthenticationPanelManager authPanMan) {
-		this.authPanMan = authPanMan;
-		this.setLayout(null);
+    public LoginPane(AuthenticationPanelManager authPanMan) {
+	setBackground(Color.WHITE);
+	this.authPanMan = authPanMan;
+	this.setLayout(null);
+	// TODO add background picture
 
-		txtUsername = new JTextField();
-		txtUsername.setToolTipText("Your Flow username");
-		txtUsername.setText("Username");
-		txtUsername.setBounds(165, 91, 165, 20);
-		this.add(txtUsername);
-		txtUsername.setColumns(10);
+	// TODO make title less gross (logo, possibly?)
+	JLabel title = new JLabel("Flow - Log In");
+	title.setFont(new Font("Tahoma", Font.BOLD, 18));
+	title.setBounds(165, 33, 165, 20);
+	this.add(title);
 
-		loginButton = new JButton("Login");
-		loginButton.setBounds(165, 183, 89, 23);
-		this.add(loginButton);
+	JLabel usernamePrompt = new JLabel("Username");
+	usernamePrompt.setBounds(165, 64, 165, 16);
+	this.add(usernamePrompt);
 
-		newAccountButton = new JButton("<html>No Account?<br>Create one!</html>");
-		newAccountButton.setBounds(165, 243, 140, 37);
-		newAccountButton.addActionListener(new ActionListener() {
+	UsernameBox usernameEntry = new UsernameBox();
+	usernameEntry.setBounds(165, 91, 165, 20);
+	this.add(usernameEntry);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LoginPane.this.switchToNewAccount();
-			}
-		});
-		this.add(newAccountButton);
+	JLabel passwordPrompt = new JLabel("Password");
+	passwordPrompt.setBounds(165, 127, 165, 16);
+	this.add(passwordPrompt);
 
-		lblUsername = new JLabel("Username");
-		lblUsername.setBounds(165, 64, 165, 16);
-		add(lblUsername);
+	JPasswordField passwordEntry = new JPasswordField();
+	passwordEntry.setToolTipText("Your Flow password");
+	passwordEntry.setBounds(165, 154, 165, 20);
+	this.add(passwordEntry);
 
-		lblPassword = new JLabel("Password");
-		lblPassword.setBounds(165, 127, 165, 16);
-		add(lblPassword);
+	JButton logInButton = new JButton("Login");
+	logInButton.setBounds(165, 183, 89, 23);
+	logInButton.addActionListener(new ActionListener() {
 
-		passwordField = new JPasswordField();
-		passwordField.setToolTipText("Your Flow password");
-		passwordField.setBounds(165, 154, 165, 20);
-		add(passwordField);
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		// TODO add something here to send username and password off for
+		// authentication
+		LoginPane.this.authPanMan.switchToEditor();
+	    }
+	});
+	this.add(logInButton);
 
-	}
+	JButton newAccountButton = new JButton(
+		"<html>No Account?<br>Create one!</html>");
+	newAccountButton.setBounds(165, 243, 140, 37);
+	newAccountButton.addActionListener(new ActionListener() {
 
-	private void switchToNewAccount() {
-		this.authPanMan.switchToCreate();
-	}
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		LoginPane.this.authPanMan.switchToCreateNewAccount();
+	    }
+	});
+	this.add(newAccountButton);
+    }
 }

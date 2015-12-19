@@ -1,6 +1,6 @@
 package editing;
 
-import javax.swing.*;
+import javax.swing.JEditorPane;
 
 /**
  * Created by Vince on 2015-12-18.
