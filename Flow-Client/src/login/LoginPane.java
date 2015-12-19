@@ -3,6 +3,7 @@ package login;
 import gui.PanelManager;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,21 +11,14 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-
-import java.awt.FlowLayout;
-
-import javax.swing.BoxLayout;
-
-import com.sun.xml.internal.ws.api.Component;
-
-import javax.swing.Box;
-
-import java.awt.Dimension;
+import javax.swing.JSpinner;
 
 public class LoginPane extends JPanel {
     private PanelManager authPanMan;
@@ -33,7 +27,7 @@ public class LoginPane extends JPanel {
 	setBackground(Color.WHITE);
 	this.authPanMan = authPanMan;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	
+
 	java.awt.Component verticalStrut_4 = Box.createVerticalStrut(20);
 	add(verticalStrut_4);
 	// TODO add background picture
@@ -43,13 +37,14 @@ public class LoginPane extends JPanel {
 	title.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 	add(title);
 	try {
-	    title.setIcon(new ImageIcon(ImageIO.read(new File("images/flow.png"))
-	    	.getScaledInstance(414, 128, Image.SCALE_SMOOTH)));
+	    title.setIcon(new ImageIcon(ImageIO.read(
+		    new File("images/flow.png")).getScaledInstance(414, 128,
+		    Image.SCALE_SMOOTH)));
 	} catch (IOException e1) {
 	    // TODO Auto-generated catch block
 	    e1.printStackTrace();
 	}
-	
+
 	java.awt.Component verticalStrut_3 = Box.createVerticalStrut(20);
 	add(verticalStrut_3);
 
@@ -61,7 +56,7 @@ public class LoginPane extends JPanel {
 	UsernameBox usernameEntry = new UsernameBox();
 	usernameEntry.setMaximumSize(new Dimension(128, 24));
 	add(usernameEntry);
-	
+
 	java.awt.Component verticalStrut = Box.createVerticalStrut(20);
 	add(verticalStrut);
 
@@ -73,14 +68,14 @@ public class LoginPane extends JPanel {
 	passwordEntry.setMaximumSize(new Dimension(128, 24));
 	add(passwordEntry);
 	passwordEntry.setToolTipText("Your Flow password");
-	
+
 	java.awt.Component verticalStrut_1 = Box.createVerticalStrut(20);
 	add(verticalStrut_1);
 
 	JButton logInButton = new JButton("Login");
 	add(logInButton);
 	logInButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-	
+
 	java.awt.Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
 

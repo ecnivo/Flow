@@ -7,19 +7,45 @@ import javax.swing.JSplitPane;
 
 public class EditPane extends JPanel {
 
+    private EditArea editArea;
+    private DocTree tree;
+
     public EditPane() {
 	this.setLayout(new BorderLayout(0, 0));
 
-	EditArea editorPane = new EditArea();
-	this.add(editorPane, BorderLayout.CENTER);
+	JSplitPane mainSplit = new JSplitPane();
+	add(mainSplit, BorderLayout.CENTER);
 
-	DocTree tree = new DocTree();
-	this.add(tree, BorderLayout.WEST);
+	JSplitPane rightSide = new JSplitPane();
+	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
+	mainSplit.setRightComponent(rightSide);
 
 	EditConsole editConsole = new EditConsole();
+	rightSide.setRightComponent(editConsole);
+
 	CollabsList collabsList = new CollabsList();
-	JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-		editConsole, collabsList);
-	this.add(splitPane, BorderLayout.EAST);
+	rightSide.setLeftComponent(collabsList);
+
+	JSplitPane leftSide = new JSplitPane();
+	mainSplit.setLeftComponent(leftSide);
+
+	JPanel leftLeft = new JPanel(new BorderLayout());
+	tree = new DocTree();
+	leftLeft.add(tree, BorderLayout.CENTER);
+	NavBar navBar = new NavBar();
+	leftLeft.add(navBar, BorderLayout.NORTH);
+	leftSide.setLeftComponent(leftLeft);
+
+	editArea = new EditArea();
+	leftSide.setRightComponent(editArea);
+
+    }
+
+    public EditArea getEditArea() {
+	return editArea;
+    }
+    
+    public DocTree getDocTree (){
+	return tree;
     }
 }
