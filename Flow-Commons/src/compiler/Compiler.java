@@ -3,34 +3,91 @@ package compiler;
 import struct.Document;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import javax.tools.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Represents a wrapper around the javac compiler
  * Attempts to compile a document, then execute
- *
+ * <p>
  * Created by Netdex on 12/18/2015.
  */
 public class Compiler {
 
     private Document[] documents;
+    private Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
-    public Compiler(Document... doc){
+    public Compiler(Document... doc) {
         this.documents = doc;
     }
 
     public CompilationResult build() throws IOException {
-        for(Document doc : documents){
+        File workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow");
+        L.info("Found working directory of " + workingDirectory.getAbsolutePath());
+        ArrayList<File> paths = new ArrayList<>();
+        if (!workingDirectory.exists()) {
+            workingDirectory.mkdir();
+            L.info("Working directory did not exist, created it");
+        }
+        L.info(documents.length + " documents queued for compilation");
+        for (Document doc : documents) {
             String body = doc.getDocumentText();
-            FileOutputStream fos  = new FileOutputStream("todo");
+            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getID());
+            paths.add(tempPath);
+            PrintStream ps = new PrintStream(tempPath);
+            ps.println(doc.getDocumentText());
+            L.info("Wrote " + doc.getID() + " to temporary path of " + tempPath.getAbsolutePath());
         }
 
+        try {
+            L.info("Setting up compilation diagnostics and compiler");
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+
+            L.info("Setting up cmd arguments for compiler");
+            List<String> optionList = new ArrayList<>();
+            optionList.add("-classpath");
+            optionList.add(workingDirectory.getAbsolutePath() + ";dist/InlineCompiler.jar");
+
+            L.info("Setting up compilation task");
+            Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(paths);
+            JavaCompiler.CompilationTask task = compiler.getTask(
+                    null,
+                    fileManager,
+                    diagnostics,
+                    optionList,
+                    null,
+                    compilationUnit);
+
+            L.info("Calling compilation task");
+            if (task.call()) {
+                L.info("Calling class loader");
+                URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("./").toURI().toURL()});
+                Class<?> loadedClass = classLoader.loadClass("");
+                Object obj = loadedClass.newInstance();
+            } else {
+                L.severe("Failed to compile!");
+                for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                    L.severe(String.format("Error on line %d in %s", diagnostic.getLineNumber(), diagnostic.getSource().toUri()));
+                }
+            }
+            fileManager.close();
+        } catch (Exception e) {
+            L.severe("Exception occured while compiling!");
+            L.severe(e.getMessage());
+        }
         throw new NotImplementedException();
     }
 
-    public StandardPut execute(){
+    public StandardPut execute() {
         ProcessBuilder pb = new ProcessBuilder();
         throw new NotImplementedException();
     }
