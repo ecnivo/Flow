@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
@@ -22,13 +23,18 @@ import java.util.logging.Logger;
 public class Compiler {
 
     private Document[] documents;
-    private Logger L = Logger.getLogger("Flow-Commons/Compiler");
+    private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
     public Compiler(Document... doc) {
         this.documents = doc;
     }
 
-    public CompilationResult build() throws IOException {
+    /**
+     * Attempts to build a set of documents into classes
+     * @return The diagnostics containing compilation errors and warnings
+     * @throws IOException when files cannot be written
+     */
+    public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
         File workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow");
         L.info("Found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
@@ -55,7 +61,7 @@ public class Compiler {
             L.info("Setting up cmd arguments for compiler");
             List<String> optionList = new ArrayList<>();
             optionList.add("-classpath");
-            optionList.add(workingDirectory.getAbsolutePath() + ";dist/InlineCompiler.jar");
+            optionList.add(workingDirectory.getAbsolutePath());
 
             L.info("Setting up compilation task");
             Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(paths);
@@ -69,22 +75,20 @@ public class Compiler {
 
             L.info("Calling compilation task");
             if (task.call()) {
-                L.info("Calling class loader");
-                URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("./").toURI().toURL()});
-                Class<?> loadedClass = classLoader.loadClass("");
-                Object obj = loadedClass.newInstance();
+                L.info("Compilation success!");
             } else {
                 L.severe("Failed to compile!");
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    L.severe(String.format("Error on line %d in %s", diagnostic.getLineNumber(), diagnostic.getSource().toUri()));
+                    L.severe(String.format("Error on line %d in %s: %s", diagnostic.getLineNumber(), diagnostic.getSource().toUri(), diagnostic.getMessage(Locale.getDefault())));
                 }
+                return diagnostics.getDiagnostics();
             }
             fileManager.close();
         } catch (Exception e) {
-            L.severe("Exception occured while compiling!");
+            L.severe("Exception occurred while compiling!");
             L.severe(e.getMessage());
         }
-        throw new NotImplementedException();
+        return null;
     }
 
     public StandardPut execute() {
