@@ -27,7 +27,7 @@ public class FlowClient extends JFrame {
 
 	// sets the icon in the task bark
 	try {
-	    this.setIconImage(ImageIO.read(new File("icon.png")));
+	    this.setIconImage(ImageIO.read(new File("images/icon.png")));
 	} catch (IOException e) {
 	    JOptionPane.showConfirmDialog(this, "Window icon not found",
 		    "Missing Image", JOptionPane.DEFAULT_OPTION,
@@ -45,7 +45,6 @@ public class FlowClient extends JFrame {
 	this.setLocation((int) (Toolkit.getDefaultToolkit().getScreenSize()
 		.getWidth() * 0.1), (int) (Toolkit.getDefaultToolkit()
 		.getScreenSize().getHeight() * 0.1));
-	this.pack();
 	this.setVisible(true);
     }
 }

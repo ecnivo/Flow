@@ -1,5 +1,7 @@
 package login;
 
+import gui.PanelManager;
+
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -19,13 +21,15 @@ import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
 
 import com.sun.xml.internal.ws.api.Component;
+
 import javax.swing.Box;
+
 import java.awt.Dimension;
 
 public class LoginPane extends JPanel {
-    private AuthenticationPanelManager authPanMan;
+    private PanelManager authPanMan;
 
-    public LoginPane(AuthenticationPanelManager authPanMan) {
+    public LoginPane(PanelManager authPanMan) {
 	setBackground(Color.WHITE);
 	this.authPanMan = authPanMan;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -39,7 +43,7 @@ public class LoginPane extends JPanel {
 	title.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 	add(title);
 	try {
-	    title.setIcon(new ImageIcon(ImageIO.read(new File("flow.png"))
+	    title.setIcon(new ImageIcon(ImageIO.read(new File("images/flow.png"))
 	    	.getScaledInstance(414, 128, Image.SCALE_SMOOTH)));
 	} catch (IOException e1) {
 	    // TODO Auto-generated catch block
@@ -91,7 +95,7 @@ public class LoginPane extends JPanel {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		LoginPane.this.authPanMan.switchToCreateNewAccount();
+		LoginPane.this.authPanMan.switchToCreateAccount();
 	    }
 	});
 	logInButton.addActionListener(new ActionListener() {

@@ -4,35 +4,52 @@ import java.awt.CardLayout;
 
 import javax.swing.JPanel;
 
-import login.AuthenticationPanelManager;
+import login.CreateAccountPane;
+import login.LoginPane;
 import settings.SettingsPane;
 import editing.EditPane;
 
 public class PanelManager extends JPanel {
-    private EditPane editPanel;
-    private SettingsPane settingsPanel;
-    private AuthenticationPanelManager loginAuthPanel;
+    private EditPane editPane;
+    private SettingsPane settingsPane;
+    private LoginPane loginPane;
+    private CreateAccountPane createPane;
     private CardLayout layout;
 
     public PanelManager() {
 	layout = new CardLayout();
 	this.setLayout(layout);
 
-	loginAuthPanel = new AuthenticationPanelManager(this);
-	this.add(loginAuthPanel, "loginPanel");
+	loginPane = new LoginPane(this);
+	this.add(loginPane, "loginPane");
 
-	editPanel = new EditPane();
-	this.add(editPanel, "editPanel");
+	createPane = new CreateAccountPane(this);
+	this.add(createPane, "createPane");
 
-	settingsPanel = new SettingsPane();
-	this.add(settingsPanel, "settingsPanel");
+	editPane = new EditPane();
+	this.add(editPane, "editPane");
+
+	settingsPane = new SettingsPane();
+	this.add(settingsPane, "settingsPane");
     }
 
     public void switchToEditor() {
-	layout.show(this, "editPanel");
+	layout.show(this, "editPane");
     }
-    
+
+    public void switchToLogin() {
+	layout.show(this, "loginPane");
+    }
+
+    public void switchToCreateAccount() {
+	layout.show(this, "createPane");
+    }
+
     protected void updatePositions(int width, int height) {
 	// TODO update login and auth positions
+    }
+
+    public LoginPane getLoginPane() {
+	return loginPane;
     }
 }

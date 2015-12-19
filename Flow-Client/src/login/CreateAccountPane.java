@@ -1,5 +1,7 @@
 package login;
 
+import gui.PanelManager;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,12 +13,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.BoxLayout;
+
 import java.awt.Component;
+
 import javax.swing.Box;
+
 import java.awt.Dimension;
+import java.awt.Color;
+import gui.BackButton;
+import java.awt.FlowLayout;
+import javax.swing.SwingConstants;
 
 public class CreateAccountPane extends JPanel {
-    private AuthenticationPanelManager manager;
+    private PanelManager manager;
     private JLabel usernamePrompt;
     private UsernameBox usernameEntry;
     private JLabel passwordPrompt;
@@ -26,8 +35,11 @@ public class CreateAccountPane extends JPanel {
     private Component verticalStrut_1;
     private Component verticalStrut_2;
     private Component verticalStrut_3;
+    private BackButton backButton;
+    private Component verticalStrut_4;
 
-    public CreateAccountPane(AuthenticationPanelManager manager) {
+    public CreateAccountPane(PanelManager manager) {
+    	setBackground(Color.WHITE);
 	this.manager = manager;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	
@@ -77,8 +89,16 @@ public class CreateAccountPane extends JPanel {
 	    }
 	});
 	
+	verticalStrut_4 = Box.createVerticalStrut(20);
+	add(verticalStrut_4);
+	add(newAccountButton);
+	
 	verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
-	add(newAccountButton);
+	
+	backButton = new BackButton(manager.getLoginPane(), manager);
+	backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+	add(backButton);
+	backButton.setHorizontalAlignment(SwingConstants.LEFT);
     }
 }
