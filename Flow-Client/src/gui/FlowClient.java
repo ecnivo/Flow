@@ -10,13 +10,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
 
 public class FlowClient extends JFrame {
 
     private PanelManager manager;
-    static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
+    public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
 	    .createEmptyBorder();
+    public static final int BUTTON_ICON_SIZE = 24;
 
     public static void main(String[] args) throws ClassNotFoundException,
 	    InstantiationException, IllegalAccessException,
@@ -50,9 +50,5 @@ public class FlowClient extends JFrame {
 		.getWidth() * 0.1), (int) (Toolkit.getDefaultToolkit()
 		.getScreenSize().getHeight() * 0.1));
 	this.setVisible(true);
-    }
-
-    public static Border emptyBorder() {
-	return EMPTY_BORDER;
     }
 }

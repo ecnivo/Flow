@@ -42,7 +42,7 @@ public class SettingsPane extends JPanel {
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 	CustomScrollPane scrolling = new CustomScrollPane(panel);
-	scrolling.setBorder(FlowClient.emptyBorder());
+	scrolling.setBorder(FlowClient.EMPTY_BORDER);
 
 	JLabel title = new JLabel("Settings");
 	title.setFont(new Font("Tahoma", Font.BOLD, 18));

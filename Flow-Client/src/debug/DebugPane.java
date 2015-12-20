@@ -6,12 +6,12 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import editing.DocTree;
-import editing.EditArea;
 import editing.EditPane;
+import gui.NavBar;
 
 public class DebugPane extends JPanel {
 
-    public DebugPane(EditPane editPane) {
+    public DebugPane(EditPane editPane, NavBar navBar) {
 	setLayout(new BorderLayout(0, 0));
 
 	JSplitPane bothSides = new JSplitPane();
@@ -20,11 +20,10 @@ public class DebugPane extends JPanel {
 	JSplitPane leftHalf = new JSplitPane();
 	bothSides.setLeftComponent(leftHalf);
 
-	DocTree tree = editPane.getDocTree();
-	leftHalf.setLeftComponent(tree);
+	DocTree docTree = editPane.getDocTree();
+	leftHalf.setLeftComponent(docTree);
 
-	EditArea editArea = editPane.getEditArea();
-	leftHalf.setRightComponent(editArea);
+	leftHalf.setRightComponent(editPane);
 
 	JSplitPane rightHalf = new JSplitPane();
 	rightHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -33,14 +32,19 @@ public class DebugPane extends JPanel {
 	DebugConsole debugConsole = new DebugConsole();
 	rightHalf.setRightComponent(debugConsole);
 
-	JPanel panel = new JPanel();
-	rightHalf.setLeftComponent(panel);
+	JPanel rightTop = new JPanel();
+	rightHalf.setLeftComponent(rightTop);
 
-	DebugToolbar debugToolbar = new DebugToolbar();
-	panel.add(debugToolbar, BorderLayout.NORTH);
+	JPanel buttonPanel = new JPanel();
+	rightTop.add(buttonPanel);
+
+	buttonPanel.add(navBar);
+
+	DebugToolbar debugBar = new DebugToolbar();
+	buttonPanel.add(debugBar);
 
 	VariablesList variablesList = new VariablesList();
-	panel.add(variablesList, BorderLayout.CENTER);
+	rightTop.add(variablesList, BorderLayout.CENTER);
 
     }
 }

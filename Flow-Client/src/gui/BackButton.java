@@ -18,8 +18,8 @@ public class BackButton extends JButton {
     public BackButton(JPanel target, PanelManager manager) {
 	try {
 	    setIcon(new ImageIcon(ImageIO.read(
-		    new File("images/backButton.png")).getScaledInstance(32,
-		    32, Image.SCALE_SMOOTH)));
+		    new File("images/backButton.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
+			    FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}

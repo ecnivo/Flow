@@ -1,5 +1,7 @@
 package editing;
 
+import gui.NavBar;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
@@ -10,7 +12,7 @@ public class EditPane extends JPanel {
     private EditArea editArea;
     private DocTree tree;
 
-    public EditPane() {
+    public EditPane(NavBar navBar) {
 	this.setLayout(new BorderLayout(0, 0));
 
 	JSplitPane mainSplit = new JSplitPane();
@@ -32,9 +34,12 @@ public class EditPane extends JPanel {
 	JPanel leftLeft = new JPanel(new BorderLayout());
 	tree = new DocTree();
 	leftLeft.add(tree, BorderLayout.CENTER);
-	NavBar navBar = new NavBar();
-	leftLeft.add(navBar, BorderLayout.NORTH);
 	leftSide.setLeftComponent(leftLeft);
+	
+	JPanel buttonPanel = new JPanel();
+	buttonPanel.add(navBar);
+	buttonPanel.add(new EditToolbar());
+	leftLeft.add(buttonPanel, BorderLayout.NORTH);
 
 	editArea = new EditArea();
 	leftSide.setRightComponent(editArea);

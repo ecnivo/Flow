@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 
 import javax.swing.JPanel;
 
+import debug.DebugPane;
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
@@ -13,7 +14,9 @@ public class PanelManager extends JPanel {
     private EditPane editPane;
     private SettingsPane settingsPane;
     private LoginPane loginPane;
-    private CreateAccountPane createPane;
+    private DebugPane debugPane;
+    private CreateAccountPane createAccountPane;
+    private NavBar navBar;
     private CardLayout layout;
 
     public PanelManager() {
@@ -23,14 +26,21 @@ public class PanelManager extends JPanel {
 	loginPane = new LoginPane(this);
 	this.add(loginPane, "loginPane");
 
-	createPane = new CreateAccountPane(this);
-	this.add(createPane, "createPane");
+	createAccountPane = new CreateAccountPane(this);
+	this.add(createAccountPane, "createPane");
 
-	editPane = new EditPane();
+	editPane = new EditPane(navBar);
 	this.add(editPane, "editPane");
+
+	navBar = new NavBar(this);
+
+	debugPane = new DebugPane(editPane, navBar);
+	this.add(debugPane, "debugPane");
 
 	settingsPane = new SettingsPane();
 	this.add(settingsPane, "settingsPane");
+
+	layout.show(this, "loginPane");
     }
 
     public void switchToEditor() {
@@ -45,8 +55,12 @@ public class PanelManager extends JPanel {
 	layout.show(this, "createPane");
     }
 
-    protected void updatePositions(int width, int height) {
-	// TODO update login and auth positions
+    public void switchToDebug() {
+	layout.show(this, "debugPane");
+    }
+    
+    public void switchToSettings(){
+	layout.show(this, "settingsPane");
     }
 
     public LoginPane getLoginPane() {
