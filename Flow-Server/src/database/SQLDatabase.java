@@ -19,7 +19,8 @@ class SQLDatabase {
 	 */
 	public static final int TIMEOUT = 5;
 
-	public static final int ADD_USER = 0, REMOVE_USER = 1;
+	public static final int ADD_USER = 0, REMOVE_USER = 1, ONWER = 0, EDIT = 1,
+			VIEW = 2;
 
 	/**
 	 * Connection to the database
