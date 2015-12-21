@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-class SQLDatabase {
+public class SQLDatabase {
 
 	/**
 	 * Location where the SQLite JDBC drivers are stored
@@ -23,16 +23,14 @@ class SQLDatabase {
 			VIEW = 2;
 
 	/**
-	 * Connection to the database
+	 * Connection to the database.
 	 */
 	private Connection connection;
 
 	public SQLDatabase(String databaseName) {
-		Driver driver = null;
 		try {
-			driver = (Driver) Class.forName(DRIVER).newInstance();
-			DriverManager.registerDriver(driver);
-			System.out.println(driver);
+			DriverManager.registerDriver(
+					(Driver) Class.forName(DRIVER).newInstance());
 		} catch (Exception e) {
 			System.out
 					.println("Error loading database driver: " + e.toString());
@@ -50,16 +48,19 @@ class SQLDatabase {
 	}
 
 	/**
+	 * Getter for all projects associated with the specified UserID, completely
+	 * ignoring whether the user is the owner, or has only edit or view access.
 	 * 
-	 * @param id
-	 * @return
+	 * @param userId
+	 *            the ID of the user.
+	 * @return all projects associated with the specified UserID.
 	 */
-	protected ResultSet getProjects(int id) {
+	protected ResultSet getProjects(int userId) {
 		try {
 			// TODO Allow for multiple users to be in permission (see
 			// updatePermission())
-			return this.query("SELECT projectId FROM projects WHERE owner = "
-					+ id + " OR permission = " + id);
+			return this.query("SELECT ProjectId FROM access WHERE UserID = "
+					+ userId + ";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -67,27 +68,33 @@ class SQLDatabase {
 	}
 
 	/**
+	 * Specifies the access level to a specific project for a user.
 	 * 
 	 * @param accessLevel
+	 *            the level of access provided to the user, either {@link OWNER}
+	 *            , {@link EDIT}, or {@link VIEW}.
 	 * @param projectId
+	 *            the project which to provide the user access to.
 	 * @param userId
-	 * @return
+	 *            the ID of the user which to provide access to.
+	 * @return whether or not the access was successfully granted.
 	 */
 	protected boolean updateAccess(int accessLevel, int projectId, int userId) {
+		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
 				this.update("INSERT INTO access values(" + projectId + ", "
-						+ userId + ", " + accessLevel);
+						+ userId + ", " + accessLevel + ";");
 				return true;
 			}
 			if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
 				this.update("UPDATE projects SET OwnerID = " + userId
-						+ " WHERE ProjectID = " + projectId);
+						+ " WHERE ProjectID = " + projectId + ";");
 
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values(" + projectId + ", "
-						+ userId + ", " + OWNER);
+						+ userId + ", " + OWNER + ");");
 
 				// TODO remove all other permissions (i.e. if they had edit
 				// permissions)
@@ -100,15 +107,17 @@ class SQLDatabase {
 	}
 
 	/**
+	 * Getter for all files associated with the specified project.
 	 * 
 	 * @param projectId
-	 * @return
+	 *            the ID of the project.
+	 * @return all associated files.
 	 */
 	protected ResultSet getFiles(int projectId) {
 		try {
 			return this
 					.query("SELECT DocumentName FROM documents WHERE ProjectID = "
-							+ projectId);
+							+ projectId + ";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -116,25 +125,31 @@ class SQLDatabase {
 	}
 
 	/**
+	 * Creates a new project with the specified name and owner
 	 * 
 	 * @param name
+	 *            name of the project
 	 * @param ownerId
+	 *            ID of the user who creates the project
 	 */
 	protected void newProject(String name, int ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
 			this.update("INSERT INTO projects(ProjectName, OwnerID) values("
-					+ name + ", " + ownerId + ")");
+					+ name + ", " + ownerId + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
+	 * Creates a new file within the specified project.
 	 * 
 	 * @param fileName
+	 *            the name of the file (including the extension).
 	 * @param projectId
+	 *            the ID of the project which to place the file inside
 	 */
 	protected void newFile(String fileName, int projectId) {
 		try {
@@ -146,13 +161,13 @@ class SQLDatabase {
 	}
 
 	/**
-	 * Getter for all of the usernames in the database
+	 * Getter for all of the usernames in the database.
 	 * 
-	 * @return all of the usernames in the database
+	 * @return all of the usernames in the database.
 	 */
 	protected ResultSet getUserNames() {
 		try {
-			return this.query("SELECT username FROM users");
+			return this.query("SELECT username FROM users;");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Switch this to an empty resultset is possible
@@ -162,13 +177,13 @@ class SQLDatabase {
 
 	/**
 	 * Authenticates a user by verifying if the specified username and password
-	 * pair exists in the database
+	 * pair exists in the database.
 	 * 
 	 * @param username
-	 *            the user's username
+	 *            the user's username.
 	 * @param password
-	 *            the user's encrypted password
-	 * @return whether or not the username and password exists in the database
+	 *            the user's encrypted password.
+	 * @return whether or not the username and password exists in the database.
 	 */
 	protected boolean authenticate(String username, String password) {
 		try {
@@ -187,20 +202,20 @@ class SQLDatabase {
 	}
 
 	/**
-	 * Add users to the database with the specified username and password
+	 * Add users to the database with the specified username and password.
 	 * 
 	 * @param username
 	 *            the desired username
 	 * @param password
 	 *            the <b>encrypted</b> password <br>
-	 *            Please don't enter passwords in plain text
+	 *            Please don't enter passwords in plain text.
 	 * @return whether or not the insertion into the database was successful. It
 	 *         could have been unsuccesful (returned false) because:<br>
 	 *         <ul>
-	 *         <li>The selected username already exists in the database</li>
+	 *         <li>The selected username already exists in the database.</li>
 	 *         <li>An error was thrown when searching the database for all
-	 *         current users</li>
-	 *         <li>An error was thrown when inserting user into the database
+	 *         current users.</li>
+	 *         <li>An error was thrown when inserting user into the database.
 	 *         </li>
 	 *         </ul>
 	 */
