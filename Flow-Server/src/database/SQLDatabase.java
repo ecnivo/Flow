@@ -19,7 +19,7 @@ class SQLDatabase {
 	 */
 	public static final int TIMEOUT = 5;
 
-	public static final int ADD_USER = 0, REMOVE_USER = 1, ONWER = 0, EDIT = 1,
+	public static final int ADD_USER = 0, REMOVE_USER = 1, OWNER = 0, EDIT = 1,
 			VIEW = 2;
 
 	/**
@@ -49,6 +49,11 @@ class SQLDatabase {
 		}
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	protected ResultSet getProjects(int id) {
 		try {
 			// TODO Allow for multiple users to be in permission (see
@@ -61,50 +66,80 @@ class SQLDatabase {
 		return null;
 	}
 
-	protected boolean updatePermission(int type, int projectId, int userId) {
+	/**
+	 * 
+	 * @param accessLevel
+	 * @param projectId
+	 * @param userId
+	 * @return
+	 */
+	protected boolean updateAccess(int accessLevel, int projectId, int userId) {
 		try {
-			// TODO Figure out storing multiple users as collaborators
-			switch (type) {
-			case ADD_USER:
-				this.update("");
+			if (accessLevel == EDIT || accessLevel == VIEW) {
+				this.update("INSERT INTO access values(" + projectId + ", "
+						+ userId + ", " + accessLevel);
 				return true;
-			case REMOVE_USER:
-				this.update("");
+			}
+			if (accessLevel == OWNER) {
+				// Changes the owner of the project in the projects table
+				this.update("UPDATE projects SET OwnerID = " + userId
+						+ " WHERE ProjectID = " + projectId);
+
+				// Changes the permissions of the user to be an owner
+				this.update("INSERT INTO access values(" + projectId + ", "
+						+ userId + ", " + OWNER);
+
+				// TODO remove all other permissions (i.e. if they had edit
+				// permissions)
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param projectId
+	 * @return
+	 */
 	protected ResultSet getFiles(int projectId) {
 		try {
-			return this.query("SELECT fileName FROM documents WHERE project = "
-					+ projectId);
+			return this
+					.query("SELECT DocumentName FROM documents WHERE ProjectID = "
+							+ projectId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	protected void newProject(String name, int id) {
+	/**
+	 * 
+	 * @param name
+	 * @param ownerId
+	 */
+	protected void newProject(String name, int ownerId) {
 		try {
-			// -1 used as default value TODO: check if possible to not enter
-			// anything there
-			this.update(
-					"INSERT INTO projects(projectName, onwer, permission) values("
-							+ name + ", " + id + ", -1)");
+			// TODO Add check to make sure user doesn't have two projects with
+			// same name
+			this.update("INSERT INTO projects(ProjectName, OwnerID) values("
+					+ name + ", " + ownerId + ")");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	protected void newFile(String name, int projectId) {
+	/**
+	 * 
+	 * @param fileName
+	 * @param projectId
+	 */
+	protected void newFile(String fileName, int projectId) {
 		try {
-			this.update("INSERT INTO documents(fileName, projectName) values("
-					+ name + ", " + projectId + ")");
+			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
+					+ projectId + ", " + fileName + ")");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -202,7 +237,7 @@ class SQLDatabase {
 	 *            the SQL statement to search the database with.
 	 * @return the results returned from the server.
 	 */
-	protected ResultSet query(String query) throws SQLException {
+	ResultSet query(String query) throws SQLException {
 		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		return statement.executeQuery(query);
@@ -215,7 +250,7 @@ class SQLDatabase {
 	 * @param query
 	 *            the SQL statement to update the database with.
 	 */
-	protected void update(String query) throws SQLException {
+	void update(String query) throws SQLException {
 		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		statement.executeUpdate(query);
