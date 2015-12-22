@@ -1,6 +1,9 @@
 package editing;
 
-import gui.NavBar;
+import flow_debug_commons.DocTree;
+import flow_debug_commons.EditArea;
+import flow_debug_commons.GenericConsole;
+import flow_debug_commons.NavBar;
 
 import java.awt.BorderLayout;
 
@@ -22,27 +25,27 @@ public class EditPane extends JPanel {
 	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	mainSplit.setRightComponent(rightSide);
 
-	EditConsole editConsole = new EditConsole();
-	rightSide.setRightComponent(editConsole);
+	GenericConsole editConsole = new GenericConsole();
+	rightSide.setTopComponent(editConsole);
 
 	CollabsList collabsList = new CollabsList();
-	rightSide.setLeftComponent(collabsList);
+	rightSide.setBottomComponent(collabsList);
 
 	JSplitPane leftSide = new JSplitPane();
 	mainSplit.setLeftComponent(leftSide);
 
-	JPanel leftLeft = new JPanel(new BorderLayout());
-	tree = new DocTree();
-	leftLeft.add(tree, BorderLayout.CENTER);
-	leftSide.setLeftComponent(leftLeft);
+	editArea = new EditArea();
+	leftSide.setRightComponent(editArea);
+
+	JPanel treeAndButtons = new JPanel(new BorderLayout());
+	tree = new DocTree(editArea);
+	treeAndButtons.add(tree, BorderLayout.CENTER);
+	leftSide.setLeftComponent(treeAndButtons);
 	
 	JPanel buttonPanel = new JPanel();
 	buttonPanel.add(navBar);
 	buttonPanel.add(new EditToolbar());
-	leftLeft.add(buttonPanel, BorderLayout.NORTH);
-
-	editArea = new EditArea();
-	leftSide.setRightComponent(editArea);
+	treeAndButtons.add(buttonPanel, BorderLayout.NORTH);
 
     }
 

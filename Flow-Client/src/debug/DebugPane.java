@@ -1,13 +1,14 @@
 package debug;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import editing.DocTree;
 import editing.EditPane;
-import gui.NavBar;
+import flow_debug_commons.DocTree;
+import flow_debug_commons.NavBar;
 
 public class DebugPane extends JPanel {
 
@@ -20,8 +21,7 @@ public class DebugPane extends JPanel {
 	JSplitPane leftHalf = new JSplitPane();
 	bothSides.setLeftComponent(leftHalf);
 
-	DocTree docTree = editPane.getDocTree();
-	leftHalf.setLeftComponent(docTree);
+	leftHalf.setLeftComponent(editPane.getDocTree());
 
 	leftHalf.setRightComponent(editPane);
 
@@ -30,13 +30,13 @@ public class DebugPane extends JPanel {
 	bothSides.setRightComponent(rightHalf);
 
 	DebugConsole debugConsole = new DebugConsole();
-	rightHalf.setRightComponent(debugConsole);
+	rightHalf.setBottomComponent(debugConsole);
 
-	JPanel rightTop = new JPanel();
-	rightHalf.setLeftComponent(rightTop);
+	JPanel rightTop = new JPanel(new BorderLayout());
+	rightHalf.setBottomComponent(rightTop);
 
-	JPanel buttonPanel = new JPanel();
-	rightTop.add(buttonPanel);
+	JPanel buttonPanel = new JPanel(new FlowLayout());
+	rightTop.add(buttonPanel, BorderLayout.NORTH);
 
 	buttonPanel.add(navBar);
 

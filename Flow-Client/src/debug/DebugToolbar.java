@@ -28,7 +28,7 @@ public class DebugToolbar extends JPanel {
 	private StartDebuggingButton() {
 	    try {
 		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/startDebugButton.png"))
+			ImageIO.read(new File("images/debug.png"))
 				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
 					FlowClient.BUTTON_ICON_SIZE,
 					Image.SCALE_SMOOTH)));
@@ -51,7 +51,7 @@ public class DebugToolbar extends JPanel {
 	private StepInButton() {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/stepInButton.png")).getScaledInstance(
+			new File("images/stepIn.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
@@ -73,7 +73,7 @@ public class DebugToolbar extends JPanel {
 	private StepOverButton() {
 	    try {
 		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stepOverButton.png"))
+			ImageIO.read(new File("images/stepOver.png"))
 				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
 					FlowClient.BUTTON_ICON_SIZE,
 					Image.SCALE_SMOOTH)));
@@ -96,7 +96,7 @@ public class DebugToolbar extends JPanel {
 	private StepOutButton() {
 	    try {
 		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stepOutButton.png"))
+			ImageIO.read(new File("images/stepOut.png"))
 				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
 					FlowClient.BUTTON_ICON_SIZE,
 					Image.SCALE_SMOOTH)));

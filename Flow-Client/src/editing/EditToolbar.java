@@ -26,7 +26,7 @@ public class EditToolbar extends JPanel {
 	private SearchButton() {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/searchButton.png")).getScaledInstance(
+			new File("images/search.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
@@ -48,7 +48,7 @@ public class EditToolbar extends JPanel {
 	private ShareButton() {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/shareButton.png")).getScaledInstance(
+			new File("images/addCollab.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {

@@ -9,6 +9,7 @@ import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
 import editing.EditPane;
+import flow_debug_commons.NavBar;
 
 public class PanelManager extends JPanel {
     private EditPane editPane;

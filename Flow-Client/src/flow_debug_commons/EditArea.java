@@ -1,4 +1,4 @@
-package editing;
+package flow_debug_commons;
 
 import javax.swing.JEditorPane;
 

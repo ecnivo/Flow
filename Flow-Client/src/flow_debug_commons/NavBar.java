@@ -1,4 +1,7 @@
-package gui;
+package flow_debug_commons;
+
+import gui.FlowClient;
+import gui.PanelManager;
 
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -28,7 +31,7 @@ public class NavBar extends JPanel {
 	private EditButton(PanelManager manager) {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/editButton.png")).getScaledInstance(
+			new File("images/editWindow.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
@@ -50,7 +53,7 @@ public class NavBar extends JPanel {
 	private DebugButton(PanelManager manager) {
 	    try {
 		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/goToDebugButton.png"))
+			ImageIO.read(new File("images/debugWindow.png"))
 				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
 					FlowClient.BUTTON_ICON_SIZE,
 					Image.SCALE_SMOOTH)));
@@ -73,7 +76,7 @@ public class NavBar extends JPanel {
 	private SettingsButton(PanelManager manager) {
 	    try {
 		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/settingsButton.png"))
+			ImageIO.read(new File("images/settingsWindow.png"))
 				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
 					FlowClient.BUTTON_ICON_SIZE,
 					Image.SCALE_SMOOTH)));
@@ -96,7 +99,7 @@ public class NavBar extends JPanel {
 	public RunButton(PanelManager manager) {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/runButton.png")).getScaledInstance(
+			new File("images/run.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
@@ -120,7 +123,7 @@ public class NavBar extends JPanel {
 	public StopButton(PanelManager manager) {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/stopButton.png")).getScaledInstance(
+			new File("images/stop.png")).getScaledInstance(
 			FlowClient.BUTTON_ICON_SIZE,
 			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
