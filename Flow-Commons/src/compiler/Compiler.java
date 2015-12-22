@@ -7,8 +7,6 @@ import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,12 +23,18 @@ public class Compiler {
     private Document[] documents;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
+    /**
+     * Instantiates a compiler from the given documents
+     *
+     * @param doc The documents to compile
+     */
     public Compiler(Document... doc) {
         this.documents = doc;
     }
 
     /**
      * Attempts to build a set of documents into classes
+     *
      * @return The diagnostics containing compilation errors and warnings
      * @throws IOException when files cannot be written
      */

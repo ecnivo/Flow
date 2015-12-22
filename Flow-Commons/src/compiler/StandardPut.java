@@ -11,15 +11,25 @@ public class StandardPut {
     private InputStream stdIn;
     private OutputStream stdOut;
 
-    protected StandardPut(InputStream in, OutputStream out){
+    protected StandardPut(InputStream in, OutputStream out) {
         this.stdIn = in;
         this.stdOut = out;
     }
 
+    /**
+     * Gets standard input of the program
+     *
+     * @return standard input of the program
+     */
     public InputStream getStdIn() {
         return stdIn;
     }
 
+    /**
+     * Gets standard output of the program
+     *
+     * @return standard output of the program
+     */
     public OutputStream getStdOut() {
         return stdOut;
     }

@@ -2,6 +2,7 @@ package network;
 
 /**
  * An interface representing a piece of data which can be serialized into a series of bytes and back into the original object
+ * <p>
  * Created by Netdex on 12/17/2015.
  */
 public interface Parcelable {

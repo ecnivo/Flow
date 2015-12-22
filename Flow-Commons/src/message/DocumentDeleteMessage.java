@@ -1,11 +1,11 @@
 package message;
 
 import network.MalformedParcelableException;
-import network.Parcelable;
 
 import java.nio.ByteBuffer;
 
 /**
+ * Represents a message for the deletion of a character from a remote document
  * Created by Netdex on 12/18/2015.
  */
 public class DocumentDeleteMessage extends DocumentMessage {
@@ -45,10 +45,20 @@ public class DocumentDeleteMessage extends DocumentMessage {
         return remaining;
     }
 
+    /**
+     * Gets the line number this message corresponds to
+     *
+     * @return the line number this message corresponds to
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Gets the index in the line this message corresponds to
+     *
+     * @return the index in the line this message corresponds to
+     */
     public int getIndex() {
         return idx;
     }

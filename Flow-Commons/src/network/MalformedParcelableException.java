@@ -5,10 +5,11 @@ package network;
  * Created by Netdex on 12/18/2015.
  */
 public class MalformedParcelableException extends Exception {
-    public MalformedParcelableException(String msg){
+    public MalformedParcelableException(String msg) {
         super(msg);
     }
-    public MalformedParcelableException(){
+
+    public MalformedParcelableException() {
 
     }
 }
