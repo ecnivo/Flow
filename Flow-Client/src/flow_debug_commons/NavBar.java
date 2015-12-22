@@ -3,6 +3,7 @@ package flow_debug_commons;
 import gui.FlowClient;
 import gui.PanelManager;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;

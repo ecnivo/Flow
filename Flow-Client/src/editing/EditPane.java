@@ -20,16 +20,12 @@ public class EditPane extends JPanel {
 
 	JSplitPane mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
-
 	JSplitPane rightSide = new JSplitPane();
 	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	mainSplit.setRightComponent(rightSide);
-
-	GenericConsole editConsole = new GenericConsole();
-	rightSide.setLeftComponent(editConsole);
-
-	CollabsList collabsList = new CollabsList();
-	rightSide.setRightComponent(collabsList);
+	
+	rightSide.setLeftComponent(new GenericConsole());
+	rightSide.setRightComponent(new CollabsList());
 
 	JSplitPane leftSide = new JSplitPane();
 	mainSplit.setLeftComponent(leftSide);
@@ -43,7 +39,8 @@ public class EditPane extends JPanel {
 	buttonPanel.add(navBar);
 	buttonPanel.add(new EditorToolbar());
 	treeAndButtons.setLeftComponent(buttonPanel);
-	treeAndButtons.setRightComponent(new DocTree(editArea));
+	tree = new DocTree(editArea);
+	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);
     }
 

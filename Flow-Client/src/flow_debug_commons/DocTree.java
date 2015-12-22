@@ -47,7 +47,7 @@ public class DocTree extends JTree {
 
     }
     
-    public JScrollPane getScrollPane(){
+    public JScrollPane getScrollable(){
 	return scrollView;
     }
 

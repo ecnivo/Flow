@@ -20,6 +20,7 @@ public class EditorToolbar extends JToolBar {
 
 	add(new SearchButton());
 	add(new ShareButton());
+	add(new ExportButton());
 
 	setFloatable(false);
 	setRollover(false);
@@ -66,6 +67,30 @@ public class EditorToolbar extends JToolBar {
 		public void actionPerformed(ActionEvent e) {
 		    // TODO pop open a sharing window to search for other users
 		    System.out.println("Share button pressed");
+		}
+	    });
+	}
+    }
+
+    private class ExportButton extends JButton {
+	private ExportButton() {
+	    try {
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/export.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+	    } catch (IOException e1) {
+		e1.printStackTrace();
+	    }
+	    setFocusable(false);
+	    setBorder(FlowClient.EMPTY_BORDER);
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    // TODO pop open a window asking where the user would like
+		    // the file exported, then export file to that location.
+		    System.out.println("Export button pressed");
 		}
 	    });
 	}
