@@ -1,5 +1,6 @@
 package flow_debug_commons;
 
+import editing.EditorToolbar;
 import gui.FlowClient;
 import gui.PanelManager;
 
@@ -13,22 +14,44 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-public class NavBar extends JPanel {
-    public NavBar(PanelManager manager) {
-	setLayout(new FlowLayout());
+public class NavBar extends JToolBar {
 
-	add(new EditButton(manager));
-	add(new DebugButton(manager));
-	add(new SettingsButton(manager));
-	add(new RunButton(manager));
-	add(new StopButton(manager));
+    private PanelManager manager;
+    private EditButton editButton;
+    private DebugButton debugButton;
+    private SettingsButton settingsButton;
+
+    public NavBar(PanelManager panMan) {
+	manager = panMan;
+
+	setOrientation(HORIZONTAL);
+
+	editButton = new EditButton();
+	debugButton = new DebugButton();
+	settingsButton = new SettingsButton();
+	add(editButton);
+	add(debugButton);
+	add(settingsButton);
+	addSeparator();
+
+	add(new RunButton());
+	add(new StopButton());
+	addSeparator();
+
+	setFloatable(false);
+	setRollover(true);
     }
 
     private class EditButton extends JButton {
 
-	private EditButton(PanelManager manager) {
+	private EditButton() {
+	    setToolTipText("Switch to the editing view");
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/editWindow.png")).getScaledInstance(
@@ -43,6 +66,9 @@ public class NavBar extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToEditor();
+		    EditButton.this.setEnabled(false);
+		    debugButton.setEnabled(true);
+		    settingsButton.setEnabled(true);
 		}
 	    });
 	}
@@ -50,13 +76,13 @@ public class NavBar extends JPanel {
 
     private class DebugButton extends JButton {
 
-	private DebugButton(PanelManager manager) {
+	private DebugButton() {
+	    setToolTipText("Switch to the debug view");
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/debugWindow.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/debugWindow.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -66,6 +92,9 @@ public class NavBar extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToDebug();
+		    DebugButton.this.setEnabled(false);
+		    editButton.setEnabled(true);
+		    settingsButton.setEnabled(true);
 		}
 	    });
 	}
@@ -73,7 +102,8 @@ public class NavBar extends JPanel {
 
     private class SettingsButton extends JButton {
 
-	private SettingsButton(PanelManager manager) {
+	private SettingsButton() {
+	    setToolTipText("Switch to the settings view");
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/settingsWindow.png"))
@@ -89,19 +119,23 @@ public class NavBar extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToSettings();
+		    editButton.setEnabled(true);
+		    debugButton.setEnabled(true);
+		    settingsButton.setEnabled(true);
 		}
 	    });
 	}
     }
 
     private class RunButton extends JButton {
-
-	public RunButton(PanelManager manager) {
+	public RunButton() {
+	    setToolTipText("Compiles, then runs the file currently open in the editor");
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/run.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(
+			ImageIO.read(new File("images/run.png"))
+				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
+					FlowClient.BUTTON_ICON_SIZE,
+					Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -120,12 +154,14 @@ public class NavBar extends JPanel {
 
     private class StopButton extends JButton {
 
-	public StopButton(PanelManager manager) {
+	public StopButton() {
+	    setToolTipText("Stops the currently running program");
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/stop.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(
+			ImageIO.read(new File("images/stop.png"))
+				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
+					FlowClient.BUTTON_ICON_SIZE,
+					Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -139,6 +175,20 @@ public class NavBar extends JPanel {
 		}
 	    });
 	}
+    }
 
+    public static void main(String[] args) throws ClassNotFoundException,
+	    InstantiationException, IllegalAccessException,
+	    UnsupportedLookAndFeelException {
+	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	JFrame testFrame = new JFrame("TESTING");
+	testFrame.setVisible(true);
+	testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	JPanel pane = new JPanel();
+	testFrame.add(pane);
+	pane.setLayout(new FlowLayout());
+	pane.add(new NavBar(null));
+	pane.add(new EditorToolbar());
+	testFrame.pack();
     }
 }

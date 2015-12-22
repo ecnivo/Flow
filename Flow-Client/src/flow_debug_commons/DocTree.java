@@ -19,7 +19,8 @@ public class DocTree extends JTree {
 	scrollView = new JScrollPane(this);
 	model = new DocTreeModel();
 	setModel(model);
-	getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+	getSelectionModel().setSelectionMode(
+		TreeSelectionModel.SINGLE_TREE_SELECTION);
 	addTreeSelectionListener(new DocTreeSelectionListener());
     }
 
@@ -34,11 +35,20 @@ public class DocTree extends JTree {
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-	    // TODO get the link to the file, then open a new tab in the
-	    // editPane for the file
-	    DocTree.this.getSelectionPath().getLastPathComponent();
+
+	    DefaultMutableTreeNode node = (DefaultMutableTreeNode) DocTree.this
+		    .getSelectionPath().getLastPathComponent();
+
+	    if (node.isLeaf()) {
+		// TODO get the link to the file, then open a new tab in the
+		// editPane for the file
+	    }
 	}
 
+    }
+    
+    public JScrollPane getScrollPane(){
+	return scrollView;
     }
 
     private void addProject() {

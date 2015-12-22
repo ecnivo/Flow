@@ -21,11 +21,11 @@ import javax.swing.JPasswordField;
 import javax.swing.JSpinner;
 
 public class LoginPane extends JPanel {
-    private PanelManager authPanMan;
+    private PanelManager panMan;
 
-    public LoginPane(PanelManager authPanMan) {
+    public LoginPane(PanelManager panMan) {
 	setBackground(Color.WHITE);
-	this.authPanMan = authPanMan;
+	this.panMan = panMan;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 	java.awt.Component verticalStrut_4 = Box.createVerticalStrut(20);
@@ -90,7 +90,7 @@ public class LoginPane extends JPanel {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		LoginPane.this.authPanMan.switchToCreateAccount();
+		LoginPane.this.panMan.switchToCreateAccount();
 	    }
 	});
 	logInButton.addActionListener(new ActionListener() {
@@ -99,7 +99,7 @@ public class LoginPane extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		// TODO add something here to send username and password off for
 		// authentication
-		LoginPane.this.authPanMan.switchToEditor();
+		LoginPane.this.panMan.switchToEditor();
 	    }
 	});
     }

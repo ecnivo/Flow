@@ -24,13 +24,17 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import gui.BackButton;
+import gui.PanelManager;
 
 public class SettingsPane extends JPanel {
     private JPasswordField passwordField;
     private JPasswordField retypePasswordField;
     private JTextField closeAccountConfirm;
+    private PanelManager panMan;
 
-    public SettingsPane() {
+    public SettingsPane(PanelManager manager) {
+	panMan = manager;
 	setAlignmentY(Component.TOP_ALIGNMENT);
 	setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -43,10 +47,17 @@ public class SettingsPane extends JPanel {
 
 	CustomScrollPane scrolling = new CustomScrollPane(panel);
 	scrolling.setBorder(FlowClient.EMPTY_BORDER);
+	
+	JPanel titlePanel = new JPanel();
+	titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+	panel.add(titlePanel);
+	
+	BackButton backButton = new BackButton(panMan.getEditPane(), panMan);
+	titlePanel.add(backButton);
 
 	JLabel title = new JLabel("Settings");
+	titlePanel.add(title);
 	title.setFont(new Font("Tahoma", Font.BOLD, 18));
-	panel.add(title);
 
 	Component verticalStrut = Box.createVerticalStrut(20);
 	panel.add(verticalStrut);

@@ -7,33 +7,33 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import editing.EditPane;
-import flow_debug_commons.DocTree;
+import flow_debug_commons.GenericConsole;
 import flow_debug_commons.NavBar;
 
 public class DebugPane extends JPanel {
 
     public DebugPane(EditPane editPane, NavBar navBar) {
-	setLayout(new BorderLayout(0, 0));
+	setLayout(new BorderLayout());
 
-	JSplitPane bothSides = new JSplitPane();
-	add(bothSides, BorderLayout.CENTER);
+	JSplitPane middleSplit = new JSplitPane();
+	add(middleSplit, BorderLayout.CENTER);
 
 	JSplitPane leftHalf = new JSplitPane();
-	bothSides.setLeftComponent(leftHalf);
+	middleSplit.setLeftComponent(leftHalf);
 
 	leftHalf.setLeftComponent(editPane.getDocTree());
 
-	leftHalf.setRightComponent(editPane);
+	leftHalf.setRightComponent(editPane.getEditArea());
 
 	JSplitPane rightHalf = new JSplitPane();
 	rightHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
-	bothSides.setRightComponent(rightHalf);
+	middleSplit.setRightComponent(rightHalf);
 
-	DebugConsole debugConsole = new DebugConsole();
-	rightHalf.setBottomComponent(debugConsole);
+	GenericConsole debugConsole = new GenericConsole();
+	rightHalf.setRightComponent(debugConsole);
 
 	JPanel rightTop = new JPanel(new BorderLayout());
-	rightHalf.setBottomComponent(rightTop);
+	rightHalf.setLeftComponent(rightTop);
 
 	JPanel buttonPanel = new JPanel(new FlowLayout());
 	rightTop.add(buttonPanel, BorderLayout.NORTH);

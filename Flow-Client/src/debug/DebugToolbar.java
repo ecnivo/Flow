@@ -12,9 +12,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-public class DebugToolbar extends JPanel {
+public class DebugToolbar extends JToolBar {
     public DebugToolbar() {
 	this.setLayout(new FlowLayout());
 
@@ -22,6 +22,9 @@ public class DebugToolbar extends JPanel {
 	add(new StepInButton());
 	add(new StepOverButton());
 	add(new StepOutButton());
+
+	setFloatable(false);
+
     }
 
     private class StartDebuggingButton extends JButton {
@@ -72,11 +75,10 @@ public class DebugToolbar extends JPanel {
     private class StepOverButton extends JButton {
 	private StepOverButton() {
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stepOver.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/stepOver.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -95,11 +97,10 @@ public class DebugToolbar extends JPanel {
     private class StepOutButton extends JButton {
 	private StepOutButton() {
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stepOut.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/stepOut.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }

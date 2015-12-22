@@ -12,14 +12,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-public class EditToolbar extends JPanel {
-    public EditToolbar() {
+public class EditorToolbar extends JToolBar {
+    public EditorToolbar() {
 	setLayout(new FlowLayout());
 
 	add(new SearchButton());
 	add(new ShareButton());
+	
+	setFloatable(false);
     }
 
     private class SearchButton extends JButton {

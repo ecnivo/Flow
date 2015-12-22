@@ -4,10 +4,10 @@ import java.awt.CardLayout;
 
 import javax.swing.JPanel;
 
-import debug.DebugPane;
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
+import debug.DebugPane;
 import editing.EditPane;
 import flow_debug_commons.NavBar;
 
@@ -25,46 +25,58 @@ public class PanelManager extends JPanel {
 	this.setLayout(layout);
 
 	loginPane = new LoginPane(this);
-	this.add(loginPane, "loginPane");
+	add(loginPane, "loginPane");
 
 	createAccountPane = new CreateAccountPane(this);
-	this.add(createAccountPane, "createPane");
-
-	editPane = new EditPane(navBar);
-	this.add(editPane, "editPane");
+	add(createAccountPane, "createPane");
 
 	navBar = new NavBar(this);
 
+	editPane = new EditPane(navBar);
+	add(editPane, "editPane");
+
 	debugPane = new DebugPane(editPane, navBar);
-	this.add(debugPane, "debugPane");
+	add(debugPane, "debugPane");
 
-	settingsPane = new SettingsPane();
-	this.add(settingsPane, "settingsPane");
-
-	layout.show(this, "loginPane");
+	settingsPane = new SettingsPane(this);
+	add(settingsPane, "settingsPane");
     }
 
     public void switchToEditor() {
 	layout.show(this, "editPane");
+	revalidate();
+	repaint();
     }
 
     public void switchToLogin() {
 	layout.show(this, "loginPane");
+	revalidate();
+	repaint();
     }
 
     public void switchToCreateAccount() {
 	layout.show(this, "createPane");
+	revalidate();
+	repaint();
     }
 
     public void switchToDebug() {
 	layout.show(this, "debugPane");
+	revalidate();
+	repaint();
     }
-    
-    public void switchToSettings(){
+
+    public void switchToSettings() {
 	layout.show(this, "settingsPane");
+	revalidate();
+	repaint();
     }
 
     public LoginPane getLoginPane() {
 	return loginPane;
+    }
+
+    public JPanel getEditPane() {
+	return editPane;
     }
 }
