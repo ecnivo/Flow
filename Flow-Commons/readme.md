@@ -3,65 +3,45 @@ Flow-Commons
 A collection of code that is meant to be used between both the client and server.
 
 ###Networking
-Networking is all handled through a `PackageSocket`. They are able to send and receive `Parcelable`s, which are a data type
-which can be converted to a byte array and back. After conversion to a byte array, they can be sent across the network, or 
-written to a file. The following is the current structure of `Parcelable`s:
+Networking is all handled through a `PackageSocket`. They are able to send and receive all objects implementing 
+`Serializable` through the `.sendPackage()` and `.receivePackage()` functions.
 
-* Parcelable
-  * Message
-  * DocumentMessage
-    * DocumentInsertMessage
-    * DocumentDeleteMessage
-  * Document
+One such `Serializable` is the `Message` class. This is a simplified method of sending information across a network.
 
-More will be added in the future as they come to mind.
+Suppose the client wants to tell the server that it is logging in. To do so, we first create a message with the information 
+required.
 
-Each additional level of `Parcelable` adds additional information to the packet, in a hierarchical manner. For example,
-`Parcelable`s themselves do not contain any information themselves. A `Document` contains information regarding its contents, 
-line count etc. A `Message` contains its type and a signature, while a `DocumentMessage` has the information which a `Message` has 
-in addition to whatever information it may need. This structure makes it so that all `Parcelable`s under a subtype will have 
-the headers of that subtype in addition to what additional information it adds.
+```java
+Message message = new Message();
+message.put("username", "netdex");
+message.put("password", "a8fi3kr"); // not my actual password
+```
 
-Here is an example of a `DocumentInsertMessage`'s structure:
-
-| ------------- | ------------- | ---------------- | --------------------  |
-| Parcelable    | Message       | DocumentMessage  | DocumentInsertMessage |
-| --------------| ------------- | ---------------- | --------------------- |
-| 0 bytes       | 4 bytes - magic signature<br>1 byte - message type| 1 byte - message type| 2 bytes - character to add<br>4 bytes - line number<br>4 bytes - line index|
-| --------------| ------------- | ---------------- | --------------------- |
-
-###Implementation
-You might be wondering, how the heck do I use this in my code? Well, here's a brief abstract implementation:
-
-After initiating a connection with the server/client, you receive a `Socket`. To create a `PackageSocket` from the socket, 
-pass in the socket into the constructor as follows:
+This constructs a message with the property `username=netdex` and `password=a8fi3kr`. To send this message to the server, we must 
+have an instance of `PackageSocket`. A socket may be passed into the constructor to easily create one.
 
 ```java
 Socket socket = ...;
 PackageSocket packageSocket = new PackageSocket(socket);
 ```
 
-This creates a wrapper around the socket that has additional, nice, useful methods for you to use. Now, lets say I am the client 
-and I have a document open, and the user added a character somewhere into the document. How do we let the server know that the 
-document changed?
-
-First we create a new `DocumentInsertMessage` as described below:
+From this point onwards, use `packageSocket` for all your I/O needs to avoid errors. To send the `Message`, do the following:
 
 ```java
-DocumentInsertMessage documentInsertMessage = new DocumentInsertMessage('C', 1, 60);
+packageSocket.sendPackage(message);
 ```
 
-This means the user will be inserting a capital letter 'C' on line 1 index 60. Now we send the message as follows:
+And the client is now done. From the server, receive the message as follows:
 
 ```java
-packageSocket.sendParcelable(documentInsertMessage);
+Message message = (Message) packageSocket.receivePackage();
 ```
 
-And that's it. On the server side, we will receive the message as such:
+To retrieve the properties on the server side, do the following:
 
 ```java
-DocumentInsertMessage message = new DocumentInsertMessage(); // note the empty constructor
-packageSocket.receiveParcelable(message);
+String username = message.get("username", String.class);
+String password = message.get("password", String.class);
 ```
 
-The information received is copied into the reference passed in, and also returned as a result.
+And the transportation of information is complete.

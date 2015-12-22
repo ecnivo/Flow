@@ -1,35 +1,24 @@
 package message;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 /**
- * Represents a message (packet) between the remote client/server
- * <p>
- * Created by Netdex on 12/18/2015.
+ * Created by Netdex on 12/22/2015.
  */
-public abstract class Message implements Serializable {
+public class Message implements Serializable {
 
-    private static transient final int MAGIC_SIGNATURE = 0xDEADBEEF;
+    private HashMap<String, Object> stringObjectHashMap;
 
-    private MessageType type;
-
-    public Message(MessageType type) {
-        this.type = type;
+    public Message(){
+        this.stringObjectHashMap = new HashMap<>();
     }
 
-    /**
-     * Gets the general type of this message
-     *
-     * @return the general type of this message
-     */
-    public MessageType getMessageType() {
-        return type;
+    public void put(String key, Object o){
+        stringObjectHashMap.put(key, o);
     }
 
-    /**
-     * Types of messages
-     */
-    public static enum MessageType {
-        DOCUMENT_MESSAGE;
+    public Object get(String key, Class<?> type){
+        return type.cast(stringObjectHashMap.get(key));
     }
 }

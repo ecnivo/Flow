@@ -1,17 +1,14 @@
 package network;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 /**
  * A wrapper around a socket which has the ability to send Parcelables over the network
  * <p>
  * Created by Netdex on 12/17/2015.
  */
-public class PackageSocket extends Socket {
+public class PackageSocket {
 
     private Socket socket;
 
@@ -29,8 +26,10 @@ public class PackageSocket extends Socket {
     }
 
     public void sendPackage(Serializable serializable) throws IOException {
-        oos.writeObject(serializable);
-        oos.flush();
+        synchronized (serializable) {
+            oos.writeObject(serializable);
+            oos.flush();
+        }
     }
 
     public Object receivePackage() throws IOException, ClassNotFoundException {
