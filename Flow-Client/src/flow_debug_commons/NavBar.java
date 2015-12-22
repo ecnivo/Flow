@@ -48,6 +48,10 @@ public class NavBar extends JToolBar {
 	setRollover(true);
     }
 
+    public EditButton getEditButton() {
+	return editButton;
+    }
+
     private class EditButton extends JButton {
 
 	private EditButton() {
@@ -60,6 +64,7 @@ public class NavBar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
@@ -86,6 +91,7 @@ public class NavBar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
@@ -113,6 +119,7 @@ public class NavBar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
@@ -139,6 +146,7 @@ public class NavBar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
@@ -165,6 +173,7 @@ public class NavBar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 

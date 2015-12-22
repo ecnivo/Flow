@@ -13,13 +13,15 @@ import javax.swing.JPanel;
 
 import login.CreateAccountPane;
 import login.LoginPane;
+import editing.EditPane;
 
 public class BackButton extends JButton {
     public BackButton(JPanel target, PanelManager manager) {
 	try {
 	    setIcon(new ImageIcon(ImageIO.read(
-		    new File("images/backButton.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-			    FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		    new File("images/backButton.png")).getScaledInstance(
+		    FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE,
+		    Image.SCALE_SMOOTH)));
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
@@ -32,6 +34,8 @@ public class BackButton extends JButton {
 		    manager.switchToLogin();
 		} else if (target instanceof CreateAccountPane) {
 		    manager.switchToCreateAccount();
+		} else if (target instanceof EditPane) {
+		    manager.switchToEditor();
 		}
 	    }
 	});

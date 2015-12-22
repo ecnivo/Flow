@@ -37,12 +37,9 @@ public class DebugPane extends JPanel {
 
 	JPanel buttonPanel = new JPanel(new FlowLayout());
 	rightTop.add(buttonPanel, BorderLayout.NORTH);
-
 	buttonPanel.add(navBar);
-
 	DebugToolbar debugBar = new DebugToolbar();
 	buttonPanel.add(debugBar);
-
 	VariablesList variablesList = new VariablesList();
 	rightTop.add(variablesList, BorderLayout.CENTER);
 

@@ -1,7 +1,6 @@
 package editing;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -15,10 +14,11 @@ public class EditPane extends JPanel {
 
     private EditArea editArea;
     private DocTree tree;
+    private NavBar navBar;
 
     public EditPane(NavBar navBar) {
 	this.setLayout(new BorderLayout());
-	
+
 	JSplitPane mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
 
@@ -38,16 +38,14 @@ public class EditPane extends JPanel {
 	editArea = new EditArea();
 	leftSide.setRightComponent(editArea);
 
-	JPanel treeAndButtons = new JPanel(new BorderLayout());
-	tree = new DocTree(editArea);
-	treeAndButtons.add(tree.getScrollPane(), BorderLayout.CENTER);
-	leftSide.setLeftComponent(treeAndButtons);
-	
+	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	treeAndButtons.setEnabled(false);
 	JPanel buttonPanel = new JPanel();
-	buttonPanel.setLayout(new FlowLayout());
 	buttonPanel.add(navBar);
 	buttonPanel.add(new EditorToolbar());
-	treeAndButtons.add(buttonPanel, BorderLayout.NORTH);
+	treeAndButtons.setLeftComponent(buttonPanel);
+	treeAndButtons.setRightComponent(new DocTree(editArea));
+	leftSide.setLeftComponent(treeAndButtons);
     }
 
     public EditArea getEditArea() {

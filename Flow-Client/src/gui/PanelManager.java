@@ -17,8 +17,8 @@ public class PanelManager extends JPanel {
     private LoginPane loginPane;
     private DebugPane debugPane;
     private CreateAccountPane createAccountPane;
-    private NavBar navBar;
     private CardLayout layout;
+    private NavBar navBar;
 
     public PanelManager() {
 	layout = new CardLayout();
@@ -31,7 +31,7 @@ public class PanelManager extends JPanel {
 	add(createAccountPane, "createPane");
 
 	navBar = new NavBar(this);
-
+	
 	editPane = new EditPane(navBar);
 	add(editPane, "editPane");
 

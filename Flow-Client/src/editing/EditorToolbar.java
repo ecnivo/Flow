@@ -20,7 +20,7 @@ public class EditorToolbar extends JToolBar {
 
 	add(new SearchButton());
 	add(new ShareButton());
-	
+
 	setFloatable(false);
     }
 
@@ -34,6 +34,7 @@ public class EditorToolbar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
@@ -56,6 +57,7 @@ public class EditorToolbar extends JToolBar {
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
+	    setFocusable(false);
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    addActionListener(new ActionListener() {
 
