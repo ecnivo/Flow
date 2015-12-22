@@ -1,5 +1,4 @@
 import compiler.Compiler;
-import message.document.DocumentInsertMessage;
 import struct.Document;
 
 import java.io.IOException;
@@ -10,14 +9,7 @@ import java.util.Arrays;
  */
 public class Test {
     public static void main(String[] args) throws IOException {
-        messageTest();
-    }
 
-    public static void messageTest() {
-        DocumentInsertMessage dim = new DocumentInsertMessage('c', 1, 1);
-        byte[] serial = dim.serialize();
-        System.out.println(Arrays.toString(serial));
-        System.out.println(bytesToHex(serial));
     }
 
     public static void compilerTest() throws IOException {

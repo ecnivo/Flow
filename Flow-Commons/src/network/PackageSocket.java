@@ -25,6 +25,11 @@ public class PackageSocket {
         this.oos = new ObjectOutputStream(oos);
     }
 
+    /**
+     * Sends a serializable over the network
+     * @param serializable The serializable to send
+     * @throws IOException When something nasty happens
+     */
     public void sendPackage(Serializable serializable) throws IOException {
         synchronized (serializable) {
             oos.writeObject(serializable);
@@ -32,6 +37,12 @@ public class PackageSocket {
         }
     }
 
+    /**
+     * Receives a serializable from the network
+     * @return The serializable as an object
+     * @throws IOException When something nasty happens
+     * @throws ClassNotFoundException When the serialized object does not exist client side
+     */
     public Object receivePackage() throws IOException, ClassNotFoundException {
         return ois.readObject();
     }

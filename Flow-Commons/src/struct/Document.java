@@ -1,9 +1,5 @@
 package struct;
 
-import message.document.DocumentDeleteMessage;
-import message.document.DocumentInsertMessage;
-import message.document.DocumentMessage;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -114,17 +110,6 @@ public class Document implements Serializable {
      */
     public String getLine(int lineNumber) {
         return lines.get(lineNumber);
-    }
-
-    public void executeMessage(DocumentMessage message) {
-        DocumentMessage.DocumentMessageType type = message.getDocumentMessageType();
-        if (type == DocumentMessage.DocumentMessageType.CHARACTER_INSERT) {
-            DocumentInsertMessage dim = (DocumentInsertMessage) message;
-            this.insert(dim.getCharacter(), dim.getLineNumber(), dim.getIndex());
-        } else if (type == DocumentMessage.DocumentMessageType.CHARACTER_DELETE) {
-            DocumentDeleteMessage dem = (DocumentDeleteMessage) message;
-            this.delete(dem.getLineNumber(), dem.getIndex());
-        }
     }
 
 
