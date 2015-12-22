@@ -1,11 +1,12 @@
 package message;
 
 import network.MalformedParcelableException;
-import network.Parcelable;
 
 import java.nio.ByteBuffer;
 
 /**
+ * Represents a message for the insertion of a chracter in a remote document
+ * <p>
  * Created by Netdex on 12/18/2015.
  */
 public class DocumentInsertMessage extends DocumentMessage {
@@ -49,14 +50,29 @@ public class DocumentInsertMessage extends DocumentMessage {
         return remaining;
     }
 
+    /**
+     * Gets the character to add
+     *
+     * @return the character to add
+     */
     public char getCharacter() {
         return c;
     }
 
+    /**
+     * Gets the line number to add the character
+     *
+     * @return the line number to add the character
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Gets the index to add the character
+     *
+     * @return the index to add the character
+     */
     public int getIndex() {
         return idx;
     }

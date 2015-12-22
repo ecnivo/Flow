@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 /**
+ * A wrapper around a socket which has the ability to send Parcelables over the network
+ * <p>
  * Created by Netdex on 12/17/2015.
  */
 public class PackageSocket extends Socket {
@@ -24,6 +26,12 @@ public class PackageSocket extends Socket {
         this.is = socket.getInputStream();
     }
 
+    /**
+     * Sends a parcelable across the network
+     *
+     * @param parcelable The parcelable to send
+     * @throws IOException When something bad happens
+     */
     public void sendParcelable(Parcelable parcelable) throws IOException {
         byte[] data = parcelable.serialize();
         byte[] dataLen = intToByteArr(data.length);
@@ -32,6 +40,13 @@ public class PackageSocket extends Socket {
         os.flush();
     }
 
+    /**
+     * Receives a parcelable from the network
+     *
+     * @return The parcelable received from the network
+     * @throws IOException                  When something bad happens
+     * @throws MalformedParcelableException When input data does not correspond to the provided template
+     */
     public Parcelable receiveParcelable() throws IOException, MalformedParcelableException {
         byte[] dataLen = new byte[4];
         is.read(dataLen);
@@ -41,12 +56,24 @@ public class PackageSocket extends Socket {
         throw new NotImplementedException();
     }
 
+    /**
+     * Converts an integer into 4 bytes
+     *
+     * @param integer The integer to convert
+     * @return 4 bytes, little endian
+     */
     private static byte[] intToByteArr(int integer) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(integer);
         return b.array();
     }
 
+    /**
+     * Converts 4 bytes into an integer
+     *
+     * @param arr 4 bytes, little endian
+     * @return The 4 bytes as an integer
+     */
     private static int byteArrToInteger(byte[] arr) {
         if (arr.length != 4)
             throw new IllegalArgumentException("Byte array size is not 4");

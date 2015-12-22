@@ -92,6 +92,7 @@ public class Document implements Parcelable {
 
     /**
      * Sets the text of the document to a string
+     *
      * @param str The string to set the text of the document to
      */
     public void setDocumentText(String str) {
@@ -107,6 +108,12 @@ public class Document implements Parcelable {
         }
     }
 
+    /**
+     * Gets a line in a document
+     *
+     * @param lineNumber The line number of the line to get
+     * @return The line at that line number
+     */
     public String getLine(int lineNumber) {
         return lines.get(lineNumber);
     }
