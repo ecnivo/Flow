@@ -14,7 +14,6 @@ public class EditPane extends JPanel {
 
     private EditArea editArea;
     private DocTree tree;
-    private NavBar navBar;
 
     public EditPane(NavBar navBar) {
 	this.setLayout(new BorderLayout());

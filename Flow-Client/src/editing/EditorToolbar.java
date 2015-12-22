@@ -22,6 +22,7 @@ public class EditorToolbar extends JToolBar {
 	add(new ShareButton());
 
 	setFloatable(false);
+	setRollover(false);
     }
 
     private class SearchButton extends JButton {

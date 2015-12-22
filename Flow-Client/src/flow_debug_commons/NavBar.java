@@ -1,6 +1,5 @@
 package flow_debug_commons;
 
-import editing.EditorToolbar;
 import gui.FlowClient;
 import gui.PanelManager;
 
@@ -14,11 +13,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 public class NavBar extends JToolBar {
 
@@ -29,8 +24,7 @@ public class NavBar extends JToolBar {
 
     public NavBar(PanelManager panMan) {
 	manager = panMan;
-
-	setOrientation(HORIZONTAL);
+	setLayout(new FlowLayout());
 
 	editButton = new EditButton();
 	debugButton = new DebugButton();
@@ -46,10 +40,6 @@ public class NavBar extends JToolBar {
 
 	setFloatable(false);
 	setRollover(true);
-    }
-
-    public EditButton getEditButton() {
-	return editButton;
     }
 
     private class EditButton extends JButton {
@@ -184,20 +174,5 @@ public class NavBar extends JToolBar {
 		}
 	    });
 	}
-    }
-
-    public static void main(String[] args) throws ClassNotFoundException,
-	    InstantiationException, IllegalAccessException,
-	    UnsupportedLookAndFeelException {
-	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	JFrame testFrame = new JFrame("TESTING");
-	testFrame.setVisible(true);
-	testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	JPanel pane = new JPanel();
-	testFrame.add(pane);
-	pane.setLayout(new FlowLayout());
-	pane.add(new NavBar(null));
-	pane.add(new EditorToolbar());
-	testFrame.pack();
     }
 }
