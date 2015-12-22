@@ -1,5 +1,5 @@
 import compiler.Compiler;
-import message.DocumentInsertMessage;
+import message.document.DocumentInsertMessage;
 import struct.Document;
 
 import java.io.IOException;

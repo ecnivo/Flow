@@ -1,59 +1,37 @@
 package message;
 
-import network.MalformedParcelableException;
-import network.Parcelable;
-
-import java.nio.ByteBuffer;
+import java.io.Serializable;
+import java.util.HashMap;
 
 /**
- * Represents a message (packet) between the remote client/server
- * <p>
- * Created by Netdex on 12/18/2015.
+ * Represents a message with an unlimited amount of properties
+ *
+ * Created by Netdex on 12/22/2015.
  */
-public abstract class Message implements Parcelable {
+public class Message implements Serializable {
 
-    private static final int MAGIC_SIGNATURE = 0xDEADBEEF;
+    private HashMap<String, Object> stringObjectHashMap;
 
-    private MessageType type;
-
-    public Message(MessageType type) {
-        this.type = type;
-    }
-
-    public byte[] serialize() {
-        ByteBuffer buffer = ByteBuffer.allocate(5);
-        buffer.putInt(MAGIC_SIGNATURE);
-        buffer.put((byte) type.ordinal());
-        return buffer.array();
-    }
-
-    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        int magic = buffer.getInt();
-        if (magic != MAGIC_SIGNATURE)
-            throw new MalformedParcelableException("Message signature does not match!");
-
-        byte ord = buffer.get();
-        this.type = MessageType.values()[ord];
-
-        byte[] remaining = new byte[buffer.limit() - buffer.position()];
-        buffer.get(remaining);
-        return remaining;
+    public Message(){
+        this.stringObjectHashMap = new HashMap<>();
     }
 
     /**
-     * Gets the general type of this message
-     *
-     * @return the general type of this message
+     * Adds a property to this message
+     * @param key The key to retrieve the property with
+     * @param o The value of the property, must be serializable!
      */
-    public MessageType getMessageType() {
-        return type;
+    public void put(String key, Serializable o){
+        stringObjectHashMap.put(key, o);
     }
 
     /**
-     * Types of messages
+     * Retrieves a property from this message
+     * @param key The key of the message
+     * @param type The class type of the message, for example String.class
+     * @return The value of the property of type 'type'
      */
-    public static enum MessageType {
-        DOCUMENT_MESSAGE;
+    public Object get(String key, Class<?> type){
+        return type.cast(stringObjectHashMap.get(key));
     }
 }

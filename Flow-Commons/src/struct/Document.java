@@ -1,19 +1,17 @@
 package struct;
 
-import message.DocumentDeleteMessage;
-import message.DocumentInsertMessage;
-import message.DocumentMessage;
-import network.MalformedParcelableException;
-import network.Parcelable;
+import message.document.DocumentDeleteMessage;
+import message.document.DocumentInsertMessage;
+import message.document.DocumentMessage;
 
-import java.nio.ByteBuffer;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Represents a editable text document
  * Created by Netdex on 12/18/2015.
  */
-public class Document implements Parcelable {
+public class Document implements Serializable {
 
     private String id;
     private ArrayList<String> lines;
@@ -129,60 +127,5 @@ public class Document implements Parcelable {
         }
     }
 
-    @Override
-    public byte[] serialize() {
-        byte[] idBuffer = id.getBytes();
-        byte[][] lineBuffer = new byte[lines.size()][];
-        int size = idBuffer.length + 4 + 4;
-        for (int i = 0; i < lines.size(); i++) {
-            lineBuffer[i] = lines.get(i).getBytes();
-            size += lineBuffer[i].length + 4;
-        }
 
-        // Allocate a reasonably sized buffer
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-
-        // Add the size of the ID and the ID itself into the buffer
-        buffer.putInt(idBuffer.length);
-        buffer.put(idBuffer);
-
-        // Add the number of lines into the buffer
-        buffer.putInt(lines.size());
-
-        // Add the size of each line and the lines into the buffer
-        for (int i = 0; i < lineBuffer.length; i++) {
-            buffer.putInt(lineBuffer[i].length);
-            buffer.put(lineBuffer[i]);
-        }
-        return buffer.array();
-    }
-
-    @Override
-    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
-        try {
-            ByteBuffer buffer = ByteBuffer.wrap(data);
-
-            // Read in the ID
-            int idBufferSize = buffer.getInt();
-            byte[] idBuffer = new byte[idBufferSize];
-            buffer.get(idBuffer);
-            this.id = new String(idBuffer);
-
-            // Read in all the lines
-            int lineCount = buffer.getInt();
-            this.lines.clear();
-            for (int i = 0; i < lineCount; i++) {
-                int lineLength = buffer.getInt();
-                byte[] lineBuffer = new byte[lineLength];
-                buffer.get(lineBuffer);
-                this.lines.add(new String(lineBuffer));
-            }
-
-            byte[] remaining = new byte[buffer.remaining()];
-            buffer.get(remaining);
-            return remaining;
-        } catch (Exception e) {
-            throw new MalformedParcelableException();
-        }
-    }
 }
