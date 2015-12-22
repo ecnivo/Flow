@@ -1,8 +1,6 @@
-package message;
+package message.document;
 
-import network.MalformedParcelableException;
-
-import java.nio.ByteBuffer;
+import message.Message;
 
 /**
  * Represents a message which affects a remote document
@@ -16,24 +14,6 @@ public abstract class DocumentMessage extends Message {
     public DocumentMessage(DocumentMessageType type) {
         super(MessageType.DOCUMENT_MESSAGE);
         this.type = type;
-    }
-
-    public byte[] serialize() {
-        byte[] header = super.serialize();
-        ByteBuffer buffer = ByteBuffer.allocate(header.length + 1);
-        buffer.put(header);
-        buffer.put((byte) type.ordinal());
-        return buffer.array();
-    }
-
-    public byte[] deserialize(byte[] data) throws MalformedParcelableException {
-        data = super.deserialize(data);
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        this.type = DocumentMessageType.values()[buffer.get()];
-
-        byte[] remaining = new byte[buffer.remaining()];
-        buffer.get(remaining);
-        return remaining;
     }
 
     /**
