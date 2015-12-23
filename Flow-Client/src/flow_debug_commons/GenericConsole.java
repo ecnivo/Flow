@@ -14,6 +14,6 @@ public class GenericConsole extends JTextArea {
 	setForeground(Color.WHITE);
 	setFont(new Font("Consolas", Font.PLAIN, 12));
 	setEditable(false);
-	setMaximumSize(new Dimension(120, Integer.MAX_VALUE));
+	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
 }

@@ -3,7 +3,6 @@ package flow_debug_commons;
 import gui.FlowClient;
 import gui.PanelManager;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -19,9 +18,12 @@ import javax.swing.JToolBar;
 public class NavBar extends JToolBar {
 
     private PanelManager manager;
+
+    public static final byte EDIT = 71;
+    public final static byte DEBUG = -18;
+
     private EditButton editButton;
     private DebugButton debugButton;
-    private SettingsButton settingsButton;
 
     public NavBar(PanelManager panMan) {
 	manager = panMan;
@@ -29,10 +31,10 @@ public class NavBar extends JToolBar {
 
 	editButton = new EditButton();
 	debugButton = new DebugButton();
-	settingsButton = new SettingsButton();
+
 	add(editButton);
 	add(debugButton);
-	add(settingsButton);
+	add(new SettingsButton());
 	addSeparator();
 
 	add(new RunButton());
@@ -41,6 +43,17 @@ public class NavBar extends JToolBar {
 
 	setFloatable(false);
 	setRollover(true);
+    }
+
+    public void disableButton(byte button) {
+	switch (button) {
+	case EDIT:
+	    editButton.setEnabled(false);
+	    return;
+	case DEBUG:
+	    debugButton.setEnabled(false);
+	    return;
+	}
     }
 
     private class EditButton extends JButton {
@@ -62,9 +75,6 @@ public class NavBar extends JToolBar {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToEditor();
-		    EditButton.this.setEnabled(false);
-		    debugButton.setEnabled(true);
-		    settingsButton.setEnabled(true);
 		}
 	    });
 	}
@@ -89,9 +99,6 @@ public class NavBar extends JToolBar {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToDebug();
-		    DebugButton.this.setEnabled(false);
-		    editButton.setEnabled(true);
-		    settingsButton.setEnabled(true);
 		}
 	    });
 	}
@@ -117,9 +124,6 @@ public class NavBar extends JToolBar {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToSettings();
-		    editButton.setEnabled(true);
-		    debugButton.setEnabled(true);
-		    settingsButton.setEnabled(true);
 		}
 	    });
 	}

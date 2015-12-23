@@ -1,4 +1,6 @@
-package flow_debug_commons;
+package editing;
+
+import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -8,14 +10,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
+import flow_debug_commons.EditTabs;
+
 public class DocTree extends JTree {
 
     DocTreeModel model;
     JScrollPane scrollView;
-    EditArea editArea;
+    EditTabs editTabs;
 
-    public DocTree(EditArea editArea) {
-	this.editArea = editArea;
+    public DocTree(EditTabs editTabs) {
+	this.editTabs = editTabs;
+	setMinimumSize(new Dimension(100, 0));
+	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	scrollView = new JScrollPane(this);
 	model = new DocTreeModel();
 	setModel(model);
@@ -46,8 +52,8 @@ public class DocTree extends JTree {
 	}
 
     }
-    
-    public JScrollPane getScrollable(){
+
+    public JScrollPane getScrollable() {
 	return scrollView;
     }
 
