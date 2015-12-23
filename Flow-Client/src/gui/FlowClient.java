@@ -16,7 +16,7 @@ public class FlowClient extends JFrame {
     private PanelManager manager;
     public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
 	    .createEmptyBorder();
-    public static final int BUTTON_ICON_SIZE = 32;
+    public static final int BUTTON_ICON_SIZE = 24;
 
     public static void main(String[] args) throws ClassNotFoundException,
 	    InstantiationException, IllegalAccessException,
@@ -29,7 +29,7 @@ public class FlowClient extends JFrame {
 	// loads things
 	super("Flow");
 
-	// sets the icon in the task bark
+	// sets the icon in the task bar
 	try {
 	    this.setIconImage(ImageIO.read(new File("images/icon.png")));
 	} catch (IOException e) {
@@ -38,7 +38,7 @@ public class FlowClient extends JFrame {
 		    JOptionPane.ERROR_MESSAGE);
 	}
 
-	manager = new PanelManager();
+	manager = new PanelManager(this);
 	this.add(manager);
 
 	this.setResizable(true);

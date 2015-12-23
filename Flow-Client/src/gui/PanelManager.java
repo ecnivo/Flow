@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.CardLayout;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import login.CreateAccountPane;
@@ -9,7 +10,6 @@ import login.LoginPane;
 import settings.SettingsPane;
 import debug.DebugPane;
 import editing.EditPane;
-import flow_debug_commons.NavBar;
 
 public class PanelManager extends JPanel {
     private EditPane editPane;
@@ -18,8 +18,9 @@ public class PanelManager extends JPanel {
     private DebugPane debugPane;
     private CreateAccountPane createAccountPane;
     private CardLayout layout;
+    private JFrame frame;
 
-    public PanelManager() {
+    public PanelManager(JFrame frame) {
 	layout = new CardLayout();
 	this.setLayout(layout);
 
@@ -29,12 +30,10 @@ public class PanelManager extends JPanel {
 	createAccountPane = new CreateAccountPane(this);
 	add(createAccountPane, "createPane");
 
-	NavBar navBar = new NavBar(this);
-
-	editPane = new EditPane(navBar);
+	editPane = new EditPane(this);
 	add(editPane, "editPane");
 
-	debugPane = new DebugPane(editPane, navBar);
+	debugPane = new DebugPane(this);
 	add(debugPane, "debugPane");
 
 	settingsPane = new SettingsPane(this);
@@ -75,7 +74,11 @@ public class PanelManager extends JPanel {
 	return loginPane;
     }
 
-    public JPanel getEditPane() {
+    public EditPane getEditPane() {
 	return editPane;
+    }
+
+    public void setTitleBarName(String newName) {
+	frame.setTitle(newName);
     }
 }
