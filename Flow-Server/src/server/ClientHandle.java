@@ -1,35 +1,50 @@
 package server;
 
-import java.io.BufferedReader;
+import message.Message;
+import network.PackageSocket;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.Socket;
+import java.util.UUID;
 
 public class ClientHandle implements Runnable {
 
-	private Socket socket;
+    private Socket socket;
+    private PackageSocket psocket;
 
-	private BufferedReader in;
-	private PrintStream out;
+    private UUID uuid;
 
-	private User user;
+    public ClientHandle(Socket socket) throws IOException {
+        this.socket = socket;
+        this.psocket = new PackageSocket(socket);
+    }
 
-	public ClientHandle(Socket socket) throws IOException {
-		this.socket = socket;
-
-		this.in = new BufferedReader(
-				new InputStreamReader(socket.getInputStream()));
-		this.out = new PrintStream(socket.getOutputStream());
-	}
-
-	@Override
-	public void run() {
-
-		while (socket.isConnected()) {
-
-		}
-
-	}
-
+    @Override
+    public void run() {
+        try {
+            while (socket.isConnected()) {
+                final Message message = psocket.receivePackage(Message.class);
+                String type = message.get("type", String.class);
+                switch (type) {
+                    case "auth":
+                        String user = message.get("username", String.class);
+                        String pass = message.get("password", String.class);
+                        boolean authenticated = true; // call bimde's authentication code somewhere
+                        Message authStatusMessage = new Message();
+                        authStatusMessage.put("type", "auth");
+                        if (authenticated) {
+                            this.uuid = UUID.randomUUID();
+                            authStatusMessage.put("status", "OK");
+                            authStatusMessage.put("session_id", uuid);
+                        } else {
+                            authStatusMessage.put("status", "INVALID");
+                        }
+                        psocket.sendPackage(authStatusMessage);
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

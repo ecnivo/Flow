@@ -28,15 +28,15 @@ public class Message implements Serializable {
 
     /**
      * Retrieves a property from this message
-     *
-     * @param key  The key of the message
+     * @param key The key of the message
      * @param type The class type of the message, for example String.class
+     * @param <T> The type of the value of the message
      * @return The value of the property of type 'type'
      */
-    public Object get(String key, Class<?> type) {
+    public <T> T get(String key, Class<T> type) {
         try {
             return type.cast(stringObjectHashMap.get(key));
-        } catch (Exception e) {
+        } catch (ClassCastException e) {
             return null;
         }
     }

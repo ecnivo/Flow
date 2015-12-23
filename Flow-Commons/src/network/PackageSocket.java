@@ -27,6 +27,7 @@ public class PackageSocket {
 
     /**
      * Sends a serializable over the network
+     *
      * @param serializable The serializable to send
      * @throws IOException When something nasty happens
      */
@@ -38,13 +39,15 @@ public class PackageSocket {
     }
 
     /**
-     * Receives a serializable from the network
-     * @return The serializable as an object
+     * Receives a serializable over the network
+     * @param clazz The class of the serializable
+     * @param <T> The type of the class of the serializable
+     * @return The serializable from the network
      * @throws IOException When something nasty happens
-     * @throws ClassNotFoundException When the serialized object does not exist client side
+     * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
-    public Object receivePackage() throws IOException, ClassNotFoundException {
-        return ois.readObject();
+    public <T extends Serializable> T receivePackage(Class<T> clazz) throws IOException, ClassNotFoundException {
+        return clazz.cast(ois.readObject());
     }
 
 }

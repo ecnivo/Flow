@@ -34,7 +34,7 @@ packageSocket.sendPackage(message);
 And the client is now done. From the server, receive the message as follows:
 
 ```java
-Message message = (Message) packageSocket.receivePackage();
+Message message = packageSocket.receivePackage(Message.class);
 ```
 
 To retrieve the properties on the server side, do the following:
