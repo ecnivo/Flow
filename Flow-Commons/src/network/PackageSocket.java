@@ -40,10 +40,11 @@ public class PackageSocket {
 
     /**
      * Receives a serializable over the network
+     *
      * @param clazz The class of the serializable
-     * @param <T> The type of the class of the serializable
+     * @param <T>   The type of the class of the serializable
      * @return The serializable from the network
-     * @throws IOException When something nasty happens
+     * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
     public <T extends Serializable> T receivePackage(Class<T> clazz) throws IOException, ClassNotFoundException {

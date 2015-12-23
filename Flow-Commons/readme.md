@@ -12,7 +12,7 @@ Suppose the client wants to tell the server that it is logging in. To do so, we 
 required.
 
 ```java
-Message message = new Message();
+Message message = new Message("auth"); // 'auth' is the type of message
 message.put("username", "netdex");
 message.put("password", "a8fi3kr"); // not my actual password
 ```

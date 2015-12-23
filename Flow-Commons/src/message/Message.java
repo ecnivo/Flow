@@ -15,6 +15,18 @@ public class Message implements Serializable {
     public Message() {
         this.stringObjectHashMap = new HashMap<>();
     }
+    public Message(String type){
+        this();
+        stringObjectHashMap.put("type", type);
+    }
+
+    /**
+     * Gets the type of this message
+     * @return The type of this message
+     */
+    public String getType(){
+        return (String) stringObjectHashMap.get("type");
+    }
 
     /**
      * Adds a property to this message
