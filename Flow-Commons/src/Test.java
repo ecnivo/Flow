@@ -1,8 +1,7 @@
 import compiler.Compiler;
-import struct.Document;
+import struct.TextDocument;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by Netdex on 12/18/2015.
@@ -13,7 +12,7 @@ public class Test {
     }
 
     public static void compilerTest() throws IOException {
-        Document d = new Document("Test.java");
+        TextDocument d = new TextDocument("Test.java");
         d.setDocumentText(
                 "public class Test {\n" +
                         "   public static void main(String[] args){\n" +

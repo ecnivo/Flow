@@ -1,6 +1,6 @@
 package server;
 
-import message.Message;
+import message.Data;
 import network.PackageSocket;
 
 import java.io.IOException;
@@ -26,26 +26,26 @@ public class ClientHandle implements Runnable {
             boolean authenticated = false;
             while(!authenticated && socket.isConnected())
             {
-                final Message authRequest = psocket.receivePackage(Message.class);
+                final Data authRequest = psocket.receivePackage(Data.class);
                 if (!authRequest.getType().equals("auth"))
                     return;
                 String user = authRequest.get("username", String.class);
                 String pass = authRequest.get("password", String.class);
 
                 authenticated = true; // call bimde's authentication code somewhere
-                Message authStatusMessage = new Message("auth");
+                Data authStatusData = new Data("auth");
                 if (authenticated) {
                     this.uuid = UUID.randomUUID();
-                    authStatusMessage.put("status", "OK");
-                    authStatusMessage.put("session_id", uuid);
+                    authStatusData.put("status", "OK");
+                    authStatusData.put("session_id", uuid);
                 } else {
-                    authStatusMessage.put("status", "INVALID");
+                    authStatusData.put("status", "INVALID");
                 }
-                psocket.sendPackage(authStatusMessage);
+                psocket.sendPackage(authStatusData);
             }
             while (socket.isConnected()) {
-                Message message = psocket.receivePackage(Message.class);
-                String type = message.get("type", String.class);
+                Data data = psocket.receivePackage(Data.class);
+                String type = data.get("type", String.class);
                 switch (type) {
 
                 }

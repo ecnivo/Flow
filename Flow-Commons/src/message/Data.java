@@ -8,14 +8,14 @@ import java.util.HashMap;
  * <p>
  * Created by Netdex on 12/22/2015.
  */
-public class Message implements Serializable {
+public class Data implements Serializable {
 
     private HashMap<String, Object> stringObjectHashMap;
 
-    public Message() {
+    public Data() {
         this.stringObjectHashMap = new HashMap<>();
     }
-    public Message(String type){
+    public Data(String type){
         this();
         stringObjectHashMap.put("type", type);
     }

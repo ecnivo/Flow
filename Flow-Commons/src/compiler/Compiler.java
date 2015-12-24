@@ -1,6 +1,6 @@
 package compiler;
 
-import struct.Document;
+import struct.TextDocument;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.tools.*;
@@ -20,20 +20,20 @@ import java.util.logging.Logger;
  */
 public class Compiler {
 
-    private Document[] documents;
+    private TextDocument[] textDocuments;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
     /**
-     * Instantiates a compiler from the given documents
+     * Instantiates a compiler from the given textDocuments
      *
-     * @param doc The documents to compile
+     * @param doc The textDocuments to compile
      */
-    public Compiler(Document... doc) {
-        this.documents = doc;
+    public Compiler(TextDocument... doc) {
+        this.textDocuments = doc;
     }
 
     /**
-     * Attempts to build a set of documents into classes
+     * Attempts to build a set of textDocuments into classes
      *
      * @return The diagnostics containing compilation errors and warnings
      * @throws IOException when files cannot be written
@@ -46,8 +46,8 @@ public class Compiler {
             workingDirectory.mkdir();
             L.info("Working directory did not exist, created it");
         }
-        L.info(documents.length + " documents queued for compilation");
-        for (Document doc : documents) {
+        L.info(textDocuments.length + " textDocuments queued for compilation");
+        for (TextDocument doc : textDocuments) {
             String body = doc.getDocumentText();
             File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getID());
             paths.add(tempPath);
