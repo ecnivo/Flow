@@ -11,18 +11,6 @@ public class Test {
 
     }
 
-    public static void compilerTest() throws IOException {
-        TextDocument d = new TextDocument("Test.java");
-        d.setDocumentText(
-                "public class Test {\n" +
-                        "   public static void main(String[] args){\n" +
-                        "System.out.println(\"Hello world!\")\n" +
-                        "   }\n" +
-                        "}\n");
-        Compiler c = new Compiler(d);
-        c.build();
-    }
-
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     public static String bytesToHex(byte[] bytes) {
