@@ -22,9 +22,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 /**
@@ -33,11 +31,13 @@ import javax.swing.plaf.basic.BasicButtonUI;
 public class EditTabs extends JTabbedPane {
 
     public static final int TAB_ICON_SIZE = 16;
+    private boolean editable;
 
-    public EditTabs() {
+    public EditTabs(boolean editable) {
 	setMinimumSize(new Dimension(50, 0));
 	setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
+	this.editable = editable;
     }
 
     public void openTab(File file) {

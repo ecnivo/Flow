@@ -1,8 +1,6 @@
-package edit_debug_commons;
+package gui;
 
-import gui.FlowClient;
-import gui.PanelManager;
-
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -21,9 +19,11 @@ public class NavBar extends JToolBar {
 
     public static final byte EDIT = 71;
     public final static byte DEBUG = -18;
+    public static final byte HISTORY = 0;
 
     private EditButton editButton;
     private DebugButton debugButton;
+    private HistoryButton historyButton;
 
     public NavBar(PanelManager panMan) {
 	manager = panMan;
@@ -31,9 +31,11 @@ public class NavBar extends JToolBar {
 
 	editButton = new EditButton();
 	debugButton = new DebugButton();
+	historyButton = new HistoryButton();
 
 	add(editButton);
 	add(debugButton);
+	add(historyButton);
 	add(new SettingsButton());
 	addSeparator();
 
@@ -53,6 +55,8 @@ public class NavBar extends JToolBar {
 	case DEBUG:
 	    debugButton.setEnabled(false);
 	    return;
+	case HISTORY:
+	    historyButton.setEnabled(false);
 	}
     }
 
@@ -99,6 +103,36 @@ public class NavBar extends JToolBar {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    manager.switchToDebug();
+		    // TODO if the last open window is the editor, then get the
+		    // currently open file in the editor and open it in the
+		    // debug's tab view, and switch to that tab.
+		}
+	    });
+	}
+    } 
+    
+    private class HistoryButton extends JButton {
+
+	private HistoryButton() {
+	    setToolTipText("Switch to the version history view");
+	    try {
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/historyWindow.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+	    } catch (IOException e1) {
+		e1.printStackTrace();
+	    }
+	    setFocusable(false);
+	    setBorder(FlowClient.EMPTY_BORDER);
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    manager.switchToHistory();
+		    // TODO if the last open window is the editor, then get the
+		    // currently open file in the editor and open it in the
+		    // debug's tab view, and switch to that tab.
 		}
 	    });
 	}

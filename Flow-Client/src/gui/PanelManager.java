@@ -1,5 +1,7 @@
 package gui;
 
+import history.HistoryPane;
+
 import java.awt.CardLayout;
 
 import javax.swing.JFrame;
@@ -19,6 +21,7 @@ public class PanelManager extends JPanel {
     private CreateAccountPane createAccountPane;
     private CardLayout layout;
     private JFrame frame;
+    private HistoryPane historyPane;
 
     public PanelManager(JFrame frame) {
 	layout = new CardLayout();
@@ -38,6 +41,9 @@ public class PanelManager extends JPanel {
 
 	settingsPane = new SettingsPane(this);
 	add(settingsPane, "settingsPane");
+
+	historyPane = new HistoryPane(this);
+	add(historyPane, "historyPane");
     }
 
     public void switchToEditor() {
@@ -66,6 +72,12 @@ public class PanelManager extends JPanel {
 
     public void switchToSettings() {
 	layout.show(this, "settingsPane");
+	revalidate();
+	repaint();
+    }
+
+    public void switchToHistory() {
+	layout.show(this, "historyPane");
 	revalidate();
 	repaint();
     }

@@ -29,6 +29,7 @@ public class DebugToolbar extends JToolBar {
 
     private class StartDebuggingButton extends JButton {
 	private StartDebuggingButton() {
+	    setToolTipText("Start debugging the currently open tab");
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/debug.png"))
@@ -52,6 +53,7 @@ public class DebugToolbar extends JToolBar {
 
     private class StepInButton extends JButton {
 	private StepInButton() {
+	    setToolTipText("Step into the current ");
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/stepIn.png")).getScaledInstance(

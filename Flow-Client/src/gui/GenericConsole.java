@@ -1,10 +1,13 @@
-package edit_debug_commons;
+package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -13,29 +16,38 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultEditorKit;
 
 public class GenericConsole extends JTextArea {
 
-    String userInput;
-    String history = "FLOW - CONSOLE\n";
-    JPopupMenu popUp;
+    private String userInput;
+    private String history = "FLOW - CONSOLE\n";
+    private JPopupMenu popUp;
+    private JScrollPane scrolling;
 
     public GenericConsole() {
-	super(50, 20);
+	super();
 	setWrapStyleWord(true);
 	setBackground(Color.BLACK);
 	setForeground(Color.WHITE);
 	setFont(new Font("Consolas", Font.PLAIN, 12));
 	setHighlighter(null);
+	// TODO implement selecting (and delete/backspace key while selecting,
+	// and typing... later.)
 	setEditable(false);
 	getCaret().setVisible(true);
 	setCaretColor(Color.WHITE);
+	scrolling = new JScrollPane(this);
+	scrolling
+		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	// scrolling.setAutoscrolls(true);
 	popUp = new JPopupMenu();
 	JMenuItem copyButton = new JMenuItem(new Action() {
 
@@ -94,8 +106,18 @@ public class GenericConsole extends JTextArea {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		try {
-		    userInput += Toolkit.getDefaultToolkit()
-			    .getSystemClipboard().getContents(null);
+		    String clip = "";
+		    try {
+			clip = Toolkit.getDefaultToolkit().getSystemClipboard()
+				.getData(DataFlavor.stringFlavor).toString();
+		    } catch (HeadlessException e) {
+			e.printStackTrace();
+		    } catch (UnsupportedFlavorException e) {
+			e.printStackTrace();
+		    } catch (IOException e) {
+			e.printStackTrace();
+		    }
+		    userInput += clip;
 		    update();
 		} catch (IllegalStateException e) {
 		    e.printStackTrace();
@@ -145,10 +167,13 @@ public class GenericConsole extends JTextArea {
 	popUp.add(pasteButton);
 	getCaret().setSelectionVisible(true);
 	setLineWrap(true);
-	getActionMap().get(DefaultEditorKit.deletePrevCharAction).setEnabled(
-		false);
-	getActionMap().get(DefaultEditorKit.deleteNextCharAction).setEnabled(
-		false);
+	String[] disableTargets = { DefaultEditorKit.deletePrevCharAction,
+		DefaultEditorKit.deletePrevWordAction,
+		DefaultEditorKit.deleteNextWordAction,
+		DefaultEditorKit.deleteNextCharAction };
+	for (String target : disableTargets) {
+	    getActionMap().get(target).setEnabled(false);
+	}
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setMinimumSize(new Dimension(5, 25));
 	userInput = "";
@@ -219,8 +244,6 @@ public class GenericConsole extends JTextArea {
 		if (setNewCaretPos)
 		    getCaret().setDot(pos + history.length());
 	    }
-	    // TODO add right click menu: copy, paste, export current console
-	    // text
 	});
 	addFocusListener(new FocusListener() {
 
@@ -278,5 +301,9 @@ public class GenericConsole extends JTextArea {
     public void addOutput(String output) {
 	history += output;
 	update();
+    }
+
+    public JScrollPane getScroll() {
+	return scrolling;
     }
 }

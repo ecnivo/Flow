@@ -4,13 +4,20 @@ import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 
 import editing.CollabsList.CollabButton;
 
 public class CollabsList extends JList<CollabButton> {
+
+    private JScrollPane scrolling;
+
     public CollabsList() {
 	setMinimumSize(new Dimension(5, 1));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+	scrolling = new JScrollPane(this);
+	scrolling
+		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     }
 
     public void addCollab() {
@@ -20,6 +27,10 @@ public class CollabsList extends JList<CollabButton> {
 
     public void removeCollab() {
 	// TODO should accept a collab's object, removes it, shows notif
+    }
+
+    public JScrollPane getScroll() {
+	return scrolling;
     }
 
     class CollabButton extends JButton {

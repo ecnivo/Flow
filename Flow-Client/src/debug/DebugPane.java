@@ -1,8 +1,8 @@
 package debug;
 
-import edit_debug_commons.GenericConsole;
-import edit_debug_commons.NavBar;
 import editing.EditTabs;
+import gui.GenericConsole;
+import gui.NavBar;
 import gui.PanelManager;
 
 import java.awt.BorderLayout;
@@ -17,20 +17,21 @@ public class DebugPane extends JPanel {
     public DebugPane(PanelManager manager) {
 	setLayout(new BorderLayout());
 
-	JSplitPane middleSplit = new JSplitPane();
-	add(middleSplit, BorderLayout.CENTER);
+	JSplitPane mainSplit = new JSplitPane();
+	add(mainSplit, BorderLayout.CENTER);
+	mainSplit.setResizeWeight(1);
 
-	middleSplit.setLeftComponent(new EditTabs());
+	mainSplit.setLeftComponent(new EditTabs(true));
 
 	JSplitPane rightHalf = new JSplitPane();
 	rightHalf.setPreferredSize(new Dimension(420, 574));
 	rightHalf.setMinimumSize(new Dimension(420, 0));
 	rightHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
-	middleSplit.setRightComponent(rightHalf);
+	mainSplit.setRightComponent(rightHalf);
 
 	GenericConsole debugConsole = new GenericConsole();
-	debugConsole.setPreferredSize(new Dimension(400, 255));
-	rightHalf.setRightComponent(debugConsole);
+	debugConsole.getScroll().setPreferredSize(new Dimension(400, 255));
+	rightHalf.setRightComponent(debugConsole.getScroll());
 
 	JPanel rightTop = new JPanel(new BorderLayout());
 	rightHalf.setLeftComponent(rightTop);

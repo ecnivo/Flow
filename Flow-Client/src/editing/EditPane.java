@@ -1,15 +1,15 @@
 package editing;
 
+import gui.GenericConsole;
+import gui.NavBar;
+import gui.PanelManager;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-
-import edit_debug_commons.GenericConsole;
-import edit_debug_commons.NavBar;
-import gui.PanelManager;
 
 public class EditPane extends JPanel {
 
@@ -26,6 +26,7 @@ public class EditPane extends JPanel {
 	mainSplit.setMinimumSize(new Dimension(0, 0));
 	mainSplit.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
+	mainSplit.setResizeWeight(0.9);
 	JSplitPane rightSide = new JSplitPane();
 	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	rightSide.setMinimumSize(new Dimension(5, 0));
@@ -36,11 +37,13 @@ public class EditPane extends JPanel {
 	mainSplit.setRightComponent(rightSide);
 
 	GenericConsole genericConsole = new GenericConsole();
-	genericConsole.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
-	rightSide.setLeftComponent(genericConsole);
+	genericConsole.getScroll().setPreferredSize(
+		new Dimension(RIGHT_SIDE_WIDTH, 500));
+	rightSide.setLeftComponent(genericConsole.getScroll());
 	CollabsList collabsList = new CollabsList();
-	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
-	rightSide.setRightComponent(collabsList);
+	collabsList.getScroll().setPreferredSize(
+		new Dimension(RIGHT_SIDE_WIDTH, 225));
+	rightSide.setRightComponent(collabsList.getScroll());
 
 	JSplitPane leftSide = new JSplitPane();
 	leftSide.setMinimumSize(new Dimension(390, 0));
@@ -48,7 +51,7 @@ public class EditPane extends JPanel {
 		Integer.MAX_VALUE));
 	mainSplit.setLeftComponent(leftSide);
 
-	editTabs = new EditTabs();
+	editTabs = new EditTabs(true);
 	leftSide.setRightComponent(editTabs);
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
