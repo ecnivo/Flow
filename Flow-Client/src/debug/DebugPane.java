@@ -1,8 +1,8 @@
 package debug;
 
-import flow_debug_commons.EditTabs;
-import flow_debug_commons.GenericConsole;
-import flow_debug_commons.NavBar;
+import edit_debug_commons.GenericConsole;
+import edit_debug_commons.NavBar;
+import editing.EditTabs;
 import gui.PanelManager;
 
 import java.awt.BorderLayout;
@@ -29,20 +29,22 @@ public class DebugPane extends JPanel {
 	middleSplit.setRightComponent(rightHalf);
 
 	GenericConsole debugConsole = new GenericConsole();
+	debugConsole.setPreferredSize(new Dimension(400, 255));
 	rightHalf.setRightComponent(debugConsole);
 
 	JPanel rightTop = new JPanel(new BorderLayout());
 	rightHalf.setLeftComponent(rightTop);
 
 	JPanel buttonPanel = new JPanel(new FlowLayout());
+	buttonPanel.setMinimumSize(new Dimension(200, 0));
+	buttonPanel.setPreferredSize(new Dimension(200, 60));
 	rightTop.add(buttonPanel, BorderLayout.NORTH);
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.DEBUG);
 	buttonPanel.add(navBar);
 	DebugToolbar debugBar = new DebugToolbar();
 	buttonPanel.add(debugBar);
-	VariablesList variablesList = new VariablesList();
-	rightTop.add(variablesList, BorderLayout.CENTER);
+	rightTop.add(new VariablesList(), BorderLayout.CENTER);
 
     }
 }

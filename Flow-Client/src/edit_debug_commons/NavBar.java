@@ -1,4 +1,4 @@
-package flow_debug_commons;
+package edit_debug_commons;
 
 import gui.FlowClient;
 import gui.PanelManager;

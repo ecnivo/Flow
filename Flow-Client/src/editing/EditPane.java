@@ -7,15 +7,16 @@ import java.awt.FlowLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import flow_debug_commons.EditTabs;
-import flow_debug_commons.GenericConsole;
-import flow_debug_commons.NavBar;
+import edit_debug_commons.GenericConsole;
+import edit_debug_commons.NavBar;
 import gui.PanelManager;
 
 public class EditPane extends JPanel {
 
     private EditTabs editTabs;
     private DocTree tree;
+
+    private static final int RIGHT_SIDE_WIDTH = 300;
 
     public EditPane(PanelManager manager) {
 	this.setLayout(new BorderLayout());
@@ -31,14 +32,15 @@ public class EditPane extends JPanel {
 	rightSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
 	rightSide.setResizeWeight(0.5);
-	rightSide.setPreferredSize(new Dimension(250, 500));
+	rightSide.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
 	mainSplit.setRightComponent(rightSide);
 
 	GenericConsole genericConsole = new GenericConsole();
-	genericConsole.setPreferredSize(new Dimension(120, 120));
-	genericConsole.setMinimumSize(new Dimension(1, 0));
+	genericConsole.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
 	rightSide.setLeftComponent(genericConsole);
-	rightSide.setRightComponent(new CollabsList());
+	CollabsList collabsList = new CollabsList();
+	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
+	rightSide.setRightComponent(collabsList);
 
 	JSplitPane leftSide = new JSplitPane();
 	leftSide.setMinimumSize(new Dimension(390, 0));

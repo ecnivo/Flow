@@ -9,9 +9,8 @@ import editing.CollabsList.CollabButton;
 
 public class CollabsList extends JList<CollabButton> {
     public CollabsList() {
-	setMinimumSize(new Dimension(1, 1));
+	setMinimumSize(new Dimension(5, 1));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-	setPreferredSize(new Dimension(120,120));
     }
 
     public void addCollab() {

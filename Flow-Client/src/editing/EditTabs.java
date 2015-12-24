@@ -1,4 +1,4 @@
-package flow_debug_commons;
+package editing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -174,16 +174,5 @@ public class EditTabs extends JTabbedPane {
 	}
     }
 
-    private class EditArea extends Component {
-	private JScrollPane scrolling;
-
-	private EditArea(File file) {
-	    scrolling = new JScrollPane(EditArea.this);
-	    // TODO make things work
-	}
-
-	public JScrollPane getScrollPane() {
-	    return scrolling;
-	}
-    }
+    
 }

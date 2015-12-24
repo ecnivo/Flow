@@ -10,8 +10,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import flow_debug_commons.EditTabs;
-
 public class DocTree extends JTree {
 
     DocTreeModel model;

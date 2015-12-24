@@ -1,7 +1,9 @@
 package settings;
 
+import gui.BackButton;
 import gui.CustomScrollPane;
 import gui.FlowClient;
+import gui.PanelManager;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -20,12 +22,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import gui.BackButton;
-import gui.PanelManager;
 
 public class SettingsPane extends JPanel {
     private JPasswordField passwordField;
@@ -47,11 +48,11 @@ public class SettingsPane extends JPanel {
 
 	CustomScrollPane scrolling = new CustomScrollPane(panel);
 	scrolling.setBorder(FlowClient.EMPTY_BORDER);
-	
+
 	JPanel titlePanel = new JPanel();
 	titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 	panel.add(titlePanel);
-	
+
 	BackButton backButton = new BackButton(panMan.getEditPane(), panMan);
 	titlePanel.add(backButton);
 
@@ -173,7 +174,15 @@ public class SettingsPane extends JPanel {
 		if (closeAccountConfirm.getText().equals("close my account"))
 		    // TODO send message to server, close account, show
 		    // joptionpane go to login screen
-		    System.out.println("Temp message to avoid error");
+		    System.out.println("Account closed button pressed");
+		else
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "You did not type the confirmation message correctly\nIf you would like to close your account, type \"close my account\" without the quotation marks into the text box.",
+				    "Incorrect Confirmation Text",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.WARNING_MESSAGE);
 	    }
 	});
 	panel.add(btnConfirm);

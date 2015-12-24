@@ -9,8 +9,8 @@ import debug.VariablesList.VariablePanel;
 
 public class VariablesList extends JList<VariablePanel> {
     public VariablesList() {
-	setPreferredSize(new Dimension(425,225));
-	setMinimumSize(new Dimension(0,50));;
+	setPreferredSize(new Dimension(400, 275));
+	setMinimumSize(new Dimension(0, 50));
 	// TODO Auto-generated constructor stub
     }
 
