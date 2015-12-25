@@ -2,6 +2,7 @@ package struct;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -11,36 +12,29 @@ import java.util.UUID;
  */
 public abstract class Document implements Serializable {
 
+    private FlowFile parentFile;
     private UUID uuid;
-    private String remotePath;
-    private String remoteName;
 
-    private ArrayList<Document> versions;
-
-    protected Document(String remotePath, String remoteName, UUID uuid){
-        this.remotePath = remotePath;
-        this.remoteName = remoteName;
+    protected Document(FlowFile flowFile, UUID uuid){
+        this.parentFile = flowFile;
         this.uuid = uuid;
-        this.versions = new ArrayList<>();
     }
 
-    protected Document(String remotePath, String remoteName){
-        this(remotePath, remoteName, UUID.randomUUID());
+    public Document(){
+        this(null, UUID.randomUUID());
     }
 
-    public ArrayList<Document> getVersions(){
-        return versions;
+    public void setParentFile(FlowFile file){
+        this.parentFile = file;
+    }
+
+    public FlowFile getParentFile(){
+        return parentFile;
     }
 
     public UUID getUUID(){
         return uuid;
     }
 
-    public String getRemotePath(){
-        return remotePath;
-    }
 
-    public String getRemoteName(){
-        return remoteName;
-    }
 }

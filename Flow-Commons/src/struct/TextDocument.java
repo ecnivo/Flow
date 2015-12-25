@@ -13,13 +13,10 @@ public class TextDocument extends Document {
 
     private ArrayList<String> lines;
 
-    public TextDocument(String path, String name, UUID id) {
-        super(path, name, id);
+    public TextDocument() {
+        super();
         this.lines = new ArrayList<>();
         lines.add("");
-    }
-    public TextDocument(String path, String name){
-        this(path, name, UUID.randomUUID());
     }
 
 
