@@ -3,6 +3,7 @@
 	<name>Flow-Client</name>
 	<comment></comment>
 	<projects>
+		<project>Flow-Commons</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

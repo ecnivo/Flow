@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JSpinner;
 
 public class LoginPane extends JPanel {
     private PanelManager panMan;
