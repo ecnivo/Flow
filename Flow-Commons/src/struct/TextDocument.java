@@ -10,10 +10,13 @@ public class TextDocument extends FlowDocument {
 
     private ArrayList<String> lines;
 
-    public TextDocument() {
-        super();
+    public TextDocument(FlowFile parent) {
+        super(parent);
         this.lines = new ArrayList<>();
         lines.add("");
+    }
+    public TextDocument(){
+        this(null);
     }
 
 

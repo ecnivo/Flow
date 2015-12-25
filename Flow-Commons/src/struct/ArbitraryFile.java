@@ -12,16 +12,10 @@ import java.nio.file.Files;
 public class ArbitraryFile extends FlowDocument {
 
     private File localFile;
-    private transient byte[] fileBytes;
 
     protected ArbitraryFile(File localFile) throws IOException {
         super();
         this.localFile = localFile;
-        this.fileBytes = Files.readAllBytes(localFile.toPath());
-    }
-
-    public byte[] getFileBytes() {
-        return fileBytes;
     }
 
     public File getLocalFile() {
