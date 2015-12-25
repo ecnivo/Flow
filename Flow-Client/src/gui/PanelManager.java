@@ -26,6 +26,7 @@ public class PanelManager extends JPanel {
     public PanelManager(JFrame frame) {
 	layout = new CardLayout();
 	this.setLayout(layout);
+	setBorder(FlowClient.EMPTY_BORDER);
 
 	loginPane = new LoginPane(this);
 	add(loginPane, "loginPane");

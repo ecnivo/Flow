@@ -1,5 +1,7 @@
 package editing;
 
+import gui.FlowClient;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,6 +39,7 @@ public class EditTabs extends JTabbedPane {
 	setMinimumSize(new Dimension(50, 0));
 	setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
+	setBorder(FlowClient.EMPTY_BORDER);
 	this.editable = editable;
     }
 
@@ -174,5 +177,4 @@ public class EditTabs extends JTabbedPane {
 	}
     }
 
-    
 }

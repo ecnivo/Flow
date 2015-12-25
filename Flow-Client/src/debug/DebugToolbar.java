@@ -17,6 +17,7 @@ import javax.swing.JToolBar;
 public class DebugToolbar extends JToolBar {
     public DebugToolbar() {
 	this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	setBorder(FlowClient.EMPTY_BORDER);
 
 	addSeparator();
 	add(new StartDebuggingButton());
@@ -31,6 +32,7 @@ public class DebugToolbar extends JToolBar {
     private class StartDebuggingButton extends JButton {
 	private StartDebuggingButton() {
 	    setToolTipText("Start debugging the currently open tab");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/debug.png"))
@@ -54,7 +56,8 @@ public class DebugToolbar extends JToolBar {
 
     private class StepInButton extends JButton {
 	private StepInButton() {
-	    setToolTipText("Step into the current ");
+	    setToolTipText("Step into the current method");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/stepIn.png")).getScaledInstance(
@@ -77,6 +80,8 @@ public class DebugToolbar extends JToolBar {
 
     private class StepOverButton extends JButton {
 	private StepOverButton() {
+	    setBorder(FlowClient.EMPTY_BORDER);
+	    setToolTipText("Step over the highlighted method");
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/stepOver.png")).getScaledInstance(
@@ -99,6 +104,8 @@ public class DebugToolbar extends JToolBar {
 
     private class StepOutButton extends JButton {
 	private StepOutButton() {
+	    setBorder(FlowClient.EMPTY_BORDER);
+	    setToolTipText("Step out of (return) the current method");
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/stepOut.png")).getScaledInstance(

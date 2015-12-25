@@ -60,6 +60,7 @@ public class NavBar extends JToolBar {
 
 	private EditButton() {
 	    setToolTipText("Switch to the editing view");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/editWindow.png")).getScaledInstance(
@@ -84,6 +85,7 @@ public class NavBar extends JToolBar {
 
 	private DebugButton() {
 	    setToolTipText("Switch to the debug view");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/debugWindow.png")).getScaledInstance(
@@ -111,6 +113,7 @@ public class NavBar extends JToolBar {
 
 	private HistoryButton() {
 	    setToolTipText("Switch to the version history view");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/historyWindow.png"))
@@ -139,6 +142,7 @@ public class NavBar extends JToolBar {
 
 	private SettingsButton() {
 	    setToolTipText("Switch to the settings view");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/settingsWindow.png"))

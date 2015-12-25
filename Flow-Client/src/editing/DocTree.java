@@ -1,5 +1,7 @@
 package editing;
 
+import gui.FlowClient;
+
 import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
@@ -20,6 +22,7 @@ public class DocTree extends JTree {
 	this.editTabs = editTabs;
 	setMinimumSize(new Dimension(100, 0));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+	setBorder(FlowClient.EMPTY_BORDER);
 	scrollView = new JScrollPane(this);
 	model = new DocTreeModel();
 	setModel(model);

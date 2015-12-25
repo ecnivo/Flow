@@ -8,6 +8,7 @@ import javax.swing.JSplitPane;
 
 import editing.DocTree;
 import editing.EditTabs;
+import gui.FlowClient;
 import gui.NavBar;
 import gui.PanelManager;
 
@@ -19,17 +20,20 @@ public class HistoryPane extends JSplitPane {
 
     public HistoryPane(PanelManager manager) {
 	setResizeWeight(0.2);
+	setBorder(FlowClient.EMPTY_BORDER);
 
 	JPanel leftSide = new JPanel(new BorderLayout(0, 0));
-	Dimension leftSize = new Dimension(200,32);
+	leftSide.setBorder(FlowClient.EMPTY_BORDER);
+	Dimension leftSize = new Dimension(200, 32);
 	leftSide.setMinimumSize(leftSize);
 	leftSide.setPreferredSize(leftSize);
 	setLeftComponent(leftSide);
 	navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.HISTORY);
 	leftSide.add(navBar, BorderLayout.NORTH);
-	
+
 	JSplitPane treeAndVersion = new JSplitPane();
+	treeAndVersion.setBorder(FlowClient.EMPTY_BORDER);
 	treeAndVersion.setResizeWeight(0.4);
 	leftSide.add(treeAndVersion, BorderLayout.CENTER);
 

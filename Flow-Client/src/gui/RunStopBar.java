@@ -27,6 +27,7 @@ public class RunStopBar extends JToolBar {
     private class RunButton extends JButton {
 	public RunButton() {
 	    setToolTipText("Compiles, then runs the file currently open in the editor");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/run.png"))
@@ -54,6 +55,7 @@ public class RunStopBar extends JToolBar {
 
 	public StopButton() {
 	    setToolTipText("Stops the currently running program");
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
 		setIcon(new ImageIcon(
 			ImageIO.read(new File("images/stop.png"))

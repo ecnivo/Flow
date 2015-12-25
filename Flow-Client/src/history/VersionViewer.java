@@ -1,5 +1,6 @@
 package history;
 
+import gui.FlowClient;
 import history.VersionViewer.VersionItem;
 
 import java.awt.Dimension;
@@ -11,11 +12,13 @@ public class VersionViewer extends JList<VersionItem> {
 
     public VersionViewer() {
 	setMinimumSize(new Dimension(25, 0));
+	setBorder(FlowClient.EMPTY_BORDER);
 	// TODO Auto-generated constructor stub
     }
 
     class VersionItem extends JPanel {
 	public VersionItem() {
+	    setBorder(FlowClient.EMPTY_BORDER);
 	    // TODO Auto-generated constructor stub
 	}
     }

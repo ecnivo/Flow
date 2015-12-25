@@ -22,14 +22,17 @@ public class EditPane extends JPanel {
 
     public EditPane(PanelManager manager) {
 	this.setLayout(new BorderLayout());
+	setBorder(FlowClient.EMPTY_BORDER);
 
 	JSplitPane mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
+	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 	mainSplit.setMinimumSize(new Dimension(0, 0));
 	mainSplit.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
 	mainSplit.setResizeWeight(0.9);
 	JSplitPane rightSide = new JSplitPane();
+	rightSide.setBorder(FlowClient.EMPTY_BORDER);
 	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	rightSide.setMinimumSize(new Dimension(5, 0));
 	rightSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
@@ -48,6 +51,7 @@ public class EditPane extends JPanel {
 	rightSide.setRightComponent(collabsList.getScroll());
 
 	JSplitPane leftSide = new JSplitPane();
+	leftSide.setBorder(FlowClient.EMPTY_BORDER);
 	leftSide.setMinimumSize(new Dimension(390, 0));
 	leftSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
@@ -57,6 +61,7 @@ public class EditPane extends JPanel {
 	leftSide.setRightComponent(editTabs);
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	treeAndButtons.setBorder(FlowClient.EMPTY_BORDER);
 	treeAndButtons.setMinimumSize(new Dimension(330, 0));
 	treeAndButtons.setEnabled(false);
 	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));

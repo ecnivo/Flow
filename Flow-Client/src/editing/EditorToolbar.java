@@ -12,14 +12,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JToolBar;
-
-import settings.SettingsPane;
 
 public class EditorToolbar extends JToolBar {
     public EditorToolbar() {
 	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	setBorder(FlowClient.EMPTY_BORDER);
 
 	add(new SearchButton());
 	add(new ShareButton());

@@ -42,6 +42,7 @@ public class GenericConsole extends JTextArea {
 	// TODO implement selecting (and delete/backspace key while selecting,
 	// and typing... later.)
 	setEditable(false);
+	setBorder(FlowClient.EMPTY_BORDER);
 	getCaret().setVisible(true);
 	setCaretColor(Color.WHITE);
 	scrolling = new JScrollPane(this);
