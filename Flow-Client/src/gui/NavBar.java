@@ -19,10 +19,12 @@ public class NavBar extends JToolBar {
     public static final byte EDIT = 71;
     public final static byte DEBUG = -18;
     public static final byte HISTORY = 0;
+    public static final byte SETTINGS = -35;
 
     private EditButton editButton;
     private DebugButton debugButton;
     private HistoryButton historyButton;
+    private SettingsButton settingsButton;
 
     public NavBar(PanelManager panMan) {
 	manager = panMan;
@@ -32,11 +34,12 @@ public class NavBar extends JToolBar {
 	editButton = new EditButton();
 	debugButton = new DebugButton();
 	historyButton = new HistoryButton();
+	settingsButton = new SettingsButton();
 
 	add(editButton);
 	add(debugButton);
 	add(historyButton);
-	add(new SettingsButton());
+	add(settingsButton);
 	addSeparator();
 
 	setFloatable(false);
@@ -53,6 +56,10 @@ public class NavBar extends JToolBar {
 	    return;
 	case HISTORY:
 	    historyButton.setEnabled(false);
+	    return;
+	case SETTINGS:
+	    settingsButton.setEnabled(false);
+	    return;
 	}
     }
 

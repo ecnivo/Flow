@@ -9,6 +9,9 @@ import gui.RunStopBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.File;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -73,6 +76,32 @@ public class EditPane extends JPanel {
 	buttonPanel.add(new RunStopBar());
 	treeAndButtons.setLeftComponent(buttonPanel);
 	tree = new DocTree(editTabs);
+
+	// START DEBUG
+	tree.addKeyListener(new KeyListener() {
+
+	    @Override
+	    public void keyTyped(KeyEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void keyReleased(KeyEvent e) {
+		// System.out.println("Hi");
+		try {
+		    editTabs.openTab(new File("D:/questfile.txt"));
+		} catch (Exception h) {
+		    return;
+		}
+	    }
+
+	    @Override
+	    public void keyPressed(KeyEvent e) {
+		// nothing
+	    }
+	});
+	// END DEBUG
+
 	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);
     }

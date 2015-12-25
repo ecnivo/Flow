@@ -27,6 +27,7 @@ public class CreateAccountPane extends JPanel {
     public CreateAccountPane(PanelManager manager) {
 	setBackground(Color.WHITE);
 	this.manager = manager;
+	//TODO put a limit on name length
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 	Component verticalStrut_3 = Box.createVerticalStrut(20);

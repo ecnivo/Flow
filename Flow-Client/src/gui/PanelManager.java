@@ -15,7 +15,7 @@ import editing.EditPane;
 
 public class PanelManager extends JPanel {
     private EditPane editPane;
-    private SettingsPane settingsPane;
+    private SettingsPane settingsTabs;
     private LoginPane loginPane;
     private DebugPane debugPane;
     private CreateAccountPane createAccountPane;
@@ -40,8 +40,8 @@ public class PanelManager extends JPanel {
 	debugPane = new DebugPane(this);
 	add(debugPane, "debugPane");
 
-	settingsPane = new SettingsPane(this);
-	add(settingsPane, "settingsPane");
+	settingsTabs = new SettingsPane(this);
+	add(settingsTabs, "settingsPane");
 
 	historyPane = new HistoryPane(this);
 	add(historyPane, "historyPane");

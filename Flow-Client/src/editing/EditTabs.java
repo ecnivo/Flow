@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -32,26 +34,52 @@ import javax.swing.plaf.basic.BasicButtonUI;
  */
 public class EditTabs extends JTabbedPane {
 
+    public static final int TAB_LIMIT = 25;
+
     public static final int TAB_ICON_SIZE = 16;
     private boolean editable;
 
     public EditTabs(boolean editable) {
 	setMinimumSize(new Dimension(50, 0));
-	setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
 	setBorder(FlowClient.EMPTY_BORDER);
 	this.editable = editable;
+	addKeyListener(new KeyListener() {
+
+	    @Override
+	    public void keyTyped(KeyEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void keyReleased(KeyEvent e) {
+		if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_W) {
+		    removeTabAt(getSelectedIndex());
+		}
+	    }
+
+	    @Override
+	    public void keyPressed(KeyEvent e) {
+		// nothing
+	    }
+	});
     }
 
     public void openTab(File file) {
 	// TODO change the parameter, and add checks if the tab is already open
-	addTab(file.getName(), new EditArea(file).getScrollPane());
-	setTabComponentAt(getTabCount() - 1, new CustomTabHeader());
+	if (getTabCount() <= TAB_LIMIT) {
+	    addTab(file.getName(),
+		    new EditArea(file, editable, this).getScrollPane());
+	    int idx = getTabCount() - 1;
+	    setTabComponentAt(idx, new CustomTabHeader(file));
+	    setToolTipTextAt(idx, file.getAbsolutePath());
+	}
     }
 
     class CustomTabHeader extends JPanel {
 
-	public CustomTabHeader() {
+	public CustomTabHeader(File file) {
 	    super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 	    setOpaque(false);
 
@@ -63,20 +91,12 @@ public class EditTabs extends JTabbedPane {
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }
-	    add(new JLabel(icon));
+	    JLabel iconL = new JLabel(icon);
+	    iconL.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+	    add(iconL);
 
 	    // make JLabel read titles from JTabbedPane
-	    JLabel label = new JLabel() {
-		public String getText() {
-		    int i = EditTabs.this
-			    .indexOfTabComponent(CustomTabHeader.this);
-		    if (i != -1) {
-			return EditTabs.this.getTitleAt(i);
-		    }
-		    return null;
-		}
-	    };
-
+	    JLabel label = new JLabel(file.getName());
 	    add(label);
 	    // add more space between the label and the button
 	    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));

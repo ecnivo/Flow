@@ -22,24 +22,24 @@ public class DebugPane extends JPanel {
 
 	JSplitPane mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
-	mainSplit.setResizeWeight(1);
+	mainSplit.setResizeWeight(0);
 	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 
-	mainSplit.setLeftComponent(new EditTabs(true));
+	mainSplit.setRightComponent(new EditTabs(true));
 
-	JSplitPane rightHalf = new JSplitPane();
-	rightHalf.setPreferredSize(new Dimension(310, 574));
-	rightHalf.setBorder(FlowClient.EMPTY_BORDER);
-	rightHalf.setMinimumSize(new Dimension(310, 0));
-	rightHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
-	mainSplit.setRightComponent(rightHalf);
+	JSplitPane leftHalf = new JSplitPane();
+	leftHalf.setPreferredSize(new Dimension(310, 574));
+	leftHalf.setBorder(FlowClient.EMPTY_BORDER);
+	leftHalf.setMinimumSize(new Dimension(310, 0));
+	leftHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
+	mainSplit.setLeftComponent(leftHalf);
 
 	GenericConsole debugConsole = new GenericConsole();
 	debugConsole.getScroll().setPreferredSize(new Dimension(400, 255));
-	rightHalf.setRightComponent(debugConsole.getScroll());
+	leftHalf.setRightComponent(debugConsole.getScroll());
 
 	JPanel rightTop = new JPanel(new BorderLayout());
-	rightHalf.setLeftComponent(rightTop);
+	leftHalf.setLeftComponent(rightTop);
 
 	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 	buttonPanel.setMinimumSize(new Dimension(310, 0));
