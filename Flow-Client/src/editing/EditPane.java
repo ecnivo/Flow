@@ -1,8 +1,10 @@
 package editing;
 
+import gui.FlowClient;
 import gui.GenericConsole;
 import gui.NavBar;
 import gui.PanelManager;
+import gui.RunStopBar;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -55,13 +57,15 @@ public class EditPane extends JPanel {
 	leftSide.setRightComponent(editTabs);
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	treeAndButtons.setMinimumSize(new Dimension(340, 0));
+	treeAndButtons.setMinimumSize(new Dimension(330, 0));
 	treeAndButtons.setEnabled(false);
-	JPanel buttonPanel = new JPanel(new FlowLayout());
+	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	buttonPanel.setBorder(FlowClient.EMPTY_BORDER);
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.EDIT);
 	buttonPanel.add(navBar);
 	buttonPanel.add(new EditorToolbar());
+	buttonPanel.add(new RunStopBar());
 	treeAndButtons.setLeftComponent(buttonPanel);
 	tree = new DocTree(editTabs);
 	treeAndButtons.setRightComponent(tree.getScrollable());

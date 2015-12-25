@@ -4,6 +4,7 @@ import editing.EditTabs;
 import gui.GenericConsole;
 import gui.NavBar;
 import gui.PanelManager;
+import gui.RunStopBar;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -24,8 +25,8 @@ public class DebugPane extends JPanel {
 	mainSplit.setLeftComponent(new EditTabs(true));
 
 	JSplitPane rightHalf = new JSplitPane();
-	rightHalf.setPreferredSize(new Dimension(420, 574));
-	rightHalf.setMinimumSize(new Dimension(420, 0));
+	rightHalf.setPreferredSize(new Dimension(310, 574));
+	rightHalf.setMinimumSize(new Dimension(310, 0));
 	rightHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	mainSplit.setRightComponent(rightHalf);
 
@@ -36,15 +37,15 @@ public class DebugPane extends JPanel {
 	JPanel rightTop = new JPanel(new BorderLayout());
 	rightHalf.setLeftComponent(rightTop);
 
-	JPanel buttonPanel = new JPanel(new FlowLayout());
-	buttonPanel.setMinimumSize(new Dimension(200, 0));
-	buttonPanel.setPreferredSize(new Dimension(200, 60));
+	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	buttonPanel.setMinimumSize(new Dimension(310, 0));
+	buttonPanel.setPreferredSize(new Dimension(310, 32));
 	rightTop.add(buttonPanel, BorderLayout.NORTH);
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.DEBUG);
 	buttonPanel.add(navBar);
-	DebugToolbar debugBar = new DebugToolbar();
-	buttonPanel.add(debugBar);
+	buttonPanel.add(new RunStopBar());
+	buttonPanel.add(new DebugToolbar());
 	rightTop.add(new VariablesList(), BorderLayout.CENTER);
 
     }

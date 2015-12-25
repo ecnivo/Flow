@@ -15,7 +15,7 @@ public class FlowClient extends JFrame {
 
     private PanelManager manager;
     public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
-	    .createEmptyBorder();
+	    .createEmptyBorder(0, 0, 0, 0);
     public static final int BUTTON_ICON_SIZE = 24;
 
     public static void main(String[] args) throws ClassNotFoundException,

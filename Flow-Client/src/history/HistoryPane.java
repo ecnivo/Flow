@@ -1,12 +1,15 @@
 package history;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import java.awt.BorderLayout;
-import gui.NavBar;
-import gui.PanelManager;
+
 import editing.DocTree;
 import editing.EditTabs;
+import gui.NavBar;
+import gui.PanelManager;
 
 public class HistoryPane extends JSplitPane {
     private EditTabs viewer;
@@ -17,14 +20,15 @@ public class HistoryPane extends JSplitPane {
     public HistoryPane(PanelManager manager) {
 	setResizeWeight(0.2);
 
-	JPanel leftSide = new JPanel();
+	JPanel leftSide = new JPanel(new BorderLayout(0, 0));
+	Dimension leftSize = new Dimension(200,32);
+	leftSide.setMinimumSize(leftSize);
+	leftSide.setPreferredSize(leftSize);
 	setLeftComponent(leftSide);
-	leftSide.setLayout(new BorderLayout(0, 0));
-
 	navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.HISTORY);
 	leftSide.add(navBar, BorderLayout.NORTH);
-
+	
 	JSplitPane treeAndVersion = new JSplitPane();
 	treeAndVersion.setResizeWeight(0.4);
 	leftSide.add(treeAndVersion, BorderLayout.CENTER);

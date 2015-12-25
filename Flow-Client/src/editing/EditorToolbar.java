@@ -19,11 +19,13 @@ import settings.SettingsPane;
 
 public class EditorToolbar extends JToolBar {
     public EditorToolbar() {
-	setLayout(new FlowLayout());
+	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
 	add(new SearchButton());
 	add(new ShareButton());
+	add(new ImportButton());
 	add(new ExportButton());
+	addSeparator();
 
 	setFloatable(false);
 	setRollover(false);
@@ -70,6 +72,30 @@ public class EditorToolbar extends JToolBar {
 		public void actionPerformed(ActionEvent e) {
 		    // TODO pop open a sharing window to search for other users
 		    System.out.println("Share button pressed");
+		}
+	    });
+	}
+    }
+
+    private class ImportButton extends JButton {
+	private ImportButton() {
+	    try {
+		setIcon(new ImageIcon(ImageIO.read(
+			new File("images/import.png")).getScaledInstance(
+			FlowClient.BUTTON_ICON_SIZE,
+			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+	    } catch (IOException e1) {
+		e1.printStackTrace();
+	    }
+	    setFocusable(false);
+	    setBorder(FlowClient.EMPTY_BORDER);
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    // TODO pop open a window for the user to first select a
+		    // file, then to choose the project to insert it in
+		    System.out.println("Import button pressed");
 		}
 	    });
 	}

@@ -16,8 +16,9 @@ import javax.swing.JToolBar;
 
 public class DebugToolbar extends JToolBar {
     public DebugToolbar() {
-	this.setLayout(new FlowLayout());
+	this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
+	addSeparator();
 	add(new StartDebuggingButton());
 	add(new StepInButton());
 	add(new StepOverButton());

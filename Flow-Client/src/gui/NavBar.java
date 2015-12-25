@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -27,7 +26,8 @@ public class NavBar extends JToolBar {
 
     public NavBar(PanelManager panMan) {
 	manager = panMan;
-	setLayout(new FlowLayout());
+	setBorder(FlowClient.EMPTY_BORDER);
+	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
 	editButton = new EditButton();
 	debugButton = new DebugButton();
@@ -37,10 +37,6 @@ public class NavBar extends JToolBar {
 	add(debugButton);
 	add(historyButton);
 	add(new SettingsButton());
-	addSeparator();
-
-	add(new RunButton());
-	add(new StopButton());
 	addSeparator();
 
 	setFloatable(false);
@@ -109,17 +105,18 @@ public class NavBar extends JToolBar {
 		}
 	    });
 	}
-    } 
-    
+    }
+
     private class HistoryButton extends JButton {
 
 	private HistoryButton() {
 	    setToolTipText("Switch to the version history view");
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/historyWindow.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(
+			ImageIO.read(new File("images/historyWindow.png"))
+				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
+					FlowClient.BUTTON_ICON_SIZE,
+					Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -163,55 +160,4 @@ public class NavBar extends JToolBar {
 	}
     }
 
-    private class RunButton extends JButton {
-	public RunButton() {
-	    setToolTipText("Compiles, then runs the file currently open in the editor");
-	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/run.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
-	    setFocusable(false);
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    addActionListener(new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    // TODO make it run
-		    System.out.println("Run button pressed");
-		}
-	    });
-	}
-
-    }
-
-    private class StopButton extends JButton {
-
-	public StopButton() {
-	    setToolTipText("Stops the currently running program");
-	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stop.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
-	    setFocusable(false);
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    addActionListener(new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    // TODO make it stop
-		    System.out.println("Stop button pressed");
-		}
-	    });
-	}
-    }
 }
