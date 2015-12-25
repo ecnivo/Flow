@@ -11,11 +11,11 @@ import java.util.Date;
 public class Test {
     public static void main(String[] args) throws IOException {
 
-        FlowFile flowFile = new FlowFile("test", "Test.java");
-        TextDocument doc = new TextDocument();
-        doc.setDocumentText("package test;public class Test { public static void main(String[] args){System.out.println(\"hello world!\");}}");
+        FlowFile flowFile = new FlowFile("", "Test.java");
+        TextDocument doc = new TextDocument(flowFile);
+        doc.setDocumentText("public class Test { public static void main(String[] args){System.out.println(\"hello world!\");}}");
         flowFile.addVersion(new Date(), doc);
-        Compiler compiler = new Compiler(flowFile);
+        Compiler compiler = new Compiler(doc);
         compiler.build();
         compiler.readAllOutput();
     }

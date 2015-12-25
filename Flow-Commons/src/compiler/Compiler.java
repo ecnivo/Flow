@@ -1,6 +1,5 @@
 package compiler;
 
-import struct.FlowFile;
 import struct.TextDocument;
 
 import javax.tools.*;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class Compiler {
 
-    private FlowFile[] textDocuments;
+    private TextDocument[] textDocuments;
     private UUID dirUUID;
     private File workingDirectory;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
@@ -29,7 +28,7 @@ public class Compiler {
      *
      * @param doc The textDocuments to compile
      */
-    public Compiler(FlowFile... doc) {
+    public Compiler(TextDocument... doc) {
         this.textDocuments = doc;
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
@@ -50,17 +49,18 @@ public class Compiler {
             L.info("Working directory did not exist, created it");
         }
         L.info(textDocuments.length + " textDocuments queued for compilation");
-        for (FlowFile doc : textDocuments) {
-            if(doc.latest() instanceof TextDocument){
-                File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getRemotePath() + File.separator + doc.getRemoteName());
-                if (tempPath.getParentFile().mkdirs()) {
-                    L.info("Directory " + tempPath.getParent() + " did not exist, created!");
-                }
-                paths.add(tempPath);
-                PrintStream ps = new PrintStream(tempPath);
-                ps.println(((TextDocument) doc.latest()).getDocumentText());
-                L.info("Wrote " + doc.getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
+        for (TextDocument doc : textDocuments) {
+            if (doc.getParentFile() == null)
+                throw new IllegalArgumentException("Compiler contains a text document without link to file reference!");
+
+            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getParentFile().getRemotePath() + File.separator + doc.getParentFile().getRemoteName());
+            if (tempPath.getParentFile().mkdirs()) {
+                L.info("Directory " + tempPath.getParent() + " did not exist, created!");
             }
+            paths.add(tempPath);
+            PrintStream ps = new PrintStream(tempPath);
+            ps.println(doc.getDocumentText());
+            L.info("Wrote " + doc.getParentFile().getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
         }
 
         try {
@@ -71,6 +71,7 @@ public class Compiler {
 
             L.info("Setting up cmd arguments for compiler");
             List<String> optionList = new ArrayList<>();
+            optionList.add("-g"); // FOR THE DEBUGGER
             optionList.add("-classpath");
             optionList.add(workingDirectory.getAbsolutePath());
 
@@ -103,8 +104,8 @@ public class Compiler {
     }
 
     public Process execute() throws IOException {
-        String remotePath = textDocuments[0].getRemotePath() + "/" // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
-                + removeExtension(textDocuments[0].getRemoteName());
+        String remotePath = (textDocuments[0].getParentFile().getRemotePath() == "" ? "" : textDocuments[0].getParentFile().getRemotePath() + "/") // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
+                + removeExtension(textDocuments[0].getParentFile().getRemoteName());
         L.info("Assuming main class is " + remotePath);
         ProcessBuilder pb = new ProcessBuilder("java", "-cp", workingDirectory.getAbsolutePath(), remotePath);
         L.info("Execution arguments are: " + pb.command().toString());
@@ -125,7 +126,15 @@ public class Compiler {
         return str;
     }
 
-    public static String removeExtension(String s) {
+    protected File getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    protected TextDocument[] getFlowFiles() {
+        return textDocuments;
+    }
+
+    protected static String removeExtension(String s) {
         String separator = System.getProperty("file.separator");
         String filename;
         int lastSeparatorIndex = s.lastIndexOf(separator);
