@@ -3,6 +3,7 @@ package editing;
 import gui.FlowClient;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -16,6 +17,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -25,6 +27,7 @@ public class EditArea extends JTextPane {
     private StyledDocument doc;
     private Style keywords;
     private Style plain;
+    private ArrayList<StyleToken> blocks;
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
 	    "boolean", "break", "byte", "case", "catch", "char", "class",
 	    "const", "continue", "default", "do", "double", "else", "enum",
@@ -38,11 +41,13 @@ public class EditArea extends JTextPane {
     protected EditArea(File file, boolean editable, EditTabs tabs) {
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
+	setFont(new Font("Consolas", Font.PLAIN, 13));
 	doc = (StyledDocument) getDocument();
+	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
 	keywords = addStyle("keywords", null);
-	StyleConstants.setForeground(keywords, new Color(255, 171, 0));
+	StyleConstants.setForeground(keywords, new Color(0x006C79));
 	StyleConstants.setBold(keywords, true);
 	plain = addStyle("plain", null);
 	StyleConstants.setForeground(plain, Color.BLACK);
@@ -121,16 +126,16 @@ public class EditArea extends JTextPane {
     }
 
     private class StyleToken {
-	private String token;
+	private int length;
 	private int pos;
 
-	private StyleToken(String token, int pos) {
-	    this.token = token;
+	private StyleToken(int length, int pos) {
+	    this.length = length;
 	    this.pos = pos;
 	}
 
-	private String getToken() {
-	    return token;
+	private int getLength() {
+	    return length;
 	}
 
 	private int getPos() {
@@ -139,52 +144,89 @@ public class EditArea extends JTextPane {
     }
 
     private void highlightSyntax() {
-	String words = getText().trim();
-	ArrayList<StyleToken> blocks = new ArrayList<StyleToken>();
-	int pos = 0;
-	int nextWhitespace = indexOfWhitespace(words, pos);
-	while (nextWhitespace > -1 && pos < words.length()) {
-	    String nextToken = words.substring(pos, nextWhitespace);
-	    if (arrayContains(JAVA_KEYWORDS, nextToken.trim())) {
-		SwingUtilities.invokeLater(new SetStyleLater(pos, nextToken));
+	blocks = new ArrayList<StyleToken>();
+	String sourceCode = getText();
+	int sourceLength = sourceCode.length();
+	for (String target : JAVA_KEYWORDS) {
+	    int targetLength = target.length();
+
+	    for (int pos = 0; pos + targetLength < sourceLength; pos++) {
+		if (pos > 0 && pos + targetLength + 1 < sourceLength) {
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))
+			    && !Character.isAlphabetic(sourceCode.charAt(pos
+				    + targetLength))) {
+			edgesOkay(sourceCode, pos, target);
+		    }
+		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos
+			    + targetLength)))
+			edgesOkay(sourceCode, pos, target);
+		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)))
+			edgesOkay(sourceCode, pos, target);
+		} else if (pos == 0 && pos + targetLength + 1 == sourceLength)
+		    edgesOkay(sourceCode, pos, target);
 	    }
-	    blocks.add(new StyleToken(nextToken.trim(), pos));
-	    pos = nextWhitespace;
-	    nextWhitespace = indexOfWhitespace(words, pos+1);
 	}
-	System.out.println("quit loop");
-	blocks.add(new StyleToken(words.substring(pos).trim(), pos));
+
+	for (StyleToken styleToken : blocks) {
+	    SwingUtilities.invokeLater(new HighlightKeywordsLater(styleToken
+		    .getPos(), styleToken.getLength()));
+	}
     }
 
-    private int indexOfWhitespace(String str, int startVal) {
-	for (int i = startVal; i < str.length(); i++) {
-	    if (Character.isWhitespace(str.charAt(i)))
-		return i;
-	}
-	return -1;
-    }
+    // private int nextNonLetterIdx(String str, int startIdx) {
+    // for (int i = startIdx; i < str.length(); i++) {
+    // if (!Character.isAlphabetic(str.charAt(i)))
+    // return i;
+    // }
+    // return -1;
+    // }
 
-    private boolean arrayContains(Object[] array, Object target) {
-	for (Object object : array) {
-	    if (object.equals(target))
+    private boolean arrayContains(String[] array, String target) {
+	for (String string : array) {
+	    if (string.equals(target))
 		return true;
 	}
 	return false;
     }
 
-    private class SetStyleLater implements Runnable {
+    private void edgesOkay(String sourceCode, int pos, String target) {
+	String candidate = sourceCode.substring(pos, pos + target.length());
+	if (arrayContains(JAVA_KEYWORDS, candidate))
+	    blocks.add(new StyleToken(candidate.length(), pos));
+    }
+
+    private class HighlightKeywordsLater implements Runnable {
 
 	private int pos;
-	private String nextToken;
+	private int nextToken;
 
-	private SetStyleLater(int pos, String nextToken) {
+	private HighlightKeywordsLater(int pos, int nextToken) {
 	    this.pos = pos;
 	    this.nextToken = nextToken;
 	}
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken.length(), keywords, false);
+	    doc.setCharacterAttributes(pos, nextToken, keywords, false);
+	}
+
+    }
+
+    private class RevertToPlainLater implements Runnable {
+
+	private int pos;
+	private String nextToken;
+
+	private RevertToPlainLater(int pos, String nextToken) {
+	    this.pos = pos;
+	    this.nextToken = nextToken;
+	}
+
+	@Override
+	public void run() {
+	    doc.setCharacterAttributes(pos, nextToken.length(), plain, false);
 	}
 
     }
