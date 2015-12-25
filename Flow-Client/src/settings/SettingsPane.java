@@ -1,12 +1,8 @@
 package settings;
 
-import gui.BackButton;
-import gui.CustomScrollPane;
-import gui.FlowClient;
 import gui.PanelManager;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
@@ -16,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -25,47 +20,33 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class SettingsPane extends JPanel {
-    private JPasswordField passwordField;
-    private JPasswordField retypePasswordField;
-    private JTextField closeAccountConfirm;
-    private PanelManager panMan;
+public class SettingsPane extends JTabbedPane {
 
+    private static final Dimension TEXT_BOX_SIZE = new Dimension(256, 24);
+
+    /*
+     * Change user avatar
+     * 
+     * Change password
+     * 
+     * Log out
+     * 
+     * Theme (planned!)
+     * 
+     * Close account
+     * 
+     * Manage "friends" (planned)
+     */
     public SettingsPane(PanelManager manager) {
-	panMan = manager;
-	setAlignmentY(Component.TOP_ALIGNMENT);
-	setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-	Component horizontalStrut = Box.createHorizontalStrut(20);
-	add(horizontalStrut);
-
-	JPanel panel = new JPanel();
-	panel.setAlignmentY(Component.TOP_ALIGNMENT);
-	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-	CustomScrollPane scrolling = new CustomScrollPane(panel);
-	scrolling.setBorder(FlowClient.EMPTY_BORDER);
-
-	JPanel titlePanel = new JPanel();
-	titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-	panel.add(titlePanel);
-
-	BackButton backButton = new BackButton(panMan.getEditPane(), panMan);
-	titlePanel.add(backButton);
-
-	JLabel title = new JLabel("Settings");
-	titlePanel.add(title);
-	title.setFont(new Font("Tahoma", Font.BOLD, 18));
-
-	Component verticalStrut = Box.createVerticalStrut(20);
-	panel.add(verticalStrut);
-
-	JLabel avatarChangePrompt = new JLabel("Change avatar");
-	panel.add(avatarChangePrompt);
-
+	SettingsTab avatar = new SettingsTab("Avatar");
+	avatar.add(new JLabel("Personalize your avatar"));
 	JButton selectAvatar = new JButton("Select...");
 	selectAvatar.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
@@ -75,7 +56,7 @@ public class SettingsPane extends JPanel {
 
 			    @Override
 			    public String getDescription() {
-				return "Only PNG, JPG, GIF (first frame), BMP formats";
+				return "Only PNG, JPG, GIF, BMP formats";
 			    }
 
 			    @Override
@@ -102,27 +83,17 @@ public class SettingsPane extends JPanel {
 		}
 	    }
 	});
-	panel.add(selectAvatar);
+	avatar.add(selectAvatar);
 
-	Component verticalStrut_1 = Box.createVerticalStrut(20);
-	panel.add(verticalStrut_1);
-
-	JLabel passwordChangePrompt = new JLabel("Change password");
-	panel.add(passwordChangePrompt);
-
-	passwordField = new JPasswordField();
-	passwordField.setAlignmentX(Component.LEFT_ALIGNMENT);
-	passwordField.setMaximumSize(new Dimension(128, 24));
-	panel.add(passwordField);
-
-	JLabel retypePassword = new JLabel("Re-type password");
-	panel.add(retypePassword);
-
-	retypePasswordField = new JPasswordField();
-	retypePasswordField.setAlignmentX(Component.LEFT_ALIGNMENT);
-	retypePasswordField.setMaximumSize(new Dimension(128, 24));
-	panel.add(retypePasswordField);
-
+	SettingsTab passChange = new SettingsTab("Password");
+	passChange.add(new JLabel("Change your password"));
+	JPasswordField passField = new JPasswordField();
+	passField.setMaximumSize(TEXT_BOX_SIZE);
+	passChange.add(passField);
+	passChange.add(new JLabel("Re-type your password"));
+	JPasswordField retypePass = new JPasswordField();
+	retypePass.setMaximumSize(TEXT_BOX_SIZE);
+	passChange.add(retypePass);
 	JButton savePassword = new JButton("Save new password");
 	savePassword.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
@@ -130,48 +101,41 @@ public class SettingsPane extends JPanel {
 		// when done.
 	    }
 	});
-	panel.add(savePassword);
+	passChange.add(savePassword);
 
-	Component verticalStrut_2 = Box.createVerticalStrut(20);
-	panel.add(verticalStrut_2);
+	SettingsTab logout = new SettingsTab("Logout");
+	logout.add(new JLabel("Logout"));
+	JButton logoutButton = new JButton("Logout");
+	logoutButton.addActionListener(new ActionListener() {
 
-	JButton logOutButton = new JButton("Log out");
-	logOutButton.addActionListener(new ActionListener() {
+	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// Close session, and go to login screen
+		// TODO log out the user, show login screen
+		return;
 	    }
 	});
-	panel.add(logOutButton);
+	logout.add(logoutButton);
 
-	Component verticalStrut_3 = Box.createVerticalStrut(20);
-	panel.add(verticalStrut_3);
-
-	JLabel deleteAccountButton = new JLabel("Close account");
-	panel.add(deleteAccountButton);
-
-	JTextArea closeAccountWarning = new JTextArea();
-	closeAccountWarning.setForeground(Color.RED);
-	closeAccountWarning.setMaximumSize(new Dimension(320, 512));
-	closeAccountWarning.setAlignmentX(Component.LEFT_ALIGNMENT);
-	closeAccountWarning.setFont(new Font("Tahoma", Font.PLAIN, 11));
-	closeAccountWarning
-		.setText("WARNING: Closing your account means that all your projects will be deleted, and all contributors to these projects will lose access to the code. Please back up all necessary information before closing your account.\r\nType \"close my account\" to confirm.");
-	closeAccountWarning.setEnabled(false);
-	closeAccountWarning.setEditable(false);
-	closeAccountWarning.setWrapStyleWord(true);
-	closeAccountWarning.setLineWrap(true);
-	closeAccountWarning.setOpaque(false);
-	panel.add(closeAccountWarning);
-
-	closeAccountConfirm = new JTextField();
-	closeAccountConfirm.setMaximumSize(new Dimension(128, 24));
-	panel.add(closeAccountConfirm);
-	closeAccountConfirm.setColumns(10);
-
-	JButton btnConfirm = new JButton("Confirm");
-	btnConfirm.addActionListener(new ActionListener() {
+	SettingsTab closeAccount = new SettingsTab("Close account");
+	closeAccount.add(new JLabel("Close account"));
+	JTextArea warning = new JTextArea(
+		"WARNING: Closing your account means that all your projects will be deleted, and all contributors to these projects will lose access to the code."
+			+ " Please back up all necessary information before closing your account.\r\nType \"close my account\" into the following text box to confirm.");
+	warning.setFont(new Font("Tahoma", Font.PLAIN, 11));
+	warning.setEditable(false);
+	warning.setForeground(Color.RED);
+	warning.setWrapStyleWord(true);
+	warning.setLineWrap(true);
+	warning.setOpaque(false);
+	closeAccount.add(warning);
+	JTextField confirm = new JTextField();
+	confirm.setMaximumSize(TEXT_BOX_SIZE);
+	closeAccount.add(confirm);
+	confirm.setColumns(20);
+	JButton confirmButton = new JButton("Confirm close account");
+	confirmButton.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
-		if (closeAccountConfirm.getText().equals("close my account"))
+		if (confirmButton.getText().equals("close my account"))
 		    // TODO send message to server, close account, show
 		    // joptionpane go to login screen
 		    System.out.println("Account closed button pressed");
@@ -185,8 +149,18 @@ public class SettingsPane extends JPanel {
 				    JOptionPane.WARNING_MESSAGE);
 	    }
 	});
-	panel.add(btnConfirm);
+	closeAccount.add(confirmButton);
+    }
 
-	add(scrolling);
+    private class SettingsTab extends JPanel {
+	private JScrollPane scrolling;
+
+	private SettingsTab(String name) {
+	    scrolling = new JScrollPane(this);
+	    scrolling
+		    .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	    SettingsPane.this.addTab(name, this);
+	}
     }
 }

@@ -11,7 +11,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -52,30 +51,30 @@ public class CreateAccountPane extends JPanel {
 
 	Component verticalStrut_1 = Box.createVerticalStrut(20);
 	add(verticalStrut_1);
-	
-		JLabel passwordPrompt = new JLabel("Password");
-		passwordPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
-		add(passwordPrompt);
-		
-			JComponent passwordEntry = new JPasswordField();
-			passwordEntry.setMaximumSize(new Dimension(128, 24));
-			passwordEntry.setPreferredSize(new Dimension(128, 24));
-			passwordEntry.setToolTipText("The password for Flow");
-			add(passwordEntry);
-	
-		Component verticalStrut_4 = Box.createVerticalStrut(20);
-		add(verticalStrut_4);
-	
+
+	JLabel passwordPrompt = new JLabel("Password");
+	passwordPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
+	add(passwordPrompt);
+
+	JComponent passwordEntry = new JPasswordField();
+	passwordEntry.setMaximumSize(new Dimension(128, 24));
+	passwordEntry.setPreferredSize(new Dimension(128, 24));
+	passwordEntry.setToolTipText("The password for Flow");
+	add(passwordEntry);
+
+	Component verticalStrut_4 = Box.createVerticalStrut(20);
+	add(verticalStrut_4);
+
 	JLabel label = new JLabel("Re-type password");
 	label.setAlignmentX(0.5f);
 	add(label);
-	
+
 	passwordField = new JPasswordField();
 	passwordField.setToolTipText("The password for Flow");
 	passwordField.setPreferredSize(new Dimension(128, 24));
 	passwordField.setMaximumSize(new Dimension(128, 24));
 	add(passwordField);
-	
+
 	Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
 
@@ -99,7 +98,7 @@ public class CreateAccountPane extends JPanel {
 		// TODO send new user name and password to server to add them to
 		// the list
 		CreateAccountPane.this.manager.switchToEditor();
-		//TODO show joptionpane when successful
+		// TODO show joptionpane when successful
 	    }
 	});
     }
