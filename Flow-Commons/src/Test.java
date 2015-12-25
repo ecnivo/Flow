@@ -8,7 +8,11 @@ import java.io.IOException;
  */
 public class Test {
     public static void main(String[] args) throws IOException {
-
+        TextDocument doc = new TextDocument("test", "Test.java");
+        doc.setDocumentText("package test;public class Test { public static void main(String[] args){System.out.println(\"hello world!\");}}");
+        Compiler compiler = new Compiler(doc);
+        compiler.build();
+        compiler.readAllOutput();
     }
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();

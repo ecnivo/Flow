@@ -10,7 +10,7 @@ public class User implements Serializable {
 
     private String username;
     private transient String password;
-    private transient UUID uuid;
+    private UUID uuid;
 
     public User(String username, String password){
         this.username = username;
