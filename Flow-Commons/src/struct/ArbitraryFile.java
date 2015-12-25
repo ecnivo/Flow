@@ -3,14 +3,13 @@ package struct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.UUID;
 
 /**
  * Represents a file of arbitrary extension
  * <p>
  * Created by Netdex on 12/24/2015.
  */
-public class ArbitraryFile extends Document {
+public class ArbitraryFile extends FlowDocument {
 
     private File localFile;
     private transient byte[] fileBytes;

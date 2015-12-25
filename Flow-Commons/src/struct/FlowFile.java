@@ -12,7 +12,7 @@ public class FlowFile implements Serializable {
     private String remotePath;
     private String remoteName;
 
-    private TreeMap<Date, Document> versions;
+    private TreeMap<Date, FlowDocument> versions;
 
     public FlowFile(String remotePath, String remoteName) {
         this.remoteName = remoteName;
@@ -20,11 +20,11 @@ public class FlowFile implements Serializable {
         this.versions = new TreeMap<>();
     }
 
-    public Document latest() {
+    public FlowDocument latest() {
         return versions.get(versions.lastKey());
     }
 
-    public void addVersion(Date date, Document document) {
+    public void addVersion(Date date, FlowDocument document) {
         versions.put(date, document);
     }
 

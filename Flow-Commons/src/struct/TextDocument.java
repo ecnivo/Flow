@@ -1,15 +1,12 @@
 package struct;
 
-import java.awt.*;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * Represents a editable text document
  * Created by Netdex on 12/18/2015.
  */
-public class TextDocument extends Document {
+public class TextDocument extends FlowDocument {
 
     private ArrayList<String> lines;
 

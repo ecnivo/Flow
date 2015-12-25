@@ -1,8 +1,6 @@
 package struct;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -10,17 +8,17 @@ import java.util.UUID;
  *
  * Created by Netdex on 12/24/2015.
  */
-public abstract class Document implements Serializable {
+public abstract class FlowDocument implements Serializable {
 
     private FlowFile parentFile;
     private UUID uuid;
 
-    protected Document(FlowFile flowFile, UUID uuid){
+    protected FlowDocument(FlowFile flowFile, UUID uuid){
         this.parentFile = flowFile;
         this.uuid = uuid;
     }
 
-    public Document(){
+    public FlowDocument(){
         this(null, UUID.randomUUID());
     }
 
