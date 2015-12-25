@@ -1,16 +1,21 @@
 import compiler.Compiler;
+import struct.FlowFile;
 import struct.TextDocument;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by Netdex on 12/18/2015.
  */
 public class Test {
     public static void main(String[] args) throws IOException {
-        TextDocument doc = new TextDocument("test", "Test.java");
+
+        FlowFile flowFile = new FlowFile("test", "Test.java");
+        TextDocument doc = new TextDocument();
         doc.setDocumentText("package test;public class Test { public static void main(String[] args){System.out.println(\"hello world!\");}}");
-        Compiler compiler = new Compiler(doc);
+        flowFile.addVersion(new Date(), doc);
+        Compiler compiler = new Compiler(flowFile);
         compiler.build();
         compiler.readAllOutput();
     }

@@ -15,14 +15,10 @@ public class ArbitraryFile extends Document {
     private File localFile;
     private transient byte[] fileBytes;
 
-    protected ArbitraryFile(String remotePath, String remoteFile, File localFile, UUID uuid) throws IOException {
-        super(remotePath, remoteFile, uuid);
+    protected ArbitraryFile(File localFile) throws IOException {
+        super();
         this.localFile = localFile;
         this.fileBytes = Files.readAllBytes(localFile.toPath());
-    }
-
-    protected ArbitraryFile(String remotePath, String remoteFile, File localFile) throws IOException {
-        this(remotePath, remoteFile, localFile, UUID.randomUUID());
     }
 
     public byte[] getFileBytes() {

@@ -1,5 +1,6 @@
 package compiler;
 
+import struct.FlowFile;
 import struct.TextDocument;
 
 import javax.tools.*;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class Compiler {
 
-    private TextDocument[] textDocuments;
+    private FlowFile[] textDocuments;
     private UUID dirUUID;
     private File workingDirectory;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
@@ -28,7 +29,7 @@ public class Compiler {
      *
      * @param doc The textDocuments to compile
      */
-    public Compiler(TextDocument... doc) {
+    public Compiler(FlowFile... doc) {
         this.textDocuments = doc;
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
@@ -49,15 +50,17 @@ public class Compiler {
             L.info("Working directory did not exist, created it");
         }
         L.info(textDocuments.length + " textDocuments queued for compilation");
-        for (TextDocument doc : textDocuments) {
-            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getRemotePath() + File.separator + doc.getRemoteName());
-            if (tempPath.getParentFile().mkdirs()) {
-                L.info("Directory " + tempPath.getParent() + " did not exist, created!");
+        for (FlowFile doc : textDocuments) {
+            if(doc.latest() instanceof TextDocument){
+                File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getRemotePath() + File.separator + doc.getRemoteName());
+                if (tempPath.getParentFile().mkdirs()) {
+                    L.info("Directory " + tempPath.getParent() + " did not exist, created!");
+                }
+                paths.add(tempPath);
+                PrintStream ps = new PrintStream(tempPath);
+                ps.println(((TextDocument) doc.latest()).getDocumentText());
+                L.info("Wrote " + doc.getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
             }
-            paths.add(tempPath);
-            PrintStream ps = new PrintStream(tempPath);
-            ps.println(doc.getDocumentText());
-            L.info("Wrote " + doc.getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
         }
 
         try {
