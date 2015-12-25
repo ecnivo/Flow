@@ -14,11 +14,14 @@ public class TextDocument extends Document {
     private UUID id;
     private ArrayList<String> lines;
 
-    public TextDocument(String path, UUID id) {
-        super(path);
+    public TextDocument(String path, String name, UUID id) {
+        super(path, name, id);
         this.id = id;
         this.lines = new ArrayList<>();
         lines.add("");
+    }
+    public TextDocument(String path, String name){
+        this(path, name, UUID.randomUUID());
     }
 
     public UUID getID() {

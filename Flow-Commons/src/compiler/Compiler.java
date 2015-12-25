@@ -1,15 +1,13 @@
 package compiler;
 
 import struct.TextDocument;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.tools.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -21,6 +19,8 @@ import java.util.logging.Logger;
 public class Compiler {
 
     private TextDocument[] textDocuments;
+    private UUID dirUUID;
+    private File workingDirectory;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
     /**
@@ -30,6 +30,9 @@ public class Compiler {
      */
     public Compiler(TextDocument... doc) {
         this.textDocuments = doc;
+        this.dirUUID = UUID.randomUUID();
+        this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
     }
 
     /**
@@ -39,7 +42,6 @@ public class Compiler {
      * @throws IOException when files cannot be written
      */
     public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
-        File workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow");
         L.info("Found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
         if (!workingDirectory.exists()) {
@@ -48,12 +50,14 @@ public class Compiler {
         }
         L.info(textDocuments.length + " textDocuments queued for compilation");
         for (TextDocument doc : textDocuments) {
-            String body = doc.getDocumentText();
-            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getID());
+            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getRemotePath() + File.separator + doc.getRemoteName());
+            if (tempPath.getParentFile().mkdirs()) {
+                L.info("Directory " + tempPath.getParent() + " did not exist, created!");
+            }
             paths.add(tempPath);
             PrintStream ps = new PrintStream(tempPath);
             ps.println(doc.getDocumentText());
-            L.info("Wrote " + doc.getID() + " to temporary path of " + tempPath.getAbsolutePath());
+            L.info("Wrote " + doc.getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
         }
 
         try {
@@ -95,9 +99,42 @@ public class Compiler {
         return null;
     }
 
-    public StandardPut execute() {
-        ProcessBuilder pb = new ProcessBuilder();
-        throw new NotImplementedException();
+    public Process execute() throws IOException {
+        String remotePath = textDocuments[0].getRemotePath() + "/" // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
+                + removeExtension(textDocuments[0].getRemoteName());
+        L.info("Assuming main class is " + remotePath);
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp", workingDirectory.getAbsolutePath(), remotePath);
+        L.info("Execution arguments are: " + pb.command().toString());
+        Process p = pb.start();
+        return p;
+    }
+
+    public String readAllOutput() throws IOException {
+        L.info("Reading all output of execution");
+        String str = "";
+        Process p = this.execute();
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while ((line = br.readLine()) != null) {
+            L.info(line);
+            str += line + '\n';
+        }
+        return str;
+    }
+
+    public static String removeExtension(String s) {
+        String separator = System.getProperty("file.separator");
+        String filename;
+        int lastSeparatorIndex = s.lastIndexOf(separator);
+        if (lastSeparatorIndex == -1) {
+            filename = s;
+        } else {
+            filename = s.substring(lastSeparatorIndex + 1);
+        }
+        int extensionIndex = filename.lastIndexOf(".");
+        if (extensionIndex == -1)
+            return filename;
+        return filename.substring(0, extensionIndex);
     }
 }
 
