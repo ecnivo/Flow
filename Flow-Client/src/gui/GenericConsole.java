@@ -23,7 +23,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.text.DefaultEditorKit;
+import javax.swing.KeyStroke;
 
 public class GenericConsole extends JTextArea {
 
@@ -168,16 +168,18 @@ public class GenericConsole extends JTextArea {
 	popUp.add(pasteButton);
 	getCaret().setSelectionVisible(true);
 	setLineWrap(true);
-	String[] disableTargets = { DefaultEditorKit.deletePrevCharAction,
-		DefaultEditorKit.deletePrevWordAction,
-		DefaultEditorKit.deleteNextWordAction,
-		DefaultEditorKit.deleteNextCharAction };
-	for (String target : disableTargets) {
-	    getActionMap().get(target).setEnabled(false);
-	}
+	// String[] disableTargets = { DefaultEditorKit.deletePrevCharAction,
+	// DefaultEditorKit.deletePrevWordAction,
+	// DefaultEditorKit.deleteNextWordAction,
+	// DefaultEditorKit.deleteNextCharAction };
+	// for (String target : disableTargets) {
+	// getActionMap().get(target).setEnabled(false);
+	// }
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setMinimumSize(new Dimension(5, 25));
 	userInput = "";
+	getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), "none");
+	getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "none");
 	addKeyListener(new KeyListener() {
 
 	    @Override

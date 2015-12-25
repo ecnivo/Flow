@@ -92,13 +92,13 @@ public class SettingsPane extends JTabbedPane {
 	JPasswordField passField = new JPasswordField();
 	passField.setMaximumSize(TEXT_BOX_SIZE);
 	passField.setPreferredSize(TEXT_BOX_SIZE);
-	passField.addKeyListener(new PassFieldListener(passField));
+//	passField.addKeyListener(new PassFieldListener(passField));
 	passChange.add(passField);
 	passChange.add(new JLabel("Re-type your password"));
 	JPasswordField retypePass = new JPasswordField();
 	retypePass.setMaximumSize(TEXT_BOX_SIZE);
 	retypePass.setPreferredSize(TEXT_BOX_SIZE);
-	retypePass.addKeyListener(new PassFieldListener(retypePass));
+//	retypePass.addKeyListener(new PassFieldListener(retypePass));
 	passChange.add(retypePass);
 	JButton savePassword = new JButton("Save new password");
 	savePassword.addActionListener(new ActionListener() {
@@ -196,31 +196,31 @@ public class SettingsPane extends JTabbedPane {
 	}
     }
 
-    private class PassFieldListener implements KeyListener {
-
-	private JPasswordField field;
-
-	private PassFieldListener(JPasswordField field) {
-	    this.field = field;
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-	    // nothing
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-	    // nothing
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-	    if (e.getKeyChar() == KeyEvent.VK_DELETE
-		    || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
-		field.setText("");
-	    }
-	}
-
-    }
+//    private class PassFieldListener implements KeyListener {
+//
+//	private JPasswordField field;
+//
+//	private PassFieldListener(JPasswordField field) {
+//	    this.field = field;
+//	}
+//
+//	@Override
+//	public void keyPressed(KeyEvent e) {
+//	    // nothing
+//	}
+//
+//	@Override
+//	public void keyReleased(KeyEvent e) {
+//	    // nothing
+//	}
+//
+//	@Override
+//	public void keyTyped(KeyEvent e) {
+//	    if (e.getKeyChar() == KeyEvent.VK_DELETE
+//		    || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+//		field.setText("");
+//	    }
+//	}
+//
+//    }
 }
