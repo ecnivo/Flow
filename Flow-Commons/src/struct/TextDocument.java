@@ -11,12 +11,10 @@ import java.util.UUID;
  */
 public class TextDocument extends Document {
 
-    private UUID id;
     private ArrayList<String> lines;
 
     public TextDocument(String path, String name, UUID id) {
         super(path, name, id);
-        this.id = id;
         this.lines = new ArrayList<>();
         lines.add("");
     }
@@ -24,9 +22,6 @@ public class TextDocument extends Document {
         this(path, name, UUID.randomUUID());
     }
 
-    public UUID getID() {
-        return id;
-    }
 
     /**
      * Insert a character at line number at index
