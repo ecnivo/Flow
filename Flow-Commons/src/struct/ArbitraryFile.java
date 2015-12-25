@@ -7,12 +7,12 @@ import java.util.UUID;
 
 /**
  * Represents a file of arbitrary extension
- *
+ * <p>
  * Created by Netdex on 12/24/2015.
  */
 public class ArbitraryFile extends Document {
 
-    private transient File localFile;
+    private File localFile;
     private byte[] fileBytes;
 
     protected ArbitraryFile(String remotePath, String remoteFile, File localFile, UUID uuid) throws IOException {
@@ -24,11 +24,12 @@ public class ArbitraryFile extends Document {
     protected ArbitraryFile(String remotePath, String remoteFile, File localFile) throws IOException {
         this(remotePath, remoteFile, localFile, UUID.randomUUID());
     }
-    public byte[] getFileBytes(){
+
+    public byte[] getFileBytes() {
         return fileBytes;
     }
 
-    public File getLocalFile(){
+    public File getLocalFile() {
         return localFile;
     }
 }
