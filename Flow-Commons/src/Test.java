@@ -1,6 +1,7 @@
 import compiler.Compiler;
 import struct.FlowFile;
 import struct.TextDocument;
+import util.DiffMatchPatch;
 
 import java.io.IOException;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Date;
  */
 public class Test {
     public static void main(String[] args) throws IOException {
+        DiffMatchPatch dif = new DiffMatchPatch();
 
         FlowFile flowFile = new FlowFile("", "Test.java");
         TextDocument doc = new TextDocument(flowFile);
