@@ -16,16 +16,20 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
 
@@ -78,6 +82,8 @@ public class EditTabs extends JTabbedPane {
     }
 
     class CustomTabHeader extends JPanel {
+	
+	private JPopupMenu rightClickMenu;
 
 	public CustomTabHeader(File file) {
 	    super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -106,6 +112,148 @@ public class EditTabs extends JTabbedPane {
 	    add(button);
 	    // add more space to the top of the component
 	    setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+
+	    rightClickMenu = new JPopupMenu();
+	    JMenuItem closeTabButton = new JMenuItem(new Action() {
+
+	        
+	        @Override
+	        public void actionPerformed(ActionEvent arg0) {
+	            int i = EditTabs.this.indexOfTabComponent(CustomTabHeader.this);
+	            if (i != -1){
+	        	EditTabs.this.removeTabAt(i);
+	            }
+	        }
+	        
+	        @Override
+	        public void setEnabled(boolean b) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public void removePropertyChangeListener(PropertyChangeListener listener) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public void putValue(String key, Object value) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public boolean isEnabled() {
+	    	// TODO Auto-generated method stub
+	    	return false;
+	        }
+	        
+	        @Override
+	        public Object getValue(String key) {
+	    	// TODO Auto-generated method stub
+	    	return null;
+	        }
+	        
+	        @Override
+	        public void addPropertyChangeListener(PropertyChangeListener listener) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	    });
+	    closeTabButton.setText("Close Tab (Ctrl+W)");
+	    closeTabButton.setEnabled(true);
+	    rightClickMenu.add(closeTabButton);
+	    JMenuItem closeAllTabsButton = new JMenuItem(new Action() {
+
+	        
+	        @Override
+	        public void actionPerformed(ActionEvent arg0) {
+	            EditTabs.this.removeAll();
+	        }
+	        
+	        @Override
+	        public void setEnabled(boolean b) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public void removePropertyChangeListener(PropertyChangeListener listener) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public void putValue(String key, Object value) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	        
+	        @Override
+	        public boolean isEnabled() {
+	    	// TODO Auto-generated method stub
+	    	return false;
+	        }
+	        
+	        @Override
+	        public Object getValue(String key) {
+	    	// TODO Auto-generated method stub
+	    	return null;
+	        }
+	        
+	        @Override
+	        public void addPropertyChangeListener(PropertyChangeListener listener) {
+	    	// TODO Auto-generated method stub
+	    	
+	        }
+	    });
+	    closeAllTabsButton.setText("Close All Tabs");
+	    closeAllTabsButton.setEnabled(true);
+	    rightClickMenu.add(closeAllTabsButton);
+	    addMouseListener(new MouseListener() {
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		    // TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		    // TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		    // TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		    // TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		    int i = EditTabs.this
+			    .indexOfTabComponent(CustomTabHeader.this);
+		    if (i != -1) {
+			if (e.getButton() == MouseEvent.BUTTON2) {
+			    EditTabs.this.remove(i);
+
+			} else if (e.getButton() == MouseEvent.BUTTON1) {
+			    EditTabs.this.setSelectedIndex(i);
+
+			} else if (e.getButton() == MouseEvent.BUTTON3) {
+			    rightClickMenu.show(CustomTabHeader.this, e.getX(), e.getY());
+			}
+		    }
+		}
+	    });
 	}
 
 	private class CloseTabButton extends JButton implements ActionListener {

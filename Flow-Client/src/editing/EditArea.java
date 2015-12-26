@@ -27,7 +27,8 @@ public class EditArea extends JTextPane {
     private StyledDocument doc;
     private Style keywords;
     private Style plain;
-    private ArrayList<StyleToken> blocks;
+    private ArrayList<StyleToken> keywordBlocks;
+    private ArrayList<StyleToken> plainBlocks;
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
 	    "boolean", "break", "byte", "case", "catch", "char", "class",
 	    "const", "continue", "default", "do", "double", "else", "enum",
@@ -144,7 +145,8 @@ public class EditArea extends JTextPane {
     }
 
     private void highlightSyntax() {
-	blocks = new ArrayList<StyleToken>();
+	keywordBlocks = new ArrayList<StyleToken>();
+	plainBlocks = new ArrayList<StyleToken>();
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();
 	for (String target : JAVA_KEYWORDS) {
@@ -169,19 +171,15 @@ public class EditArea extends JTextPane {
 	    }
 	}
 
-	for (StyleToken styleToken : blocks) {
-	    SwingUtilities.invokeLater(new HighlightKeywordsLater(styleToken
+	for (StyleToken styleToken : plainBlocks) {
+	    SwingUtilities.invokeLater(new FormatPlainLater(
+		    styleToken.getPos(), styleToken.getLength()));
+	}
+	for (StyleToken styleToken : keywordBlocks) {
+	    SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
 		    .getPos(), styleToken.getLength()));
 	}
     }
-
-    // private int nextNonLetterIdx(String str, int startIdx) {
-    // for (int i = startIdx; i < str.length(); i++) {
-    // if (!Character.isAlphabetic(str.charAt(i)))
-    // return i;
-    // }
-    // return -1;
-    // }
 
     private boolean arrayContains(String[] array, String target) {
 	for (String string : array) {
@@ -194,15 +192,17 @@ public class EditArea extends JTextPane {
     private void edgesOkay(String sourceCode, int pos, String target) {
 	String candidate = sourceCode.substring(pos, pos + target.length());
 	if (arrayContains(JAVA_KEYWORDS, candidate))
-	    blocks.add(new StyleToken(candidate.length(), pos));
+	    keywordBlocks.add(new StyleToken(candidate.length(), pos));
+	else
+	    plainBlocks.add(new StyleToken(candidate.length(), pos));
     }
 
-    private class HighlightKeywordsLater implements Runnable {
+    private class FormatKeywordsLater implements Runnable {
 
 	private int pos;
 	private int nextToken;
 
-	private HighlightKeywordsLater(int pos, int nextToken) {
+	private FormatKeywordsLater(int pos, int nextToken) {
 	    this.pos = pos;
 	    this.nextToken = nextToken;
 	}
@@ -214,19 +214,19 @@ public class EditArea extends JTextPane {
 
     }
 
-    private class RevertToPlainLater implements Runnable {
+    private class FormatPlainLater implements Runnable {
 
 	private int pos;
-	private String nextToken;
+	private int nextToken;
 
-	private RevertToPlainLater(int pos, String nextToken) {
+	private FormatPlainLater(int pos, int nextToken) {
 	    this.pos = pos;
 	    this.nextToken = nextToken;
 	}
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken.length(), plain, false);
+	    doc.setCharacterAttributes(pos, nextToken, plain, false);
 	}
 
     }
