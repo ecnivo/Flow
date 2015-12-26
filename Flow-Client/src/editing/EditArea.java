@@ -78,7 +78,14 @@ public class EditArea extends JTextPane {
 
 	    @Override
 	    public void keyPressed(KeyEvent e) {
-		// nothing
+		if (e.getKeyCode() == KeyEvent.VK_TAB) {
+		    try {
+			doc.insertString(getCaretPosition(), "    ", null);
+		    } catch (BadLocationException e1) {
+			e1.printStackTrace();
+		    }
+		    e.consume();
+		}
 	    }
 	});
 	doc.addDocumentListener(new DocumentListener() {
@@ -159,70 +166,76 @@ public class EditArea extends JTextPane {
 
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();
+	int line;
 	for (String target : JAVA_KEYWORDS) {
 	    int targetLength = target.length();
-
+	    line = 0;
 	    for (int pos = 0; pos + targetLength < sourceLength; pos++) {
 		if (pos > 0 && pos + targetLength + 1 < sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))
 			    && !Character.isAlphabetic(sourceCode.charAt(pos
 				    + targetLength))) {
-			markWordBlocks(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target, line);
 		    }
 		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos
 			    + targetLength)))
-			markWordBlocks(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target, line);
 		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)))
-			markWordBlocks(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target, line);
 		} else if (pos == 0 && pos + targetLength + 1 == sourceLength)
-		    markWordBlocks(sourceCode, pos, target);
+		    markWordBlocks(sourceCode, pos, target, line);
 
-		if (sourceCode.charAt(pos) == '"') {
-		    boolean escaped;
-		    if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\')
-			    || pos == 0) {
-			escaped = false;
-		    } else {
-			escaped = true;
-		    }
-		    if (!escaped) {
-			int closeQuote = sourceCode.indexOf('"', pos + 1);
+		if (sourceCode.charAt(pos) == '\n') {
+		    line++;
+		}
+	    }
+	}
 
-			System.out.println(closeQuote);
-			while (closeQuote > 0
-				&& sourceCode.charAt(closeQuote - 1) == '\\') {
-			    closeQuote = sourceCode
-				    .indexOf('"', closeQuote + 1);
-			}
-			if (closeQuote > -1) {
-			    strings.add(new StyleToken(closeQuote - pos, pos));
-			    pos = closeQuote;
-			}
+	line = 0;
+	for (int pos = 0; pos < sourceLength; pos++) {
+	    if (sourceCode.charAt(pos) == '"') {
+		boolean escaped;
+		if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
+		    escaped = false;
+		} else {
+		    escaped = true;
+		}
+		if (!escaped) {
+		    int closeQuote = sourceCode.indexOf('"', pos + 1);
+
+		    while (closeQuote > 0
+			    && sourceCode.charAt(closeQuote - 1) == '\\') {
+			closeQuote = sourceCode.indexOf('"', closeQuote + 1);
 		    }
-		} else if (sourceCode.charAt(pos) == '\'') {
-		    boolean escaped;
-		    if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\')
-			    || pos == 0) {
-			escaped = false;
-		    } else {
-			escaped = true;
-		    }
-		    if (!escaped) {
-			int closeQuote = sourceCode.indexOf('\'', pos + 1);
-			while (closeQuote > 0
-				&& sourceCode.charAt(closeQuote - 1) == '\\') {
-			    closeQuote = sourceCode.indexOf('\'',
-				    closeQuote + 1);
-			}
-			if (closeQuote > -1) {
-			    strings.add(new StyleToken(closeQuote - pos, pos));
-			    pos = closeQuote;
-			}
+		    if (closeQuote > -1) {
+			strings.add(new StyleToken(closeQuote - pos, pos - line));
+			pos = closeQuote;
 		    }
 		}
+	    } else if (sourceCode.charAt(pos) == '\'') {
+		boolean escaped;
+		if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
+		    escaped = false;
+		} else {
+		    escaped = true;
+		}
+		if (!escaped) {
+		    int closeQuote = sourceCode.indexOf('\'', pos + 1);
+		    while (closeQuote > 0
+			    && sourceCode.charAt(closeQuote - 1) == '\\') {
+			closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
+		    }
+		    if (closeQuote > -1) {
+			strings.add(new StyleToken(closeQuote - pos, pos - line));
+			pos = closeQuote;
+		    }
+		}
+	    }
 
+	    if (sourceCode.charAt(pos) == '\n') {
+		line++;
 	    }
 	}
 
@@ -248,12 +261,13 @@ public class EditArea extends JTextPane {
 	return false;
     }
 
-    private void markWordBlocks(String sourceCode, int pos, String target) {
+    private void markWordBlocks(String sourceCode, int pos, String target,
+	    int line) {
 	String candidate = sourceCode.substring(pos, pos + target.length());
 	if (arrayContains(JAVA_KEYWORDS, candidate))
-	    keywordBlocks.add(new StyleToken(candidate.length(), pos));
+	    keywordBlocks.add(new StyleToken(candidate.length(), pos - line));
 	else
-	    plainBlocks.add(new StyleToken(candidate.length(), pos));
+	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
     }
 
     private class FormatKeywordsLater implements Runnable {
