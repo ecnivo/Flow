@@ -25,10 +25,15 @@ import javax.swing.text.StyledDocument;
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private Style keywords;
-    private Style plain;
+
+    private Style keywordStyle;
+    private Style plainStyle;
+    private Style stringStyle;
+
     private ArrayList<StyleToken> keywordBlocks;
     private ArrayList<StyleToken> plainBlocks;
+    private ArrayList<StyleToken> strings;
+
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
 	    "boolean", "break", "byte", "case", "catch", "char", "class",
 	    "const", "continue", "default", "do", "double", "else", "enum",
@@ -47,12 +52,15 @@ public class EditArea extends JTextPane {
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
-	keywords = addStyle("keywords", null);
-	StyleConstants.setForeground(keywords, new Color(0x006C79));
-	StyleConstants.setBold(keywords, true);
-	plain = addStyle("plain", null);
-	StyleConstants.setForeground(plain, Color.BLACK);
-	StyleConstants.setBold(plain, false);
+	keywordStyle = addStyle("keywords", null);
+	StyleConstants.setForeground(keywordStyle, new Color(0x006C79));
+	StyleConstants.setBold(keywordStyle, true);
+	plainStyle = addStyle("plain", null);
+	StyleConstants.setForeground(plainStyle, Color.BLACK);
+	StyleConstants.setBold(plainStyle, false);
+	stringStyle = addStyle("strings", null);
+	StyleConstants.setBold(stringStyle, false);
+	StyleConstants.setForeground(stringStyle, new Color(0x45AD00));
 
 	addKeyListener(new KeyListener() {
 
@@ -147,6 +155,8 @@ public class EditArea extends JTextPane {
     private void highlightSyntax() {
 	keywordBlocks = new ArrayList<StyleToken>();
 	plainBlocks = new ArrayList<StyleToken>();
+	strings = new ArrayList<StyleToken>();
+
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();
 	for (String target : JAVA_KEYWORDS) {
@@ -157,17 +167,62 @@ public class EditArea extends JTextPane {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))
 			    && !Character.isAlphabetic(sourceCode.charAt(pos
 				    + targetLength))) {
-			edgesOkay(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target);
 		    }
 		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos
 			    + targetLength)))
-			edgesOkay(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target);
 		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)))
-			edgesOkay(sourceCode, pos, target);
+			markWordBlocks(sourceCode, pos, target);
 		} else if (pos == 0 && pos + targetLength + 1 == sourceLength)
-		    edgesOkay(sourceCode, pos, target);
+		    markWordBlocks(sourceCode, pos, target);
+
+		if (sourceCode.charAt(pos) == '"') {
+		    boolean escaped;
+		    if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\')
+			    || pos == 0) {
+			escaped = false;
+		    } else {
+			escaped = true;
+		    }
+		    if (!escaped) {
+			int closeQuote = sourceCode.indexOf('"', pos + 1);
+
+			System.out.println(closeQuote);
+			while (closeQuote > 0
+				&& sourceCode.charAt(closeQuote - 1) == '\\') {
+			    closeQuote = sourceCode
+				    .indexOf('"', closeQuote + 1);
+			}
+			if (closeQuote > -1) {
+			    strings.add(new StyleToken(closeQuote - pos, pos));
+			    pos = closeQuote;
+			}
+		    }
+		} else if (sourceCode.charAt(pos) == '\'') {
+		    boolean escaped;
+		    if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\')
+			    || pos == 0) {
+			escaped = false;
+		    } else {
+			escaped = true;
+		    }
+		    if (!escaped) {
+			int closeQuote = sourceCode.indexOf('\'', pos + 1);
+			while (closeQuote > 0
+				&& sourceCode.charAt(closeQuote - 1) == '\\') {
+			    closeQuote = sourceCode.indexOf('\'',
+				    closeQuote + 1);
+			}
+			if (closeQuote > -1) {
+			    strings.add(new StyleToken(closeQuote - pos, pos));
+			    pos = closeQuote;
+			}
+		    }
+		}
+
 	    }
 	}
 
@@ -179,6 +234,10 @@ public class EditArea extends JTextPane {
 	    SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
 		    .getPos(), styleToken.getLength()));
 	}
+	for (StyleToken styleToken : strings) {
+	    SwingUtilities.invokeLater(new FormatStringsLater(styleToken
+		    .getPos(), styleToken.getLength() + 1));
+	}
     }
 
     private boolean arrayContains(String[] array, String target) {
@@ -189,7 +248,7 @@ public class EditArea extends JTextPane {
 	return false;
     }
 
-    private void edgesOkay(String sourceCode, int pos, String target) {
+    private void markWordBlocks(String sourceCode, int pos, String target) {
 	String candidate = sourceCode.substring(pos, pos + target.length());
 	if (arrayContains(JAVA_KEYWORDS, candidate))
 	    keywordBlocks.add(new StyleToken(candidate.length(), pos));
@@ -209,7 +268,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, keywords, false);
+	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
 	}
 
     }
@@ -226,8 +285,23 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, plain, false);
+	    doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
 	}
 
+    }
+
+    private class FormatStringsLater implements Runnable {
+	private int pos;
+	private int nextToken;
+
+	private FormatStringsLater(int pos, int nextToken) {
+	    this.pos = pos;
+	    this.nextToken = nextToken;
+	}
+
+	@Override
+	public void run() {
+	    doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
+	}
     }
 }
