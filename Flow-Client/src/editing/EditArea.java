@@ -176,11 +176,14 @@ public class EditArea extends JTextPane {
 			    && !Character.isAlphabetic(sourceCode.charAt(pos
 				    + targetLength))) {
 			markWordBlocks(sourceCode, pos, target, line);
+			pos += targetLength;
 		    }
 		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos
-			    + targetLength)))
+			    + targetLength))) {
 			markWordBlocks(sourceCode, pos, target, line);
+			pos += targetLength;
+		    }
 		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
 		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)))
 			markWordBlocks(sourceCode, pos, target, line);
