@@ -13,6 +13,11 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class FlowClient extends JFrame {
 
+    public static final boolean NETWORK = false;
+
+    private static final String HOST = "127.0.0.1";
+    private static final int PORT = 5000;
+
     private PanelManager manager;
     public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
 	    .createEmptyBorder(0, 0, 0, 0);
@@ -20,12 +25,12 @@ public class FlowClient extends JFrame {
 
     public static void main(String[] args) throws ClassNotFoundException,
 	    InstantiationException, IllegalAccessException,
-	    UnsupportedLookAndFeelException {
+	    UnsupportedLookAndFeelException, IOException {
 	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	new FlowClient();
     }
 
-    public FlowClient() {
+    public FlowClient() throws IOException {
 	// loads things
 	super("Flow");
 
@@ -38,6 +43,10 @@ public class FlowClient extends JFrame {
 		    JOptionPane.ERROR_MESSAGE);
 	}
 
+	// Socket socket = new Socket(HOST, PORT);
+	// PackageSocket packageSender = new PackageSocket(socket);
+
+	// manager = new PanelManager(this, packageSender);
 	manager = new PanelManager(this);
 	this.add(manager);
 

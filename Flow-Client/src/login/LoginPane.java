@@ -22,8 +22,10 @@ import javax.swing.JPasswordField;
 public class LoginPane extends JPanel {
     private PanelManager panMan;
 
+    // public LoginPane(PanelManager panMan, PackageSocket packageSender) {
     public LoginPane(PanelManager panMan) {
 	setBackground(Color.WHITE);
+
 	this.panMan = panMan;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -31,7 +33,6 @@ public class LoginPane extends JPanel {
 	add(verticalStrut_4);
 	// TODO add background picture
 
-	// TODO make title less gross (logo, possibly?)
 	JLabel title = new JLabel();
 	title.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 	add(title);
@@ -40,7 +41,6 @@ public class LoginPane extends JPanel {
 		    new File("images/flow.png")).getScaledInstance(414, 128,
 		    Image.SCALE_SMOOTH)));
 	} catch (IOException e1) {
-	    // TODO Auto-generated catch block
 	    e1.printStackTrace();
 	}
 
@@ -78,14 +78,14 @@ public class LoginPane extends JPanel {
 	java.awt.Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
 
-	JButton newAccountButton = new JButton(
+	JButton createAccountButton = new JButton(
 		"<html>No Account?<br>Create one!</html>");
-	newAccountButton.setPreferredSize(new Dimension(128, 32));
-	newAccountButton.setMinimumSize(new Dimension(32, 2));
-	newAccountButton.setMaximumSize(new Dimension(128, 32));
-	add(newAccountButton);
-	newAccountButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-	newAccountButton.addActionListener(new ActionListener() {
+	createAccountButton.setPreferredSize(new Dimension(128, 32));
+	createAccountButton.setMinimumSize(new Dimension(32, 2));
+	createAccountButton.setMaximumSize(new Dimension(128, 32));
+	add(createAccountButton);
+	createAccountButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+	createAccountButton.addActionListener(new ActionListener() {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -98,7 +98,69 @@ public class LoginPane extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		// TODO add something here to send username and password off for
 		// authentication
+		// if (usernameEntry.getText().length() >= 16) {
+		// JOptionPane
+		// .showConfirmDialog(
+		// null,
+		// "The username is too long.\nUsernames have a limit of 16 characters.",
+		// "Invalid username",
+		// JOptionPane.DEFAULT_OPTION,
+		// JOptionPane.ERROR_MESSAGE);
+		// return;
+		// }
+		//
+		// Data usernamePass = new Data("login");
+		// usernamePass.put("username", usernameEntry.getText());
+		// usernamePass.put("password", passwordEntry.getPassword());
+		// Data reply = null;
+		// try {
+		// packageSender.sendPackage(usernamePass);
+		// reply = packageSender.receivePackage(Data.class);
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// JOptionPane
+		// .showConfirmDialog(
+		// null,
+		// "Cannot communicated with the server.\nCheck your internet connection and try again.",
+		// "Server connection",
+		// JOptionPane.DEFAULT_OPTION,
+		// JOptionPane.ERROR_MESSAGE);
+		// return;
+		// } catch (ClassNotFoundException e1) {
+		// e1.printStackTrace();
+		// }
+		// switch (reply.get("status", String.class)) {
+		// case "USERNAME_DOES_NOT_EXIST":
+		// JOptionPane
+		// .showConfirmDialog(
+		// null,
+		// "The username does not exist.\nPlease enter a username that is valid, or create a new account.",
+		// "Invalid username",
+		// JOptionPane.DEFAULT_OPTION,
+		// JOptionPane.ERROR_MESSAGE);
+		// return;
+		// case "PASSWORD_INCORRECT":
+		// JOptionPane
+		// .showConfirmDialog(
+		// null,
+		// "Whoops! Your password does not match the one we don't have. Try again.",
+		// "Incorrect password",
+		// JOptionPane.DEFAULT_OPTION,
+		// JOptionPane.ERROR_MESSAGE);
+		// return;
+		//
+		// case "ALREADY_LOGGED_IN":
+		// JOptionPane
+		// .showConfirmDialog(
+		// null,
+		// "You are already logged in from another machine.\nFlow does not support logins from different machines.",
+		// "Already logged in",
+		// JOptionPane.DEFAULT_OPTION,
+		// JOptionPane.ERROR_MESSAGE);
+		// return;
+		// }
 		LoginPane.this.panMan.switchToEditor();
+
 	    }
 	});
     }

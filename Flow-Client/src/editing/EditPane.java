@@ -1,6 +1,7 @@
 package editing;
 
 import gui.FlowClient;
+import gui.FlowPermission;
 import gui.GenericConsole;
 import gui.NavBar;
 import gui.PanelManager;
@@ -48,10 +49,10 @@ public class EditPane extends JPanel {
 	genericConsole.getScroll().setPreferredSize(
 		new Dimension(RIGHT_SIDE_WIDTH, 500));
 	rightSide.setLeftComponent(genericConsole.getScroll());
-	CollabsList collabsList = new CollabsList();
-	collabsList.getScroll().setPreferredSize(
+	CollabsList collabsList = new CollabsList(new FlowPermission(FlowPermission.OWNER));
+	collabsList.setPreferredSize(
 		new Dimension(RIGHT_SIDE_WIDTH, 225));
-	rightSide.setRightComponent(collabsList.getScroll());
+	rightSide.setRightComponent(collabsList);
 
 	JSplitPane leftSide = new JSplitPane();
 	leftSide.setBorder(FlowClient.EMPTY_BORDER);

@@ -12,7 +12,7 @@ public class FlowPermission {
     private static final Color NONE_COLOUR = Color.WHITE;
     private static final Color EDIT_COLOUR = new Color(0xFFC46F);
     private static final Color VIEW_COLOUR = new Color(0xC8FFAD);
-    private static final Color OWNER_COLOUR = new Color(929292);
+    private static final Color OWNER_COLOUR = new Color(606060);
 
     private byte permissionLevel;
 
