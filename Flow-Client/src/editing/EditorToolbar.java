@@ -1,7 +1,9 @@
 package editing;
 
 import gui.FlowClient;
+import gui.FlowPermission;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -12,6 +14,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 public class EditorToolbar extends JToolBar {
@@ -68,8 +75,9 @@ public class EditorToolbar extends JToolBar {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    // TODO pop open a sharing window to search for other users
-		    System.out.println("Share button pressed");
+		    // TODO ask server for permissions for the user in the
+		    // currently open project
+		    new ShareWindow(new FlowPermission(FlowPermission.OWNER));
 		}
 	    });
 	}

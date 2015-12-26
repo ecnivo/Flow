@@ -60,7 +60,7 @@ public class EditPane extends JPanel {
 		Integer.MAX_VALUE));
 	mainSplit.setLeftComponent(leftSide);
 
-	editTabs = new EditTabs(true);
+	editTabs = new EditTabs();
 	leftSide.setRightComponent(editTabs);
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -89,7 +89,7 @@ public class EditPane extends JPanel {
 	    public void keyReleased(KeyEvent e) {
 		// System.out.println("Hi");
 		try {
-		    editTabs.openTab(new File("D:/questfile.txt"));
+		    editTabs.openTab(new File("D:/questfile.txt"), true);
 		} catch (Exception h) {
 		    return;
 		}

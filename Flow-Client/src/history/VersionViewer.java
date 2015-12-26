@@ -19,7 +19,8 @@ public class VersionViewer extends JList<VersionItem> {
     class VersionItem extends JPanel {
 	public VersionItem() {
 	    setBorder(FlowClient.EMPTY_BORDER);
-	    // TODO Auto-generated constructor stub
+	    // TODO should actually be init with a version timestamp or
+	    // something
 	}
     }
 }

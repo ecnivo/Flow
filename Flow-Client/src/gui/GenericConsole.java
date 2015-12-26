@@ -294,7 +294,6 @@ public class GenericConsole extends JTextArea {
 
     private void sendCommand(String command) {
 	// TODO send command to the standard in
-	System.out.println("Sending " + userInput + " to standard in");
     }
 
     private void update() {

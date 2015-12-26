@@ -90,9 +90,6 @@ public class EditArea extends JTextPane {
 	});
 	doc.addDocumentListener(new DocumentListener() {
 
-	    // TODO if the server denies the request, add the string back/delete
-	    // the added string without making the change
-
 	    @Override
 	    public void changedUpdate(DocumentEvent e) {
 		// useless for plaintext areas
@@ -103,26 +100,21 @@ public class EditArea extends JTextPane {
 		String insertedString = "";
 		try {
 		    insertedString = doc.getText(
-			    EditArea.this.getCaretPosition(), e.getLength());
+			    EditArea.this.getCaretPosition() - e.getLength(),
+			    e.getLength());
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		}
-		highlightSyntax();
-		// System.out.println(insertedString + " was added at position "
-		// + EditArea.this.getCaret().getDot());
+		// TODO send this change to server, if not approved, then return
 
-		// TODO send this change to server
+		highlightSyntax();
 	    }
 
 	    @Override
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
+		// TODO send change to server, and cut if unapproved
 		highlightSyntax();
-		// System.out.println("String of length " + removedLen
-		// + " was removed at "
-		// + EditArea.this.getCaret().getDot());
-
-		// TODO send this change to server
 	    }
 	});
 	addCaretListener(new CaretListener() {
@@ -130,8 +122,6 @@ public class EditArea extends JTextPane {
 	    @Override
 	    public void caretUpdate(CaretEvent arg0) {
 		int caretPos = getCaret().getDot();
-		// System.out.println("Caret moved to "
-		// + EditArea.this.getCaret().getDot());
 		// TODO send position to server
 	    }
 	});

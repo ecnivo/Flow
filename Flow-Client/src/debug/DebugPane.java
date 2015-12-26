@@ -25,7 +25,7 @@ public class DebugPane extends JPanel {
 	mainSplit.setResizeWeight(0);
 	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 
-	mainSplit.setRightComponent(new EditTabs(true));
+	mainSplit.setRightComponent(new EditTabs());
 
 	JSplitPane leftHalf = new JSplitPane();
 	leftHalf.setPreferredSize(new Dimension(310, 574));

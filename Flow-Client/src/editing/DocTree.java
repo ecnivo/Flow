@@ -28,28 +28,24 @@ public class DocTree extends JTree {
 	setModel(model);
 	getSelectionModel().setSelectionMode(
 		TreeSelectionModel.SINGLE_TREE_SELECTION);
-	addTreeSelectionListener(new DocTreeSelectionListener());
+	addTreeSelectionListener(new TreeSelectionListener() {
+
+	    @Override
+	    public void valueChanged(TreeSelectionEvent e) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) DocTree.this
+			.getSelectionPath().getLastPathComponent();
+
+		if (node.isLeaf()) {
+		    // TODO get the link to the file, then open a new tab in the
+		    // editPane for the file that's editable
+		}
+	    }
+	});
     }
 
     private class DocTreeModel extends DefaultTreeModel {
 	private DocTreeModel() {
 	    super(new DefaultMutableTreeNode("Workspace"));
-	}
-
-    }
-
-    private class DocTreeSelectionListener implements TreeSelectionListener {
-
-	@Override
-	public void valueChanged(TreeSelectionEvent e) {
-
-	    DefaultMutableTreeNode node = (DefaultMutableTreeNode) DocTree.this
-		    .getSelectionPath().getLastPathComponent();
-
-	    if (node.isLeaf()) {
-		// TODO get the link to the file, then open a new tab in the
-		// editPane for the file
-	    }
 	}
 
     }
