@@ -105,7 +105,7 @@ public class SQLDatabase {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Getter for all files associated with the specified project.
 	 * 
