@@ -7,7 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,6 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class CollabsList extends JPanel {
     private JPanel searchPane;
@@ -37,6 +40,12 @@ public class CollabsList extends JPanel {
     private JPanel userList;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
+    private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
+	    16);
+    private static final Border TEXT_ENTRY_BORDER = BorderFactory
+	    .createLineBorder(new Color(0xB1ADFF), 2);
+    private static final Border ICON_ENTRY_BORDER = BorderFactory
+	    .createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
 
     public CollabsList(FlowPermission myPermission) {
@@ -51,6 +60,8 @@ public class CollabsList extends JPanel {
 		BorderLayout.NORTH);
 
 	searchBox = new JTextField();
+	searchBox.setText(SEARCHBOX_TEXT);
+	searchBox.setForeground(Color.GRAY);
 	searchBox.addFocusListener(new FocusListener() {
 
 	    @Override
@@ -88,6 +99,7 @@ public class CollabsList extends JPanel {
 	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
 		.getSize().getWidth()), Integer.MAX_VALUE));
 	JScrollPane userListScroll = new JScrollPane(userList);
+	userListScroll.getVerticalScrollBar().setUnitIncrement(12);
 	userListScroll
 		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	userListScroll
@@ -130,6 +142,46 @@ public class CollabsList extends JPanel {
 	}
 	userList.add(new UserInfo("testname3", icon, new FlowPermission(
 		FlowPermission.EDIT)));
+
+	try {
+	    icon = new ImageIcon(ImageIO.read(
+		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
+		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	userList.add(new UserInfo("testname4", icon, new FlowPermission(
+		FlowPermission.EDIT)));
+
+	try {
+	    icon = new ImageIcon(ImageIO.read(
+		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
+		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	userList.add(new UserInfo("testname5", icon, new FlowPermission(
+		FlowPermission.EDIT)));
+
+	try {
+	    icon = new ImageIcon(ImageIO.read(
+		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
+		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	userList.add(new UserInfo("testname6", icon, new FlowPermission(
+		FlowPermission.EDIT)));
+    }
+
+    /**
+     * For displaying a list of users after a search has been completed.
+     * 
+     * @param matches
+     *            the list of search results
+     */
+    private void updateUsers(UserInfo[] matches) {
+	throw new NotImplementedException();
     }
 
     class UserInfo extends JPanel {
@@ -140,6 +192,8 @@ public class CollabsList extends JPanel {
 
 	private JPanel simpleView;
 	private JPanel permissionsView;
+
+	private JLabel permissionLabel;
 
 	public UserInfo(String username, ImageIcon avatar,
 		FlowPermission permission) {
@@ -155,27 +209,39 @@ public class CollabsList extends JPanel {
 		    .getSize().getWidth() * .9), 80));
 	    setMinimumSize(new Dimension(5, 5));
 
-	    setLayout(new FlowLayout(FlowLayout.LEFT, 3, 0));
+	    setLayout(new BorderLayout(2, 0));
 	    JLabel icon = new JLabel(userAvatar);
-	    icon.setPreferredSize(new Dimension(32, 32));
-	    add(icon);
+	    icon.setPreferredSize(new Dimension(USER_ICON_SIZE, USER_ICON_SIZE));
+	    icon.setMinimumSize(new Dimension(USER_ICON_SIZE, USER_ICON_SIZE));
+	    add(icon, BorderLayout.WEST);
 	    JPanel switcher = new JPanel(new CardLayout(0, 0));
+	    switcher.setOpaque(false);
+	    add(switcher, BorderLayout.CENTER);
 
-	    simpleView = new JPanel(new BorderLayout(0, 0));
+	    simpleView = new JPanel(new BorderLayout(0, 1));
+	    simpleView.setMaximumSize(new Dimension((int) Math
+		    .floor(CollabsList.this.getSize().getWidth() * .9), 80));
 	    JLabel name = new JLabel(userName);
-	    JLabel permissionLabel = new JLabel(userPermission.toString());
+	    name.setFont(USERNAME_FONT);
+	    permissionLabel = new JLabel(userPermission.toString());
 	    simpleView.add(name, BorderLayout.NORTH);
-	    simpleView.add(permissionLabel, BorderLayout.SOUTH);
+	    name.setBorder(FlowClient.EMPTY_BORDER);
+	    simpleView.add(permissionLabel, BorderLayout.CENTER);
+	    permissionLabel.setBorder(FlowClient.EMPTY_BORDER);
+	    simpleView.setOpaque(false);
 	    switcher.add(simpleView, "simple");
 
 	    permissionsView = new JPanel(new BorderLayout(0, 0));
-	    permissionsView.add(new JLabel(userName), BorderLayout.NORTH);
+	    JLabel name2 = new JLabel(userName);
+	    name2.setFont(USERNAME_FONT);
+	    permissionsView.add(name2, BorderLayout.NORTH);
 	    ButtonGroup permissionGroup = new ButtonGroup();
 	    JPanel permissionPanel = new JPanel();
-	    permissionPanel.setLayout(new BoxLayout(permissionPanel,
-		    BoxLayout.Y_AXIS));
+	    permissionPanel.setLayout(new GridLayout(2, 2, 1, 1));
+	    permissionPanel.setOpaque(false);
 	    permissionsView.add(permissionPanel, BorderLayout.CENTER);
-	    switcher.add(permissionPanel, "permissions");
+	    permissionsView.setOpaque(false);
+	    switcher.add(permissionsView, "permissions");
 
 	    setBackground(userPermission.getPermissionColor());
 	    switcher.addMouseListener(new MouseListener() {
@@ -192,19 +258,19 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-		    // nothing
+		    setBorder(FlowClient.EMPTY_BORDER);
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-		    // nothing
+		    setBorder(TEXT_ENTRY_BORDER);
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
 		    if (myPermission.canChangeCollabs())
-			((CardLayout) UserInfo.this.getLayout()).show(
-				UserInfo.this, "permissions");
+			((CardLayout) switcher.getLayout()).show(switcher,
+				"permissions");
 		}
 	    });
 	    icon.addMouseListener(new MouseListener() {
@@ -221,12 +287,12 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-		    // nothing
+		    setBorder(FlowClient.EMPTY_BORDER);
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-		    // nothing
+		    setBorder(ICON_ENTRY_BORDER);
 		}
 
 		@Override
@@ -236,38 +302,48 @@ public class CollabsList extends JPanel {
 		}
 	    });
 
-	    JRadioButton noButton = new JRadioButton("None (un-invite)");
+	    JRadioButton noButton = new JRadioButton(new FlowPermission(
+		    FlowPermission.NONE).toString());
 	    noButton.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    userPermission.setPermission(FlowPermission.NONE);
 		}
 	    });
+	    noButton.addMouseListener(new ButtonHighlightListener());
+	    noButton.setOpaque(false);
 	    permissionGroup.add(noButton);
 	    permissionPanel.add(noButton);
 
-	    JRadioButton viewButton = new JRadioButton("View only");
+	    JRadioButton viewButton = new JRadioButton(new FlowPermission(
+		    FlowPermission.VIEW).toString());
 	    viewButton.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    userPermission.setPermission(FlowPermission.VIEW);
 		}
 	    });
+	    viewButton.addMouseListener(new ButtonHighlightListener());
+	    viewButton.setOpaque(false);
 	    permissionPanel.add(viewButton);
 	    permissionGroup.add(viewButton);
 
-	    JRadioButton editButton = new JRadioButton("Edit");
+	    JRadioButton editButton = new JRadioButton(new FlowPermission(
+		    FlowPermission.EDIT).toString());
 	    editButton.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 		    userPermission.setPermission(FlowPermission.EDIT);
 		}
 	    });
+	    editButton.addMouseListener(new ButtonHighlightListener());
+	    editButton.setOpaque(false);
 	    permissionPanel.add(editButton);
 	    permissionGroup.add(editButton);
 
 	    if (myPermission.canChangeOwner()) {
-		JRadioButton ownerButton = new JRadioButton("Owner");
+		JRadioButton ownerButton = new JRadioButton(new FlowPermission(
+			FlowPermission.OWNER).toString());
 		ownerButton.addActionListener(new ActionListener() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
@@ -276,6 +352,8 @@ public class CollabsList extends JPanel {
 			userPermission.setPermission(FlowPermission.OWNER);
 		    }
 		});
+		ownerButton.addMouseListener(new ButtonHighlightListener());
+		ownerButton.setOpaque(false);
 		permissionPanel.add(ownerButton);
 		permissionGroup.add(ownerButton);
 	    }
@@ -286,11 +364,50 @@ public class CollabsList extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 		    // TODO formally send a change in editors to server
-		    ((CardLayout) UserInfo.this.getLayout()).show(
-			    UserInfo.this, "simple");
+		    ((CardLayout) switcher.getLayout())
+			    .show(switcher, "simple");
+		    updateFields();
 		}
 	    });
+	    saveButton.addMouseListener(new ButtonHighlightListener());
 	    permissionPanel.add(saveButton);
+
+	}
+
+	private void updateFields() {
+	    setBackground(userPermission.getPermissionColor());
+	    permissionLabel.setText(userPermission.toString());
+	    revalidate();
+	}
+
+	class ButtonHighlightListener implements MouseListener {
+
+	    @Override
+	    public void mouseClicked(MouseEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseExited(MouseEvent e) {
+		setBorder(FlowClient.EMPTY_BORDER);
+	    }
+
+	    @Override
+	    public void mouseEntered(MouseEvent e) {
+		setBorder(TEXT_ENTRY_BORDER);
+	    }
+
+	    @Override
+	    public void mousePressed(MouseEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseReleased(MouseEvent e) {
+		// nothing
+	    }
+
 	}
     }
+
 }

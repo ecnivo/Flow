@@ -27,7 +27,7 @@ public class EditorToolbar extends JToolBar {
 	setBorder(FlowClient.EMPTY_BORDER);
 
 	add(new SearchButton());
-	add(new ShareButton());
+	add(new ProjectManageButton());
 	add(new ImportButton());
 	add(new ExportButton());
 	addSeparator();
@@ -59,8 +59,8 @@ public class EditorToolbar extends JToolBar {
 	}
     }
 
-    private class ShareButton extends JButton {
-	private ShareButton() {
+    private class ProjectManageButton extends JButton {
+	private ProjectManageButton() {
 	    try {
 		setIcon(new ImageIcon(ImageIO.read(
 			new File("images/addCollab.png")).getScaledInstance(
@@ -75,9 +75,7 @@ public class EditorToolbar extends JToolBar {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    // TODO ask server for permissions for the user in the
-		    // currently open project
-		    new ShareWindow(new FlowPermission(FlowPermission.OWNER));
+		    //TODO open a window to create a new project, 
 		}
 	    });
 	}

@@ -10,9 +10,9 @@ public class FlowPermission {
     public static final byte OWNER = 3;
 
     private static final Color NONE_COLOUR = Color.WHITE;
-    private static final Color EDIT_COLOUR = new Color(0xFFC46F);
-    private static final Color VIEW_COLOUR = new Color(0xC8FFAD);
-    private static final Color OWNER_COLOUR = new Color(606060);
+    private static final Color EDIT_COLOUR = new Color(255,200,155);
+    private static final Color VIEW_COLOUR = new Color(200,255,200);
+    private static final Color OWNER_COLOUR = new Color(200,200,255);
 
     private byte permissionLevel;
 
@@ -67,9 +67,9 @@ public class FlowPermission {
 	case NONE:
 	    return "None";
 	case VIEW:
-	    return "Read only";
+	    return "View (read only)";
 	case EDIT:
-	    return "Read/write";
+	    return "Edit (read/write)";
 	case OWNER:
 	    return "Owner";
 
