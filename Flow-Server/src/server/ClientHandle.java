@@ -5,18 +5,19 @@ import java.net.Socket;
 import java.util.UUID;
 
 import message.Data;
+import network.DataSocket;
 
 public class ClientHandle implements Runnable {
 
 	private Socket socket;
-	private PackageSocket psocket;
+	private DataSocket psocket;
 	private Server server;
 
 	private UUID uuid;
 
 	public ClientHandle(Server server, Socket socket) throws IOException {
 		this.socket = socket;
-		this.psocket = new PackageSocket(socket);
+		this.psocket = new DataSocket(socket);
 		this.server = server;
 	}
 
@@ -26,7 +27,7 @@ public class ClientHandle implements Runnable {
 			this.socket.setSoTimeout(1000);
 			boolean authenticated = false;
 			while (!authenticated && socket.isConnected()) {
-				final Data authRequest = psocket.receivePackage(Data.class);
+				final Data authRequest = psocket.receive(Data.class);
 				if (!authRequest.getType().equals("auth"))
 					return;
 				String user = authRequest.get("username", String.class);
@@ -45,10 +46,10 @@ public class ClientHandle implements Runnable {
 				} else {
 					authStatusData.put("status", "INVALID");
 				}
-				this.psocket.sendPackage(authStatusData);
+				this.psocket.send(authStatusData);
 			}
 			while (this.socket.isConnected()) {
-				Data data = psocket.receivePackage(Data.class);
+				Data data = psocket.receive(Data.class);
 				String type = data.get("type", String.class);
 				switch (type) {
 
