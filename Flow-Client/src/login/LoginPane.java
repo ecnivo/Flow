@@ -1,5 +1,7 @@
 package login;
 
+import gui.Communicator;
+import gui.FlowClient;
 import gui.PanelManager;
 
 import java.awt.Color;
@@ -16,13 +18,17 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+
+import message.Data;
 
 public class LoginPane extends JPanel {
     private PanelManager panMan;
 
-    // public LoginPane(PanelManager panMan, PackageSocket packageSender) {
+    // https://i.imgur.com/19iZW9K.png
+
     public LoginPane(PanelManager panMan) {
 	setBackground(Color.WHITE);
 
@@ -98,67 +104,55 @@ public class LoginPane extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		// TODO add something here to send username and password off for
 		// authentication
-		// if (usernameEntry.getText().length() >= 16) {
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "The username is too long.\nUsernames have a limit of 16 characters.",
-		// "Invalid username",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		//
-		// Data usernamePass = new Data("login");
-		// usernamePass.put("username", usernameEntry.getText());
-		// usernamePass.put("password", passwordEntry.getPassword());
-		// Data reply = null;
-		// try {
-		// packageSender.sendPackage(usernamePass);
-		// reply = packageSender.receivePackage(Data.class);
-		// } catch (IOException e1) {
-		// e1.printStackTrace();
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "Cannot communicated with the server.\nCheck your internet connection and try again.",
-		// "Server connection",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// } catch (ClassNotFoundException e1) {
-		// e1.printStackTrace();
-		// }
-		// switch (reply.get("status", String.class)) {
-		// case "USERNAME_DOES_NOT_EXIST":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "The username does not exist.\nPlease enter a username that is valid, or create a new account.",
-		// "Invalid username",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// case "PASSWORD_INCORRECT":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "Whoops! Your password does not match the one we don't have. Try again.",
-		// "Incorrect password",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		//
-		// case "ALREADY_LOGGED_IN":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "You are already logged in from another machine.\nFlow does not support logins from different machines.",
-		// "Already logged in",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
+		if (FlowClient.NETWORK) {
+		    if (usernameEntry.getText().length() >= 16) {
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"The username is too long.\nUsernames have a limit of 16 characters.",
+					"Invalid username",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+
+		    Data usernamePass = new Data("login");
+		    usernamePass.put("username", usernameEntry.getText());
+		    usernamePass.put("password", passwordEntry.getPassword());
+
+		    String reply = Communicator.communicate(usernamePass).get(
+			    "status", String.class);
+		    switch (reply) {
+		    case "USERNAME_DOES_NOT_EXIST":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"The username does not exist.\nPlease enter a username that is valid, or create a new account.",
+					"Invalid username",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    case "PASSWORD_INCORRECT":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"Whoops! Your password does not match the one we don't have. Try again.",
+					"Incorrect password",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+
+		    case "ALREADY_LOGGED_IN":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"You are already logged in from another machine.\nFlow does not support logins from different machines.",
+					"Already logged in",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		}
 		LoginPane.this.panMan.switchToEditor();
 
 	    }

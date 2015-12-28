@@ -1,6 +1,8 @@
 package login;
 
 import gui.BackButton;
+import gui.Communicator;
+import gui.FlowClient;
 import gui.PanelManager;
 
 import java.awt.Color;
@@ -15,20 +17,20 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
+
+import message.Data;
 
 public class CreateAccountPane extends JPanel {
     private PanelManager manager;
     private JPasswordField passwordField;
 
-    // public CreateAccountPane(PanelManager manager, PackageSocket
-    // packageSender) {
     public CreateAccountPane(PanelManager manager) {
 	setBackground(Color.WHITE);
 	this.manager = manager;
-	// TODO put a limit on name length
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 	Component verticalStrut_3 = Box.createVerticalStrut(20);
@@ -97,64 +99,71 @@ public class CreateAccountPane extends JPanel {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// if (usernameEntry.getText().length() > 16) {
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "Username is too long.\nUsernames must be below 16 characters.",
-		// "Invalid username",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		//
-		// Data userData = new Data("user");
-		// userData.put("user_type", "REGISTER");
-		// userData.put("username", usernameEntry.getText());
-		// userData.put("password", passwordEntry.getPassword());
-		// Data reply = null;
-		// try {
-		// packageSender.sendPackage(userData);
-		// reply = packageSender.receivePackage(Data.class);
-		// } catch (IOException e1) {
-		// e1.printStackTrace();
-		// } catch (ClassNotFoundException e1) {
-		// e1.printStackTrace();
-		// }
-		// String replyMsg = reply.get("status", String.class);
-		// switch (replyMsg) {
-		// case "USERNAME_TAKEN":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "This username has been taken already.\nPlease select another one.",
-		// "Username in use",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// case "USERNAME_INVALID":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "This username is invalid.\nThe most likely cause is the presence of special characters.\nPlease select another one.",
-		// "Username invalid",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// case "PASSWORD_INVALID":
-		// JOptionPane
-		// .showConfirmDialog(
-		// null,
-		// "This password is invalid.\nThe most likely cause is the presence of special characters.\nPlease select another one.",
-		// "Password invalid",
-		// JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		// JOptionPane.showConfirmDialog(null,
-		// "You have successfully registered a Flow account!",
-		// "Registration successful", JOptionPane.DEFAULT_OPTION,
-		// JOptionPane.INFORMATION_MESSAGE);
+		if (FlowClient.NETWORK) {
+		    int usernameLength = usernameEntry.getText().trim().length();
+		    if (usernameLength < 1 || usernameLength > 16) {
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"Username is too long or too short.\nUsernames must be no less than 1 character, and no greater than 16 characters.",
+					"Invalid username",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		    if (passwordEntry.getPassword().length < 1) {
+			JOptionPane.showConfirmDialog(null,
+				"Please enter a password", "No password",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+
+		    Data userData = new Data("user");
+		    userData.put("user_type", "REGISTER");
+		    userData.put("username", usernameEntry.getText().trim());
+		    userData.put("password",
+			    String.copyValueOf(passwordEntry.getPassword()));
+
+		    String replyMsg = Communicator.communicate(userData).get(
+			    "status", String.class);
+		    switch (replyMsg) {
+		    case "USERNAME_TAKEN":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"This username has been taken already.\nPlease select another one.",
+					"Username in use",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    case "USERNAME_INVALID":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"This username is invalid.\nThe most likely cause is the presence of special characters.\nPlease select another one.",
+					"Username invalid",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    case "PASSWORD_INVALID":
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"This password is invalid.\nThe most likely cause is the presence of special characters.\nPlease select another one.",
+					"Password invalid",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		}
+		JOptionPane
+			.showConfirmDialog(
+				null,
+				"Congratulations, you have successfully registered a Flow account!",
+				"Registration successful",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.INFORMATION_MESSAGE);
 		CreateAccountPane.this.manager.switchToEditor();
 	    }
 	});

@@ -11,7 +11,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,10 +18,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -34,13 +30,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import struct.User;
 
 public class CollabsList extends JPanel {
+    // TODO when switching projects, clear search box and doClick on the search
+    // box
+    // TODO have something that stores the current project (doctree) and have an
+    // access for it
     private JPanel searchPane;
     private JTextField searchBox;
     private JButton searchButton;
-    private JPanel userList;
+    private JPanel userListPanel;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
     private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
@@ -50,6 +50,7 @@ public class CollabsList extends JPanel {
     private static final Border ICON_ENTRY_BORDER = BorderFactory
 	    .createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
+    private User[] listOfUsers;
 
     public CollabsList(FlowPermission myPermission) {
 	this.myPermission = myPermission;
@@ -91,18 +92,24 @@ public class CollabsList extends JPanel {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// TODO starts a search if the search box contents are
-		// "searchboxtext" or nothing (should eventually send a parameter to the updateUsers method)
-		updateUsers();
+		if (FlowClient.NETWORK) {
+		    if (searchBox.getText().equals(SEARCHBOX_TEXT)
+			    || searchBox.getText().trim().equals("")) {
+			displayUserList(null);
+		    } else {
+			displayUserList(searchBox.getText().trim());
+		    }
+		}
 	    }
 	});
 	searchPane.add(searchButton, BorderLayout.EAST);
 	add(searchPane, BorderLayout.NORTH);
 
-	userList = new JPanel(new GridLayout(0, 1, 2, 3));
-	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
-		.getSize().getWidth()), Integer.MAX_VALUE));
-	JScrollPane userListScroll = new JScrollPane(userList);
+	userListPanel = new JPanel(new GridLayout(0, 1, 2, 3));
+	userListPanel.setMaximumSize(new Dimension((int) Math
+		.floor(CollabsList.this.getSize().getWidth()),
+		Integer.MAX_VALUE));
+	JScrollPane userListScroll = new JScrollPane(userListPanel);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(
 		FlowClient.SCROLL_SPEED);
 	userListScroll
@@ -110,83 +117,36 @@ public class CollabsList extends JPanel {
 	userListScroll
 		.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	add(userListScroll, BorderLayout.CENTER);
-	updateUsers();
     }
 
-    private void updateUsers() {
-	// TODO add the current project's collaborators first, then add all
-	// other users in userList
-	ImageIcon icon = null;
-	try {
-	    icon = new ImageIcon(ImageIO.read(
-		    new File("D:/My Pictures/happysad face.png"))
-		    .getScaledInstance(USER_ICON_SIZE, USER_ICON_SIZE,
-			    Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname", icon, new FlowPermission(
-		FlowPermission.OWNER)));
-
-	try {
-	    icon = new ImageIcon(ImageIO.read(new File("D:/My Pictures/h.jpg"))
-		    .getScaledInstance(USER_ICON_SIZE, USER_ICON_SIZE,
-			    Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname2", icon, new FlowPermission(
-		FlowPermission.EDIT)));
-
-	try {
-	    icon = new ImageIcon(ImageIO.read(
-		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
-		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname3", icon, new FlowPermission(
-		FlowPermission.VIEW)));
-
-	try {
-	    icon = new ImageIcon(ImageIO.read(
-		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
-		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname4", icon, new FlowPermission(
-		FlowPermission.NONE)));
-
-	try {
-	    icon = new ImageIcon(ImageIO.read(
-		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
-		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname5", icon, new FlowPermission(
-		FlowPermission.VIEW)));
-
-	try {
-	    icon = new ImageIcon(ImageIO.read(
-		    new File("D:/My Pictures/v-3.jpg")).getScaledInstance(
-		    USER_ICON_SIZE, USER_ICON_SIZE, Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	userList.add(new UserInfo("testname6", icon, new FlowPermission(
-		FlowPermission.VIEW)));
-    }
-
-    /**
-     * For displaying a list of users after a search has been completed.
-     * 
-     * @param matches
-     *            the list of search results
-     */
-    private void updateUsers(UserInfo[] matches) {
-	throw new NotImplementedException();
+    private void displayUserList(String query) {
+	// Data listUsers = new Data("list_users");
+	// listOfUsers = Communicator.communicate(listUsers).get("users",
+	// User[].class);
+	//
+	// // TODO puts the ones that are currently
+	// // collaborators first
+	//
+	// if (query != null) {
+	// User[] tempList = new User[listOfUsers.length];
+	// int pos = 0;
+	// for (User user : tempList) {
+	// if (user.getUsername().contains(query)) {
+	// tempList[pos] = user;
+	// pos++;
+	// }
+	// }
+	// listOfUsers = tempList;
+	// }
+	//
+	// userListPanel.removeAll();
+	// for (User user : listOfUsers) {
+	//
+	// }
+	//
+	// // TODO for loop through. Clear userlistpanel, and create new
+	// userinfo
+	// // panels on it
     }
 
     class UserInfo extends JPanel {

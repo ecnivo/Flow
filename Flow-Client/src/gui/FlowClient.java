@@ -44,10 +44,8 @@ public class FlowClient extends JFrame {
 		    JOptionPane.ERROR_MESSAGE);
 	}
 
-	// Socket socket = new Socket(HOST, PORT);
-	// PackageSocket packageSender = new PackageSocket(socket);
+	Communicator.initComms();
 
-	// manager = new PanelManager(this, packageSender);
 	manager = new PanelManager(this);
 	this.add(manager);
 

@@ -23,17 +23,14 @@ public class PanelManager extends JPanel {
     private JFrame frame;
     private HistoryPane historyPane;
 
-    // public PanelManager(JFrame frame, PackageSocket packageSender) {
     public PanelManager(JFrame frame) {
 	layout = new CardLayout();
 	this.setLayout(layout);
 	setBorder(FlowClient.EMPTY_BORDER);
 
-//	loginPane = new LoginPane(this, packageSender);
 	loginPane = new LoginPane(this);
 	add(loginPane, "loginPane");
 
-//	createAccountPane = new CreateAccountPane(this, packageSender);
 	createAccountPane = new CreateAccountPane(this);
 	add(createAccountPane, "createPane");
 
