@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.UUID;
 
+import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
 
@@ -12,13 +13,17 @@ public class ClientRequestHandle implements Runnable {
 	private Socket socket;
 	private DataSocket psocket;
 	private FlowServer server;
+	private SQLDatabase database;
 
 	private UUID uuid;
 
-	public ClientRequestHandle(Socket socket) throws IOException {
+	public ClientRequestHandle(FlowServer server, Socket socket)
+			throws IOException {
 		this.socket = socket;
 		this.psocket = new DataSocket(socket);
 		this.uuid = UUID.randomUUID();
+		this.server = server;
+		this.database = this.server.getDatabase();
 	}
 
 	@Override
@@ -37,7 +42,6 @@ public class ClientRequestHandle implements Runnable {
 					UUID sessionID = this.server.newSession();
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
-					// TODO write session ID into database
 				} else {
 					returnData.put("status", "INVALID_CREDENTIALS");
 				}
