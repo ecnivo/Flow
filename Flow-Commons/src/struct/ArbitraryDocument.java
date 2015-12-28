@@ -9,11 +9,11 @@ import java.nio.file.Files;
  * <p>
  * Created by Netdex on 12/24/2015.
  */
-public class ArbitraryFile extends FlowDocument {
+public class ArbitraryDocument extends FlowDocument {
 
     private File localFile;
 
-    protected ArbitraryFile(File localFile) throws IOException {
+    protected ArbitraryDocument(File localFile) throws IOException {
         super();
         this.localFile = localFile;
     }

@@ -21,6 +21,7 @@ public class HistoryPane extends JSplitPane {
     public HistoryPane(PanelManager manager) {
 	setResizeWeight(0.2);
 	setBorder(FlowClient.EMPTY_BORDER);
+	setContinuousLayout(true);
 
 	JPanel leftSide = new JPanel(new BorderLayout(0, 0));
 	leftSide.setBorder(FlowClient.EMPTY_BORDER);
@@ -33,18 +34,20 @@ public class HistoryPane extends JSplitPane {
 	leftSide.add(navBar, BorderLayout.NORTH);
 
 	JSplitPane treeAndVersion = new JSplitPane();
+	treeAndVersion.setContinuousLayout(true);
 	treeAndVersion.setBorder(FlowClient.EMPTY_BORDER);
 	treeAndVersion.setResizeWeight(0.4);
 	leftSide.add(treeAndVersion, BorderLayout.CENTER);
 
 	versionViewer = new VersionViewer();
-	treeAndVersion.setLeftComponent(versionViewer);
+	VersionViewer.initImages();
+	treeAndVersion.setRightComponent(versionViewer);
 
 	viewer = new EditTabs();
 	setRightComponent(viewer);
 
 	docTree = new DocTree(viewer);
-	treeAndVersion.setRightComponent(docTree);
+	treeAndVersion.setLeftComponent(docTree);
 
     }
 }
