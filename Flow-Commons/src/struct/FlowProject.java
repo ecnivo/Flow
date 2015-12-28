@@ -17,6 +17,10 @@ public class FlowProject implements Serializable {
 	this.projectUUID = UUID.randomUUID();
     }
 
+    public UUID getProjectUUID() {
+        return projectUUID;
+    }
+
     public FlowProject() {
     }
 
