@@ -33,6 +33,7 @@ public class ClientRequestHandle implements Runnable {
 		try {
 			this.socket.setSoTimeout(100);
 			Data data = psocket.receive(Data.class);
+			System.err.println(data.toString());
 			Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
@@ -97,6 +98,12 @@ public class ClientRequestHandle implements Runnable {
 			this.psocket.send(returnData);
 		} catch (Exception e) {
 			e.printStackTrace();
+			try {
+				this.psocket.send(null);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
+
 	}
 }
