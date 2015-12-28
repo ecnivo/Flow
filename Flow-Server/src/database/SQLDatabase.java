@@ -55,7 +55,7 @@ public class SQLDatabase {
 	 *            the ID of the user.
 	 * @return all projects associated with the specified UserID.
 	 */
-	public ResultSet getProjects(int userId) {
+	public ResultSet getProjects(String userId) {
 		try {
 			// TODO Allow for multiple users to be in permission (see
 			// updatePermission())
@@ -79,7 +79,8 @@ public class SQLDatabase {
 	 *            the ID of the user which to provide access to.
 	 * @return whether or not the access was successfully granted.
 	 */
-	public boolean updateAccess(int accessLevel, int projectId, int userId) {
+	public boolean updateAccess(int accessLevel, String projectId,
+			String userId) {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
@@ -113,7 +114,7 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	public ResultSet getFiles(int projectId) {
+	public ResultSet getFiles(String projectId) {
 		try {
 			return this
 					.query("SELECT DocumentName FROM documents WHERE ProjectID = "
@@ -132,7 +133,7 @@ public class SQLDatabase {
 	 * @param ownerId
 	 *            ID of the user who creates the project
 	 */
-	public void newProject(String name, int ownerId) {
+	public void newProject(String name, String ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
@@ -151,7 +152,7 @@ public class SQLDatabase {
 	 * @param projectId
 	 *            the ID of the project which to place the file inside
 	 */
-	public void newFile(String fileName, int projectId) {
+	public void newFile(String fileName, String projectId) {
 		try {
 			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
 					+ projectId + ", " + fileName + ")");
@@ -213,9 +214,9 @@ public class SQLDatabase {
 		return true;
 	}
 
-	public boolean removeSession(String sessionUUID) {
+	public boolean removeSession(String sessionId) {
 		try {
-			this.update("DELETE FROM sessions WHERE session = " + sessionUUID
+			this.update("DELETE FROM sessions WHERE SessionID = " + sessionId
 					+ ";");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

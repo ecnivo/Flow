@@ -7,6 +7,8 @@ import java.util.UUID;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
+import struct.FlowProject;
+import util.Results;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -60,6 +62,15 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
+				// TODO Acquire user UUID from session in database
+				String[][] response = Results.toStringArray(new String[] {},
+						this.database.getProjects("REPLACE WITH USERUUID"));
+				FlowProject[] projects = new FlowProject[response.length];
+				for (int i = 0; i < response.length; i++) {
+					projects[i] = new FlowProject();
+					// TODO Add data to flow project
+				}
+				returnData.put("projects", projects);
 				break;
 			case "list_project_files":
 				break;

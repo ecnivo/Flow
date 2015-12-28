@@ -25,7 +25,6 @@ public class FlowServer implements Runnable {
 			ServerSocket serverSocket = new ServerSocket(PORT);
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
-
 				int i = 0;
 				do {
 					i %= MAX_THREADS;
