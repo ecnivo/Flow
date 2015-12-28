@@ -15,8 +15,8 @@
     </target>
 
     <target name="compile" depends="init" description="compile the source">
-        <javac srcdir="${src_client}" destdir="${build}"/>
         <javac srcdir="${src_commons}" destdir="${build}"/>
+        <javac srcdir="${src_client}" destdir="${build}"/>
         <javac srcdir="${src_server}" destdir="${build}"/>
     </target>
 
