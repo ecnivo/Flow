@@ -50,6 +50,8 @@ public class ClientRequestHandle implements Runnable {
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
 				case "REGISTER":
+					this.database.addUser(data.get("username", String.class),
+							data.get("password", String.class));
 					break;
 				case "CLOSE_ACCOUNT":
 					break;
@@ -57,7 +59,22 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
+			case "list_projects":
+				break;
+			case "list_project_files":
+				break;
+			case "file_request":
+				break;
+			case "file_checksum":
+				break;
+			case "new_project":
+				break;
+			case "project_modify":
+				break;
+			case "document_modify":
+				break;
 			}
+
 			this.psocket.send(returnData);
 		} catch (Exception e) {
 			e.printStackTrace();
