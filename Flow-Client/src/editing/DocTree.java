@@ -1,8 +1,11 @@
 package editing;
 
 import gui.FlowClient;
+import history.VersionViewer;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -19,15 +22,7 @@ public class DocTree extends JTree {
     EditTabs editTabs;
 
     public DocTree(EditTabs editTabs) {
-	this.editTabs = editTabs;
-	setMinimumSize(new Dimension(100, 0));
-	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-	setBorder(FlowClient.EMPTY_BORDER);
-	scrollView = new JScrollPane(this);
-	model = new DocTreeModel();
-	setModel(model);
-	getSelectionModel().setSelectionMode(
-		TreeSelectionModel.SINGLE_TREE_SELECTION);
+	init();
 	addTreeSelectionListener(new TreeSelectionListener() {
 
 	    @Override
@@ -39,6 +34,61 @@ public class DocTree extends JTree {
 		    // TODO get the link to the file, then open a new tab in the
 		    // editPane for the file that's editable
 		}
+	    }
+	});
+    }
+
+    public DocTree(VersionViewer versionViewer) {
+	addTreeSelectionListener(new TreeSelectionListener() {
+
+	    @Override
+	    public void valueChanged(TreeSelectionEvent e) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) DocTree.this
+			.getSelectionPath().getLastPathComponent();
+
+		if (node.isLeaf()) {
+		    // TODO get the link to the file, then do setFile() on the
+		    // versionViewer
+		}
+	    }
+	});
+    }
+
+    private void init() {
+	this.editTabs = editTabs;
+	setMinimumSize(new Dimension(100, 0));
+	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+	setBorder(FlowClient.EMPTY_BORDER);
+	scrollView = new JScrollPane(this);
+	model = new DocTreeModel();
+	setModel(model);
+	getSelectionModel().setSelectionMode(
+		TreeSelectionModel.SINGLE_TREE_SELECTION);
+	addMouseListener(new MouseListener() {
+
+	    @Override
+	    public void mouseReleased(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mousePressed(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseExited(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseEntered(MouseEvent arg0) {
+		// TODO make something to update the list of projects
+	    }
+
+	    @Override
+	    public void mouseClicked(MouseEvent arg0) {
+		// nothing
 	    }
 	});
     }

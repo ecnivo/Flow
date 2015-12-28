@@ -1,4 +1,6 @@
 import compiler.Compiler;
+import message.Data;
+import network.FMLNetworker;
 import struct.FlowFile;
 import struct.TextDocument;
 import util.DiffMatchPatch;
@@ -11,6 +13,15 @@ import java.util.Date;
  */
 public class Test {
     public static void main(String[] args) throws IOException {
+        FMLNetworker fmlNetworker = new FMLNetworker("127.0.0.1", 10244);
+        Data testData = new Data("login");
+        testData.put("username", "test");
+        testData.put("password", "test");
+        Data response = fmlNetworker.send(testData);
+        System.out.println(response);
+
+    }
+    public void test() throws IOException {
         DiffMatchPatch dif = new DiffMatchPatch();
 
         FlowFile flowFile = new FlowFile("", "Test.java");

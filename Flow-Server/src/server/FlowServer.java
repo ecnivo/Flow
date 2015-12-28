@@ -1,10 +1,19 @@
 package server;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 import database.SQLDatabase;
+import message.Data;
+import network.FMLNetworker;
+
+import javax.net.ssl.*;
 
 public class FlowServer implements Runnable {
 
@@ -23,6 +32,7 @@ public class FlowServer implements Runnable {
 	public void run() {
 		try {
 			ServerSocket serverSocket = new ServerSocket(PORT);
+
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
 				int i = 0;
@@ -43,9 +53,13 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, KeyManagementException, NoSuchAlgorithmException {
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
+		// TEST CODE
+
+
+
 	}
 
 	protected UUID newSession(String userId, String serialNumber) {
