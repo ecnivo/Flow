@@ -1,7 +1,7 @@
 package settings;
 
+import gui.Communicator;
 import gui.FlowClient;
-import gui.PanelManager;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -23,6 +23,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
+
+import message.Data;
 
 public class SettingsTabs extends JTabbedPane {
 
@@ -90,19 +92,58 @@ public class SettingsTabs extends JTabbedPane {
 	JPasswordField passField = new JPasswordField();
 	passField.setMaximumSize(TEXT_BOX_SIZE);
 	passField.setPreferredSize(TEXT_BOX_SIZE);
-	// passField.addKeyListener(new PassFieldListener(passField));
 	passChange.add(passField);
 	passChange.add(new JLabel("Re-type your password"));
 	JPasswordField retypePass = new JPasswordField();
 	retypePass.setMaximumSize(TEXT_BOX_SIZE);
 	retypePass.setPreferredSize(TEXT_BOX_SIZE);
-	// retypePass.addKeyListener(new PassFieldListener(retypePass));
 	passChange.add(retypePass);
 	JButton savePassword = new JButton("Save new password");
 	savePassword.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
-		// TODO hash password and send off to server. Show joptionpane
-		// when done.
+		if (String.copyValueOf(passField.getPassword()).length() < 1) {
+		    JOptionPane.showConfirmDialog(null,
+			    "Please enter a password.", "Invalid password",
+			    JOptionPane.DEFAULT_OPTION,
+			    JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		if (!passField.getPassword().equals(retypePass.getPassword())) {
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "The two passwords do not match.\nPlease try again.\n"
+					    + "No changes have been made to your account",
+				    "Passwords don't match!",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		if (FlowClient.NETWORK) {
+		    Data newPass = new Data("user");
+		    newPass.put("user_type", "CHANGE_PASSWORD");
+		    newPass.put("username", Communicator.getCurrLoggedIn());
+		    newPass.put("password",
+			    String.copyValueOf(passField.getPassword()));
+
+		    if (Communicator.communicate(newPass)
+			    .get("status", String.class)
+			    .equals("PASSWORD_INVALID")) {
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"The entered password is invalid. Typically, this is because\n"
+						+ "of the presence of special characters",
+					"Invalid password",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		}
+		JOptionPane.showConfirmDialog(null,
+			"Your Flow password has successfully been changed",
+			"Password change success", JOptionPane.DEFAULT_OPTION,
+			JOptionPane.INFORMATION_MESSAGE);
 	    }
 	});
 	passChange.add(savePassword);

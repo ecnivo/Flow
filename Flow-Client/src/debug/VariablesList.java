@@ -3,24 +3,26 @@ package debug;
 import gui.FlowClient;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
 
 import debug.VariablesList.VariablePanel;
 
-public class VariablesList extends JList<VariablePanel> {
+public class VariablesList extends JPanel {
     public VariablesList() {
 	setPreferredSize(new Dimension(400, 275));
+	setLayout(new GridLayout(0, 1, 0, 2));
 	setMinimumSize(new Dimension(0, 50));
 	setBorder(FlowClient.EMPTY_BORDER);
-	// TODO Auto-generated constructor stub
+	// TODO make this entire thing work some way or another
     }
 
     class VariablePanel extends JPanel {
 	public VariablePanel() {
 	    setBorder(FlowClient.EMPTY_BORDER);
-	    // TODO Auto-generated constructor stub
+
 	}
     }
 }
