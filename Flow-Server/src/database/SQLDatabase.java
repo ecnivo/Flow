@@ -55,7 +55,7 @@ public class SQLDatabase {
 	 *            the ID of the user.
 	 * @return all projects associated with the specified UserID.
 	 */
-	protected ResultSet getProjects(int userId) {
+	public ResultSet getProjects(int userId) {
 		try {
 			// TODO Allow for multiple users to be in permission (see
 			// updatePermission())
@@ -79,7 +79,7 @@ public class SQLDatabase {
 	 *            the ID of the user which to provide access to.
 	 * @return whether or not the access was successfully granted.
 	 */
-	protected boolean updateAccess(int accessLevel, int projectId, int userId) {
+	public boolean updateAccess(int accessLevel, int projectId, int userId) {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
@@ -105,7 +105,7 @@ public class SQLDatabase {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Getter for all files associated with the specified project.
 	 * 
@@ -113,7 +113,7 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	protected ResultSet getFiles(int projectId) {
+	public ResultSet getFiles(int projectId) {
 		try {
 			return this
 					.query("SELECT DocumentName FROM documents WHERE ProjectID = "
@@ -132,7 +132,7 @@ public class SQLDatabase {
 	 * @param ownerId
 	 *            ID of the user who creates the project
 	 */
-	protected void newProject(String name, int ownerId) {
+	public void newProject(String name, int ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
@@ -151,7 +151,7 @@ public class SQLDatabase {
 	 * @param projectId
 	 *            the ID of the project which to place the file inside
 	 */
-	protected void newFile(String fileName, int projectId) {
+	public void newFile(String fileName, int projectId) {
 		try {
 			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
 					+ projectId + ", " + fileName + ")");
@@ -165,7 +165,7 @@ public class SQLDatabase {
 	 * 
 	 * @return all of the usernames in the database.
 	 */
-	protected ResultSet getUserNames() {
+	public ResultSet getUserNames() {
 		try {
 			return this.query("SELECT username FROM users;");
 		} catch (SQLException e) {
@@ -185,7 +185,7 @@ public class SQLDatabase {
 	 *            the user's encrypted password.
 	 * @return whether or not the username and password exists in the database.
 	 */
-	protected boolean authenticate(String username, String password) {
+	public boolean authenticate(String username, String password) {
 		try {
 			ResultSet pair = this
 					.query("SELECT password FROM users WHERE username = "
@@ -219,7 +219,7 @@ public class SQLDatabase {
 	 *         </li>
 	 *         </ul>
 	 */
-	protected boolean addUser(String username, String password) {
+	public boolean addUser(String username, String password) {
 		try {
 			// Checks if a user with the specified username already exsists
 			if (this.query("SELECT username FROM users WHERE username = "
