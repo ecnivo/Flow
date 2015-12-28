@@ -40,13 +40,12 @@ public class HistoryPane extends JSplitPane {
 	leftSide.add(treeAndVersion, BorderLayout.CENTER);
 
 	versionViewer = new VersionViewer();
-	VersionViewer.initImages();
 	treeAndVersion.setRightComponent(versionViewer);
 
 	viewer = new EditTabs();
 	setRightComponent(viewer);
 
-	docTree = new DocTree(viewer);
+	docTree = new DocTree(versionViewer);
 	treeAndVersion.setLeftComponent(docTree);
 
     }
