@@ -201,6 +201,30 @@ public class SQLDatabase {
 		return false;
 	}
 
+	public boolean newSession(String userUUID, String serialNumber,
+			String sessionUUID) {
+		try {
+			this.update("INSERT INTO sessions VALUES (" + userUUID + ", "
+					+ serialNumber + ", " + sessionUUID + ");");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean removeSession(String sessionUUID) {
+		try {
+			this.update("DELETE FROM sessions WHERE session = " + sessionUUID
+					+ ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Add users to the database with the specified username and password.
 	 * 

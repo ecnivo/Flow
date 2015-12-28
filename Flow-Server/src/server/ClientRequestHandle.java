@@ -24,7 +24,7 @@ public class ClientRequestHandle implements Runnable {
 	@Override
 	public void run() {
 		try {
-			socket.setSoTimeout(100);
+			this.socket.setSoTimeout(100);
 			Data data = psocket.receive(Data.class);
 			Data returnData = new Data();
 			switch (data.getType()) {
@@ -54,7 +54,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			}
-			psocket.send(returnData);
+			this.psocket.send(returnData);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
