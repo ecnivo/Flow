@@ -226,6 +226,17 @@ public class SQLDatabase {
 		return true;
 	}
 
+	public ResultSet getUserId(String username) {
+		try {
+			return this.query("SELECT UserID FROM users WHERE Username = "
+					+ username + ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/**
 	 * Add users to the database with the specified username and password.
 	 * 

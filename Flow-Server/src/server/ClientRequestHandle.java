@@ -38,10 +38,18 @@ public class ClientRequestHandle implements Runnable {
 			case "login":
 				String username = data.get("username", String.class);
 				String password = data.get("password", String.class);
-				// TODO query the database
 				if (this.server.getDatabase().authenticate(username,
 						password)) {
-					UUID sessionID = this.server.newSession();
+					// TODO Netdex get the serial number
+					UUID sessionID = this.server
+							.newSession(
+									Results.toStringArray(this.database
+											.getUserId(username))[0][0],
+							"REPLACE WITH SERIAL NUMBER");
+
+					// TODO Add check for if the session cannot be created
+					// This could potentially be directly in the authenticate
+					// method
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
 				} else {

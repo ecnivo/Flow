@@ -48,8 +48,10 @@ public class FlowServer implements Runnable {
 		new Thread(server).start();
 	}
 
-	protected UUID newSession() {
-		return UUID.randomUUID();
+	protected UUID newSession(String userId, String serialNumber) {
+		UUID sessionId = UUID.randomUUID();
+		this.database.newSession(userId, serialNumber, sessionId.toString());
+		return sessionId;
 	}
 
 	protected SQLDatabase getDatabase() {
