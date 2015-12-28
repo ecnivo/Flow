@@ -23,6 +23,7 @@ public class EditPane extends JPanel {
     private DocTree tree;
 
     private static final int RIGHT_SIDE_WIDTH = 300;
+    private static final int LEFT_SIDE_WIDTH = 300;
 
     public EditPane(PanelManager manager) {
 	this.setLayout(new BorderLayout());
@@ -34,6 +35,7 @@ public class EditPane extends JPanel {
 	mainSplit.setMinimumSize(new Dimension(0, 0));
 	mainSplit.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
+	mainSplit.setContinuousLayout(true);
 	mainSplit.setResizeWeight(0.9);
 	JSplitPane rightSide = new JSplitPane();
 	rightSide.setBorder(FlowClient.EMPTY_BORDER);
@@ -42,6 +44,7 @@ public class EditPane extends JPanel {
 	rightSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
 	rightSide.setResizeWeight(0.5);
+	rightSide.setContinuousLayout(true);
 	rightSide.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
 	mainSplit.setRightComponent(rightSide);
 
@@ -56,7 +59,8 @@ public class EditPane extends JPanel {
 
 	JSplitPane leftSide = new JSplitPane();
 	leftSide.setBorder(FlowClient.EMPTY_BORDER);
-	leftSide.setMinimumSize(new Dimension(390, 0));
+	leftSide.setContinuousLayout(true);
+	leftSide.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH, 0));
 	leftSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
 		Integer.MAX_VALUE));
 	mainSplit.setLeftComponent(leftSide);
@@ -66,7 +70,7 @@ public class EditPane extends JPanel {
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	treeAndButtons.setBorder(FlowClient.EMPTY_BORDER);
-	treeAndButtons.setMinimumSize(new Dimension(330, 0));
+	treeAndButtons.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH, 0));
 	treeAndButtons.setEnabled(false);
 	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 	buttonPanel.setBorder(FlowClient.EMPTY_BORDER);

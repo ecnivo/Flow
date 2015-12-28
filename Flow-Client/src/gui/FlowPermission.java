@@ -77,4 +77,8 @@ public class FlowPermission {
 	    return null;
 	}
     }
+    
+    public byte getPermissionLevel(){
+	return permissionLevel;
+    }
 }

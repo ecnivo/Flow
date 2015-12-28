@@ -8,8 +8,11 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -41,7 +44,7 @@ public class CollabsList extends JPanel {
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
     private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
-	    16);
+	    20);
     private static final Border TEXT_ENTRY_BORDER = BorderFactory
 	    .createLineBorder(new Color(0xB1ADFF), 2);
     private static final Border ICON_ENTRY_BORDER = BorderFactory
@@ -89,7 +92,8 @@ public class CollabsList extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		// TODO starts a search if the search box contents are
-		// "searchboxtext" or nothing
+		// "searchboxtext" or nothing (should eventually send a parameter to the updateUsers method)
+		updateUsers();
 	    }
 	});
 	searchPane.add(searchButton, BorderLayout.EAST);
@@ -99,7 +103,8 @@ public class CollabsList extends JPanel {
 	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
 		.getSize().getWidth()), Integer.MAX_VALUE));
 	JScrollPane userListScroll = new JScrollPane(userList);
-	userListScroll.getVerticalScrollBar().setUnitIncrement(12);
+	userListScroll.getVerticalScrollBar().setUnitIncrement(
+		FlowClient.SCROLL_SPEED);
 	userListScroll
 		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	userListScroll
@@ -141,7 +146,7 @@ public class CollabsList extends JPanel {
 	    e.printStackTrace();
 	}
 	userList.add(new UserInfo("testname3", icon, new FlowPermission(
-		FlowPermission.EDIT)));
+		FlowPermission.VIEW)));
 
 	try {
 	    icon = new ImageIcon(ImageIO.read(
@@ -151,7 +156,7 @@ public class CollabsList extends JPanel {
 	    e.printStackTrace();
 	}
 	userList.add(new UserInfo("testname4", icon, new FlowPermission(
-		FlowPermission.EDIT)));
+		FlowPermission.NONE)));
 
 	try {
 	    icon = new ImageIcon(ImageIO.read(
@@ -161,7 +166,7 @@ public class CollabsList extends JPanel {
 	    e.printStackTrace();
 	}
 	userList.add(new UserInfo("testname5", icon, new FlowPermission(
-		FlowPermission.EDIT)));
+		FlowPermission.VIEW)));
 
 	try {
 	    icon = new ImageIcon(ImageIO.read(
@@ -171,7 +176,7 @@ public class CollabsList extends JPanel {
 	    e.printStackTrace();
 	}
 	userList.add(new UserInfo("testname6", icon, new FlowPermission(
-		FlowPermission.EDIT)));
+		FlowPermission.VIEW)));
     }
 
     /**
@@ -194,6 +199,9 @@ public class CollabsList extends JPanel {
 	private JPanel permissionsView;
 
 	private JLabel permissionLabel;
+	private ButtonGroup permissionGroup;
+
+	private JRadioButton[] permissionSelectors = new JRadioButton[4];
 
 	public UserInfo(String username, ImageIcon avatar,
 		FlowPermission permission) {
@@ -221,7 +229,16 @@ public class CollabsList extends JPanel {
 	    simpleView = new JPanel(new BorderLayout(0, 1));
 	    simpleView.setMaximumSize(new Dimension((int) Math
 		    .floor(CollabsList.this.getSize().getWidth() * .9), 80));
-	    JLabel name = new JLabel(userName);
+	    JLabel name = new JLabel(userName) {
+		public void paintComponent(Graphics g) {
+		    Graphics2D g2 = (Graphics2D) g;
+		    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+			    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		    g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+			    RenderingHints.VALUE_RENDER_QUALITY);
+		    super.paintComponent(g2);
+		}
+	    };
 	    name.setFont(USERNAME_FONT);
 	    permissionLabel = new JLabel(userPermission.toString());
 	    simpleView.add(name, BorderLayout.NORTH);
@@ -235,7 +252,7 @@ public class CollabsList extends JPanel {
 	    JLabel name2 = new JLabel(userName);
 	    name2.setFont(USERNAME_FONT);
 	    permissionsView.add(name2, BorderLayout.NORTH);
-	    ButtonGroup permissionGroup = new ButtonGroup();
+	    permissionGroup = new ButtonGroup();
 	    JPanel permissionPanel = new JPanel();
 	    permissionPanel.setLayout(new GridLayout(2, 2, 1, 1));
 	    permissionPanel.setOpaque(false);
@@ -244,6 +261,34 @@ public class CollabsList extends JPanel {
 	    switcher.add(permissionsView, "permissions");
 
 	    setBackground(userPermission.getPermissionColor());
+
+	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
+		permissionSelectors[permLevel] = new JRadioButton(
+			new FlowPermission(permLevel).toString());
+		permissionSelectors[permLevel]
+			.addActionListener(new PermissionRadioButtonListener(
+				permLevel));
+		permissionSelectors[permLevel]
+			.addMouseListener(new ButtonHighlightListener());
+		permissionSelectors[permLevel].setOpaque(false);
+		permissionGroup.add(permissionSelectors[permLevel]);
+		permissionPanel.add(permissionSelectors[permLevel]);
+	    }
+
+	    JButton saveButton = new JButton("Save");
+	    saveButton.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+		    // TODO formally send a change in editors to server
+		    ((CardLayout) switcher.getLayout())
+			    .show(switcher, "simple");
+		    updateFields();
+		}
+	    });
+	    saveButton.addMouseListener(new ButtonHighlightListener());
+	    permissionPanel.add(saveButton);
+
 	    switcher.addMouseListener(new MouseListener() {
 
 		@Override
@@ -271,6 +316,8 @@ public class CollabsList extends JPanel {
 		    if (myPermission.canChangeCollabs())
 			((CardLayout) switcher.getLayout()).show(switcher,
 				"permissions");
+		    permissionSelectors[userPermission.getPermissionLevel()]
+			    .setSelected(true);
 		}
 	    });
 	    icon.addMouseListener(new MouseListener() {
@@ -301,76 +348,6 @@ public class CollabsList extends JPanel {
 		    // user
 		}
 	    });
-
-	    JRadioButton noButton = new JRadioButton(new FlowPermission(
-		    FlowPermission.NONE).toString());
-	    noButton.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    userPermission.setPermission(FlowPermission.NONE);
-		}
-	    });
-	    noButton.addMouseListener(new ButtonHighlightListener());
-	    noButton.setOpaque(false);
-	    permissionGroup.add(noButton);
-	    permissionPanel.add(noButton);
-
-	    JRadioButton viewButton = new JRadioButton(new FlowPermission(
-		    FlowPermission.VIEW).toString());
-	    viewButton.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    userPermission.setPermission(FlowPermission.VIEW);
-		}
-	    });
-	    viewButton.addMouseListener(new ButtonHighlightListener());
-	    viewButton.setOpaque(false);
-	    permissionPanel.add(viewButton);
-	    permissionGroup.add(viewButton);
-
-	    JRadioButton editButton = new JRadioButton(new FlowPermission(
-		    FlowPermission.EDIT).toString());
-	    editButton.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    userPermission.setPermission(FlowPermission.EDIT);
-		}
-	    });
-	    editButton.addMouseListener(new ButtonHighlightListener());
-	    editButton.setOpaque(false);
-	    permissionPanel.add(editButton);
-	    permissionGroup.add(editButton);
-
-	    if (myPermission.canChangeOwner()) {
-		JRadioButton ownerButton = new JRadioButton(new FlowPermission(
-			FlowPermission.OWNER).toString());
-		ownerButton.addActionListener(new ActionListener() {
-		    @Override
-		    public void actionPerformed(ActionEvent e) {
-			// TODO Show a Joptionpane to confirm, and don't forget
-			// to set the current user to be an editor
-			userPermission.setPermission(FlowPermission.OWNER);
-		    }
-		});
-		ownerButton.addMouseListener(new ButtonHighlightListener());
-		ownerButton.setOpaque(false);
-		permissionPanel.add(ownerButton);
-		permissionGroup.add(ownerButton);
-	    }
-
-	    JButton saveButton = new JButton("Save");
-	    saveButton.addActionListener(new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-		    // TODO formally send a change in editors to server
-		    ((CardLayout) switcher.getLayout())
-			    .show(switcher, "simple");
-		    updateFields();
-		}
-	    });
-	    saveButton.addMouseListener(new ButtonHighlightListener());
-	    permissionPanel.add(saveButton);
 
 	}
 
@@ -407,6 +384,20 @@ public class CollabsList extends JPanel {
 		// nothing
 	    }
 
+	}
+
+	class PermissionRadioButtonListener implements ActionListener {
+
+	    private byte permLevel;
+
+	    public PermissionRadioButtonListener(byte permLevel) {
+		this.permLevel = permLevel;
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		userPermission.setPermission(permLevel);
+	    }
 	}
     }
 

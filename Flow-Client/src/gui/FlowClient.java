@@ -22,6 +22,7 @@ public class FlowClient extends JFrame {
     public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory
 	    .createEmptyBorder(0, 0, 0, 0);
     public static final int BUTTON_ICON_SIZE = 24;
+    public static final int SCROLL_SPEED = 12;
 
     public static void main(String[] args) throws ClassNotFoundException,
 	    InstantiationException, IllegalAccessException,

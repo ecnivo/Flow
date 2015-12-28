@@ -27,7 +27,7 @@ public class EditorToolbar extends JToolBar {
 	setBorder(FlowClient.EMPTY_BORDER);
 
 	add(new SearchButton());
-	add(new ProjectManageButton());
+	// add(new ProjectManageButton());
 	add(new ImportButton());
 	add(new ExportButton());
 	addSeparator();
@@ -59,27 +59,27 @@ public class EditorToolbar extends JToolBar {
 	}
     }
 
-    private class ProjectManageButton extends JButton {
-	private ProjectManageButton() {
-	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/addCollab.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
-	    setFocusable(false);
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    addActionListener(new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    //TODO open a window to create a new project, 
-		}
-	    });
-	}
-    }
+    // private class ProjectManageButton extends JButton {
+    // private ProjectManageButton() {
+    // try {
+    // setIcon(new ImageIcon(ImageIO.read(
+    // new File("images/addCollab.png")).getScaledInstance(
+    // FlowClient.BUTTON_ICON_SIZE,
+    // FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+    // } catch (IOException e1) {
+    // e1.printStackTrace();
+    // }
+    // setFocusable(false);
+    // setBorder(FlowClient.EMPTY_BORDER);
+    // addActionListener(new ActionListener() {
+    //
+    // @Override
+    // public void actionPerformed(ActionEvent e) {
+    // //TODO open a window to create a new project,
+    // }
+    // });
+    // }
+    // }
 
     private class ImportButton extends JButton {
 	private ImportButton() {

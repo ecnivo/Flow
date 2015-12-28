@@ -23,6 +23,7 @@ public class DebugPane extends JPanel {
 	JSplitPane mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
 	mainSplit.setResizeWeight(0);
+	mainSplit.setContinuousLayout(true);
 	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 
 	mainSplit.setRightComponent(new EditTabs());
@@ -32,6 +33,7 @@ public class DebugPane extends JPanel {
 	leftHalf.setBorder(FlowClient.EMPTY_BORDER);
 	leftHalf.setMinimumSize(new Dimension(310, 0));
 	leftHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
+	leftHalf.setContinuousLayout(true);
 	mainSplit.setLeftComponent(leftHalf);
 
 	GenericConsole debugConsole = new GenericConsole();
