@@ -52,4 +52,9 @@ public class Data implements Serializable {
             return null;
         }
     }
+
+    @Override
+    public String toString(){
+        return stringObjectHashMap.toString();
+    }
 }
