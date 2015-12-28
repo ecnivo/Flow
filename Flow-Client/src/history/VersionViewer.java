@@ -19,6 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import struct.FlowDocument;
+
 public class VersionViewer extends JPanel {
 
     private ImageIcon first;
@@ -64,8 +66,9 @@ public class VersionViewer extends JPanel {
 	removeAll();
     }
 
-    protected void setFile() {
+    public void setFile(FlowDocument file) {
 	// TODO this method is run when the tree is clicked for a version
+	// file.
 	updateVersions();
     }
 

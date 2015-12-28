@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -120,9 +121,9 @@ public class LoginPane extends JPanel {
 		    usernamePass.put("username", usernameEntry.getText());
 		    usernamePass.put("password", passwordEntry.getPassword());
 
-		    String reply = Communicator.communicate(usernamePass).get(
-			    "status", String.class);
-		    switch (reply) {
+		    Data reply = Communicator.communicate(usernamePass);
+		    String status = reply.get("status", String.class);
+		    switch (status) {
 		    case "USERNAME_DOES_NOT_EXIST":
 			JOptionPane
 				.showConfirmDialog(
@@ -141,17 +142,9 @@ public class LoginPane extends JPanel {
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.ERROR_MESSAGE);
 			return;
-
-		    case "ALREADY_LOGGED_IN":
-			JOptionPane
-				.showConfirmDialog(
-					null,
-					"You are already logged in from another machine.\nFlow does not support logins from different machines.",
-					"Already logged in",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE);
-			return;
 		    }
+		    Communicator.setSessionID(reply.get("session_id",
+			    UUID.class));
 		}
 		LoginPane.this.panMan.switchToEditor();
 

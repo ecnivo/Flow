@@ -1,6 +1,7 @@
 package gui;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import message.Data;
 import network.FMLNetworker;
@@ -10,7 +11,7 @@ public class Communicator {
     private static final String HOST = "127.0.0.1";
     private final static int PORT = 1234;
 
-    private static String currLoggedIn;
+    private static UUID sessionID;
 
     private static FMLNetworker packageSender;
 
@@ -28,11 +29,13 @@ public class Communicator {
 	return null;
     }
 
-    public static void setUser(String newUser) {
-	currLoggedIn = newUser;
+    public static UUID getSessionID() {
+        return sessionID;
     }
 
-    public static String getCurrLoggedIn() {
-	return currLoggedIn;
+    public static void setSessionID(UUID sessionID) {
+        Communicator.sessionID = sessionID;
     }
+
+    
 }

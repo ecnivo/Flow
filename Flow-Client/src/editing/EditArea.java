@@ -22,9 +22,12 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import struct.FlowDocument;
+
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
+    private FlowDocument file;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -44,11 +47,13 @@ public class EditArea extends JTextPane {
 	    "synchronized", "this", "throws", "throw", "transient", "try",
 	    "void", "volatile", "while" };
 
-    protected EditArea(File file, boolean editable, EditTabs tabs) {
+    protected EditArea(FlowDocument file, boolean editable, EditTabs tabs) {
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(new Font("Consolas", Font.PLAIN, 13));
-	doc = (StyledDocument) getDocument();
+	this.file = file;
+	doc = (StyledDocument) new File(file.getParentFile().getRemotePath());
+	setStyledDocument(doc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
@@ -125,6 +130,10 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
+    }
+    
+    public FlowDocument getFlowDoc(){
+	return file;
     }
 
     public JScrollPane getScrollPane() {

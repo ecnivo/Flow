@@ -12,10 +12,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
+import java.util.UUID;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+
+import struct.FlowDocument;
+import struct.FlowFile;
 
 public class EditPane extends JPanel {
 
@@ -52,9 +55,9 @@ public class EditPane extends JPanel {
 	genericConsole.getScroll().setPreferredSize(
 		new Dimension(RIGHT_SIDE_WIDTH, 500));
 	rightSide.setLeftComponent(genericConsole.getScroll());
-	CollabsList collabsList = new CollabsList(new FlowPermission(FlowPermission.OWNER));
-	collabsList.setPreferredSize(
-		new Dimension(RIGHT_SIDE_WIDTH, 225));
+	CollabsList collabsList = new CollabsList(new FlowPermission(
+		FlowPermission.OWNER));
+	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
 	rightSide.setRightComponent(collabsList);
 
 	JSplitPane leftSide = new JSplitPane();
@@ -81,31 +84,6 @@ public class EditPane extends JPanel {
 	buttonPanel.add(new RunStopBar());
 	treeAndButtons.setLeftComponent(buttonPanel);
 	tree = new DocTree(editTabs);
-
-	// START DEBUG
-	tree.addKeyListener(new KeyListener() {
-
-	    @Override
-	    public void keyTyped(KeyEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void keyReleased(KeyEvent e) {
-		// System.out.println("Hi");
-		try {
-		    editTabs.openTab(new File("D:/questfile.txt"), true);
-		} catch (Exception h) {
-		    return;
-		}
-	    }
-
-	    @Override
-	    public void keyPressed(KeyEvent e) {
-		// nothing
-	    }
-	});
-	// END DEBUG
 
 	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);

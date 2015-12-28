@@ -122,7 +122,7 @@ public class SettingsTabs extends JTabbedPane {
 		if (FlowClient.NETWORK) {
 		    Data newPass = new Data("user");
 		    newPass.put("user_type", "CHANGE_PASSWORD");
-		    newPass.put("username", Communicator.getCurrLoggedIn());
+		    newPass.put("session_id", Communicator.getSessionID());
 		    newPass.put("password",
 			    String.copyValueOf(passField.getPassword()));
 

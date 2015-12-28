@@ -3,6 +3,7 @@ package struct;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Created by Netdex on 12/25/2015.
@@ -11,6 +12,7 @@ public class FlowFile implements Serializable {
 
     private String remotePath;
     private String remoteName;
+    private UUID uuid;
 
     private TreeMap<Date, FlowDocument> versions;
 
@@ -34,6 +36,10 @@ public class FlowFile implements Serializable {
 
     public String getRemoteName() {
         return remoteName;
+    }
+    
+    public UUID getFileUUID(){
+	return uuid;
     }
 }
 

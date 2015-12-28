@@ -28,10 +28,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
+
+import struct.FlowDocument;
 
 /**
  * Created by Vince on 2015-12-18.
@@ -39,7 +42,6 @@ import javax.swing.plaf.basic.BasicButtonUI;
 public class EditTabs extends JTabbedPane {
 
     public static final int TAB_LIMIT = 25;
-
     public static final int TAB_ICON_SIZE = 16;
 
     public EditTabs() {
@@ -68,14 +70,31 @@ public class EditTabs extends JTabbedPane {
 	});
     }
 
-    public void openTab(File file, boolean editable) {
-	// TODO change the parameter, and add checks if the tab is already open
+    public void openTab(FlowDocument doc, boolean editable) {
+	int tabs = getTabCount();
+	for (int i = 0; i < tabs; i++) {
+	    if (((EditArea) getComponentAt(i)).getFlowDoc().equals(doc)) {
+		setSelectedIndex(i);
+		return;
+	    }
+	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(file.getName(),
-		    new EditArea(file, editable, this).getScrollPane());
+	    addTab(doc.getParentFile().getRemoteName(), new EditArea(doc,
+		    editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
-	    setTabComponentAt(idx, new CustomTabHeader(file));
-	    setToolTipTextAt(idx, file.getAbsolutePath());
+	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile()
+		    .getRemoteName()));
+	    // setToolTipTextAt(idx, doc.getParentFile().latest());
+	    // TODO should be the last saved date
+	} else {
+	    JOptionPane
+		    .showConfirmDialog(
+			    null,
+			    "The limit on currently open tabs is 25.\n"
+			    + "The reason for doing so is to save processing power and reduce strain on your system.\n"
+			    + "If you need more than 25 tabs at a time, consider better organizing your workflow.",
+			    "Too many tabs!", JOptionPane.DEFAULT_OPTION,
+			    JOptionPane.WARNING_MESSAGE);
 	}
     }
 
@@ -83,7 +102,7 @@ public class EditTabs extends JTabbedPane {
 
 	private JPopupMenu rightClickMenu;
 
-	public CustomTabHeader(File file) {
+	public CustomTabHeader(String fileName) {
 	    super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 	    setOpaque(false);
 
@@ -100,7 +119,7 @@ public class EditTabs extends JTabbedPane {
 	    add(iconL);
 
 	    // make JLabel read titles from JTabbedPane
-	    JLabel label = new JLabel(file.getName());
+	    JLabel label = new JLabel(fileName);
 	    add(label);
 	    // add more space between the label and the button
 	    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -125,45 +144,45 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void setEnabled(boolean b) {
-		    // TODO Auto-generated method stub
-
+// nothing
 		}
 
 		@Override
 		public void removePropertyChangeListener(
 			PropertyChangeListener listener) {
-		    // TODO Auto-generated method stub
+		 // nothing
 
 		}
 
 		@Override
 		public void putValue(String key, Object value) {
-		    // TODO Auto-generated method stub
+		 // nothing
 
 		}
 
 		@Override
 		public boolean isEnabled() {
-		    // TODO Auto-generated method stub
+		 // nothing
 		    return false;
 		}
 
 		@Override
 		public Object getValue(String key) {
-		    // TODO Auto-generated method stub
+		 // nothing
 		    return null;
 		}
 
 		@Override
 		public void addPropertyChangeListener(
 			PropertyChangeListener listener) {
-		    // TODO Auto-generated method stub
+		 // nothing
 
 		}
 	    });
 	    closeTabButton.setText("Close Tab (Ctrl+W)");
 	    closeTabButton.setEnabled(true);
 	    rightClickMenu.add(closeTabButton);
+	    
 	    JMenuItem closeAllTabsButton = new JMenuItem(new Action() {
 
 		@Override
@@ -173,40 +192,36 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void setEnabled(boolean b) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public void removePropertyChangeListener(
 			PropertyChangeListener listener) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public void putValue(String key, Object value) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public boolean isEnabled() {
-		    // TODO Auto-generated method stub
+		 // nothing
 		    return false;
 		}
 
 		@Override
 		public Object getValue(String key) {
-		    // TODO Auto-generated method stub
+		 // nothing
 		    return null;
 		}
 
 		@Override
 		public void addPropertyChangeListener(
 			PropertyChangeListener listener) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 	    });
 	    closeAllTabsButton.setText("Close All Tabs");
@@ -216,26 +231,22 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-		    // TODO Auto-generated method stub
-
+		 // nothing
 		}
 
 		@Override

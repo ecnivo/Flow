@@ -28,6 +28,10 @@ public class CreateAccountPane extends JPanel {
     private PanelManager manager;
     private JPasswordField passwordField;
 
+    public final static char[] INVALID_CHARS = { '\\', '/', '?', '%', '*', ':',
+	    '|', '"', '<', '>', '.', '#', '&', '{', '}', '$', '@', '=', '`',
+	    '+' };
+
     public CreateAccountPane(PanelManager manager) {
 	setBackground(Color.WHITE);
 	this.manager = manager;
@@ -100,7 +104,8 @@ public class CreateAccountPane extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
-		    int usernameLength = usernameEntry.getText().trim().length();
+		    int usernameLength = usernameEntry.getText().trim()
+			    .length();
 		    if (usernameLength < 1 || usernameLength > 16) {
 			JOptionPane
 				.showConfirmDialog(
@@ -116,6 +121,16 @@ public class CreateAccountPane extends JPanel {
 				"Please enter a password", "No password",
 				JOptionPane.DEFAULT_OPTION,
 				JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		    if (stringContains(usernameEntry.getText(), INVALID_CHARS)) {
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"Username contains invalid characters.\nPlease reduce the use of symbols.",
+					"Invalid username",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
 
@@ -167,5 +182,13 @@ public class CreateAccountPane extends JPanel {
 		CreateAccountPane.this.manager.switchToEditor();
 	    }
 	});
+    }
+
+    public static boolean stringContains(String str, char[] array) {
+	for (char c : array) {
+	    if (str.contains(c + ""))
+		return true;
+	}
+	return false;
     }
 }

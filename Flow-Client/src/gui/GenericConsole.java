@@ -9,16 +9,15 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -48,61 +47,24 @@ public class GenericConsole extends JTextArea {
 	scrolling = new JScrollPane(this);
 	scrolling
 		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-	// scrolling.setAutoscrolls(true);
 	popUp = new JPopupMenu();
-	JMenuItem copyButton = new JMenuItem(new Action() {
+	JMenuItem copyButton = new JMenuItem();
+	copyButton.addActionListener(new ActionListener() {
 
 	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
+	    public void actionPerformed(ActionEvent e) {
 		StringSelection target = new StringSelection(history
 			+ userInput);
 		Toolkit.getDefaultToolkit().getSystemClipboard()
 			.setContents(target, target);
-	    }
-
-	    @Override
-	    public void setEnabled(boolean b) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public void removePropertyChangeListener(
-		    PropertyChangeListener listener) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public void putValue(String key, Object value) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public boolean isEnabled() {
-		// nothing
-		return false;
-	    }
-
-	    @Override
-	    public Object getValue(String key) {
-		// nothing
-		return null;
-	    }
-
-	    @Override
-	    public void addPropertyChangeListener(
-		    PropertyChangeListener listener) {
-		// nothing
-
 	    }
 	});
 	copyButton.setText("Copy");
 	copyButton.setEnabled(true);
 	popUp.add(copyButton);
 
-	JMenuItem pasteButton = new JMenuItem(new Action() {
+	JMenuItem pasteButton = new JMenuItem();
+	pasteButton.addActionListener(new ActionListener() {
 
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
@@ -124,57 +86,12 @@ public class GenericConsole extends JTextArea {
 		    e.printStackTrace();
 		}
 	    }
-
-	    @Override
-	    public void setEnabled(boolean b) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public void removePropertyChangeListener(
-		    PropertyChangeListener listener) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public void putValue(String key, Object value) {
-		// nothing
-
-	    }
-
-	    @Override
-	    public boolean isEnabled() {
-		// nothing
-		return false;
-	    }
-
-	    @Override
-	    public Object getValue(String key) {
-		// nothing
-		return null;
-	    }
-
-	    @Override
-	    public void addPropertyChangeListener(
-		    PropertyChangeListener listener) {
-		// nothing
-
-	    }
 	});
 	pasteButton.setText("Paste");
 	pasteButton.setEnabled(true);
 	popUp.add(pasteButton);
 	getCaret().setSelectionVisible(true);
 	setLineWrap(true);
-	// String[] disableTargets = { DefaultEditorKit.deletePrevCharAction,
-	// DefaultEditorKit.deletePrevWordAction,
-	// DefaultEditorKit.deleteNextWordAction,
-	// DefaultEditorKit.deleteNextCharAction };
-	// for (String target : disableTargets) {
-	// getActionMap().get(target).setEnabled(false);
-	// }
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setMinimumSize(new Dimension(5, 25));
 	userInput = "";
@@ -260,28 +177,7 @@ public class GenericConsole extends JTextArea {
 		getCaret().setVisible(true);
 	    }
 	});
-	addMouseListener(new MouseListener() {
-
-	    @Override
-	    public void mouseReleased(MouseEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mousePressed(MouseEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseEntered(MouseEvent e) {
-		// nothing
-	    }
-
+	addMouseListener(new MouseAdapter() {
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON3) {

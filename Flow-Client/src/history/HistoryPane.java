@@ -46,7 +46,7 @@ public class HistoryPane extends JSplitPane {
 	setRightComponent(viewer);
 
 	docTree = new DocTree(versionViewer);
-	treeAndVersion.setLeftComponent(docTree);
+	treeAndVersion.setLeftComponent(docTree.getScrollable());
 
     }
 }
