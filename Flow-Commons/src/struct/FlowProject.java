@@ -8,15 +8,19 @@ import java.util.UUID;
  */
 public class FlowProject implements Serializable {
     private UUID projectUUID;
-	private String name;
-	private User owner;
+    private String name;
+    private User owner;
 
-	public FlowProject(String name, User owner) {
-		this.name = name;
-		this.owner = owner;
-        this.projectUUID = UUID.randomUUID();
-	}
+    public FlowProject(String name, User owner) {
+	this.name = name;
+	this.owner = owner;
+	this.projectUUID = UUID.randomUUID();
+    }
 
-	public FlowProject() {
-	}
+    public FlowProject() {
+    }
+
+    public String toString() {
+	return name;
+    }
 }
