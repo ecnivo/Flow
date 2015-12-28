@@ -17,10 +17,12 @@ data.put("username", "netdex");
 data.put("password", "a8fi3kr"); // not my actual password
 ```
 
-This constructs a data with the property `username=netdex` and `password=a8fi3kr`. To send this data to the server, we must 
+#THE FOLLOWING INFORMATION IS NOW OUT OF DATE! USE FMLNetworker INSTEAD
+
+<s>This constructs a data with the property `username=netdex` and `password=a8fi3kr`. To send this data to the server, we must
 have an instance of `PackageSocket`. A socket may be passed into the constructor to easily create one.
 
-```java
+```java~~
 Socket socket = ...;
 PackageSocket packageSocket = new PackageSocket(socket);
 ```
@@ -36,6 +38,7 @@ And the client is now done. From the server, receive the data as follows:
 ```java
 Data data = packageSocket.receivePackage(Data.class);
 ```
+</s>
 
 To retrieve the properties on the server side, do the following:
 

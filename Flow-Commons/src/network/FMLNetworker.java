@@ -20,6 +20,13 @@ public class FMLNetworker {
         this.port = port;
     }
 
+    /**
+     * Sends a message to the server, and receives the subsequent response.
+     * @param data The data to send to the server
+     * @return The response from the server
+     * @throws IOException When something nasty happens
+     * @throws ClassNotFoundException When a class is missing client-side
+     */
     public Data send(Data data) throws IOException, ClassNotFoundException {
         Socket socket = new Socket(ip, port);
         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
