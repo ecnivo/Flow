@@ -7,6 +7,8 @@ import java.net.Socket;
 
 public class FlowServer implements Runnable {
 
+    private static final int PORT = 10244;
+
     SQLDatabase database;
 
     public FlowServer() {
@@ -16,7 +18,7 @@ public class FlowServer implements Runnable {
     @Override
     public void run() {
         try {
-            ServerSocket serverSocket = new ServerSocket();
+            ServerSocket serverSocket = new ServerSocket(PORT);
             while (serverSocket.isBound()) {
                 Socket socket = serverSocket.accept();
                 ClientRequestHandle handle = new ClientRequestHandle(socket);
