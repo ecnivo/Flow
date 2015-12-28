@@ -6,14 +6,16 @@ import java.io.*;
 import java.net.Socket;
 
 /**
+ * Communication for the Client.
+ *
  * Created by Netdex on 12/27/2015.
  */
-public class FMLNetwork {
+public class FMLNetworker {
 
     private String ip;
     private int port;
 
-    public FMLNetwork(String ip, int port){
+    public FMLNetworker(String ip, int port){
         this.ip = ip;
         this.port = port;
     }
