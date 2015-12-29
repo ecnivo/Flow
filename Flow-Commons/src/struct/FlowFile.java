@@ -9,19 +9,18 @@ import java.util.UUID;
  * Created by Netdex on 12/25/2015.
  */
 public class FlowFile implements Serializable {
-	private String remotePath;
-	private String remoteName;
+
+	private FlowDirectory parentDirectory;
 	private UUID uuid;
 
 	private TreeMap<Date, FlowDocument> versions;
 
-	public FlowFile(String remotePath, String remoteName) {
-		this(remotePath, remoteName, UUID.randomUUID());
+	public FlowFile(FlowDirectory parentDirectory) {
+		this(parentDirectory, UUID.randomUUID());
 	}
 
-	public FlowFile(String remotePath, String remoteName, UUID uuid) {
-		this.remoteName = remoteName;
-		this.remotePath = remotePath;
+	public FlowFile(FlowDirectory parentDirectory, UUID uuid) {
+		this.parentDirectory = parentDirectory;
 		this.uuid = uuid;
 		this.versions = new TreeMap<>();
 	}
@@ -34,12 +33,12 @@ public class FlowFile implements Serializable {
 		versions.put(date, document);
 	}
 
-	public String getRemotePath() {
-		return remotePath;
+	public TreeMap<Date, FlowDocument> getVersions(){
+		return versions;
 	}
 
-	public String getRemoteName() {
-		return remoteName;
+	public FlowDirectory getParentDirectory(){
+		return parentDirectory;
 	}
 
 	public UUID getFileUUID() {
