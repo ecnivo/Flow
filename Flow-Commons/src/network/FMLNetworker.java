@@ -1,11 +1,13 @@
 package network;
 
 import message.Data;
+import struct.FlowDocument;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.UUID;
 
 /**
  * Communication for the Client.
@@ -43,5 +45,9 @@ public class FMLNetworker {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void registerFlowDocumentChangeListener(FlowDocumentChangeListener listener, UUID flowDocumentUUID) {
+        Data asyncCallbackRequest = new Data("document_async_register");
     }
 }

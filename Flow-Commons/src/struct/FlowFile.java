@@ -16,7 +16,7 @@ public class FlowFile implements Serializable {
     private UUID uuid;
     private String fileName;
 
-    private TreeMap<Date, FlowDocument> versions;
+    private transient TreeMap<Date, FlowDocument> versions;
 
     public FlowFile(FlowDirectory parentDirectory, String fileName) {
         this(parentDirectory, fileName, UUID.randomUUID());
