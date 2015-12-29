@@ -7,7 +7,9 @@ import java.util.UUID;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
+import struct.FlowFile;
 import struct.FlowProject;
+import struct.User;
 import util.Results;
 
 public class ClientRequestHandle implements Runnable {
@@ -32,13 +34,15 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			this.socket.setSoTimeout(100);
+			String username, password;
+			String[][] response;
 			Data data = psocket.receive(Data.class);
 			System.err.println(data.toString());
 			Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
-				String username = data.get("username", String.class);
-				String password = data.get("password", String.class);
+				username = data.get("username", String.class);
+				password = data.get("password", String.class);
 				if (this.server.getDatabase().authenticate(username,
 						password)) {
 					// TODO Netdex get the serial number
@@ -71,23 +75,49 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
-				// TODO Acquire user UUID from session in database
-				String[][] response = Results.toStringArray(new String[] {},
-						this.database.getProjects("REPLACE WITH USERUUID"));
+				response = Results.toStringArray(
+						new String[] { "ProjectID", "ProjectName" },
+						this.database.getProjects(
+								username = data.get("username", String.class)));
 				FlowProject[] projects = new FlowProject[response.length];
 				for (int i = 0; i < response.length; i++) {
-					projects[i] = new FlowProject();
-					// TODO Add data to flow project
+					projects[i] = new FlowProject(response[i][1],
+							new User(username),
+							UUID.fromString(response[i][0]));
 				}
 				returnData.put("projects", projects);
+				returnData.put("status", "OK");
 				break;
 			case "list_project_files":
+				response = Results.toStringArray(
+						new String[] { "ProjectID", "ProjectName" },
+						this.database.getFiles(
+								username = data.get("username", String.class)));
+				FlowFile[] files = new FlowFile[response.length];
+
+				// TODO Generate 'remotePath' and 'remoteName' <-- NETDEX what
+				// does this even mean
+				for (int i = 0; i < response.length; i++) {
+					files[i] = new FlowFile("PLACE WITH PATH",
+							"REPLACE WITH NAME",
+							UUID.fromString(response[i][0]));
+				}
+				returnData.put("files", files);
+				returnData.put("status", "OK");
 				break;
 			case "file_request":
+				// TODO generate byte array using file path (from above)
 				break;
 			case "file_checksum":
 				break;
 			case "new_project":
+				this.database
+						.newProject(data.get("project_name", String.class),
+								Results.toStringArray(
+										new String[] { "OwnerUserName" },
+										this.database.getSessionInfo(
+												data.get("session_id",
+														String.class)))[0][0]);
 				break;
 			case "project_modify":
 				break;

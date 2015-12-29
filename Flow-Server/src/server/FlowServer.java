@@ -1,19 +1,13 @@
 package server;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.UUID;
 
 import database.SQLDatabase;
-import message.Data;
-import network.FMLNetworker;
-
-import javax.net.ssl.*;
 
 public class FlowServer implements Runnable {
 

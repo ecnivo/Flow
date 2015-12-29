@@ -51,16 +51,16 @@ public class SQLDatabase {
 	 * Getter for all projects associated with the specified UserID, completely
 	 * ignoring whether the user is the owner, or has only edit or view access.
 	 * 
-	 * @param userId
+	 * @param username
 	 *            the ID of the user.
 	 * @return all projects associated with the specified UserID.
 	 */
-	public ResultSet getProjects(String userId) {
+	public ResultSet getProjects(String username) {
 		try {
 			// TODO Allow for multiple users to be in permission (see
 			// updatePermission())
-			return this.query("SELECT ProjectId FROM access WHERE UserID = "
-					+ userId + ";");
+			return this.query(
+					"SELECT * FROM access WHERE Username = " + username + ";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -75,27 +75,27 @@ public class SQLDatabase {
 	 *            , {@link EDIT}, or {@link VIEW}.
 	 * @param projectId
 	 *            the project which to provide the user access to.
-	 * @param userId
-	 *            the ID of the user which to provide access to.
+	 * @param username
+	 *            the username which to provide access to.
 	 * @return whether or not the access was successfully granted.
 	 */
 	public boolean updateAccess(int accessLevel, String projectId,
-			String userId) {
+			String username) {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
 				this.update("INSERT INTO access values(" + projectId + ", "
-						+ userId + ", " + accessLevel + ";");
+						+ username + ", " + accessLevel + ";");
 				return true;
 			}
 			if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
-				this.update("UPDATE projects SET OwnerID = " + userId
+				this.update("UPDATE projects SET OwnerUserName = " + username
 						+ " WHERE ProjectID = " + projectId + ";");
 
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values(" + projectId + ", "
-						+ userId + ", " + OWNER + ");");
+						+ username + ", " + OWNER + ");");
 
 				// TODO remove all other permissions (i.e. if they had edit
 				// permissions)
@@ -116,15 +116,13 @@ public class SQLDatabase {
 	 */
 	public ResultSet getFiles(String projectId) {
 		try {
-			return this
-					.query("SELECT DocumentName FROM documents WHERE ProjectID = "
-							+ projectId + ";");
+			return this.query("SELECT * FROM documents WHERE ProjectID = "
+					+ projectId + ";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
 
 	/**
 	 * Creates a new project with the specified name and owner
@@ -167,12 +165,12 @@ public class SQLDatabase {
 	 * 
 	 * @return all of the usernames in the database.
 	 */
-	public ResultSet getUserNames() {
+	public ResultSet getUserNames(String projectId) {
 		try {
-			return this.query("SELECT username FROM users;");
+			return this.query("SELECT username FROM users WHERE ;");
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// Switch this to an empty resultset is possible
+			// Switch this to an empty resultset if possible
 			return null;
 		}
 	}
@@ -203,11 +201,11 @@ public class SQLDatabase {
 		return false;
 	}
 
-	public boolean newSession(String userUUID, String serialNumber,
-			String sessionUUID) {
+	public boolean newSession(String username, String serialNumber,
+			String sessionId) {
 		try {
-			this.update("INSERT INTO sessions VALUES (" + userUUID + ", "
-					+ serialNumber + ", " + sessionUUID + ");");
+			this.update("INSERT INTO sessions VALUES (" + username + ", "
+					+ serialNumber + ", " + sessionId + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -231,6 +229,17 @@ public class SQLDatabase {
 		try {
 			return this.query("SELECT UserID FROM users WHERE Username = "
 					+ username + ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public ResultSet getSessionInfo(String sessionId) {
+		try {
+			return this.query(
+					"SELECT * FROM sessions WHERE SessionID = " + sessionId);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
