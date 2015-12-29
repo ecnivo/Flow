@@ -15,10 +15,10 @@ public class TextDocument extends FlowDocument {
         this.lines = new ArrayList<>();
         lines.add("");
     }
+
     public TextDocument(){
         this(null);
     }
-
 
     /**
      * Insert a character at line number at index
