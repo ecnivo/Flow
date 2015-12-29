@@ -116,8 +116,40 @@ public class ClientRequestHandle implements Runnable {
 														String.class)))[0][0]);
 				break;
 			case "project_modify":
+				String projectId = data.get("project_uuid", String.class);
+				switch (data.get("project_modify_type", String.class)) {
+				case "MODIFY_COLLABORATOR":
+					username = data.get("username", String.class);
+					String accessLevel = data.get("access_level", String.class);
+					switch (accessLevel) {
+					case "NONE":
+						// TODO create collaborator removal method in database
+						break;
+					case "VIEW":
+						this.database.updateAccess(SQLDatabase.VIEW, projectId,
+								username);
+						break;
+					case "EDIT":
+						this.database.updateAccess(SQLDatabase.EDIT, projectId,
+								username);
+						break;
+					}
+					break;
+				// TODO Create database methods for following functions
+				case "RENAME_PROJECT":
+					break;
+				case "DELETE_PROJECT":
+					break;
+				}
 				break;
+			// TODO Implement sending messages to active sessions on changes
 			case "document_modify":
+				switch (data.get("doc_type", String.class)) {
+				case "INSERT":
+					break;
+				case "DELETE":
+					break;
+				}
 				break;
 			}
 
