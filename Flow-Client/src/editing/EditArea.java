@@ -23,6 +23,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import struct.FlowDocument;
+import struct.TextDocument;
 
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
@@ -47,12 +48,12 @@ public class EditArea extends JTextPane {
 	    "synchronized", "this", "throws", "throw", "transient", "try",
 	    "void", "volatile", "while" };
 
-    protected EditArea(FlowDocument file, boolean editable, EditTabs tabs) {
+    protected EditArea(TextDocument file, boolean editable, EditTabs tabs) {
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(new Font("Consolas", Font.PLAIN, 13));
 	this.file = file;
-	doc = (StyledDocument) new File(file.getParentFile().getRemotePath());
+	doc = (StyledDocument) new File(file.getDocumentText());
 	setStyledDocument(doc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
@@ -83,7 +84,7 @@ public class EditArea extends JTextPane {
 
 	    @Override
 	    public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_TAB) {
+		if (e.getKeyCode() == KeyEvent.VK_TAB && editable) {
 		    try {
 			doc.insertString(getCaretPosition(), "    ", null);
 		    } catch (BadLocationException e1) {
@@ -131,8 +132,8 @@ public class EditArea extends JTextPane {
 	    }
 	});
     }
-    
-    public FlowDocument getFlowDoc(){
+
+    public FlowDocument getFlowDoc() {
 	return file;
     }
 

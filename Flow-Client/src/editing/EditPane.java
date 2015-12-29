@@ -80,10 +80,11 @@ public class EditPane extends JPanel {
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.EDIT);
 	buttonPanel.add(navBar);
-	buttonPanel.add(new EditorToolbar());
+	EditorToolbar editToolbar = new EditorToolbar(this);
+	buttonPanel.add(editToolbar);
 	buttonPanel.add(new RunStopBar());
 	treeAndButtons.setLeftComponent(buttonPanel);
-	tree = new DocTree(editTabs);
+	tree = new DocTree(editTabs, editToolbar);
 
 	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);
