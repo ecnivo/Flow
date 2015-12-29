@@ -17,7 +17,7 @@ public class ArbitraryDocument extends FlowDocument {
     public ArbitraryDocument(File localFile) throws IOException {
         super();
         this.localFile = localFile;
-        if(localFile != null)
+        if (localFile != null)
             fileBytes = Files.readAllBytes(localFile.toPath());
     }
 
@@ -27,14 +27,16 @@ public class ArbitraryDocument extends FlowDocument {
 
     /**
      * Gets the contents of this file
+     *
      * @return the contents of this file
      */
-    public byte[] getFileBytes(){
+    public byte[] getFileBytes() {
         return fileBytes;
     }
 
     /**
      * Gets the local directory to this file
+     *
      * @return the local directory to this file
      */
     public File getLocalFile() {

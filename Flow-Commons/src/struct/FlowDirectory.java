@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 /**
  * Represents a directory in the flow file system
- *
+ * <p>
  * Created by Netdex on 12/29/2015.
  */
-public class FlowDirectory implements Serializable{
+public class FlowDirectory implements Serializable {
 
     private FlowDirectory parent;
     private ArrayList<FlowDirectory> childDirectories;
@@ -30,6 +30,7 @@ public class FlowDirectory implements Serializable{
 
     /**
      * Gets the parent of this directory, null if root directory
+     *
      * @return the parent of this directory, null if root directory
      */
     public FlowDirectory getParent() {
@@ -38,19 +39,21 @@ public class FlowDirectory implements Serializable{
 
     /**
      * Adds a directory as a child of this one
+     *
      * @param directory The directory to add as a child
      */
-    public void addDirectory(FlowDirectory directory){
+    public void addDirectory(FlowDirectory directory) {
         childDirectories.add(directory);
     }
 
     /**
      * Adds a file as a child of this directory
+     *
      * @param file The file to add as a child
      */
     public void addFile(FlowFile file) throws DuplicateFileNameException {
-        for(FlowFile childFile : childFiles){
-            if(childFile.getFileName().equals(file.getFileName()))
+        for (FlowFile childFile : childFiles) {
+            if (childFile.getFileName().equals(file.getFileName()))
                 throw new DuplicateFileNameException();
         }
         childFiles.add(file);
@@ -58,6 +61,7 @@ public class FlowDirectory implements Serializable{
 
     /**
      * Gets all child directories
+     *
      * @return all child directories
      */
     public ArrayList<FlowDirectory> getDirectories() {
@@ -66,6 +70,7 @@ public class FlowDirectory implements Serializable{
 
     /**
      * Gets all child files
+     *
      * @return all child files
      */
     public ArrayList<FlowFile> getFiles() {
@@ -75,10 +80,10 @@ public class FlowDirectory implements Serializable{
     /**
      * @return the fully qualified path from root directory
      */
-    public String getFullyQualifiedPath(){
+    public String getFullyQualifiedPath() {
         String path = "";
         FlowDirectory cd = this;
-        while(cd.getParent() != null){
+        while (cd.getParent() != null) {
             path += cd.getDirectoryName() + "/";
             cd = cd.getParent();
         }
@@ -88,18 +93,26 @@ public class FlowDirectory implements Serializable{
     /**
      * @return the root directory
      */
-    public FlowDirectory getRootDirectory(){
+    public FlowDirectory getRootDirectory() {
         FlowDirectory cd = this;
-        while(cd.getParent() != null){
+        while (cd.getParent() != null) {
             cd = cd.getParent();
         }
         return cd;
     }
 
-    public String getDirectoryName(){
+    public String getDirectoryName() {
         return dirName;
     }
 
-    static class DuplicateFileNameException extends Exception {}
-    static class InvalidFileNameException extends Exception {}
+    @Override
+    public String toString() {
+        return dirName;
+    }
+
+    static class DuplicateFileNameException extends Exception {
+    }
+
+    static class InvalidFileNameException extends Exception {
+    }
 }

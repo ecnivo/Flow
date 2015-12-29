@@ -16,7 +16,7 @@ public class TextDocument extends FlowDocument {
         lines.add("");
     }
 
-    public TextDocument(){
+    public TextDocument() {
         this(null);
     }
 

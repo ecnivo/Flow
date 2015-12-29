@@ -15,16 +15,18 @@ public class Data implements Serializable {
     public Data() {
         this.stringObjectHashMap = new HashMap<>();
     }
-    public Data(String type){
+
+    public Data(String type) {
         this();
         stringObjectHashMap.put("type", type);
     }
 
     /**
      * Gets the type of this message
+     *
      * @return The type of this message
      */
-    public String getType(){
+    public String getType() {
         return (String) stringObjectHashMap.get("type");
     }
 
@@ -40,9 +42,10 @@ public class Data implements Serializable {
 
     /**
      * Retrieves a property from this message
-     * @param key The key of the message
+     *
+     * @param key  The key of the message
      * @param type The class type of the message, for example String.class
-     * @param <T> The type of the value of the message
+     * @param <T>  The type of the value of the message
      * @return The value of the property of type 'type'
      */
     public <T> T get(String key, Class<T> type) {
@@ -54,7 +57,7 @@ public class Data implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return stringObjectHashMap.toString();
     }
 }
