@@ -46,15 +46,11 @@ public class ClientRequestHandle implements Runnable {
 				if (this.server.getDatabase().authenticate(username,
 						password)) {
 					// TODO Netdex get the serial number
-					UUID sessionID = this.server
-							.newSession(
-									Results.toStringArray(this.database
-											.getUserId(username))[0][0],
+					UUID sessionID = this.server.newSession(username,
 							"REPLACE WITH SERIAL NUMBER");
 
 					// TODO Add check for if the session cannot be created
-					// This could potentially be directly in the authenticate
-					// method
+					// This could potentially be in the authenticate method
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
 				} else {
@@ -114,7 +110,7 @@ public class ClientRequestHandle implements Runnable {
 				this.database
 						.newProject(data.get("project_name", String.class),
 								Results.toStringArray(
-										new String[] { "OwnerUserName" },
+										new String[] { "OwnerUsername" },
 										this.database.getSessionInfo(
 												data.get("session_id",
 														String.class)))[0][0]);

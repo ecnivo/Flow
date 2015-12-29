@@ -47,18 +47,17 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	public static void main(String[] args) throws IOException, KeyManagementException, NoSuchAlgorithmException {
+	public static void main(String[] args) throws IOException,
+			KeyManagementException, NoSuchAlgorithmException {
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
 		// TEST CODE
 
-
-
 	}
 
-	protected UUID newSession(String userId, String serialNumber) {
+	protected UUID newSession(String username, String serialNumber) {
 		UUID sessionId = UUID.randomUUID();
-		this.database.newSession(userId, serialNumber, sessionId.toString());
+		this.database.newSession(username, serialNumber, sessionId.toString());
 		return sessionId;
 	}
 

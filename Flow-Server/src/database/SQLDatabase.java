@@ -57,8 +57,6 @@ public class SQLDatabase {
 	 */
 	public ResultSet getProjects(String username) {
 		try {
-			// TODO Allow for multiple users to be in permission (see
-			// updatePermission())
 			return this.query(
 					"SELECT * FROM access WHERE Username = " + username + ";");
 		} catch (SQLException e) {
@@ -201,6 +199,18 @@ public class SQLDatabase {
 		return false;
 	}
 
+	/**
+	 * Creates a new session for the specified username and serial number.
+	 * 
+	 * @param username
+	 *            the UUID of the user.
+	 * @param serialNumber
+	 *            the serial number of the user's hard drive.
+	 * @param sessionId
+	 *            the session ID which to associated with the user.
+	 * @return whether or not the session was successfully associated with the
+	 *         user and serial number.
+	 */
 	public boolean newSession(String username, String serialNumber,
 			String sessionId) {
 		try {
@@ -213,8 +223,16 @@ public class SQLDatabase {
 		return true;
 	}
 
+	/**
+	 * Removes the specified session from the database
+	 * 
+	 * @param sessionId
+	 *            the string representation of the UUID of the session
+	 * @return whether or not the session was successfully removed
+	 */
 	public boolean removeSession(String sessionId) {
 		try {
+			// TODO Verify if the session actually exists prior to removal
 			this.update("DELETE FROM sessions WHERE SessionID = " + sessionId
 					+ ";");
 		} catch (SQLException e) {
@@ -225,17 +243,15 @@ public class SQLDatabase {
 		return true;
 	}
 
-	public ResultSet getUserId(String username) {
-		try {
-			return this.query("SELECT UserID FROM users WHERE Username = "
-					+ username + ";");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
+	/**
+	 * Getter for the username and serial number associated with the specified
+	 * session ID.
+	 * 
+	 * @param sessionId
+	 *            the id associated with the desired session
+	 * @return the username and serial number associated with the specified
+	 *         session ID
+	 */
 	public ResultSet getSessionInfo(String sessionId) {
 		try {
 			return this.query(
