@@ -1,6 +1,4 @@
-package editing;
-
-import gui.FlowClient;
+package shared;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -8,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -26,11 +25,16 @@ import message.Data;
 import struct.FlowDocument;
 import struct.FlowProject;
 import struct.TextDocument;
+import struct.User;
+import editing.UserCaret;
+import gui.FlowClient;
 
+@SuppressWarnings("serial")
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
     private FlowDocument document;
+    private ArrayList<UserCaret> userCarets;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -55,7 +59,7 @@ public class EditArea extends JTextPane {
 	    "synchronized", "this", "throws", "throw", "transient", "try",
 	    "void", "volatile", "while" };
 
-    protected EditArea(TextDocument file, boolean editable, EditTabs tabs) {
+    public EditArea(TextDocument file, boolean editable, EditTabs tabs) {
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
@@ -65,6 +69,13 @@ public class EditArea extends JTextPane {
 	setStyledDocument(doc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
+
+	Iterator<User> userIt = ((FlowProject) file.getParentFile()
+		.getParentDirectory().getRootDirectory()).getEditors()
+		.iterator();
+	while (userIt.hasNext()){
+	    userCarets.add(new UserCaret(userIt.next(), this));
+	}
 
 	keywordStyle = addStyle("keywords", null);
 	StyleConstants.setForeground(keywordStyle, KEYWORD_COLOUR);

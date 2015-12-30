@@ -1,4 +1,7 @@
-package gui;
+package shared;
+
+import gui.FlowClient;
+import gui.PanelManager;
 
 import java.awt.FlowLayout;
 import java.awt.Image;

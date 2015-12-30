@@ -10,23 +10,28 @@ import javax.swing.JPanel;
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
+import shared.EditTabs;
 import debug.DebugPane;
 import editing.EditPane;
 
+@SuppressWarnings("serial")
 public class PanelManager extends JPanel {
+    private CardLayout layout;
     private EditPane editPane;
     private SettingsPane settingsTabs;
     private LoginPane loginPane;
     private DebugPane debugPane;
     private CreateAccountPane createAccountPane;
-    private CardLayout layout;
-    private JFrame frame;
     private HistoryPane historyPane;
+
+    private EditTabs editTabs;
 
     public PanelManager(JFrame frame) {
 	layout = new CardLayout();
 	this.setLayout(layout);
 	setBorder(FlowClient.EMPTY_BORDER);
+
+	editTabs = new EditTabs();
 
 	loginPane = new LoginPane(this);
 	add(loginPane, "loginPane");
@@ -48,6 +53,7 @@ public class PanelManager extends JPanel {
     }
 
     public void switchToEditor() {
+	editPane.addEditTabs(editTabs);
 	layout.show(this, "editPane");
 	revalidate();
 	repaint();
@@ -66,6 +72,7 @@ public class PanelManager extends JPanel {
     }
 
     public void switchToDebug() {
+	debugPane.addEditTabs(editTabs);
 	layout.show(this, "debugPane");
 	revalidate();
 	repaint();
@@ -78,6 +85,7 @@ public class PanelManager extends JPanel {
     }
 
     public void switchToHistory() {
+	historyPane.addEditTabs(editTabs);
 	layout.show(this, "historyPane");
 	revalidate();
 	repaint();
@@ -85,13 +93,5 @@ public class PanelManager extends JPanel {
 
     public LoginPane getLoginPane() {
 	return loginPane;
-    }
-
-    public EditPane getEditPane() {
-	return editPane;
-    }
-
-    public void setTitleBarName(String newName) {
-	frame.setTitle(newName);
     }
 }

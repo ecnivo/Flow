@@ -5,11 +5,9 @@ import gui.FlowClient;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import javax.swing.JList;
 import javax.swing.JPanel;
 
-import debug.VariablesList.VariablePanel;
-
+@SuppressWarnings("serial")
 public class VariablesList extends JPanel {
     public VariablesList() {
 	setPreferredSize(new Dimension(400, 275));

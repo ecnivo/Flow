@@ -11,9 +11,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import editing.EditPane;
 import login.CreateAccountPane;
 import login.LoginPane;
-import editing.EditPane;
 
 public class BackButton extends JButton {
     public BackButton(JPanel target, PanelManager manager) {

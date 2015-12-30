@@ -1,6 +1,5 @@
 package login;
 
-import gui.Communicator;
 import gui.FlowClient;
 import gui.PanelManager;
 
@@ -23,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
+import shared.Communicator;
 import message.Data;
 
 public class LoginPane extends JPanel {

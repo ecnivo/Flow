@@ -23,11 +23,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import shared.EditTabs;
 import struct.ArbitraryDocument;
 import struct.FlowDocument;
 import struct.FlowFile;
 import struct.TextDocument;
 
+@SuppressWarnings("serial")
 public class VersionViewer extends JPanel {
 
     private ImageIcon first;
@@ -140,10 +142,11 @@ public class VersionViewer extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 		    if (e.getButton() == MouseEvent.BUTTON1
 			    && e.getClickCount() == 2) {
-			if (doc instanceof TextDocument)
-			    historyPane.getEditTabs().openTab(
-				    (TextDocument) doc, false);
-			else if (doc instanceof ArbitraryDocument)
+			if (doc instanceof TextDocument) {
+			    EditTabs tabs = historyPane.getEditTabs();
+			    if (tabs != null)
+				tabs.openTab((TextDocument) doc, false);
+			} else if (doc instanceof ArbitraryDocument)
 			    try {
 				Desktop.getDesktop().open(new File("blarghs"));
 			    } catch (IOException e1) {

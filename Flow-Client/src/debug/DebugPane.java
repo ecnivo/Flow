@@ -1,11 +1,7 @@
 package debug;
 
-import editing.EditTabs;
 import gui.FlowClient;
-import gui.GenericConsole;
-import gui.NavBar;
 import gui.PanelManager;
-import gui.RunStopBar;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,19 +10,27 @@ import java.awt.FlowLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import shared.EditTabs;
+import shared.GenericConsole;
+import shared.NavBar;
+import shared.RunStopBar;
+
+@SuppressWarnings("serial")
 public class DebugPane extends JPanel {
+    
+    //TODO if it looks so simple, things still need to be added, such as selecting break points, highlighting the line...
+
+    private JSplitPane mainSplit;
 
     public DebugPane(PanelManager manager) {
 	setLayout(new BorderLayout());
 	setBorder(FlowClient.EMPTY_BORDER);
 
-	JSplitPane mainSplit = new JSplitPane();
+	mainSplit = new JSplitPane();
 	add(mainSplit, BorderLayout.CENTER);
 	mainSplit.setResizeWeight(0);
 	mainSplit.setContinuousLayout(true);
 	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
-
-	mainSplit.setRightComponent(new EditTabs());
 
 	JSplitPane leftHalf = new JSplitPane();
 	leftHalf.setPreferredSize(new Dimension(310, 574));
@@ -55,6 +59,9 @@ public class DebugPane extends JPanel {
 	buttonPanel.add(new RunStopBar());
 	buttonPanel.add(new DebugToolbar());
 	rightTop.add(new VariablesList(), BorderLayout.CENTER);
+    }
 
+    public void addEditTabs(EditTabs editTabs) {
+	mainSplit.setRightComponent(editTabs);
     }
 }

@@ -6,17 +6,17 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import editing.DocTree;
-import editing.EditTabs;
+import shared.EditTabs;
+import shared.NavBar;
+import editing.EditorDocTree;
 import gui.FlowClient;
-import gui.NavBar;
 import gui.PanelManager;
 
+@SuppressWarnings("serial")
 public class HistoryPane extends JSplitPane {
-    private EditTabs viewer;
     private NavBar navBar;
     private VersionViewer versionViewer;
-    private DocTree docTree;
+    private VersionDocTree tree;
 
     public HistoryPane(PanelManager manager) {
 	setResizeWeight(0.2);
@@ -42,15 +42,19 @@ public class HistoryPane extends JSplitPane {
 	versionViewer = new VersionViewer(this);
 	treeAndVersion.setRightComponent(versionViewer);
 
-	viewer = new EditTabs();
-	setRightComponent(viewer);
-
-	docTree = new DocTree(versionViewer);
-	treeAndVersion.setLeftComponent(docTree.getScrollable());
+	tree = new VersionDocTree(versionViewer);
+	treeAndVersion.setLeftComponent(tree.getScrollable());
 
     }
-    
-    public EditTabs getEditTabs(){
-	return viewer;
+
+    public void addEditTabs(EditTabs editTabs) {
+	setRightComponent(editTabs);
+    }
+
+    public EditTabs getEditTabs() {
+	if (getRightComponent() instanceof EditTabs) {
+	    return (EditTabs) getRightComponent();
+	}
+	return null;
     }
 }

@@ -1,7 +1,6 @@
 package editing;
 
 import gui.FlowClient;
-import gui.FlowPermission;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -19,6 +18,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -30,18 +30,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import struct.FlowFile;
+import shared.EditArea;
+import shared.EditTabs;
+import shared.FlowPermission;
 import struct.FlowProject;
 import struct.User;
 
+@SuppressWarnings("serial")
 public class CollabsList extends JPanel {
     // TODO when switching projects, clear search box and doClick on the search
     // box
     private JPanel searchPane;
     private JTextField searchBox;
     private JButton searchButton;
+    private EditPane editPane;
     private JPanel userListPanel;
-    private EditTabs editTabs;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
     private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
@@ -51,11 +54,11 @@ public class CollabsList extends JPanel {
     private static final Border ICON_ENTRY_BORDER = BorderFactory
 	    .createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
-    private FlowFile currOpenFile;
+    private UUID currProjectUUID;
 
-    public CollabsList(FlowPermission myPermission, EditTabs editTabs) {
-	currOpenFile = null;
-	this.editTabs = editTabs;
+    public CollabsList(FlowPermission myPermission, EditPane editPane) {
+	this.editPane = editPane;
+	currProjectUUID = null;
 	this.myPermission = myPermission;
 	setMinimumSize(new Dimension(5, 1));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -96,7 +99,7 @@ public class CollabsList extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
-		    refreshUserList(currOpenFile);
+		    refreshUserList();
 		    if (!(searchBox.getText().equals(SEARCHBOX_TEXT) || searchBox
 			    .getText().trim().equals(""))) {
 			// TODO make a search for a user
@@ -130,7 +133,7 @@ public class CollabsList extends JPanel {
 
 	    @Override
 	    public void mouseEntered(MouseEvent arg0) {
-		refreshUserList(currOpenFile);
+		refreshUserList();
 	    }
 
 	    @Override
@@ -148,27 +151,22 @@ public class CollabsList extends JPanel {
 	add(userListScroll, BorderLayout.CENTER);
     }
 
-    public void refreshUserList(FlowFile file) {
-	if (currOpenFile == null
-		|| !(((FlowProject) file.getParentDirectory()
-			.getRootDirectory()).getProjectUUID()
-			.equals(((FlowProject) currOpenFile
-				.getParentDirectory().getRootDirectory())
-				.getProjectUUID()))) {
+    public void refreshUserList() {
+	FlowProject active = editPane.getTree().getActiveProject();
+	if (!currProjectUUID.equals(active.getProjectUUID())) {
+	    currProjectUUID = active.getProjectUUID();
 	    userListPanel.removeAll();
 
-	    userListPanel.add(new UserInfo(DocTree.getActiveProject()
-		    .getOwner(), new FlowPermission(FlowPermission.OWNER)));
+	    userListPanel.add(new UserInfo(active.getOwner(),
+		    new FlowPermission(FlowPermission.OWNER)));
 
-	    Iterator<User> editorIterator = DocTree.getActiveProject()
-		    .getEditors().iterator();
+	    Iterator<User> editorIterator = active.getEditors().iterator();
 	    while (editorIterator.hasNext()) {
 		userListPanel.add(new UserInfo(editorIterator.next(),
 			new FlowPermission(FlowPermission.EDIT)));
 	    }
 
-	    Iterator<User> viewerIterator = DocTree.getActiveProject()
-		    .getViewers().iterator();
+	    Iterator<User> viewerIterator = active.getViewers().iterator();
 	    while (viewerIterator.hasNext()) {
 		userListPanel.add(new UserInfo(viewerIterator.next(),
 			new FlowPermission(FlowPermission.VIEW)));
@@ -186,13 +184,9 @@ public class CollabsList extends JPanel {
 	private JLabel permissionLabel;
 	private ButtonGroup permissionGroup;
 
-	private UserCaret userCaret;
-
 	private JRadioButton[] permissionSelectors = new JRadioButton[4];
 
 	public UserInfo(User user, FlowPermission permission) {
-	    // TODO don't display a UserInfo listing for themselves; do it
-	    // elsewhere!
 	    userPermission = permission;
 
 	    setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
@@ -264,11 +258,11 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    // TODO formally send a change in editors to server
+		    // TODO formally send a change in permissions to server
 		    ((CardLayout) switcher.getLayout())
 			    .show(switcher, "simple");
 		    updateFields();
-		    CollabsList.this.refreshUserList(currOpenFile);
+		    CollabsList.this.refreshUserList();
 		}
 	    });
 	    saveButton.addMouseListener(new ButtonHighlightListener());
@@ -333,9 +327,6 @@ public class CollabsList extends JPanel {
 		    // user
 		}
 	    });
-
-	    userCaret = new UserCaret(user,
-		    ((EditArea) editTabs.getSelectedComponent()));
 	}
 
 	private void updateFields() {

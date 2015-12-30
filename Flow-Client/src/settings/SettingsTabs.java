@@ -1,6 +1,5 @@
 package settings;
 
-import gui.Communicator;
 import gui.FlowClient;
 
 import java.awt.Component;
@@ -24,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 
+import shared.Communicator;
 import message.Data;
 
 public class SettingsTabs extends JTabbedPane {

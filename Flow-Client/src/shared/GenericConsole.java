@@ -1,4 +1,6 @@
-package gui;
+package shared;
+
+import gui.FlowClient;
 
 import java.awt.Color;
 import java.awt.Dimension;

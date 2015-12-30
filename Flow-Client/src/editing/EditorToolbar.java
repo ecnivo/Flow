@@ -1,6 +1,5 @@
 package editing;
 
-import gui.Communicator;
 import gui.FlowClient;
 
 import java.awt.FlowLayout;
@@ -20,6 +19,7 @@ import javax.swing.JToolBar;
 
 import login.CreateAccountPane;
 import message.Data;
+import shared.Communicator;
 
 public class EditorToolbar extends JToolBar {
     private JPopupMenu popup;
@@ -78,7 +78,7 @@ public class EditorToolbar extends JToolBar {
 				    JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getDocTree().updateProjectList();
+		pane.getTree().updateProjectList();
 	    }
 	});
 	JMenuItem renameProjectButton = new JMenuItem();
@@ -90,7 +90,7 @@ public class EditorToolbar extends JToolBar {
 		String projectName = JOptionPane.showInputDialog(
 			null,
 			"Please enter new name for the project "
-				+ DocTree.getActiveProject().toString()
+				+ pane.getTree().getActiveProject().toString()
 				+ "\nNo characters such as: \\ / ? % * : | "
 				+ "\" < > . # & { } $ @ = ` + ",
 			"Rename project", JOptionPane.QUESTION_MESSAGE).trim();
@@ -109,7 +109,8 @@ public class EditorToolbar extends JToolBar {
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-		modifyRequest.put("project_uuid", DocTree.getActiveProject());
+		modifyRequest.put("project_uuid", pane.getTree()
+			.getActiveProject());
 		modifyRequest.put("new_name", projectName);
 		switch (Communicator.communicate(modifyRequest).get("status",
 			String.class)) {
@@ -135,14 +136,14 @@ public class EditorToolbar extends JToolBar {
 			    .showConfirmDialog(
 				    null,
 				    "The project you are trying to rename does not exist.\n"
-				    + "Try refreshing the list of projects by moving your mouse cursor into,\n"
-				    + "then out of the project list.",
+					    + "Try refreshing the list of projects by moving your mouse cursor into,\n"
+					    + "then out of the project list.",
 				    "Project renaming failure",
 				    JOptionPane.DEFAULT_OPTION,
 				    JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getDocTree().updateProjectList();
+		pane.getTree().updateProjectList();
 	    }
 	});
 

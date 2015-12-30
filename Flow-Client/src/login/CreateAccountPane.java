@@ -1,7 +1,6 @@
 package login;
 
 import gui.BackButton;
-import gui.Communicator;
 import gui.FlowClient;
 import gui.PanelManager;
 
@@ -22,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 
+import shared.Communicator;
 import message.Data;
 
 public class CreateAccountPane extends JPanel {

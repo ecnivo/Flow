@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
+@SuppressWarnings("serial")
 public class DebugToolbar extends JToolBar {
     public DebugToolbar() {
 	this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));

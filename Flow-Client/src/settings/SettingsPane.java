@@ -1,6 +1,5 @@
 package settings;
 
-import gui.NavBar;
 import gui.PanelManager;
 
 import java.awt.BorderLayout;
@@ -8,6 +7,8 @@ import java.awt.FlowLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import shared.NavBar;
 
 public class SettingsPane extends JPanel {
 

@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import shared.EditArea;
 import struct.User;
 
 public class UserCaret extends JComponent {
@@ -31,15 +32,15 @@ public class UserCaret extends JComponent {
 
 	switch ((int) Math.random() * 3) {
 	case 0:
-	    red -= 20;
+	    red -= 15;
 	    break;
 
 	case 1:
-	    green -= 20;
+	    green -= 15;
 	    break;
 
 	case 2:
-	    blue -= 20;
+	    blue -= 15;
 	    break;
 	}
 	userColor = new Color(red, green, blue, 225);

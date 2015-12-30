@@ -1,5 +1,6 @@
-package editing;
+package shared;
 
+import editing.EditPane;
 import gui.FlowClient;
 
 import java.awt.BasicStroke;
@@ -47,7 +48,7 @@ public class EditTabs extends JTabbedPane {
     public static final int TAB_LIMIT = 25;
     public static final int TAB_ICON_SIZE = 16;
 
-    public EditTabs(EditPane editPane) {
+    public EditTabs() {
 	setMinimumSize(new Dimension(50, 0));
 	setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
@@ -75,12 +76,14 @@ public class EditTabs extends JTabbedPane {
 
 	    @Override
 	    public void stateChanged(ChangeEvent e) {
-		editPane.getCollabsList().refreshUserList(
-			((EditArea) getSelectedComponent()).getFlowDoc()
-				.getParentFile());
-		DocTree.setActiveProject((FlowProject) ((EditArea) getSelectedComponent())
-			.getFlowDoc().getParentFile().getParentDirectory()
-			.getRootDirectory());
+		if (getParent() instanceof EditPane) {
+		    EditPane editPane = (EditPane) getParent();
+		    editPane.getTree().setActiveProject(
+			    (FlowProject) ((EditArea) getSelectedComponent())
+				    .getFlowDoc().getParentFile()
+				    .getParentDirectory().getRootDirectory());
+		    editPane.getCollabsList().refreshUserList();
+		}
 	    }
 	});
     }

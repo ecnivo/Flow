@@ -11,6 +11,8 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import shared.Communicator;
+
 public class FlowClient extends JFrame {
 
     public static final boolean NETWORK = false;
