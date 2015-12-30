@@ -3,6 +3,7 @@ package struct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Date;
 
 /**
  * Represents a file of arbitrary extension, cannot be collaborated on
@@ -14,15 +15,15 @@ public class ArbitraryDocument extends FlowDocument {
     private transient File localFile;
     private byte[] fileBytes;
 
-    public ArbitraryDocument(File localFile) throws IOException {
-        super();
+    public ArbitraryDocument(File localFile, FlowFile parent, Date versionDate) throws IOException {
+        super(parent, versionDate);
         this.localFile = localFile;
         if (localFile != null)
             fileBytes = Files.readAllBytes(localFile.toPath());
     }
 
     public ArbitraryDocument() throws IOException {
-        this(null);
+        this(null, null, new Date());
     }
 
     /**

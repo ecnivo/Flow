@@ -1,6 +1,7 @@
 package struct;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Represents a editable text document
@@ -10,14 +11,14 @@ public class TextDocument extends FlowDocument {
 
     private ArrayList<String> lines;
 
-    public TextDocument(FlowFile parent) {
-        super(parent);
+    public TextDocument(FlowFile parent, Date versionDate) {
+        super(parent, versionDate);
         this.lines = new ArrayList<>();
         lines.add("");
     }
 
     public TextDocument() {
-        this(null);
+        this(null, new Date());
     }
 
     /**

@@ -1,11 +1,13 @@
 package util;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
 /**
@@ -28,9 +30,11 @@ public class Checksum {
     }
 
     public static long getObjectChecksum(Serializable serializable) throws IOException {
-        ByteOutputStream bos = new ByteOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        /* TODO FIX
+        ByteBuffer buf = ByteBuffer.allocate(65535);
+        ObjectOutputStream oos = new ObjectOutputStream();
         oos.writeObject(serializable);
-        return getByteChecksum(bos.getBytes());
+        return getByteChecksum(bos.getBytes());*/
+        throw new NotImplementedException();
     }
 }

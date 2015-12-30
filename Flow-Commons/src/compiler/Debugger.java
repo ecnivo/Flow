@@ -1,6 +1,7 @@
 package compiler;
 
 import struct.TextDocument;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 
@@ -19,6 +20,7 @@ public class Debugger {
     public Debugger(TextDocument... flowFiles) {
         this.compiler = new Compiler(flowFiles);
         this.workingDirectory = compiler.getWorkingDirectory();
+        throw new NotImplementedException(); // FIXME: 12/30/2015
     }
 
     public Process begin() throws IOException {
