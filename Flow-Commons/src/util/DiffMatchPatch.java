@@ -1121,7 +1121,7 @@ public class DiffMatchPatch {
                     post_ins = true;
                 }
                 /*
-				 * Five types to be split:
+                 * Five types to be split:
 				 * <ins>A</ins><del>B</del>XY<ins>C</ins><del>D</del>
 				 * <ins>A</ins>X<ins>C</ins><del>D</del>
 				 * <ins>A</ins><del>B</del>X<ins>C</ins>

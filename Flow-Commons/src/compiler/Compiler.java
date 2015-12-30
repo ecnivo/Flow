@@ -3,11 +3,13 @@ package compiler;
 import struct.TextDocument;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.tools.*;
-import java.io.*;
-import java.util.ArrayList;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -16,7 +18,7 @@ import java.util.logging.Logger;
  * Attempts to compile a document, then execute
  * <p>
  * Created by Netdex on 12/18/2015.
- *
+ * <p>
  * TODO FIX COMPILER TO USE NEW FILE STRUCTURE
  */
 public class Compiler {

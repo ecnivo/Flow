@@ -1,12 +1,7 @@
-import compiler.Compiler;
 import message.Data;
 import network.FMLNetworker;
-import struct.FlowFile;
-import struct.TextDocument;
-import util.DiffMatchPatch;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Created by Netdex on 12/18/2015.

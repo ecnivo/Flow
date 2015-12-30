@@ -1,7 +1,6 @@
 package network;
 
 import message.Data;
-import struct.FlowDocument;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

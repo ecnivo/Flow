@@ -3,7 +3,10 @@ package compiler;
 import struct.TextDocument;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * Created by Netdex on 12/25/2015.
