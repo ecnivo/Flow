@@ -7,6 +7,7 @@ import java.util.UUID;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
+import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
 import struct.User;
@@ -94,7 +95,7 @@ public class ClientRequestHandle implements Runnable {
 				// TODO Generate 'remotePath' and 'remoteName' <-- NETDEX what
 				// does this even mean
 				for (int i = 0; i < response.length; i++) {
-					files[i] = new FlowFile("PLACE WITH PATH",
+					files[i] = new FlowFile(new FlowDirectory("PATH HERE"),
 							"REPLACE WITH NAME",
 							UUID.fromString(response[i][0]));
 				}
