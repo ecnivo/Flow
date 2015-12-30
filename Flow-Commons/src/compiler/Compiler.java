@@ -1,6 +1,7 @@
 package compiler;
 
 import struct.TextDocument;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.tools.*;
 import java.io.*;
@@ -15,6 +16,8 @@ import java.util.logging.Logger;
  * Attempts to compile a document, then execute
  * <p>
  * Created by Netdex on 12/18/2015.
+ *
+ * TODO FIX COMPILER TO USE NEW FILE STRUCTURE
  */
 public class Compiler {
 
@@ -33,6 +36,8 @@ public class Compiler {
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
+
+        throw new NotImplementedException();
     }
 
     /**
@@ -42,6 +47,7 @@ public class Compiler {
      * @throws IOException when files cannot be written
      */
     public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
+        /* TODO actually fix this, instead of commenting it out to remove the error
         L.info("Found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
         if (!workingDirectory.exists()) {
@@ -99,18 +105,20 @@ public class Compiler {
         } catch (Exception e) {
             L.severe("Exception occurred while compiling!");
             L.severe(e.getMessage());
-        }
+        }*/
         return null;
     }
 
     public Process execute() throws IOException {
+        /* TODO actually fix this, instead of commenting it out to remove the error
         String remotePath = (textDocuments[0].getParentFile().getRemotePath() == "" ? "" : textDocuments[0].getParentFile().getRemotePath() + "/") // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
                 + removeExtension(textDocuments[0].getParentFile().getRemoteName());
         L.info("Assuming main class is " + remotePath);
         ProcessBuilder pb = new ProcessBuilder("java", "-cp", workingDirectory.getAbsolutePath(), remotePath);
         L.info("Execution arguments are: " + pb.command().toString());
         Process p = pb.start();
-        return p;
+        return p;*/
+        return null;
     }
 
     public String readAllOutput() throws IOException {

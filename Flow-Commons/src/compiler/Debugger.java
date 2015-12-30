@@ -22,12 +22,14 @@ public class Debugger {
     }
 
     public Process begin() throws IOException {
+        /* TODO actually fix this, instead of commenting it out to remove the error
         ProcessBuilder pb = new ProcessBuilder("jdb", "-classpath", workingDirectory.getAbsolutePath());
         this.p = pb.start();
         this.in = new BufferedReader(new InputStreamReader(p.getInputStream()));
         this.out = new PrintStream(p.getOutputStream());
         out.println("run " + compiler.getFlowFiles()[0].getParentFile().getRemotePath() + File.separator + Compiler.removeExtension(compiler.getFlowFiles()[0].getParentFile().getRemoteName()));
-        return p;
+        return p;*/
+        return null;
     }
 
     public void addBreakpoint(String classID, int line) {
