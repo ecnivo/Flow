@@ -23,6 +23,7 @@ public class Test {
     }
 
     public void test() throws IOException {
+        /*TODO STOP IT
         DiffMatchPatch dif = new DiffMatchPatch();
 
         FlowFile flowFile = new FlowFile("", "Test.java");
@@ -31,7 +32,7 @@ public class Test {
         flowFile.addVersion(new Date(), doc);
         Compiler compiler = new Compiler(doc);
         compiler.build();
-        compiler.readAllOutput();
+        compiler.readAllOutput();*/
     }
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
