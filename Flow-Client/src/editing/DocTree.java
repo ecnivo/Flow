@@ -134,6 +134,10 @@ public class DocTree extends JTree {
     public static FlowProject getActiveProject() {
 	return activeProject;
     }
+    
+    public static void setActiveProject(FlowProject newActive){
+	activeProject = newActive;
+    }
 
     protected void updateProjectList() {
 	if (FlowClient.NETWORK) {

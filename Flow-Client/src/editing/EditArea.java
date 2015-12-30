@@ -22,13 +22,15 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import message.Data;
 import struct.FlowDocument;
+import struct.FlowProject;
 import struct.TextDocument;
 
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private FlowDocument file;
+    private FlowDocument document;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -37,6 +39,11 @@ public class EditArea extends JTextPane {
     private ArrayList<StyleToken> keywordBlocks;
     private ArrayList<StyleToken> plainBlocks;
     private ArrayList<StyleToken> strings;
+
+    public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
+    public static final Color PLAIN_COLOUR = Color.BLACK;
+    public static final Color KEYWORD_COLOUR = new Color(0x006C79);
+    public static final Color STRING_COLOUR = new Color(0x45AD00);
 
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
 	    "boolean", "break", "byte", "case", "catch", "char", "class",
@@ -51,22 +58,25 @@ public class EditArea extends JTextPane {
     protected EditArea(TextDocument file, boolean editable, EditTabs tabs) {
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
-	setFont(new Font("Consolas", Font.PLAIN, 13));
-	this.file = file;
+	setFont(PLAIN);
+	setForeground(PLAIN_COLOUR);
+	this.document = file;
 	doc = (StyledDocument) new File(file.getDocumentText());
 	setStyledDocument(doc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
 	keywordStyle = addStyle("keywords", null);
-	StyleConstants.setForeground(keywordStyle, new Color(0x006C79));
-	StyleConstants.setBold(keywordStyle, true);
+	StyleConstants.setForeground(keywordStyle, KEYWORD_COLOUR);
+	StyleConstants.setItalic(keywordStyle, true);
+
 	plainStyle = addStyle("plain", null);
-	StyleConstants.setForeground(plainStyle, Color.BLACK);
+	StyleConstants.setForeground(plainStyle, PLAIN_COLOUR);
 	StyleConstants.setBold(plainStyle, false);
+
 	stringStyle = addStyle("strings", null);
 	StyleConstants.setBold(stringStyle, false);
-	StyleConstants.setForeground(stringStyle, new Color(0x45AD00));
+	StyleConstants.setForeground(stringStyle, STRING_COLOUR);
 
 	addKeyListener(new KeyListener() {
 
@@ -111,6 +121,15 @@ public class EditArea extends JTextPane {
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		}
+		Data documentModify = new Data("document_modify");
+		documentModify.put("project", ((FlowProject) document
+			.getParentFile().getParentDirectory()
+			.getRootDirectory()).getProjectUUID());
+		documentModify.put("document", document.getUUID());
+		documentModify.put("mod_type", "INSERT");
+
+		// TODO make the cursor and get line #
+
 		// TODO send this change to server, if not approved, then return
 
 		highlightSyntax();
@@ -134,7 +153,7 @@ public class EditArea extends JTextPane {
     }
 
     public FlowDocument getFlowDoc() {
-	return file;
+	return document;
     }
 
     public JScrollPane getScrollPane() {

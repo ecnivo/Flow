@@ -18,10 +18,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,17 +30,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import struct.FlowFile;
+import struct.FlowProject;
 import struct.User;
 
 public class CollabsList extends JPanel {
     // TODO when switching projects, clear search box and doClick on the search
     // box
-    // TODO have something that stores the current project (doctree) and have an
-    // access for it
     private JPanel searchPane;
     private JTextField searchBox;
     private JButton searchButton;
     private JPanel userListPanel;
+    private EditTabs editTabs;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
     private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
@@ -50,9 +51,11 @@ public class CollabsList extends JPanel {
     private static final Border ICON_ENTRY_BORDER = BorderFactory
 	    .createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
-    private User[] listOfUsers;
+    private FlowFile currOpenFile;
 
-    public CollabsList(FlowPermission myPermission) {
+    public CollabsList(FlowPermission myPermission, EditTabs editTabs) {
+	currOpenFile = null;
+	this.editTabs = editTabs;
 	this.myPermission = myPermission;
 	setMinimumSize(new Dimension(5, 1));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -93,11 +96,10 @@ public class CollabsList extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
-		    if (searchBox.getText().equals(SEARCHBOX_TEXT)
-			    || searchBox.getText().trim().equals("")) {
-			displayUserList(null);
-		    } else {
-			displayUserList(searchBox.getText().trim());
+		    refreshUserList(currOpenFile);
+		    if (!(searchBox.getText().equals(SEARCHBOX_TEXT) || searchBox
+			    .getText().trim().equals(""))) {
+			// TODO make a search for a user
 		    }
 		}
 	    }
@@ -109,6 +111,33 @@ public class CollabsList extends JPanel {
 	userListPanel.setMaximumSize(new Dimension((int) Math
 		.floor(CollabsList.this.getSize().getWidth()),
 		Integer.MAX_VALUE));
+	userListPanel.addMouseListener(new MouseListener() {
+
+	    @Override
+	    public void mouseReleased(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mousePressed(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseExited(MouseEvent arg0) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseEntered(MouseEvent arg0) {
+		refreshUserList(currOpenFile);
+	    }
+
+	    @Override
+	    public void mouseClicked(MouseEvent arg0) {
+		// nothing
+	    }
+	});
 	JScrollPane userListScroll = new JScrollPane(userListPanel);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(
 		FlowClient.SCROLL_SPEED);
@@ -119,40 +148,36 @@ public class CollabsList extends JPanel {
 	add(userListScroll, BorderLayout.CENTER);
     }
 
-    private void displayUserList(String query) {
-	// Data listUsers = new Data("list_users");
-	// listOfUsers = Communicator.communicate(listUsers).get("users",
-	// User[].class);
-	//
-	// // TODO puts the ones that are currently
-	// // collaborators first
-	//
-	// if (query != null) {
-	// User[] tempList = new User[listOfUsers.length];
-	// int pos = 0;
-	// for (User user : tempList) {
-	// if (user.getUsername().contains(query)) {
-	// tempList[pos] = user;
-	// pos++;
-	// }
-	// }
-	// listOfUsers = tempList;
-	// }
-	//
-	// userListPanel.removeAll();
-	// for (User user : listOfUsers) {
-	//
-	// }
-	//
-	// // TODO for loop through. Clear userlistpanel, and create new
-	// userinfo
-	// // panels on it
+    public void refreshUserList(FlowFile file) {
+	if (currOpenFile == null
+		|| !(((FlowProject) file.getParentDirectory()
+			.getRootDirectory()).getProjectUUID()
+			.equals(((FlowProject) currOpenFile
+				.getParentDirectory().getRootDirectory())
+				.getProjectUUID()))) {
+	    userListPanel.removeAll();
+
+	    userListPanel.add(new UserInfo(DocTree.getActiveProject()
+		    .getOwner(), new FlowPermission(FlowPermission.OWNER)));
+
+	    Iterator<User> editorIterator = DocTree.getActiveProject()
+		    .getEditors().iterator();
+	    while (editorIterator.hasNext()) {
+		userListPanel.add(new UserInfo(editorIterator.next(),
+			new FlowPermission(FlowPermission.EDIT)));
+	    }
+
+	    Iterator<User> viewerIterator = DocTree.getActiveProject()
+		    .getViewers().iterator();
+	    while (viewerIterator.hasNext()) {
+		userListPanel.add(new UserInfo(viewerIterator.next(),
+			new FlowPermission(FlowPermission.VIEW)));
+	    }
+	}
     }
 
     class UserInfo extends JPanel {
 
-	private String userName;
-	private ImageIcon userAvatar;
 	private FlowPermission userPermission;
 
 	private JPanel simpleView;
@@ -161,14 +186,13 @@ public class CollabsList extends JPanel {
 	private JLabel permissionLabel;
 	private ButtonGroup permissionGroup;
 
+	private UserCaret userCaret;
+
 	private JRadioButton[] permissionSelectors = new JRadioButton[4];
 
-	public UserInfo(String username, ImageIcon avatar,
-		FlowPermission permission) {
+	public UserInfo(User user, FlowPermission permission) {
 	    // TODO don't display a UserInfo listing for themselves; do it
 	    // elsewhere!
-	    userName = username;
-	    userAvatar = avatar;
 	    userPermission = permission;
 
 	    setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
@@ -178,7 +202,7 @@ public class CollabsList extends JPanel {
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setLayout(new BorderLayout(2, 0));
-	    JLabel icon = new JLabel(userAvatar);
+	    JLabel icon = new JLabel(user.getAvatar());
 	    icon.setPreferredSize(new Dimension(USER_ICON_SIZE, USER_ICON_SIZE));
 	    icon.setMinimumSize(new Dimension(USER_ICON_SIZE, USER_ICON_SIZE));
 	    add(icon, BorderLayout.WEST);
@@ -189,7 +213,7 @@ public class CollabsList extends JPanel {
 	    simpleView = new JPanel(new BorderLayout(0, 1));
 	    simpleView.setMaximumSize(new Dimension((int) Math
 		    .floor(CollabsList.this.getSize().getWidth() * .9), 80));
-	    JLabel name = new JLabel(userName) {
+	    JLabel name = new JLabel(user.getUsername()) {
 		public void paintComponent(Graphics g) {
 		    Graphics2D g2 = (Graphics2D) g;
 		    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -209,7 +233,7 @@ public class CollabsList extends JPanel {
 	    switcher.add(simpleView, "simple");
 
 	    permissionsView = new JPanel(new BorderLayout(0, 0));
-	    JLabel name2 = new JLabel(userName);
+	    JLabel name2 = new JLabel(user.getUsername());
 	    name2.setFont(USERNAME_FONT);
 	    permissionsView.add(name2, BorderLayout.NORTH);
 	    permissionGroup = new ButtonGroup();
@@ -244,6 +268,7 @@ public class CollabsList extends JPanel {
 		    ((CardLayout) switcher.getLayout())
 			    .show(switcher, "simple");
 		    updateFields();
+		    CollabsList.this.refreshUserList(currOpenFile);
 		}
 	    });
 	    saveButton.addMouseListener(new ButtonHighlightListener());
@@ -309,6 +334,8 @@ public class CollabsList extends JPanel {
 		}
 	    });
 
+	    userCaret = new UserCaret(user,
+		    ((EditArea) editTabs.getSelectedComponent()));
 	}
 
 	private void updateFields() {

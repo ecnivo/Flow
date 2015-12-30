@@ -32,8 +32,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import struct.FlowProject;
 import struct.TextDocument;
 
 /**
@@ -44,7 +47,7 @@ public class EditTabs extends JTabbedPane {
     public static final int TAB_LIMIT = 25;
     public static final int TAB_ICON_SIZE = 16;
 
-    public EditTabs() {
+    public EditTabs(EditPane editPane) {
 	setMinimumSize(new Dimension(50, 0));
 	setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
@@ -66,6 +69,18 @@ public class EditTabs extends JTabbedPane {
 	    @Override
 	    public void keyPressed(KeyEvent e) {
 		// nothing
+	    }
+	});
+	addChangeListener(new ChangeListener() {
+
+	    @Override
+	    public void stateChanged(ChangeEvent e) {
+		editPane.getCollabsList().refreshUserList(
+			((EditArea) getSelectedComponent()).getFlowDoc()
+				.getParentFile());
+		DocTree.setActiveProject((FlowProject) ((EditArea) getSelectedComponent())
+			.getFlowDoc().getParentFile().getParentDirectory()
+			.getRootDirectory());
 	    }
 	});
     }
