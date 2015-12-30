@@ -19,10 +19,12 @@ public class UserCaret extends JComponent {
     private Point location;
     private Color userColor;
     private JLabel infoLabel;
+    private EditArea editArea;
 
     private static final int SHOW_INFO_DISTANCE = 25;
 
     public UserCaret(User user, EditArea editArea) {
+	this.editArea = editArea;
 	setLayout(null);
 	location = new Point(0, 0);
 
@@ -49,10 +51,9 @@ public class UserCaret extends JComponent {
 	infoLabel.setBackground(userColor);
 	infoLabel.setForeground(Color.WHITE);
 	infoLabel.setFont(new Font("Tw Cen MT", Font.PLAIN, 10));
-	infoLabel.setBounds(editArea.getInsets().left,
-		(int) (editArea.getInsets().top + location.getY()),
-		(int) infoLabel.getSize().getWidth(), (int) infoLabel.getSize()
-			.getHeight());
+	infoLabel.setBounds(editArea.getInsets().left, (int) (editArea
+		.getInsets().top + location.getY()), (int) infoLabel.getSize()
+		.getWidth(), (int) infoLabel.getSize().getHeight());
 	add(infoLabel);
 
 	addMouseMotionListener(new MouseMotionListener() {
@@ -80,9 +81,11 @@ public class UserCaret extends JComponent {
 	g2d.fillRect((int) (location.getX()), (int) location.getY(), 2, 17);
     }
 
-    public void charMoved(int line, int charPos) {
+    public void caretMoved(int line, int charPos) {
 	location = new Point(charPos * 8, line * 17);
-	infoLabel.setVisible(true);
+	infoLabel.setBounds(editArea.getInsets().left, (int) (editArea
+		.getInsets().top + location.getY()), (int) infoLabel.getSize()
+		.getWidth(), (int) infoLabel.getSize().getHeight());
     }
 
     public Point getLocation() {

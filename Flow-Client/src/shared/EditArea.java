@@ -60,6 +60,7 @@ public class EditArea extends JTextPane {
 	    "void", "volatile", "while" };
 
     public EditArea(TextDocument file, boolean editable, EditTabs tabs) {
+	setLayout(null);
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
@@ -73,8 +74,10 @@ public class EditArea extends JTextPane {
 	Iterator<User> userIt = ((FlowProject) file.getParentFile()
 		.getParentDirectory().getRootDirectory()).getEditors()
 		.iterator();
-	while (userIt.hasNext()){
-	    userCarets.add(new UserCaret(userIt.next(), this));
+	while (userIt.hasNext()) {
+	    UserCaret caret = new UserCaret(userIt.next(), this);
+	    userCarets.add(caret);
+	    add(caret);
 	}
 
 	keywordStyle = addStyle("keywords", null);
@@ -139,9 +142,31 @@ public class EditArea extends JTextPane {
 		documentModify.put("document", document.getUUID());
 		documentModify.put("mod_type", "INSERT");
 
-		// TODO make the cursor and get line #
+		int lastNewLine;
+		try {
+		    lastNewLine = doc.getText(0,
+			    EditArea.this.getCaretPosition() - e.getLength())
+			    .lastIndexOf('\n');
+		} catch (BadLocationException e1) {
+		    e1.printStackTrace();
+		    return;
+		}
+		String text = getText();
+		int lines = 0;
+		for (int i = 0; i < lastNewLine; i++) {
+		    if (Character.isWhitespace(text.charAt(i)))
+			lines++;
+		}
+		documentModify.put("line", lines);
+		documentModify.put("idx",
+			EditArea.this.getCaretPosition() - e.getLength()
+				- lastNewLine);
 
-		// TODO send this change to server, if not approved, then return
+		Data response = Communicator.communicate(documentModify);
+		String status = documentModify.get("status", String.class);
+		if (!status.equals("OK")) {
+		    return;
+		}
 
 		highlightSyntax();
 	    }
@@ -215,11 +240,14 @@ public class EditArea extends JTextPane {
 			pos += targetLength;
 		    }
 		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)))
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))) {
 			markWordBlocks(sourceCode, pos, target, line);
-		} else if (pos == 0 && pos + targetLength + 1 == sourceLength)
+			pos += targetLength;
+		    }
+		} else if (pos == 0 && pos + targetLength + 1 == sourceLength) {
 		    markWordBlocks(sourceCode, pos, target, line);
-
+		    pos += targetLength;
+		}
 		if (sourceCode.charAt(pos) == '\n') {
 		    line++;
 		}
