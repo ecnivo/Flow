@@ -102,15 +102,15 @@ public class EditTabs extends JTabbedPane {
 	    int idx = getTabCount() - 1;
 	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile()
 		    .getFileName()));
-	    // setToolTipTextAt(idx, doc.getParentFile().latest());
-	    // TODO should be the last saved date
+//	     setToolTipTextAt(idx, doc.getParentFile().getVersions().);
+	    // TODO should be the save date
 	} else {
 	    JOptionPane
 		    .showConfirmDialog(
 			    null,
 			    "The limit on currently open tabs is 25.\n"
 				    + "The reason for doing so is to save processing power and reduce strain on your system.\n"
-				    + "If you need more than 25 tabs at a time, consider better organizing your workflow.",
+				    + "If you need more than 25 tabs at a time, consider reorganizing your workflow.",
 			    "Too many tabs!", JOptionPane.DEFAULT_OPTION,
 			    JOptionPane.WARNING_MESSAGE);
 	}

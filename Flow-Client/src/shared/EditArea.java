@@ -34,7 +34,6 @@ public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
     private FlowDocument document;
-    private ArrayList<UserCaret> userCarets;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -76,7 +75,6 @@ public class EditArea extends JTextPane {
 		.iterator();
 	while (userIt.hasNext()) {
 	    UserCaret caret = new UserCaret(userIt.next(), this);
-	    userCarets.add(caret);
 	    add(caret);
 	}
 
@@ -163,7 +161,7 @@ public class EditArea extends JTextPane {
 				- lastNewLine);
 
 		Data response = Communicator.communicate(documentModify);
-		String status = documentModify.get("status", String.class);
+		String status = response.get("status", String.class);
 		if (!status.equals("OK")) {
 		    return;
 		}
@@ -174,7 +172,38 @@ public class EditArea extends JTextPane {
 	    @Override
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
-		// TODO send change to server, and cut if unapproved
+
+		Data documentModify = new Data("document_modify");
+		documentModify.put("project", ((FlowProject) document
+			.getParentFile().getParentDirectory()
+			.getRootDirectory()).getProjectUUID());
+		documentModify.put("document", document.getUUID());
+		documentModify.put("mod_type", "DELETE");
+
+		int lastNewLine;
+		try {
+		    lastNewLine = doc.getText(0,
+			    EditArea.this.getCaretPosition()).lastIndexOf('\n');
+		} catch (BadLocationException e1) {
+		    e1.printStackTrace();
+		    return;
+		}
+		String text = getText();
+		int lines = 0;
+		for (int i = 0; i < lastNewLine; i++) {
+		    if (Character.isWhitespace(text.charAt(i)))
+			lines++;
+		}
+		documentModify.put("line", lines);
+		documentModify.put("idx", EditArea.this.getCaretPosition()
+			- lastNewLine);
+
+		Data response = Communicator.communicate(documentModify);
+		String status = response.get("status", String.class);
+		if (!status.equals("OK")) {
+		    return;
+		}
+
 		highlightSyntax();
 	    }
 	});
@@ -301,16 +330,14 @@ public class EditArea extends JTextPane {
 	}
 
 	for (StyleToken styleToken : plainBlocks) {
-	    SwingUtilities.invokeLater(new FormatPlainLater(
-		    styleToken.getPos(), styleToken.getLength()));
+	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
 	}
 	for (StyleToken styleToken : keywordBlocks) {
-	    SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
-		    .getPos(), styleToken.getLength()));
+	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
 	}
 	for (StyleToken styleToken : strings) {
-	    SwingUtilities.invokeLater(new FormatStringsLater(styleToken
-		    .getPos(), styleToken.getLength() + 1));
+	    doc.setCharacterAttributes(styleToken
+		    .getPos(), styleToken.getLength() + 1, stringStyle, false);
 	}
     }
 
@@ -330,53 +357,53 @@ public class EditArea extends JTextPane {
 	else
 	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
     }
-
-    private class FormatKeywordsLater implements Runnable {
-
-	private int pos;
-	private int nextToken;
-
-	private FormatKeywordsLater(int pos, int nextToken) {
-	    this.pos = pos;
-	    this.nextToken = nextToken;
-	}
-
-	@Override
-	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
-	}
-
-    }
-
-    private class FormatPlainLater implements Runnable {
-
-	private int pos;
-	private int nextToken;
-
-	private FormatPlainLater(int pos, int nextToken) {
-	    this.pos = pos;
-	    this.nextToken = nextToken;
-	}
-
-	@Override
-	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
-	}
-
-    }
-
-    private class FormatStringsLater implements Runnable {
-	private int pos;
-	private int nextToken;
-
-	private FormatStringsLater(int pos, int nextToken) {
-	    this.pos = pos;
-	    this.nextToken = nextToken;
-	}
-
-	@Override
-	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
-	}
-    }
+//
+//    private class FormatKeywordsLater implements Runnable {
+//
+//	private int pos;
+//	private int nextToken;
+//
+//	private FormatKeywordsLater(int pos, int nextToken) {
+//	    this.pos = pos;
+//	    this.nextToken = nextToken;
+//	}
+//
+//	@Override
+//	public void run() {
+//	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
+//	}
+//
+//    }
+//
+//    private class FormatPlainLater implements Runnable {
+//
+//	private int pos;
+//	private int nextToken;
+//
+//	private FormatPlainLater(int pos, int nextToken) {
+//	    this.pos = pos;
+//	    this.nextToken = nextToken;
+//	}
+//
+//	@Override
+//	public void run() {
+//	    doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
+//	}
+//
+//    }
+//
+//    private class FormatStringsLater implements Runnable {
+//	private int pos;
+//	private int nextToken;
+//
+//	private FormatStringsLater(int pos, int nextToken) {
+//	    this.pos = pos;
+//	    this.nextToken = nextToken;
+//	}
+//
+//	@Override
+//	public void run() {
+//	    doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
+//	}
+//    }
 }

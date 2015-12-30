@@ -24,22 +24,21 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import shared.EditArea;
-import shared.EditTabs;
+import message.Data;
+import shared.Communicator;
 import shared.FlowPermission;
 import struct.FlowProject;
 import struct.User;
 
 @SuppressWarnings("serial")
 public class CollabsList extends JPanel {
-    // TODO when switching projects, clear search box and doClick on the search
-    // box
     private JPanel searchPane;
     private JTextField searchBox;
     private JButton searchButton;
@@ -171,6 +170,9 @@ public class CollabsList extends JPanel {
 		userListPanel.add(new UserInfo(viewerIterator.next(),
 			new FlowPermission(FlowPermission.VIEW)));
 	    }
+
+	    searchBox.setText(SEARCHBOX_TEXT);
+	    searchBox.setForeground(Color.black);
 	}
     }
 
@@ -258,7 +260,37 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    // TODO formally send a change in permissions to server
+		    byte changePermission = FlowPermission.NONE;
+		    for (byte level = 0; level < permissionSelectors.length; level++) {
+			if (permissionSelectors[level].isSelected()) {
+			    changePermission = level;
+			    break;
+			}
+		    }
+
+		    Data changePerm = new Data("project_modify");
+		    changePerm
+			    .put("project_modify_type", "MODIFY_COLLABORATOR");
+		    changePerm.put("project_uuid", editPane.getTree()
+			    .getActiveProject().getProjectUUID());
+		    changePerm.put("username", user.getUsername());
+		    changePerm.put("access_level", changePermission);
+		    if (!Communicator.communicate(changePerm)
+			    .get("status", String.class).equals("OK")) {
+			JOptionPane
+				.showConfirmDialog(
+					null,
+					"Either this project does not exist,\n"
+						+ "the user does not exist,\n"
+						+ "the access level is invalid,\n"
+						+ "or you do not have the access to change permissions.\n\n"
+						+ "Try refreshing the list of projects by moving your mouse cursor to the documents tree\n"
+						+ "and back into this list of users and try again.",
+					"Project out of sync",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+		    }
+
 		    ((CardLayout) switcher.getLayout())
 			    .show(switcher, "simple");
 		    updateFields();

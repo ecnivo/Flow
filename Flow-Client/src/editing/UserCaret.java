@@ -24,6 +24,8 @@ public class UserCaret extends JComponent {
     private static final int SHOW_INFO_DISTANCE = 25;
 
     public UserCaret(User user, EditArea editArea) {
+	// TODO whenever usercarets are created, they need to be initialized
+	// with a listener for the caret movements of other users
 	this.editArea = editArea;
 	setLayout(null);
 	location = new Point(0, 0);

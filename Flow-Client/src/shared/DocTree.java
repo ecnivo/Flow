@@ -64,36 +64,37 @@ public abstract class DocTree extends JTree {
 	if (FlowClient.NETWORK) {
 	    usersProjectsUUIDs = Communicator.communicate(
 		    new Data("list_projects")).get("projects", UUID[].class);
-	}
 
-	DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-	// Adds a new project
-	for (UUID uuid : usersProjectsUUIDs) {
-	    boolean projectExistsLocally = false;
-	    for (int i = root.getChildCount() - 1; !projectExistsLocally
-		    && i >= 0; i--) {
-		if (((ProjectNode) root.getChildAt(i)).getProject()
-			.getProjectUUID().equals(uuid)) {
-		    projectExistsLocally = true;
+	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
+		    .getRoot();
+	    // Adds a new project
+	    for (UUID uuid : usersProjectsUUIDs) {
+		boolean projectExistsLocally = false;
+		for (int i = root.getChildCount() - 1; !projectExistsLocally
+			&& i >= 0; i--) {
+		    if (((ProjectNode) root.getChildAt(i)).getProject()
+			    .getProjectUUID().equals(uuid)) {
+			projectExistsLocally = true;
+		    }
+		}
+		if (!projectExistsLocally) {
+		    createProjectNode(uuid);
 		}
 	    }
-	    if (!projectExistsLocally) {
-		createProjectNode(uuid);
-	    }
-	}
 
-	// Deletes projects that don't exist
-	for (int i = root.getChildCount() - 1; i >= 0; i--) {
-	    boolean projectStillExists = false;
-	    for (int j = 0; j < usersProjectsUUIDs.length
-		    && !projectStillExists; j++) {
-		if (usersProjectsUUIDs[j].equals(((ProjectNode) root
-			.getChildAt(i)).getProject().getProjectUUID())) {
-		    projectStillExists = true;
+	    // Deletes projects that don't exist
+	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
+		boolean projectStillExists = false;
+		for (int j = 0; j < usersProjectsUUIDs.length
+			&& !projectStillExists; j++) {
+		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root
+			    .getChildAt(i)).getProject().getProjectUUID())) {
+			projectStillExists = true;
+		    }
 		}
-	    }
-	    if (!projectStillExists) {
-		root.remove(i);
+		if (!projectStillExists) {
+		    root.remove(i);
+		}
 	    }
 	}
     }

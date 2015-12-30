@@ -66,7 +66,7 @@ public class VersionViewer extends JPanel {
     }
 
     public void setFile(FlowFile flowFile) {
-	this.file = flowFile;
+	file = flowFile;
 	updateVersions();
     }
 
