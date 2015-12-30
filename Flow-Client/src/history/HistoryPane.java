@@ -39,7 +39,7 @@ public class HistoryPane extends JSplitPane {
 	treeAndVersion.setResizeWeight(0.4);
 	leftSide.add(treeAndVersion, BorderLayout.CENTER);
 
-	versionViewer = new VersionViewer();
+	versionViewer = new VersionViewer(this);
 	treeAndVersion.setRightComponent(versionViewer);
 
 	viewer = new EditTabs();
@@ -48,5 +48,9 @@ public class HistoryPane extends JSplitPane {
 	docTree = new DocTree(versionViewer);
 	treeAndVersion.setLeftComponent(docTree.getScrollable());
 
+    }
+    
+    public EditTabs getEditTabs(){
+	return viewer;
     }
 }

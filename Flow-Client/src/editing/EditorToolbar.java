@@ -1,5 +1,6 @@
 package editing;
 
+import gui.Communicator;
 import gui.FlowClient;
 
 import java.awt.FlowLayout;
@@ -18,32 +19,33 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 
 import login.CreateAccountPane;
+import message.Data;
 
 public class EditorToolbar extends JToolBar {
     private JPopupMenu popup;
+    private JMenuItem createProjectButton;
 
-    public EditorToolbar() {
+    public EditorToolbar(EditPane pane) {
 	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 	setBorder(FlowClient.EMPTY_BORDER);
 
 	popup = new JPopupMenu("Project Management");
-	JMenuItem newProjectButton = new JMenuItem();
-	newProjectButton.setText("New project");
-	newProjectButton.addActionListener(new ActionListener() {
-
+	createProjectButton = new JMenuItem();
+	createProjectButton.setText("New project");
+	createProjectButton.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String newProjectName = JOptionPane
+		String projectName = JOptionPane
 			.showInputDialog(
 				null,
 				"Please enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
 					+ "\" < > . # & { } $ @ = ` + ",
 				"New Project", JOptionPane.QUESTION_MESSAGE)
 			.trim();
-		while (CreateAccountPane.stringContains(newProjectName,
+		while (CreateAccountPane.stringContains(projectName,
 			CreateAccountPane.INVALID_CHARS)
-			|| newProjectName.length() > 1) {
-		    newProjectName = JOptionPane
+			|| projectName.length() > 1) {
+		    projectName = JOptionPane
 			    .showInputDialog(
 				    null,
 				    "That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
@@ -51,7 +53,32 @@ public class EditorToolbar extends JToolBar {
 				    "Invalid name",
 				    JOptionPane.QUESTION_MESSAGE).trim();
 		}
-		// TODO I dunno what happens when a new project is created
+
+		Data createProjectRequest = new Data("new_project");
+		createProjectRequest.put("project_name", projectName);
+		createProjectRequest.put("session_id",
+			Communicator.getSessionID());
+		switch (Communicator.communicate(createProjectRequest).get(
+			"status", String.class)) {
+		case "OK":
+		    JOptionPane.showConfirmDialog(null, "Your project "
+			    + projectName + " has been succesfully created.",
+			    "Project creation success",
+			    JOptionPane.DEFAULT_OPTION,
+			    JOptionPane.INFORMATION_MESSAGE);
+		    break;
+
+		case "PROJECT_NAME_INVALID":
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "Your project name is invalid.\nPlease choose another one.",
+				    "Project creation failure",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    break;
+		}
+		pane.getDocTree().updateProjectList();
 	    }
 	});
 	JMenuItem renameProjectButton = new JMenuItem();
@@ -60,26 +87,62 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String renameProjectName = JOptionPane
-			.showInputDialog(
-				null,
-				"Please enter new name for the current Project\nNo characters such as: \\ / ? % * : | "
-					+ "\" < > . # & { } $ @ = ` + ",
-				"Rename project", JOptionPane.QUESTION_MESSAGE)
-			.trim();
-		while (CreateAccountPane.stringContains(renameProjectName,
+		String projectName = JOptionPane.showInputDialog(
+			null,
+			"Please enter new name for the project "
+				+ DocTree.getActiveProject().toString()
+				+ "\nNo characters such as: \\ / ? % * : | "
+				+ "\" < > . # & { } $ @ = ` + ",
+			"Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		while (CreateAccountPane.stringContains(projectName,
 			CreateAccountPane.INVALID_CHARS)
-			|| renameProjectName.length() > 1) {
-		    renameProjectName = JOptionPane
+			|| projectName.length() > 1) {
+		    projectName = JOptionPane
 			    .showInputDialog(
 				    null,
-				    "That name is invalid.\nPlease enter an appropriate new name for your Project\nNo characters such as: \\ / ? % * : | "
+				    "That name is invalid.\nPlease enter an appropriate new name for this project."
+					    + "\nNo characters such as: \\ / ? % * : | "
 					    + "\" < > . # & { } $ @ = ` + ",
 				    "Invalid name",
 				    JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
-		// TODO rename project somehow?
+		Data modifyRequest = new Data("project_modify");
+		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
+		modifyRequest.put("project_uuid", DocTree.getActiveProject());
+		modifyRequest.put("new_name", projectName);
+		switch (Communicator.communicate(modifyRequest).get("status",
+			String.class)) {
+		case "OK":
+		    JOptionPane.showConfirmDialog(null,
+			    "Your project has been succesfully renamed to "
+				    + projectName + ".",
+			    "Project renaming success",
+			    JOptionPane.DEFAULT_OPTION,
+			    JOptionPane.INFORMATION_MESSAGE);
+		    break;
+		case "PROJECT_NAME_INVALID":
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "Your project name is invalid.\nPlease choose another one.",
+				    "Project renaming failure",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    break;
+		case "PROJECT_DOES_NOT_EXIST":
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "The project you are trying to rename does not exist.\n"
+				    + "Try refreshing the list of projects by moving your mouse cursor into,\n"
+				    + "then out of the project list.",
+				    "Project renaming failure",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    break;
+		}
+		pane.getDocTree().updateProjectList();
 	    }
 	});
 
@@ -98,7 +161,7 @@ public class EditorToolbar extends JToolBar {
 					+ "all collaborators will be removed. Back up code accordingly.",
 				"Confirm project deletion",
 				JOptionPane.WARNING_MESSAGE);
-		//TODO double check if projects match
+		// TODO double check if projects match
 		// TODO get current project, and delete it.
 	    }
 
@@ -211,5 +274,9 @@ public class EditorToolbar extends JToolBar {
 		}
 	    });
 	}
+    }
+
+    public void createProjectButtonDoClick() {
+	createProjectButton.doClick();
     }
 }

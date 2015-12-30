@@ -6,50 +6,54 @@ import history.VersionViewer;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.UUID;
 
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import message.Data;
 import struct.ArbitraryDocument;
+import struct.FlowDirectory;
 import struct.FlowDocument;
 import struct.FlowFile;
 import struct.FlowProject;
-import struct.User;
+import struct.TextDocument;
 
 public class DocTree extends JTree {
 
-    private DocTreeModel model;
+    private static DefaultTreeModel model;
     private JScrollPane scrollView;
     private EditTabs editTabs;
     private VersionViewer versionViewer;
+    private JPopupMenu projectPopup;
+    private JPopupMenu folderPopup;
+    private JPopupMenu filePopup;
 
-    private FlowProject[] usersProjects;
+    private static UUID[] usersProjectsUUIDs;
     private static FlowProject activeProject;
 
-    public DocTree(EditTabs editTabs) {
-	// TODO right click menus: projects (properties), folders
-	// (new-copy-cut-paste-delete), files
-	// (new-copy-cut-paste-delete-properties)
+    public DocTree(EditTabs editTabs, EditorToolbar eToolbar) {
 	this.editTabs = editTabs;
-	init();
+	init(eToolbar);
     }
 
     public DocTree(VersionViewer versionViewer) {
-	init();
+	init(null);
 	this.versionViewer = versionViewer;
     }
 
-    private void init() {
+    private void init(EditorToolbar eToolbar) {
 	// UIManager.put("Tree.closedIcon", icon);
 	// UIManager.put("Tree.openIcon", icon);
 	// UIManager.put("Tree.leafIcon", icon);
@@ -57,39 +61,16 @@ public class DocTree extends JTree {
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setBorder(FlowClient.EMPTY_BORDER);
 	scrollView = new JScrollPane(this);
-	model = new DocTreeModel();
+	model = new DefaultTreeModel(new DefaultMutableTreeNode("Workspace"));
 	setModel(model);
 	getSelectionModel().setSelectionMode(
 		TreeSelectionModel.SINGLE_TREE_SELECTION);
-	addTreeSelectionListener(new TreeSelectionListener() {
 
-	    @Override
-	    public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) DocTree.this
-			.getSelectionPath().getLastPathComponent();
-		if (node instanceof FileNode || node instanceof FolderNode) {
+	projectPopup = new JPopupMenu();
+	folderPopup = new JPopupMenu();
+	filePopup = new JPopupMenu();
 
-		} else if (node instanceof ProjectNode) {
-		    activeProject = ((ProjectNode) node).getProject();
-		}
-	    }
-	});
-	addMouseListener(new MouseListener() {
-
-	    @Override
-	    public void mouseReleased(MouseEvent arg0) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mousePressed(MouseEvent arg0) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent arg0) {
-		// nothing
-	    }
+	addMouseListener(new MouseAdapter() {
 
 	    @Override
 	    public void mouseEntered(MouseEvent arg0) {
@@ -102,69 +83,43 @@ public class DocTree extends JTree {
 			getRowForLocation(e.getX(), e.getY()))
 			.getLastPathComponent();
 		if (e.getButton() == MouseEvent.BUTTON3) {
-		    // TODO right click menu
+		    if (selected instanceof ProjectNode) {
+			projectPopup.removeAll();
+			if (editTabs != null) {
+			    JMenuItem newProjectButton = new JMenuItem();
+			    newProjectButton.setText("New project");
+			    newProjectButton
+				    .addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(
+						ActionEvent e) {
+					    eToolbar.createProjectButtonDoClick();
+					}
+				    });
+			    projectPopup.add(newProjectButton);
+			}
+		    } else if (selected instanceof FolderNode) {
+
+		    } else if (selected instanceof FileNode) {
+
+		    }
+		    // TODO right click menus: project (new project-new
+		    // folder-properties), folders
+		    // (new-copy-cut-paste-delete), files
+		    // (new-copy-cut-paste-rename-delete-properties)
 		} else if (e.getButton() == MouseEvent.BUTTON1) {
-		    if (selected instanceof FileNode && e.getClickCount() == 2) {
-			if (FlowClient.NETWORK) {
-			    FlowFile fileToOpen = ((FileNode) selected)
-				    .getFile();
-
-			    Data fileRequest = new Data("file_request");
-			    fileRequest.put("project_uuid",
-				    activeProject.getProjectUUID());
-			    fileRequest.put("file_uuid",
-				    fileToOpen.getFileUUID());
-			    Data reply = Communicator.communicate(fileRequest);
-			    switch (reply.get("status", String.class)) {
-			    case "OK":
-				FlowDocument document = reply.get("document",
-					FlowDocument.class);
-				if (document instanceof ArbitraryDocument) {
-				    try {
-					Desktop.getDesktop().open(
-						((ArbitraryDocument) document)
-							.getLocalFile());
-				    } catch (IOException e1) {
-					e1.printStackTrace();
-				    }
-				} else {
-				    if (editTabs != null) {
-					editTabs.openTab(document, true);
-				    } else if (versionViewer != null) {
-					versionViewer.setFile(document);
-				    }
-				}
-				break;
-			    case "PROJECT_NOT_FOUND":
-				JOptionPane
-					.showConfirmDialog(
-						null,
-						"The project that this file is in cannot be found for some reason.\n"
-							+ "Try refreshing the list of projects (move the mouse cursor into the console and back here)"
-							+ "\nand see if it is resolved.",
-						"Project not found",
-						JOptionPane.DEFAULT_OPTION,
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			    case "FILE_NOT_FOUND":
-				JOptionPane
-					.showConfirmDialog(
-						null,
-						"The file you are trying to open.\n"
-							+ "Try refreshing the list of projects/files (move the mouse cursor into the console and back here)"
-							+ "\nand see if it is resolved.",
-						"Project not found",
-						JOptionPane.DEFAULT_OPTION,
-						JOptionPane.ERROR_MESSAGE);
-				return;
-
-			    }
+		    if (selected instanceof FileNode) {
+			FileNode fileNode = (FileNode) selected;
+			activeProject = (FlowProject) fileNode.getFile()
+				.getParentDirectory().getRootDirectory();
+			if (e.getClickCount() == 2) {
+			    openFile(fileNode.getFile());
 			}
 		    } else if (selected instanceof ProjectNode) {
-			ProjectNode projectNode = (ProjectNode) selected;
-			activeProject = projectNode.getProject();
-			loadProjectFiles(projectNode);
-			System.out.println("loading project files");
+			activeProject = ((ProjectNode) selected).getProject();
+		    } else if (selected instanceof FolderNode) {
+			activeProject = (FlowProject) ((FolderNode) selected)
+				.getFolder().getRootDirectory();
 		    }
 		}
 	    }
@@ -172,88 +127,187 @@ public class DocTree extends JTree {
 	updateProjectList();
     }
 
-    private class DocTreeModel extends DefaultTreeModel {
-	private DocTreeModel() {
-	    super(new DefaultMutableTreeNode("Workspace"));
-	}
-    }
-
     public JScrollPane getScrollable() {
 	return scrollView;
-    }
-
-    private void updateProjectList() {
-	if (FlowClient.NETWORK) {
-	    usersProjects = Communicator.communicate(new Data("list_projects"))
-		    .get("projects", FlowProject[].class);
-	}
-
-	DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-	root.removeAllChildren();
-	// model.reload();
-
-	FlowProject example = new FlowProject("1234", new User("abc"));
-	FlowProject example2 = new FlowProject("12345678", new User("abc"));
-	usersProjects = new FlowProject[2];
-	usersProjects[0] = example;
-	usersProjects[1] = example2;
-
-	for (int i = 0; i < usersProjects.length; i++) {
-	    root.add(new ProjectNode(usersProjects[i], i));
-	}
-    }
-
-    private void loadProjectFiles(ProjectNode projectNode) {
-	if (FlowClient.NETWORK) {
-	    Data fileListRequest = new Data("list_project_files");
-	    fileListRequest.put("project_uuid", projectNode.getProject()
-		    .getProjectUUID());
-	    fileListRequest.put("session_id", Communicator.getSessionID());
-	    FlowFile[] projectFiles = Communicator.communicate(fileListRequest)
-		    .get("files", FlowFile[].class);
-
-	    for (FlowFile flowFile : projectFiles) {
-		String[] path = flowFile.getRemotePath().split("\\");
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) model
-			.getRoot();
-		for (int i = 1; i < path.length - 1; i++) {
-		    FolderNode compare = new FolderNode(path[i]);
-		    if (node.getIndex(compare) == -1) {
-			node.add(compare);
-		    }
-		}
-		node.add(new FileNode(flowFile));
-	    }
-	}
     }
 
     public static FlowProject getActiveProject() {
 	return activeProject;
     }
+    
+    public static void setActiveProject(FlowProject newActive){
+	activeProject = newActive;
+    }
 
-    private class ProjectNode extends DefaultMutableTreeNode {
+    protected void updateProjectList() {
+	if (FlowClient.NETWORK) {
+	    usersProjectsUUIDs = Communicator.communicate(
+		    new Data("list_projects")).get("projects", UUID[].class);
+	}
+
+	DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+	// Adds a new project
+	for (UUID uuid : usersProjectsUUIDs) {
+	    boolean projectExistsLocally = false;
+	    for (int i = root.getChildCount() - 1; !projectExistsLocally
+		    && i >= 0; i--) {
+		if (((ProjectNode) root.getChildAt(i)).getProject()
+			.getProjectUUID().equals(uuid)) {
+		    projectExistsLocally = true;
+		}
+	    }
+	    if (!projectExistsLocally) {
+		createProjectNode(uuid);
+	    }
+	}
+
+	// Deletes projects that don't exist
+	for (int i = root.getChildCount() - 1; i >= 0; i--) {
+	    boolean projectStillExists = false;
+	    for (int j = 0; j < usersProjectsUUIDs.length
+		    && !projectStillExists; j++) {
+		if (usersProjectsUUIDs[j].equals(((ProjectNode) root
+			.getChildAt(i)).getProject().getProjectUUID())) {
+		    projectStillExists = true;
+		}
+	    }
+	    if (!projectStillExists) {
+		root.remove(i);
+	    }
+	}
+    }
+
+    private void createProjectNode(UUID projectUUID) {
+	if (FlowClient.NETWORK) {
+	    Data fileListRequest = new Data("request_project");
+	    fileListRequest.put("project_uuid", projectUUID);
+	    fileListRequest.put("session_id", Communicator.getSessionID());
+	    FlowProject project = Communicator.communicate(fileListRequest)
+		    .get("project", FlowProject.class);
+
+	    ProjectNode newProjectNode = new ProjectNode(project);
+	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
+	    loadProjectFiles(project, newProjectNode);
+	}
+    }
+
+    private void loadProjectFiles(FlowDirectory fDir, FolderNode dir) {
+	// adds folders
+	if (!fDir.getDirectories().isEmpty()) {
+	    for (FlowDirectory subDir : fDir.getDirectories()) {
+		FolderNode subDirNode = new FolderNode(subDir);
+		loadProjectFiles(subDir, subDirNode);
+	    }
+	}
+
+	// adds files
+	if (!fDir.getFiles().isEmpty()) {
+	    for (FlowFile file : fDir.getFiles()) {
+		dir.add(new FileNode(file));
+	    }
+	}
+    }
+
+    private void openFile(FlowFile fileToOpen) {
+	if (FlowClient.NETWORK) {
+	    if (versionViewer != null) {
+		versionViewer.setFile(fileToOpen);
+	    } else if (editTabs != null) {
+		UUID projectUUID = ((FlowProject) fileToOpen
+			.getParentDirectory().getRootDirectory())
+			.getProjectUUID();
+		Data checksumRequest = new Data("file_checksum");
+		checksumRequest.put("project_uuid", projectUUID);
+		checksumRequest.put("file_uuid", fileToOpen.getFileUUID());
+		Data csReply = Communicator.communicate(checksumRequest);
+		if (csReply.get("status", String.class).equals("OK")) {
+		    // Get the current file checksum, and compare. If it's the
+		    // same,
+		    // then open this file, if it's not, then skip ahead to the
+		    // already-made block. https://goo.gl/vWWtSD
+		} else {
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "The project that this file is in cannot be found for some reason.\n"
+					    + "Try refreshing the list of projects (move the mouse cursor into the console and back here)"
+					    + "\nand see if it is resolved.",
+				    "Project not found",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+
+		Data fileRequest = new Data("file_request");
+		fileRequest.put("project_uuid", projectUUID);
+		fileRequest.put("file_uuid", fileToOpen.getFileUUID());
+		Data reply = Communicator.communicate(fileRequest);
+		switch (reply.get("status", String.class)) {
+		case "OK":
+		    FlowDocument document = reply.get("document",
+			    FlowDocument.class);
+		    if (document instanceof ArbitraryDocument) {
+			try {
+			    Desktop.getDesktop().open(
+				    ((ArbitraryDocument) document)
+					    .getLocalFile());
+			} catch (IOException e1) {
+			    e1.printStackTrace();
+			}
+		    } else if (document instanceof TextDocument) {
+			editTabs.openTab((TextDocument) document, true);
+		    }
+		    break;
+		case "PROJECT_NOT_FOUND":
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "The project that this file is in cannot be found for some reason.\n"
+					    + "Try refreshing the list of projects (move the mouse cursor into the console and back here)"
+					    + "\nand see if it is resolved.",
+				    "Project not found",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    return;
+		case "FILE_NOT_FOUND":
+		    JOptionPane
+			    .showConfirmDialog(
+				    null,
+				    "The file you are trying to open.\n"
+					    + "Try refreshing the list of projects/files (move the mouse cursor into the console and back here)"
+					    + "\nand see if it is resolved.",
+				    "Project not found",
+				    JOptionPane.DEFAULT_OPTION,
+				    JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+	    }
+	}
+    }
+
+    private class ProjectNode extends FolderNode {
 	private FlowProject project;
-	private int index;
 
-	public ProjectNode(FlowProject project, int index) {
+	public ProjectNode(FlowProject project) {
 	    super(project);
 	    this.project = project;
-	    this.index = index;
 	}
 
 	public FlowProject getProject() {
 	    return project;
 	}
-
-	public int getTreeIndex() {
-	    return index;
-	}
     }
 
     private class FolderNode extends DefaultMutableTreeNode {
-	public FolderNode(String folderName) {
-	    super(folderName);
+	private FlowDirectory folder;
 
+	private FolderNode(FlowDirectory folder) {
+	    super(folder.toString());
+	    this.folder = folder;
+	}
+
+	private FlowDirectory getFolder() {
+	    return folder;
 	}
     }
 

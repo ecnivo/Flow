@@ -32,9 +32,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import struct.FlowDocument;
+import struct.FlowProject;
+import struct.TextDocument;
 
 /**
  * Created by Vince on 2015-12-18.
@@ -44,7 +47,7 @@ public class EditTabs extends JTabbedPane {
     public static final int TAB_LIMIT = 25;
     public static final int TAB_ICON_SIZE = 16;
 
-    public EditTabs() {
+    public EditTabs(EditPane editPane) {
 	setMinimumSize(new Dimension(50, 0));
 	setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
 	setTabPlacement(JTabbedPane.TOP);
@@ -68,9 +71,21 @@ public class EditTabs extends JTabbedPane {
 		// nothing
 	    }
 	});
+	addChangeListener(new ChangeListener() {
+
+	    @Override
+	    public void stateChanged(ChangeEvent e) {
+		editPane.getCollabsList().refreshUserList(
+			((EditArea) getSelectedComponent()).getFlowDoc()
+				.getParentFile());
+		DocTree.setActiveProject((FlowProject) ((EditArea) getSelectedComponent())
+			.getFlowDoc().getParentFile().getParentDirectory()
+			.getRootDirectory());
+	    }
+	});
     }
 
-    public void openTab(FlowDocument doc, boolean editable) {
+    public void openTab(TextDocument doc, boolean editable) {
 	int tabs = getTabCount();
 	for (int i = 0; i < tabs; i++) {
 	    if (((EditArea) getComponentAt(i)).getFlowDoc().equals(doc)) {
@@ -79,11 +94,11 @@ public class EditTabs extends JTabbedPane {
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(doc.getParentFile().getRemoteName(), new EditArea(doc,
+	    addTab(doc.getParentFile().getFileName(), new EditArea(doc,
 		    editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
 	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile()
-		    .getRemoteName()));
+		    .getFileName()));
 	    // setToolTipTextAt(idx, doc.getParentFile().latest());
 	    // TODO should be the last saved date
 	} else {
@@ -91,8 +106,8 @@ public class EditTabs extends JTabbedPane {
 		    .showConfirmDialog(
 			    null,
 			    "The limit on currently open tabs is 25.\n"
-			    + "The reason for doing so is to save processing power and reduce strain on your system.\n"
-			    + "If you need more than 25 tabs at a time, consider better organizing your workflow.",
+				    + "The reason for doing so is to save processing power and reduce strain on your system.\n"
+				    + "If you need more than 25 tabs at a time, consider better organizing your workflow.",
 			    "Too many tabs!", JOptionPane.DEFAULT_OPTION,
 			    JOptionPane.WARNING_MESSAGE);
 	}
@@ -144,45 +159,45 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void setEnabled(boolean b) {
-// nothing
+		    // nothing
 		}
 
 		@Override
 		public void removePropertyChangeListener(
 			PropertyChangeListener listener) {
-		 // nothing
+		    // nothing
 
 		}
 
 		@Override
 		public void putValue(String key, Object value) {
-		 // nothing
+		    // nothing
 
 		}
 
 		@Override
 		public boolean isEnabled() {
-		 // nothing
+		    // nothing
 		    return false;
 		}
 
 		@Override
 		public Object getValue(String key) {
-		 // nothing
+		    // nothing
 		    return null;
 		}
 
 		@Override
 		public void addPropertyChangeListener(
 			PropertyChangeListener listener) {
-		 // nothing
+		    // nothing
 
 		}
 	    });
 	    closeTabButton.setText("Close Tab (Ctrl+W)");
 	    closeTabButton.setEnabled(true);
 	    rightClickMenu.add(closeTabButton);
-	    
+
 	    JMenuItem closeAllTabsButton = new JMenuItem(new Action() {
 
 		@Override
@@ -192,36 +207,36 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void setEnabled(boolean b) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public void removePropertyChangeListener(
 			PropertyChangeListener listener) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public void putValue(String key, Object value) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public boolean isEnabled() {
-		 // nothing
+		    // nothing
 		    return false;
 		}
 
 		@Override
 		public Object getValue(String key) {
-		 // nothing
+		    // nothing
 		    return null;
 		}
 
 		@Override
 		public void addPropertyChangeListener(
 			PropertyChangeListener listener) {
-		 // nothing
+		    // nothing
 		}
 	    });
 	    closeAllTabsButton.setText("Close All Tabs");
@@ -231,22 +246,22 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-		 // nothing
+		    // nothing
 		}
 
 		@Override

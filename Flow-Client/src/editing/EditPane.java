@@ -10,20 +10,15 @@ import gui.RunStopBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.UUID;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-
-import struct.FlowDocument;
-import struct.FlowFile;
 
 public class EditPane extends JPanel {
 
     private EditTabs editTabs;
     private DocTree tree;
+    private CollabsList collabsList;
 
     private static final int RIGHT_SIDE_WIDTH = 300;
     private static final int LEFT_SIDE_WIDTH = 300;
@@ -55,10 +50,6 @@ public class EditPane extends JPanel {
 	genericConsole.getScroll().setPreferredSize(
 		new Dimension(RIGHT_SIDE_WIDTH, 500));
 	rightSide.setLeftComponent(genericConsole.getScroll());
-	CollabsList collabsList = new CollabsList(new FlowPermission(
-		FlowPermission.OWNER));
-	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
-	rightSide.setRightComponent(collabsList);
 
 	JSplitPane leftSide = new JSplitPane();
 	leftSide.setBorder(FlowClient.EMPTY_BORDER);
@@ -68,8 +59,13 @@ public class EditPane extends JPanel {
 		Integer.MAX_VALUE));
 	mainSplit.setLeftComponent(leftSide);
 
-	editTabs = new EditTabs();
+	editTabs = new EditTabs(this);
 	leftSide.setRightComponent(editTabs);
+
+	collabsList = new CollabsList(new FlowPermission(
+		FlowPermission.OWNER), editTabs);
+	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
+	rightSide.setRightComponent(collabsList);
 
 	JSplitPane treeAndButtons = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	treeAndButtons.setBorder(FlowClient.EMPTY_BORDER);
@@ -80,10 +76,11 @@ public class EditPane extends JPanel {
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.EDIT);
 	buttonPanel.add(navBar);
-	buttonPanel.add(new EditorToolbar());
+	EditorToolbar editToolbar = new EditorToolbar(this);
+	buttonPanel.add(editToolbar);
 	buttonPanel.add(new RunStopBar());
 	treeAndButtons.setLeftComponent(buttonPanel);
-	tree = new DocTree(editTabs);
+	tree = new DocTree(editTabs, editToolbar);
 
 	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);
@@ -95,5 +92,9 @@ public class EditPane extends JPanel {
 
     public DocTree getDocTree() {
 	return tree;
+    }
+    
+    public CollabsList getCollabsList(){
+	return collabsList;
     }
 }
