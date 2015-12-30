@@ -47,9 +47,9 @@ public class User implements Serializable {
 	return avatar;
     }
 
-    public void setAvatar(ImageIcon icon) {
-	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
-		Image.SCALE_SMOOTH));
-
-    }
+//    public void setAvatar(ImageIcon icon) {
+//	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
+//		Image.SCALE_SMOOTH));
+//
+//    }
 }
