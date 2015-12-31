@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -108,7 +109,7 @@ public class SettingsTabs extends JTabbedPane {
 			    JOptionPane.ERROR_MESSAGE);
 		    return;
 		}
-		if (!passField.getPassword().equals(retypePass.getPassword())) {
+		if (!Arrays.equals(passField.getPassword(), retypePass.getPassword())) {
 		    JOptionPane
 			    .showConfirmDialog(
 				    null,
