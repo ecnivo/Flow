@@ -15,7 +15,7 @@
     </target>
 
     <target name="compile" depends="init" description="compile the source">
-        <javac srcdir="${src_commons}" destdir="${build}" classpath="Flow-Commons/lib"/>
+        <javac srcdir="${src_commons}" destdir="${build}"/>
         <javac srcdir="${src_client}" destdir="${build}"/>
         <javac srcdir="${src_server}" destdir="${build}"/>
     </target>
@@ -30,18 +30,5 @@
         <delete dir="${dist}"/>
     </target>
 
-    <target name="junit" depends="compile">
-        <junit printsummary="yes" haltonfailure="no">
-            <classpath location="Flow-Commons/lib/" />
-
-            <classpath location="${src_commons}" />
-
-            <batchtest fork="yes">
-                <fileset dir="${src_commons}" includes="*Test.java"/>
-            </batchtest>
-
-        </junit>
-    </target>
-
-    <target name="test" depends="dist,junit,clean"/>
+    <target name="test" depends="dist,clean"/>
 </project>
