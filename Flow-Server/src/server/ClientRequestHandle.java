@@ -12,7 +12,7 @@ import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
 import struct.User;
-import util.DocumentNotFoundException;
+import util.DatabaseException;
 import util.Results;
 
 public class ClientRequestHandle implements Runnable {
@@ -112,8 +112,8 @@ public class ClientRequestHandle implements Runnable {
 							results.getString("DocumentName"));
 					returnData.put("document", file);
 					returnData.put("status", "ok");
-				} catch (DocumentNotFoundException e) {
-					returnData.put("status", "DOCUMENT_NOT_FOUND");
+				} catch (DatabaseException e) {
+					returnData.put("status", e.getMessage());
 				}
 				break;
 			case "file_checksum":
@@ -149,6 +149,13 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				// TODO Create database methods for following functions
 				case "RENAME_PROJECT":
+					try {
+						this.database.renameProject(projectId,
+								data.get("new_name", String.class));
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						returnData.put("status", e.getMessage());
+					}
 					break;
 				case "DELETE_PROJECT":
 					break;

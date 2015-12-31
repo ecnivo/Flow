@@ -7,8 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import util.DocumentNotFoundException;
-import util.ProjectNotFoundException;
+import util.DatabaseException;
 
 public class SQLDatabase {
 
@@ -17,13 +16,14 @@ public class SQLDatabase {
 	 */
 	public static final String DRIVER = "org.sqlite.JDBC";
 
+	// TODO Implement the timeout
 	/**
-	 * Number of seconds to allow for seaching before timeout
+	 * Number of seconds to allow for searching before timeout
 	 */
 	public static final int TIMEOUT = 5;
 
-	public static final int ADD_USER = 0, REMOVE_USER = -1, OWNER = 0, EDIT = 1,
-			VIEW = 2;
+	public static final int ADD_USER = 0, REMOVE_USER = -1, NONE = 0, VIEW = 1,
+			EDIT = 2, OWNER = 3;
 
 	/**
 	 * Connection to the database.
@@ -115,16 +115,18 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	public ResultSet getFiles(String projectId)
-			throws ProjectNotFoundException {
+	public ResultSet getFiles(String projectId) throws DatabaseException {
 		try {
 			// TODO Add check if project is found
 			return this.query("SELECT * FROM documents WHERE ProjectID = "
 					+ projectId + ";");
 		} catch (SQLException e) {
 			e.printStackTrace();
+			// TODO: this won't be called for this reason, move this exception
+			// throw to the check (Above)
+			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
 		}
-		return null;
+		// return null;
 	}
 
 	/**
@@ -338,7 +340,7 @@ public class SQLDatabase {
 		statement.executeUpdate(query);
 	}
 
-	public ResultSet getFile(String uuid) throws DocumentNotFoundException {
+	public ResultSet getFile(String uuid) throws DatabaseException {
 		try {
 			// TODO Add check if found
 			return this.query(
@@ -346,7 +348,22 @@ public class SQLDatabase {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new DatabaseException("DOCUMENT_NAME_INVALID");
+			// return null;
 		}
-		return null;
+	}
+
+	public void renameProject(String uuid, String newName)
+			throws DatabaseException {
+		// TODO Check if name is valid
+		try {
+			this.update("UPDATE projects SET PorjectName = " + newName
+					+ " WHERE ProjectID = " + uuid + ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			// throw new DatabaseException("INVALID_PROJECT_NAME" or
+			// "PROJECT_DOES_NOT_EXIST"); based on the above checks
+		}
 	}
 }
