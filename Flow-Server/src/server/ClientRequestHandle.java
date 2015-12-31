@@ -91,9 +91,6 @@ public class ClientRequestHandle implements Runnable {
 						this.database.getFiles(
 								username = data.get("username", String.class)));
 				FlowFile[] files = new FlowFile[response.length];
-
-				// TODO Generate 'remotePath' and 'remoteName' <-- NETDEX what
-				// does this even mean
 				for (int i = 0; i < response.length; i++) {
 					files[i] = new FlowFile(new FlowDirectory("PATH HERE"),
 							"REPLACE WITH NAME",
@@ -151,6 +148,10 @@ public class ClientRequestHandle implements Runnable {
 				case "DELETE":
 					break;
 				}
+				break;
+			default:
+				// For completeness's sake
+				returnData.put("status", "INVALID_REQUEST_TYPE");
 				break;
 			}
 
