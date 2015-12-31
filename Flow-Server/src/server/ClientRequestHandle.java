@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.ResultSet;
 import java.util.UUID;
 
 import database.SQLDatabase;
@@ -11,6 +12,7 @@ import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
 import struct.User;
+import util.DocumentNotFoundException;
 import util.Results;
 
 public class ClientRequestHandle implements Runnable {
@@ -86,21 +88,33 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("status", "OK");
 				break;
 			case "list_project_files":
-				response = Results.toStringArray(
-						new String[] { "ProjectID", "ProjectName" },
-						this.database.getFiles(
-								username = data.get("username", String.class)));
-				FlowFile[] files = new FlowFile[response.length];
-				for (int i = 0; i < response.length; i++) {
-					files[i] = new FlowFile(new FlowDirectory("PATH HERE"),
-							"REPLACE WITH NAME",
-							UUID.fromString(response[i][0]));
-				}
-				returnData.put("files", files);
-				returnData.put("status", "OK");
+				// response = Results.toStringArray(
+				// new String[] { "ProjectID", "ProjectName" },
+				// this.database.getFiles(
+				// username = data.get("username", String.class)));
+				// FlowFile[] files = new FlowFile[response.length];
+				// for (int i = 0; i < response.length; i++) {
+				// files[i] = new FlowFile(new
+				// FlowDirectory(this.database.getPath(data.get(key, type))),
+				// "REPLACE WITH NAME",
+				// UUID.fromString(response[i][0]));
+				// }
+				// returnData.put("files", files);
+				// returnData.put("status", "OK");
 				break;
 			case "file_request":
 				// TODO generate byte array using file path (from above)
+				try {
+					ResultSet results = this.database.getFile(
+							data.get("doc_uuid", UUID.class).toString());
+					FlowFile file = new FlowFile(
+							new FlowDirectory(results.getString("Path")),
+							results.getString("DocumentName"));
+					returnData.put("document", file);
+					returnData.put("status", "ok");
+				} catch (DocumentNotFoundException e) {
+					returnData.put("status", "DOCUMENT_NOT_FOUND");
+				}
 				break;
 			case "file_checksum":
 				break;

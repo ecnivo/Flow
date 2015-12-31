@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import util.DocumentNotFoundException;
+import util.ProjectNotFoundException;
+
 public class SQLDatabase {
 
 	/**
@@ -112,8 +115,10 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	public ResultSet getFiles(String projectId) {
+	public ResultSet getFiles(String projectId)
+			throws ProjectNotFoundException {
 		try {
+			// TODO Add check if project is found
 			return this.query("SELECT * FROM documents WHERE ProjectID = "
 					+ projectId + ";");
 		} catch (SQLException e) {
@@ -331,5 +336,17 @@ public class SQLDatabase {
 		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		statement.executeUpdate(query);
+	}
+
+	public ResultSet getFile(String uuid) throws DocumentNotFoundException {
+		try {
+			// TODO Add check if found
+			return this.query(
+					"SELECT * FROM documents WHERE DocumentID = " + uuid + ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
