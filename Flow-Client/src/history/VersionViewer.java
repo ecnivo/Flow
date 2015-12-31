@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -73,12 +73,12 @@ public class VersionViewer extends JPanel {
     private void updateVersions() {
 	removeAll();
 
-	TreeMap<Date, FlowDocument> versions = file.getVersions();
-	Iterator<Date> dateIterator = versions.keySet().iterator();
+	TreeSet<FlowDocument> versions = file.getVersions();
+	Iterator<FlowDocument> versionIterator = versions.iterator();
 
-	while (dateIterator.hasNext()) {
-	    Date date = dateIterator.next();
-	    add(new VersionItem(date, versions.get(date), 1));
+	while (versionIterator.hasNext()) {
+	    FlowDocument doc = versionIterator.next();
+	    add(new VersionItem(doc, doc.getVersionDate(), 1));
 	}
 
 	revalidate();
@@ -87,7 +87,7 @@ public class VersionViewer extends JPanel {
 
     class VersionItem extends JPanel {
 
-	public VersionItem(Date date, FlowDocument doc, int position) {
+	public VersionItem(FlowDocument doc, Date date, int position) {
 	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this
 		    .getSize().getWidth() * .9), 80));
 	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this

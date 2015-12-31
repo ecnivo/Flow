@@ -1,5 +1,8 @@
 package shared;
 
+import editing.UserCaret;
+import gui.FlowClient;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -10,7 +13,6 @@ import java.util.Iterator;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -26,8 +28,6 @@ import struct.FlowDocument;
 import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
-import editing.UserCaret;
-import gui.FlowClient;
 
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
@@ -330,14 +330,22 @@ public class EditArea extends JTextPane {
 	}
 
 	for (StyleToken styleToken : plainBlocks) {
-	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(),
+		    styleToken.getLength(), keywordStyle, false);
+	    // SwingUtilities.invokeLater(new FormatPlainLater(
+	    // styleToken.getPos(), styleToken.getLength()));
 	}
 	for (StyleToken styleToken : keywordBlocks) {
-	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(),
+		    styleToken.getLength(), keywordStyle, false);
+	    // SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
+	    // .getPos(), styleToken.getLength()));
 	}
 	for (StyleToken styleToken : strings) {
-	    doc.setCharacterAttributes(styleToken
-		    .getPos(), styleToken.getLength() + 1, stringStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(),
+		    styleToken.getLength() + 1, stringStyle, false);
+	    // SwingUtilities.invokeLater(new FormatStringsLater(styleToken
+	    // .getPos(), styleToken.getLength() + 1));
 	}
     }
 
@@ -357,53 +365,53 @@ public class EditArea extends JTextPane {
 	else
 	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
     }
-//
-//    private class FormatKeywordsLater implements Runnable {
-//
-//	private int pos;
-//	private int nextToken;
-//
-//	private FormatKeywordsLater(int pos, int nextToken) {
-//	    this.pos = pos;
-//	    this.nextToken = nextToken;
-//	}
-//
-//	@Override
-//	public void run() {
-//	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
-//	}
-//
-//    }
-//
-//    private class FormatPlainLater implements Runnable {
-//
-//	private int pos;
-//	private int nextToken;
-//
-//	private FormatPlainLater(int pos, int nextToken) {
-//	    this.pos = pos;
-//	    this.nextToken = nextToken;
-//	}
-//
-//	@Override
-//	public void run() {
-//	    doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
-//	}
-//
-//    }
-//
-//    private class FormatStringsLater implements Runnable {
-//	private int pos;
-//	private int nextToken;
-//
-//	private FormatStringsLater(int pos, int nextToken) {
-//	    this.pos = pos;
-//	    this.nextToken = nextToken;
-//	}
-//
-//	@Override
-//	public void run() {
-//	    doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
-//	}
-//    }
+
+    // private class FormatKeywordsLater implements Runnable {
+    //
+    // private int pos;
+    // private int nextToken;
+    //
+    // private FormatKeywordsLater(int pos, int nextToken) {
+    // this.pos = pos;
+    // this.nextToken = nextToken;
+    // }
+    //
+    // @Override
+    // public void run() {
+    // doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
+    // }
+    //
+    // }
+    //
+    // private class FormatPlainLater implements Runnable {
+    //
+    // private int pos;
+    // private int nextToken;
+    //
+    // private FormatPlainLater(int pos, int nextToken) {
+    // this.pos = pos;
+    // this.nextToken = nextToken;
+    // }
+    //
+    // @Override
+    // public void run() {
+    // doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
+    // }
+    //
+    // }
+    //
+    // private class FormatStringsLater implements Runnable {
+    // private int pos;
+    // private int nextToken;
+    //
+    // private FormatStringsLater(int pos, int nextToken) {
+    // this.pos = pos;
+    // this.nextToken = nextToken;
+    // }
+    //
+    // @Override
+    // public void run() {
+    // doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
+    // }
+    // }
 }

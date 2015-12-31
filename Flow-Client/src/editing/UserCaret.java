@@ -34,7 +34,7 @@ public class UserCaret extends JComponent {
 	int green = (int) (Math.random() * 150) + 30;
 	int blue = (int) (Math.random() * 150) + 30;
 
-	switch ((int) Math.random() * 3) {
+	switch ((int) (Math.random() * 3)) {
 	case 0:
 	    red -= 15;
 	    break;
