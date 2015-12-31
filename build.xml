@@ -30,5 +30,18 @@
         <delete dir="${dist}"/>
     </target>
 
-    <target name="test" depends="dist,clean"/>
+    <target name="junit" depends="compile">
+        <junit printsummary="yes" haltonfailure="no">
+            <classpath location="Flow-Commons/lib/" />
+
+            <classpath location="${src_commons}" />
+
+            <batchtest fork="yes">
+                <fileset dir="${src_commons}" includes="*Test.java"/>
+            </batchtest>
+
+        </junit>
+    </target>
+
+    <target name="test" depends="dist,junit,clean"/>
 </project>
