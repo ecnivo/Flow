@@ -357,7 +357,7 @@ public class SQLDatabase {
 			throws DatabaseException {
 		// TODO Check if name is valid
 		try {
-			this.update("UPDATE projects SET PorjectName = " + newName
+			this.update("UPDATE projects SET ProjectName = " + newName
 					+ " WHERE ProjectID = " + uuid + ";");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
