@@ -182,6 +182,17 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
+			case "new_document":
+				// Implement checking if file is inside alternate directory
+				this.database.newFile(data.get("file_name", String.class),
+						data.get("project_uuid", UUID.class).toString());
+				break;
+			case "new_directory":
+				// Implement checking if file is inside alternate directory
+				this.database.newDirectory(
+						data.get("directory_name", String.class),
+						data.get("project_uuid", UUID.class).toString());
+				break;
 			// TODO Implement sending messages to active sessions on changes
 			case "document_modify":
 				switch (data.get("doc_type", String.class)) {
