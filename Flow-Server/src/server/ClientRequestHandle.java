@@ -66,10 +66,18 @@ public class ClientRequestHandle implements Runnable {
 				case "REGISTER":
 					this.database.addUser(data.get("username", String.class),
 							data.get("password", String.class));
+					returnData.put("status", "OK");
 					break;
 				case "CLOSE_ACCOUNT":
+					this.database
+							.closeAccount(data.get("username", String.class));
+					returnData.put("status", "OK");
 					break;
 				case "CHANGE_PASSWORD":
+					this.database.changePassword(
+							data.get("username", String.class),
+							data.get("new_password", String.class));
+					returnData.put("status", "OK");
 					break;
 				}
 				break;
@@ -117,6 +125,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "file_checksum":
+				// TODO implement this
 				break;
 			case "new_project":
 				this.database

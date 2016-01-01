@@ -379,4 +379,36 @@ public class SQLDatabase {
 			// the above checks
 		}
 	}
+
+	public void closeAccount(String username) throws DatabaseException {
+		try {
+			// TODO Check if project exists is valid
+			this.update(
+					"DELETE FROM users WHERE Username = '" + username + "';");
+			this.update("DELETE FROM projects WHERE Username = '" + username
+					+ "';");
+			this.update("DELETE FROM sessions WHERE Username = '" + username
+					+ "';");
+			this.update(
+					"DELETE FROM access WHERE Username = '" + username + "';");
+			// TODO Delete all the actual file data from disk
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
+			// the above checks
+		}
+	}
+
+	public void changePassword(String username, String newPassword)
+			throws DatabaseException {
+		try {
+			this.update("UPDATE users SET Password = '" + newPassword
+					+ "' WHERE Username = '" + username + "';");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
+			// the above checks
+		}
+	}
 }
