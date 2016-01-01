@@ -15,7 +15,7 @@ import shared.Communicator;
 
 public class FlowClient extends JFrame {
 
-    public static final boolean NETWORK = false;
+    public static final boolean NETWORK = true;
 
     private static final String HOST = "127.0.0.1";
     private static final int PORT = 5000;

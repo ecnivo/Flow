@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import database.SQLDatabase;
 import message.Data;
@@ -23,6 +24,8 @@ public class ClientRequestHandle implements Runnable {
 	private SQLDatabase database;
 
 	private UUID uuid;
+
+	private static Logger L = Logger.getLogger("ClientRequestHandle");
 
 	public ClientRequestHandle(FlowServer server, Socket socket)
 			throws IOException {
@@ -46,14 +49,8 @@ public class ClientRequestHandle implements Runnable {
 			case "login":
 				username = data.get("username", String.class);
 				password = data.get("password", String.class);
-				if (this.server.getDatabase().authenticate(username,
-						password)) {
-					// TODO Netdex get the serial number
-					UUID sessionID = this.server.newSession(username,
-							"REPLACE WITH SERIAL NUMBER");
-
-					// TODO Add check for if the session cannot be created
-					// This could potentially be in the authenticate method
+				if (this.server.getDatabase().authenticate(username, password)) {
+					UUID sessionID = this.server.newSession(username, null);
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
 				} else {
