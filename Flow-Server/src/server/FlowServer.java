@@ -47,7 +47,7 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	protected UUID newSession(String username, String serialNumber) {
+	protected UUID newSession(String username, String serialNumber) { // TODO what is the serial number? do we still need it?
 		UUID sessionId = UUID.randomUUID();
 		this.database.newSession(username, serialNumber, sessionId.toString());
 		return sessionId;

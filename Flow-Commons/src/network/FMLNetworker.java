@@ -46,7 +46,15 @@ public class FMLNetworker {
         }
     }
 
-    public void registerFlowDocumentChangeListener(FlowDocumentChangeListener listener, UUID flowDocumentUUID) {
+    public void registerFlowDocumentChangeListener(FlowDocumentChangeListener chngListener, UUID flowDocumentUUID) throws IOException {
         Data asyncCallbackRequest = new Data("document_async_register");
+        asyncCallbackRequest.put("doc_id", flowDocumentUUID);
+        send(asyncCallbackRequest);
+        chngListener.init(ip);
+        chngListener.listen();
+    }
+
+    public void deregisterFlowDocumentChangeListener(FlowDocumentChangeListener chngListener){
+        chngListener.stopListening();
     }
 }
