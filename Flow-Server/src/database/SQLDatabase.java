@@ -155,6 +155,25 @@ public class SQLDatabase {
 	 *            the name of the file (including the extension).
 	 * @param projectId
 	 *            the ID of the project which to place the file inside
+	 * @param directoryId
+	 *            the ID of the directory which to place the file inside
+	 */
+	public void newFile(String fileName, String projectId, String directoryId) {
+		try {
+			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
+					+ projectId + ", " + fileName + ")");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Creates a new file within the specified project.
+	 * 
+	 * @param fileName
+	 *            the name of the file (including the extension).
+	 * @param projectId
+	 *            the ID of the project which to place the file inside
 	 */
 	public void newFile(String fileName, String projectId) {
 		try {
@@ -163,6 +182,45 @@ public class SQLDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Creates a new file within the specified project.
+	 * 
+	 * @param directoryName
+	 *            the name of the directory.
+	 * @param projectId
+	 *            the ID of the project which to place the directory inside.
+	 * @param parentDirectoryId
+	 *            the ID of the directory which to place the directory inside.
+	 */
+	public void newDirectory(String directoryName, String projectId,
+			String parentDirectoryId) {
+		// TODO implement
+		// try {
+		// this.update("INSERT INTO documents(ProjectID, DocumentName) values("
+		// + projectId + ", " + fileName + ")");
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+	}
+
+	/**
+	 * Creates a new file within the specified project.
+	 * 
+	 * @param directoryName
+	 *            the name of the directory.
+	 * @param projectId
+	 *            the ID of the project which to place the directory inside.
+	 */
+	public void newDirectory(String directoryName, String projectId) {
+		// TODO implement
+		// try {
+		// this.update("INSERT INTO documents(ProjectID, DocumentName) values("
+		// + projectId + ", " + fileName + ")");
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	/**
