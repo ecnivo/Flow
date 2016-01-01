@@ -56,6 +56,15 @@ public class Data implements Serializable {
         }
     }
 
+    /**
+     * Check if this data contains the key
+     * @param key The key to check
+     * @return whether this data contains the key
+     */
+    public boolean containsKey(String key){
+        return stringObjectHashMap.containsKey(key);
+    }
+
     @Override
     public String toString() {
         return stringObjectHashMap.toString();
