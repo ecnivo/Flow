@@ -366,4 +366,17 @@ public class SQLDatabase {
 			// "PROJECT_DOES_NOT_EXIST"); based on the above checks
 		}
 	}
+
+	public void deleteProject(String projectId) throws DatabaseException {
+		try {
+			// TODO Check if project exists is valid
+			this.update("DELETE FROM projects WHERE ProjectID = " + projectId
+					+ ";");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			// throw new DatabaseException("PROJECT_DOES_NOT_EXIST"); based on
+			// the above checks
+		}
+	}
 }

@@ -132,18 +132,24 @@ public class ClientRequestHandle implements Runnable {
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					username = data.get("username", String.class);
-					String accessLevel = data.get("access_level", String.class);
+					int accessLevel = (int) data.get("access_level",
+							Byte.class);
 					switch (accessLevel) {
-					case "NONE":
+					case SQLDatabase.NONE:
 						// TODO create collaborator removal method in database
 						break;
-					case "VIEW":
+					case SQLDatabase.VIEW:
 						this.database.updateAccess(SQLDatabase.VIEW, projectId,
 								username);
 						break;
-					case "EDIT":
+					case SQLDatabase.EDIT:
 						this.database.updateAccess(SQLDatabase.EDIT, projectId,
 								username);
+						break;
+					case SQLDatabase.OWNER:
+						// TODO implement this
+						// this.database.updateAccess(SQLDatabase.OWNER,
+						// projectId, username);
 						break;
 					}
 					break;
@@ -158,6 +164,12 @@ public class ClientRequestHandle implements Runnable {
 					}
 					break;
 				case "DELETE_PROJECT":
+					try {
+						this.database.deleteProject(projectId);
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						returnData.put("status", e.getMessage());
+					}
 					break;
 				}
 				break;
