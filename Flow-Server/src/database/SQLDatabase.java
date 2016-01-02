@@ -81,21 +81,20 @@ public class SQLDatabase {
 	 * @return whether or not the access was successfully granted.
 	 */
 	public boolean updateAccess(int accessLevel, String projectId,
-			String username) {
+			String username) throws DatabaseException {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
 				this.update("INSERT INTO access values('" + projectId + "', '"
 						+ username + "', " + accessLevel + ";");
 				return true;
-			}
-			if (accessLevel == OWNER) {
+			} else if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
 				this.update("UPDATE projects SET OwnerUserName = '" + username
 						+ "' WHERE ProjectID = '" + projectId + "';");
 
 				this.update("DELETE FROM access WHERE Username = '" + username
-						+ "';");
+						+ "' AND ProjectID = '" + projectId + "';");
 
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values(" + projectId + ", "
@@ -104,6 +103,11 @@ public class SQLDatabase {
 				// TODO remove all other permissions (i.e. if they had edit
 				// permissions)
 				return true;
+			} else if (accessLevel == NONE) {
+				this.update("DELETE FROM access WHERE Username = '" + username
+						+ "' AND ProjectID = '" + projectId + "';");
+			} else {
+				throw new DatabaseException("ACCESS_LEVEL_INVALID");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -476,6 +480,6 @@ public class SQLDatabase {
 
 	public void sessionExists(String username, String serialNumber) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -49,7 +49,8 @@ public class ClientRequestHandle implements Runnable {
 			case "login":
 				username = data.get("username", String.class);
 				password = data.get("password", String.class);
-				if (this.server.getDatabase().authenticate(username, password)) {
+				if (this.server.getDatabase().authenticate(username,
+						password)) {
 					UUID sessionID = this.server.newSession(username, null);
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
@@ -139,9 +140,14 @@ public class ClientRequestHandle implements Runnable {
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					username = data.get("username", String.class);
-					this.database.updateAccess(
-							(int) data.get("access_level", Byte.class),
-							projectId, data.get("username", String.class));
+					try {
+						this.database.updateAccess(
+								(int) data.get("access_level", Byte.class),
+								projectId, data.get("username", String.class));
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						returnData.put("status", e.getMessage());
+					}
 					break;
 				case "RENAME_PROJECT":
 					try {
