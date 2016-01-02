@@ -85,14 +85,17 @@ public class SQLDatabase {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
-				this.update("INSERT INTO access values(" + projectId + ", "
-						+ username + ", " + accessLevel + ";");
+				this.update("INSERT INTO access values('" + projectId + "', '"
+						+ username + "', " + accessLevel + ";");
 				return true;
 			}
 			if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
-				this.update("UPDATE projects SET OwnerUserName = " + username
-						+ " WHERE ProjectID = " + projectId + ";");
+				this.update("UPDATE projects SET OwnerUserName = '" + username
+						+ "' WHERE ProjectID = '" + projectId + "';");
+
+				this.update("DELETE FROM access WHERE Username = '" + username
+						+ "';");
 
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values(" + projectId + ", "
@@ -441,6 +444,7 @@ public class SQLDatabase {
 	public void closeAccount(String username) throws DatabaseException {
 		try {
 			// TODO Check if project exists is valid
+			// TODO Delete all documents using the deleted project IDs
 			this.update(
 					"DELETE FROM users WHERE Username = '" + username + "';");
 			this.update("DELETE FROM projects WHERE Username = '" + username
@@ -468,5 +472,10 @@ public class SQLDatabase {
 			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
 			// the above checks
 		}
+	}
+
+	public void sessionExists(String username, String serialNumber) {
+		// TODO Auto-generated method stub
+		
 	}
 }

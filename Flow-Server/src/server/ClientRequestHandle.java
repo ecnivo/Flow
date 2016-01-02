@@ -93,6 +93,7 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("status", "OK");
 				break;
 			case "list_project_files":
+				// TODO Verify if this is not needed and remove case
 				// response = Results.toStringArray(
 				// new String[] { "ProjectID", "ProjectName" },
 				// this.database.getFiles(
@@ -138,28 +139,10 @@ public class ClientRequestHandle implements Runnable {
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					username = data.get("username", String.class);
-					int accessLevel = (int) data.get("access_level",
-							Byte.class);
-					switch (accessLevel) {
-					case SQLDatabase.NONE:
-						// TODO create collaborator removal method in database
-						break;
-					case SQLDatabase.VIEW:
-						this.database.updateAccess(SQLDatabase.VIEW, projectId,
-								username);
-						break;
-					case SQLDatabase.EDIT:
-						this.database.updateAccess(SQLDatabase.EDIT, projectId,
-								username);
-						break;
-					case SQLDatabase.OWNER:
-						// TODO implement this
-						// this.database.updateAccess(SQLDatabase.OWNER,
-						// projectId, username);
-						break;
-					}
+					this.database.updateAccess(
+							(int) data.get("access_level", Byte.class),
+							projectId, data.get("username", String.class));
 					break;
-				// TODO Create database methods for following functions
 				case "RENAME_PROJECT":
 					try {
 						this.database.renameProject(projectId,
