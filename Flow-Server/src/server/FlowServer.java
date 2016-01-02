@@ -20,7 +20,6 @@ public class FlowServer implements Runnable {
 	private static final int MAX_THREADS = 100;
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
-
 	private ArrayList<DocumentUpdateCallback> _DocumentUpdateCallbacks;
 
 	public FlowServer() {
@@ -52,9 +51,9 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	protected UUID newSession(String username, String serialNumber) { // TODO what is the serial number? do we still need it?
+	protected UUID newSession(String username) {
 		UUID sessionId = UUID.randomUUID();
-		this.database.newSession(username, serialNumber, sessionId.toString());
+		this.database.newSession(username, sessionId.toString());
 		return sessionId;
 	}
 

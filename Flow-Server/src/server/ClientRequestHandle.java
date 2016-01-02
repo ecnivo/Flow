@@ -51,7 +51,7 @@ public class ClientRequestHandle implements Runnable {
 				password = data.get("password", String.class);
 				if (this.server.getDatabase().authenticate(username,
 						password)) {
-					UUID sessionID = this.server.newSession(username, null);
+					UUID sessionID = this.server.newSession(username);
 					returnData.put("status", "OK");
 					returnData.put("session_id", sessionID);
 				} else {

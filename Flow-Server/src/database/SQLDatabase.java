@@ -283,11 +283,10 @@ public class SQLDatabase {
 	 * @return whether or not the session was successfully associated with the
 	 *         user and serial number.
 	 */
-	public boolean newSession(String username, String serialNumber,
-			String sessionId) {
+	public boolean newSession(String username, String sessionId) {
 		try {
-			this.update("INSERT INTO sessions VALUES (" + username + ", "
-					+ serialNumber + ", " + sessionId + ");");
+			this.update("INSERT INTO sessions VALUES ('" + username + "', '"
+					+ sessionId + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -305,8 +304,8 @@ public class SQLDatabase {
 	public boolean removeSession(String sessionId) {
 		try {
 			// TODO Verify if the session actually exists prior to removal
-			this.update("DELETE FROM sessions WHERE SessionID = " + sessionId
-					+ ";");
+			this.update("DELETE FROM sessions WHERE SessionID = '" + sessionId
+					+ "';");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -326,8 +325,8 @@ public class SQLDatabase {
 	 */
 	public ResultSet getSessionInfo(String sessionId) {
 		try {
-			return this.query(
-					"SELECT * FROM sessions WHERE SessionID = " + sessionId);
+			return this.query("SELECT * FROM sessions WHERE SessionID = '"
+					+ sessionId + "';");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -476,10 +475,5 @@ public class SQLDatabase {
 			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
 			// the above checks
 		}
-	}
-
-	public void sessionExists(String username, String serialNumber) {
-		// TODO Auto-generated method stub
-
 	}
 }
