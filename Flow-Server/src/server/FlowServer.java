@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import database.SQLDatabase;
@@ -12,14 +13,18 @@ import database.SQLDatabase;
 public class FlowServer implements Runnable {
 
 	private static final int PORT = 10244;
+	private static final int ARC_PORT = 10225;
 
 	private SQLDatabase database;
 
 	private static final int MAX_THREADS = 100;
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
-	public FlowServer() {
 
+	private ArrayList<DocumentUpdateCallback> _DocumentUpdateCallbacks;
+
+	public FlowServer() {
+		this._DocumentUpdateCallbacks = new ArrayList<>();
 	}
 
 	@Override
