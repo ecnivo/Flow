@@ -404,6 +404,15 @@ public class SQLDatabase {
 		statement.executeUpdate(query);
 	}
 
+	/**
+	 * Retrieves all associated data with the specified file.
+	 * 
+	 * @param uuid
+	 *            the UUID of the file.
+	 * @return all associated data from the 'documents' SQL table.
+	 * @throws DatabaseException
+	 *             if the file doesn't exists in the database.
+	 */
 	public ResultSet getFile(String uuid) throws DatabaseException {
 		try {
 			// TODO Add check if found
@@ -417,6 +426,19 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Renames the specified project. This only changes the <b>given</b> project
+	 * name, <b>not the UUID</b>, hence not the internal server directory
+	 * structure either.
+	 * 
+	 * @param uuid
+	 *            the UUID of the project.
+	 * @param newName
+	 *            the name which to assign to the project.
+	 * @throws DatabaseException
+	 *             if the specified project UUID doesn't exists in the database
+	 *             or the new name contains invalid characters.
+	 */
 	public void renameProject(String uuid, String newName)
 			throws DatabaseException {
 		// TODO Check if name is valid
