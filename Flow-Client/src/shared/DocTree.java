@@ -18,6 +18,7 @@ import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
 
+@SuppressWarnings("serial")
 public abstract class DocTree extends JTree {
 
     private DefaultTreeModel model;
@@ -42,10 +43,10 @@ public abstract class DocTree extends JTree {
 	addMouseListener(new MouseAdapter() {
 	    @Override
 	    public void mouseEntered(MouseEvent arg0) {
-		updateProjectList();
+		refreshProjectList();
 	    }
 	});
-	updateProjectList();
+	refreshProjectList();
     }
 
     public JScrollPane getScrollable() {
@@ -60,7 +61,7 @@ public abstract class DocTree extends JTree {
 	activeProject = newActive;
     }
 
-    public void updateProjectList() {
+    public void refreshProjectList() {
 	if (FlowClient.NETWORK) {
 	    usersProjectsUUIDs = Communicator.communicate(
 		    new Data("list_projects")).get("projects", UUID[].class);
@@ -130,7 +131,6 @@ public abstract class DocTree extends JTree {
 	}
     }
 
-    @SuppressWarnings("serial")
     public class ProjectNode extends DirectoryNode {
 	private FlowProject project;
 
@@ -144,11 +144,10 @@ public abstract class DocTree extends JTree {
 	}
     }
 
-    @SuppressWarnings("serial")
     public class DirectoryNode extends DefaultMutableTreeNode {
 	private FlowDirectory folder;
 
-	private DirectoryNode(FlowDirectory dir) {
+	public DirectoryNode(FlowDirectory dir) {
 	    super(dir.toString());
 	    this.folder = dir;
 	}
@@ -158,7 +157,6 @@ public abstract class DocTree extends JTree {
 	}
     }
 
-    @SuppressWarnings("serial")
     public class FileNode extends DefaultMutableTreeNode {
 	private FlowFile file;
 

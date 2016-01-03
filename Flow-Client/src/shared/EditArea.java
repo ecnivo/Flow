@@ -48,31 +48,22 @@ public class EditArea extends JTextPane {
     public static final Color KEYWORD_COLOUR = new Color(0x006C79);
     public static final Color STRING_COLOUR = new Color(0x45AD00);
 
-    private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
-	    "boolean", "break", "byte", "case", "catch", "char", "class",
-	    "const", "continue", "default", "do", "double", "else", "enum",
-	    "extends", "final", "finally", "float", "for", "goto", "if",
-	    "implements", "import", "instanceof", "int", "interface", "long",
-	    "native", "new", "package", "private", "protected", "public",
-	    "return", "short", "static", "strictfp", "super", "switch",
-	    "synchronized", "this", "throws", "throw", "transient", "try",
-	    "void", "volatile", "while" };
+    private static final String[] JAVA_KEYWORDS = { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "try", "void", "volatile", "while" };
 
-    public EditArea(TextDocument file, boolean editable, EditTabs tabs) {
+    public EditArea(TextDocument textDoc, boolean editable, EditTabs tabs) {
 	setLayout(null);
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
 	setForeground(PLAIN_COLOUR);
-	this.document = file;
-	doc = (StyledDocument) new File(file.getDocumentText());
+	this.document = textDoc;
+	doc = (StyledDocument) new File(textDoc.getDocumentText());
 	setStyledDocument(doc);
+	setText(textDoc.getDocumentText());
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
-	Iterator<User> userIt = ((FlowProject) file.getParentFile()
-		.getParentDirectory().getRootDirectory()).getEditors()
-		.iterator();
+	Iterator<User> userIt = ((FlowProject) textDoc.getParentFile().getParentDirectory().getRootDirectory()).getEditors().iterator();
 	while (userIt.hasNext()) {
 	    UserCaret caret = new UserCaret(userIt.next(), this);
 	    add(caret);
@@ -127,24 +118,18 @@ public class EditArea extends JTextPane {
 	    public void insertUpdate(DocumentEvent e) {
 		String insertedString = "";
 		try {
-		    insertedString = doc.getText(
-			    EditArea.this.getCaretPosition() - e.getLength(),
-			    e.getLength());
+		    insertedString = doc.getText(EditArea.this.getCaretPosition() - e.getLength(), e.getLength());
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		}
-		Data documentModify = new Data("document_modify");
-		documentModify.put("project", ((FlowProject) document
-			.getParentFile().getParentDirectory()
-			.getRootDirectory()).getProjectUUID());
+		Data documentModify = new Data("text_document_modify");
+		documentModify.put("project", ((FlowProject) document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
 		documentModify.put("document", document.getUUID());
 		documentModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
 		try {
-		    lastNewLine = doc.getText(0,
-			    EditArea.this.getCaretPosition() - e.getLength())
-			    .lastIndexOf('\n');
+		    lastNewLine = doc.getText(0, EditArea.this.getCaretPosition() - e.getLength()).lastIndexOf('\n');
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		    return;
@@ -156,9 +141,8 @@ public class EditArea extends JTextPane {
 			lines++;
 		}
 		documentModify.put("line", lines);
-		documentModify.put("idx",
-			EditArea.this.getCaretPosition() - e.getLength()
-				- lastNewLine);
+		documentModify.put("idx", EditArea.this.getCaretPosition() - e.getLength() - lastNewLine);
+		documentModify.put("str", insertedString);
 
 		Data response = Communicator.communicate(documentModify);
 		String status = response.get("status", String.class);
@@ -173,17 +157,14 @@ public class EditArea extends JTextPane {
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
 
-		Data documentModify = new Data("document_modify");
-		documentModify.put("project", ((FlowProject) document
-			.getParentFile().getParentDirectory()
-			.getRootDirectory()).getProjectUUID());
+		Data documentModify = new Data("text_document_modify");
+		documentModify.put("project", ((FlowProject) document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
 		documentModify.put("document", document.getUUID());
 		documentModify.put("mod_type", "DELETE");
 
 		int lastNewLine;
 		try {
-		    lastNewLine = doc.getText(0,
-			    EditArea.this.getCaretPosition()).lastIndexOf('\n');
+		    lastNewLine = doc.getText(0, EditArea.this.getCaretPosition()).lastIndexOf('\n');
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		    return;
@@ -195,8 +176,8 @@ public class EditArea extends JTextPane {
 			lines++;
 		}
 		documentModify.put("line", lines);
-		documentModify.put("idx", EditArea.this.getCaretPosition()
-			- lastNewLine);
+		documentModify.put("idx", EditArea.this.getCaretPosition() - lastNewLine);
+		documentModify.put("len", removedLen);
 
 		Data response = Communicator.communicate(documentModify);
 		String status = response.get("status", String.class);
@@ -215,6 +196,7 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
+	highlightSyntax();
     }
 
     public FlowDocument getFlowDoc() {
@@ -256,15 +238,12 @@ public class EditArea extends JTextPane {
 	    line = 0;
 	    for (int pos = 0; pos + targetLength < sourceLength; pos++) {
 		if (pos > 0 && pos + targetLength + 1 < sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))
-			    && !Character.isAlphabetic(sourceCode.charAt(pos
-				    + targetLength))) {
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)) && !Character.isAlphabetic(sourceCode.charAt(pos + targetLength))) {
 			markWordBlocks(sourceCode, pos, target, line);
 			pos += targetLength;
 		    }
 		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos
-			    + targetLength))) {
+		    if (!Character.isAlphabetic(sourceCode.charAt(pos + targetLength))) {
 			markWordBlocks(sourceCode, pos, target, line);
 			pos += targetLength;
 		    }
@@ -295,8 +274,7 @@ public class EditArea extends JTextPane {
 		if (!escaped) {
 		    int closeQuote = sourceCode.indexOf('"', pos + 1);
 
-		    while (closeQuote > 0
-			    && sourceCode.charAt(closeQuote - 1) == '\\') {
+		    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
 			closeQuote = sourceCode.indexOf('"', closeQuote + 1);
 		    }
 		    if (closeQuote > -1) {
@@ -313,8 +291,7 @@ public class EditArea extends JTextPane {
 		}
 		if (!escaped) {
 		    int closeQuote = sourceCode.indexOf('\'', pos + 1);
-		    while (closeQuote > 0
-			    && sourceCode.charAt(closeQuote - 1) == '\\') {
+		    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
 			closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
 		    }
 		    if (closeQuote > -1) {
@@ -330,20 +307,17 @@ public class EditArea extends JTextPane {
 	}
 
 	for (StyleToken styleToken : plainBlocks) {
-	    doc.setCharacterAttributes(styleToken.getPos(),
-		    styleToken.getLength(), keywordStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
 	    // SwingUtilities.invokeLater(new FormatPlainLater(
 	    // styleToken.getPos(), styleToken.getLength()));
 	}
 	for (StyleToken styleToken : keywordBlocks) {
-	    doc.setCharacterAttributes(styleToken.getPos(),
-		    styleToken.getLength(), keywordStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength(), keywordStyle, false);
 	    // SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
 	    // .getPos(), styleToken.getLength()));
 	}
 	for (StyleToken styleToken : strings) {
-	    doc.setCharacterAttributes(styleToken.getPos(),
-		    styleToken.getLength() + 1, stringStyle, false);
+	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength() + 1, stringStyle, false);
 	    // SwingUtilities.invokeLater(new FormatStringsLater(styleToken
 	    // .getPos(), styleToken.getLength() + 1));
 	}
@@ -357,8 +331,7 @@ public class EditArea extends JTextPane {
 	return false;
     }
 
-    private void markWordBlocks(String sourceCode, int pos, String target,
-	    int line) {
+    private void markWordBlocks(String sourceCode, int pos, String target, int line) {
 	String candidate = sourceCode.substring(pos, pos + target.length());
 	if (arrayContains(JAVA_KEYWORDS, candidate))
 	    keywordBlocks.add(new StyleToken(candidate.length(), pos - line));

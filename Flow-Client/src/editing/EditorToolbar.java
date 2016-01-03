@@ -24,6 +24,7 @@ import shared.Communicator;
 public class EditorToolbar extends JToolBar {
     private JPopupMenu popup;
     private JMenuItem createProjectButton;
+    private JMenuItem renameProjectButton;
 
     public EditorToolbar(EditPane pane) {
 	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -35,115 +36,53 @@ public class EditorToolbar extends JToolBar {
 	createProjectButton.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String projectName = JOptionPane
-			.showInputDialog(
-				null,
-				"Please enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
-					+ "\" < > . # & { } $ @ = ` + ",
-				"New Project", JOptionPane.QUESTION_MESSAGE)
-			.trim();
-		while (CreateAccountPane.stringContains(projectName,
-			CreateAccountPane.INVALID_CHARS)
-			|| projectName.length() > 1) {
-		    projectName = JOptionPane
-			    .showInputDialog(
-				    null,
-				    "That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
-					    + "\" < > . # & { } $ @ = ` + ",
-				    "Invalid name",
-				    JOptionPane.QUESTION_MESSAGE).trim();
+		String projectName = JOptionPane.showInputDialog(null, "Please enter a name for your new Project\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "New Project", JOptionPane.QUESTION_MESSAGE).trim();
+		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() > 1) {
+		    projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data createProjectRequest = new Data("new_project");
 		createProjectRequest.put("project_name", projectName);
-		createProjectRequest.put("session_id",
-			Communicator.getSessionID());
-		switch (Communicator.communicate(createProjectRequest).get(
-			"status", String.class)) {
+		createProjectRequest.put("session_id", Communicator.getSessionID());
+		switch (Communicator.communicate(createProjectRequest).get("status", String.class)) {
 		case "OK":
-		    JOptionPane.showConfirmDialog(null, "Your project "
-			    + projectName + " has been succesfully created.",
-			    "Project creation success",
-			    JOptionPane.DEFAULT_OPTION,
-			    JOptionPane.INFORMATION_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project " + projectName + " has been succesfully created.", "Project creation success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		    break;
 
 		case "PROJECT_NAME_INVALID":
-		    JOptionPane
-			    .showConfirmDialog(
-				    null,
-				    "Your project name is invalid.\nPlease choose another one.",
-				    "Project creation failure",
-				    JOptionPane.DEFAULT_OPTION,
-				    JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getTree().updateProjectList();
+		pane.getTree().refreshProjectList();
 	    }
 	});
-	JMenuItem renameProjectButton = new JMenuItem();
+	renameProjectButton = new JMenuItem();
 	renameProjectButton.setText("Rename current project");
 	renameProjectButton.addActionListener(new ActionListener() {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String projectName = JOptionPane.showInputDialog(
-			null,
-			"Please enter new name for the project "
-				+ pane.getTree().getActiveProject().toString()
-				+ "\nNo characters such as: \\ / ? % * : | "
-				+ "\" < > . # & { } $ @ = ` + ",
-			"Rename project", JOptionPane.QUESTION_MESSAGE).trim();
-		while (CreateAccountPane.stringContains(projectName,
-			CreateAccountPane.INVALID_CHARS)
-			|| projectName.length() > 1) {
-		    projectName = JOptionPane
-			    .showInputDialog(
-				    null,
-				    "That name is invalid.\nPlease enter an appropriate new name for this project."
-					    + "\nNo characters such as: \\ / ? % * : | "
-					    + "\" < > . # & { } $ @ = ` + ",
-				    "Invalid name",
-				    JOptionPane.QUESTION_MESSAGE).trim();
+		String projectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() > 1) {
+		    projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-		modifyRequest.put("project_uuid", pane.getTree()
-			.getActiveProject());
+		modifyRequest.put("project_uuid", pane.getTree().getActiveProject());
 		modifyRequest.put("new_name", projectName);
-		switch (Communicator.communicate(modifyRequest).get("status",
-			String.class)) {
+		switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 		case "OK":
-		    JOptionPane.showConfirmDialog(null,
-			    "Your project has been succesfully renamed to "
-				    + projectName + ".",
-			    "Project renaming success",
-			    JOptionPane.DEFAULT_OPTION,
-			    JOptionPane.INFORMATION_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project has been succesfully renamed to " + projectName + ".", "Project renaming success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		    break;
 		case "PROJECT_NAME_INVALID":
-		    JOptionPane
-			    .showConfirmDialog(
-				    null,
-				    "Your project name is invalid.\nPlease choose another one.",
-				    "Project renaming failure",
-				    JOptionPane.DEFAULT_OPTION,
-				    JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		case "PROJECT_DOES_NOT_EXIST":
-		    JOptionPane
-			    .showConfirmDialog(
-				    null,
-				    "The project you are trying to rename does not exist.\n"
-					    + "Try refreshing the list of projects by moving your mouse cursor into,\n"
-					    + "then out of the project list.",
-				    "Project renaming failure",
-				    JOptionPane.DEFAULT_OPTION,
-				    JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "The project you are trying to rename does not exist.\n" + "Try refreshing the list of projects by moving your mouse cursor into,\n" + "then out of the project list.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getTree().updateProjectList();
+		pane.getTree().refreshProjectList();
 	    }
 	});
 
@@ -153,15 +92,7 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String confirm = JOptionPane
-			.showInputDialog(
-				null,
-				"Please type the project name that you are intending\n"
-					+ "to delete EXACTLY AS IT IS in the following box.\n\n"
-					+ "Deleting a project means you will lose ALL data and\n"
-					+ "all collaborators will be removed. Back up code accordingly.",
-				"Confirm project deletion",
-				JOptionPane.WARNING_MESSAGE);
+		String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion", JOptionPane.WARNING_MESSAGE);
 		// TODO double check if projects match
 		// TODO get current project, and delete it.
 	    }
@@ -181,10 +112,7 @@ public class EditorToolbar extends JToolBar {
     private class SearchButton extends JButton {
 	private SearchButton() {
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/search.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/search.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -207,11 +135,7 @@ public class EditorToolbar extends JToolBar {
     private class ProjectManageButton extends JButton {
 	private ProjectManageButton() {
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/projectManage.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/projectManage.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -221,9 +145,7 @@ public class EditorToolbar extends JToolBar {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    popup.show(EditorToolbar.this,
-			    ProjectManageButton.this.getX(),
-			    ProjectManageButton.this.getY());
+		    popup.show(EditorToolbar.this, ProjectManageButton.this.getX(), ProjectManageButton.this.getY());
 		}
 	    });
 	}
@@ -232,10 +154,7 @@ public class EditorToolbar extends JToolBar {
     private class ImportButton extends JButton {
 	private ImportButton() {
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/import.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/import.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -256,10 +175,7 @@ public class EditorToolbar extends JToolBar {
     private class ExportButton extends JButton {
 	private ExportButton() {
 	    try {
-		setIcon(new ImageIcon(ImageIO.read(
-			new File("images/export.png")).getScaledInstance(
-			FlowClient.BUTTON_ICON_SIZE,
-			FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/export.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -279,5 +195,9 @@ public class EditorToolbar extends JToolBar {
 
     public void createProjectButtonDoClick() {
 	createProjectButton.doClick();
+    }
+
+    public void renameProjectButtonDoClick() {
+	renameProjectButton.doClick();
     }
 }

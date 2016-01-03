@@ -13,9 +13,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import shared.Communicator;
 
+@SuppressWarnings("serial")
 public class FlowClient extends JFrame {
 
-    public static final boolean NETWORK = true;
+    public static final boolean NETWORK = false;
 
     private static final String HOST = "127.0.0.1";
     private static final int PORT = 5000;

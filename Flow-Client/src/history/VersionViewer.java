@@ -45,8 +45,9 @@ public class VersionViewer extends JPanel {
 
     public VersionViewer(HistoryPane hp) {
 	historyPane = hp;
+	setBackground(Color.WHITE);
 	setMinimumSize(new Dimension(25, 0));
-	setBorder(FlowClient.EMPTY_BORDER);
+//	setBorder(FlowClient.EMPTY_BORDER);
 	setLayout(new GridLayout(0, 1, 0, 0));
 	scrolling = new JScrollPane(this);
 	scrolling
