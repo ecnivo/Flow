@@ -7,10 +7,13 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import database.SQLDatabase;
 
 public class FlowServer implements Runnable {
+
+	private static Logger L = Logger.getLogger("FlowServer");
 
 	private static final int PORT = 10244;
 	private static final int ARC_PORT = 10225;
@@ -29,17 +32,19 @@ public class FlowServer implements Runnable {
 	@Override
 	public void run() {
 		try {
+			L.info("started listening");
 			ServerSocket serverSocket = new ServerSocket(PORT);
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
+				L.info("accepted connection from " + socket.getRemoteSocketAddress());
 				int i = 0;
-//				do {
-//					i %= MAX_THREADS;
-//					if (threadPool[i] != null && !threadPool[i].isAlive())
-//						threadPool[i--] = null;
-//					++i;
-//				} while (threadPool[i] != null);
+				do {
+					i %= MAX_THREADS;
+					if (threadPool[i] != null && !threadPool[i].isAlive())
+						threadPool[i--] = null;
+					++i;
+				} while (threadPool[i] != null);
 
 				System.err.println("Request assigned worker thread " + i);
 				Thread t = new Thread(new ClientRequestHandle(this, socket));
