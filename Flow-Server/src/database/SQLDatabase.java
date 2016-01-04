@@ -404,6 +404,15 @@ public class SQLDatabase {
 		statement.executeUpdate(query);
 	}
 
+	/**
+	 * Retrieves all associated data with the specified file.
+	 * 
+	 * @param uuid
+	 *            the UUID of the file.
+	 * @return all associated data from the 'documents' SQL table.
+	 * @throws DatabaseException
+	 *             if the file doesn't exists in the database.
+	 */
 	public ResultSet getFile(String uuid) throws DatabaseException {
 		try {
 			// TODO Add check if found
@@ -417,6 +426,19 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Renames the specified project. This only changes the <b>given</b> project
+	 * name, <b>not the UUID</b>, hence not the internal server directory
+	 * structure either.
+	 * 
+	 * @param uuid
+	 *            the UUID of the project.
+	 * @param newName
+	 *            the name which to assign to the project.
+	 * @throws DatabaseException
+	 *             if the specified project UUID doesn't exists in the database
+	 *             or the new name contains invalid characters.
+	 */
 	public void renameProject(String uuid, String newName)
 			throws DatabaseException {
 		// TODO Check if name is valid
@@ -431,6 +453,20 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Deletes the specified project from the database. This will
+	 * <b>permanently</b> delete the project and access to all contained files
+	 * for <b>all users</b>. <br>
+	 * <br>
+	 * This method should only be called after verifying that the current
+	 * sessions belongs to the user which is the <b>owner</b> of the specified
+	 * project.
+	 * 
+	 * @param projectId
+	 *            the UUID of the project to delete.
+	 * @throws DatabaseException
+	 *             if the project doesn't exist.
+	 */
 	public void deleteProject(String projectId) throws DatabaseException {
 		try {
 			// TODO Check if project exists is valid
@@ -444,14 +480,25 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Allows a user to remove their account and <b>all projects which they are
+	 * the owner</b> from the database. This means these projects will <b>no
+	 * longer be accessible</b>. Please change the owner of any projects that
+	 * other users wish to continue developing.
+	 * 
+	 * @param username
+	 *            the username associated with the account to close.
+	 * @throws DatabaseException
+	 *             if the username does not exist in the database.
+	 */
 	public void closeAccount(String username) throws DatabaseException {
 		try {
 			// TODO Check if project exists is valid
 			// TODO Delete all documents using the deleted project IDs
 			this.update(
 					"DELETE FROM users WHERE Username = '" + username + "';");
-			this.update("DELETE FROM projects WHERE Username = '" + username
-					+ "';");
+			this.update("DELETE FROM projects WHERE OwnerUsername = '"
+					+ username + "';");
 			this.update("DELETE FROM sessions WHERE Username = '" + username
 					+ "';");
 			this.update(
@@ -464,6 +511,18 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Allows users to change their password.
+	 * 
+	 * @param username
+	 *            the username of the user (unique)
+	 * @param newPassword
+	 *            the new password which the user wants to associate with their
+	 *            username
+	 * @throws DatabaseException
+	 *             if the username does not exist in the system, or the entered
+	 *             password is invalid
+	 */
 	public void changePassword(String username, String newPassword)
 			throws DatabaseException {
 		try {
