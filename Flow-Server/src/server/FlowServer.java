@@ -34,12 +34,12 @@ public class FlowServer implements Runnable {
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
 				int i = 0;
-				do {
-					i %= MAX_THREADS;
-					if (threadPool[i] != null && !threadPool[i].isAlive())
-						threadPool[i--] = null;
-					++i;
-				} while (threadPool[i] != null);
+//				do {
+//					i %= MAX_THREADS;
+//					if (threadPool[i] != null && !threadPool[i].isAlive())
+//						threadPool[i--] = null;
+//					++i;
+//				} while (threadPool[i] != null);
 
 				System.err.println("Request assigned worker thread " + i);
 				Thread t = new Thread(new ClientRequestHandle(this, socket));
