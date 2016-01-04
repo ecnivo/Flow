@@ -44,9 +44,7 @@ public class LoginPane extends JPanel {
 	title.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 	add(title);
 	try {
-	    title.setIcon(new ImageIcon(ImageIO.read(
-		    new File("images/flow.png")).getScaledInstance(414, 128,
-		    Image.SCALE_SMOOTH)));
+	    title.setIcon(new ImageIcon(ImageIO.read(new File("images/flow.png")).getScaledInstance(414, 128, Image.SCALE_SMOOTH)));
 	} catch (IOException e1) {
 	    e1.printStackTrace();
 	}
@@ -85,8 +83,7 @@ public class LoginPane extends JPanel {
 	java.awt.Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
 
-	JButton createAccountButton = new JButton(
-		"<html>No Account?<br>Create one!</html>");
+	JButton createAccountButton = new JButton("<html>No Account?<br>Create one!</html>");
 	createAccountButton.setPreferredSize(new Dimension(128, 32));
 	createAccountButton.setMinimumSize(new Dimension(32, 2));
 	createAccountButton.setMaximumSize(new Dimension(128, 32));
@@ -107,44 +104,30 @@ public class LoginPane extends JPanel {
 		// authentication
 		if (FlowClient.NETWORK) {
 		    if (usernameEntry.getText().length() >= 16) {
-			JOptionPane
-				.showConfirmDialog(
-					null,
-					"The username is too long.\nUsernames have a limit of 16 characters.",
-					"Invalid username",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
 
 		    Data usernamePass = new Data("login");
 		    usernamePass.put("username", usernameEntry.getText());
-		    usernamePass.put("password", passwordEntry.getPassword());
+		    usernamePass.put("password", String.copyValueOf(passwordEntry.getPassword()));
+		    System.out.println("sending");
 
 		    Data reply = Communicator.communicate(usernamePass);
 		    String status = reply.get("status", String.class);
+		    System.out.println("received");
 		    switch (status) {
 		    case "USERNAME_DOES_NOT_EXIST":
-			JOptionPane
-				.showConfirmDialog(
-					null,
-					"The username does not exist.\nPlease enter a username that is valid, or create a new account.",
-					"Invalid username",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showConfirmDialog(null, "The username does not exist.\nPlease enter a username that is valid, or create a new account.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		    case "PASSWORD_INCORRECT":
-			JOptionPane
-				.showConfirmDialog(
-					null,
-					"Whoops! Your password does not match the one we don't have. Try again.",
-					"Incorrect password",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showConfirmDialog(null, "Whoops! Your password does not match the one we don't have. Try again.", "Incorrect password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
+
+		    default:
+			break;
 		    }
-		    Communicator.setSessionID(reply.get("session_id",
-			    UUID.class));
+		    Communicator.setSessionID(reply.get("session_id", UUID.class));
 		}
 		LoginPane.this.panMan.switchToEditor();
 

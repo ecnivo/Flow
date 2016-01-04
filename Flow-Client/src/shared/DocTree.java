@@ -46,7 +46,7 @@ public abstract class DocTree extends JTree {
 		refreshProjectList();
 	    }
 	});
-	refreshProjectList();
+//	refreshProjectList();
     }
 
     public JScrollPane getScrollable() {

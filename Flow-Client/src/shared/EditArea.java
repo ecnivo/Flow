@@ -45,8 +45,8 @@ public class EditArea extends JTextPane {
 
     public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
     public static final Color PLAIN_COLOUR = Color.BLACK;
-    public static final Color KEYWORD_COLOUR = new Color(0x006C79);
-    public static final Color STRING_COLOUR = new Color(0x45AD00);
+    public static final Color KEYWORD_COLOUR = new Color(0x9213D1);
+    public static final Color STRING_COLOUR = new Color(0xD13313);
 
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "try", "void", "volatile", "while" };
 

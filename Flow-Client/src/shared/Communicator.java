@@ -8,15 +8,12 @@ import network.FMLNetworker;
 
 public class Communicator {
 
-    private static final String HOST = "127.0.0.1";
-    private final static int PORT = 1234;
-
     private static UUID sessionID;
 
     private static FMLNetworker packageSender;
 
-    public static void initComms() {
-	packageSender = new FMLNetworker(HOST, PORT);
+    public static void initComms(String host, int port) {
+	packageSender = new FMLNetworker(host, port);
     }
 
     @SuppressWarnings("unchecked")

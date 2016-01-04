@@ -34,14 +34,21 @@ public class FMLNetworker {
     public Data send(Data data) throws IOException {
         try {
             Socket socket = new Socket(ip, port);
+            System.out.println("I GOT HERE!#Q&*");
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             synchronized (data) {
                 oos.writeObject(data);
                 oos.flush();
             }
-            return (Data) ois.readObject();
+            Data re = (Data) ois.readObject();
+            socket.close();
+            ois.close();
+            oos.close();
+            System.out.println("Y O I GOT HERE TOO");
+            return re;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
