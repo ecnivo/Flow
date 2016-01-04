@@ -57,6 +57,21 @@ public class Data implements Serializable {
     }
 
     /**
+     * Retrieves a property from this message with unchecked auto cast
+     *
+     * @param key  The key of the message
+     * @param <T>  The type of the value of the message
+     * @return The value of the property of type 'type'
+     */
+    public <T> T get(String key){
+        try {
+            return (T)stringObjectHashMap.get(key);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    /**
      * Check if this data contains the key
      * @param key The key to check
      * @return whether this data contains the key
