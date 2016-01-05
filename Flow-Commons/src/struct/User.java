@@ -14,8 +14,6 @@ public class User implements Serializable {
     private transient String password;
     private ImageIcon avatar;
 
-    private ArrayList<FlowProject> userProjects;
-
     private static final ImageIcon DEFAULT_AVATAR = new ImageIcon(
             new ImageIcon("images/icon.png").getImage().getScaledInstance(32,
                     32, Image.SCALE_SMOOTH));
@@ -25,7 +23,6 @@ public class User implements Serializable {
         this.password = password;
         this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
                 Image.SCALE_SMOOTH));
-        userProjects = new ArrayList<FlowProject>();
     }
 
     public User(String username, String password) {
@@ -48,9 +45,6 @@ public class User implements Serializable {
         return avatar;
     }
 
-    public ArrayList<FlowProject> getUserProjects(){
-        return userProjects;
-    }
 //    public void setAvatar(ImageIcon icon) {
 //	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
 //		Image.SCALE_SMOOTH));

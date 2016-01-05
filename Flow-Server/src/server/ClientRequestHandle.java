@@ -12,6 +12,7 @@ import message.Data;
 import network.DataSocket;
 import struct.FlowDirectory;
 import struct.FlowFile;
+import struct.User;
 import util.DatabaseException;
 import util.Results;
 
@@ -72,6 +73,7 @@ public class ClientRequestHandle implements Runnable {
 							this.database.addUser(
 									data.get("username", String.class),
 									data.get("password", String.class)));
+                    DataManagement.getInstance().addUser(new User(data.get("username"), data.get("password")));
 					/*
 					 * TODO we need to know if the username/password have
 					 * invalid characters
@@ -81,7 +83,9 @@ public class ClientRequestHandle implements Runnable {
 				case "CLOSE_ACCOUNT":
 					this.database
 							.closeAccount(data.get("username", String.class));
-					returnData.put("status", "OK");
+					DataManagement.getInstance().removeUser(DataManagement.getInstance().getUserByUsername(data.get("username")));
+                    returnData.put("status", "OK");
+
 					break;
 				case "CHANGE_PASSWORD":
 					this.database.changePassword(
@@ -204,8 +208,8 @@ public class ClientRequestHandle implements Runnable {
 		} catch (IOException e) {
 			L.warning("communication error: " + e.getMessage());
 		} catch (Exception e) {
-			L.severe("internal server error: "
-					+ Arrays.toString(e.getStackTrace()));
+			L.severe("internal server error: ");
+            e.printStackTrace();
 		}
 
 		try {
