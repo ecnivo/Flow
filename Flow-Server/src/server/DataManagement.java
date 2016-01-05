@@ -56,6 +56,11 @@ public class DataManagement {
         users.add(u);
         uDictionary.put(u.getUsername(), u);
     }
+    public void removeUser(User u){
+        L.info("removing user");
+        users.remove(u);
+        uDictionary.remove(u.getUsername());
+    }
 
     public User getUserByUsername(String username) {
         L.info("getting user " + username + " by username");
