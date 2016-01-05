@@ -442,26 +442,30 @@ public class SQLDatabase {
 	 * name, <b>not the UUID</b>, hence not the internal server directory
 	 * structure either.
 	 * 
-	 * @param uuid
-	 *            the UUID of the project.
+	 * @param projectId
+	 *            the UUID of the project to rename.
 	 * @param newName
 	 *            the name which to assign to the project.
 	 * @throws DatabaseException
 	 *             if the specified project UUID doesn't exists in the database
 	 *             or the new name contains invalid characters.
 	 */
-	public void renameProject(String uuid, String newName)
+	public String renameProject(String projectId, String newName)
 			throws DatabaseException {
 		// TODO Check if name is valid
 		try {
+			if (!this.query("SELECT * from projects WHERE projectID = '"
+					+ projectId + "';").next()) {
+				return "PROJECT_NAME_INVALID";
+			}
 			this.update("UPDATE projects SET ProjectName = '" + newName
-					+ "' WHERE ProjectID = '" + uuid + "';");
+					+ "' WHERE ProjectID = '" + projectId + "';");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			// throw new DatabaseException("INVALID_PROJECT_NAME" or
-			// "PROJECT_DOES_NOT_EXIST"); based on the above checks
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
@@ -478,17 +482,25 @@ public class SQLDatabase {
 	 * @throws DatabaseException
 	 *             if the project doesn't exist.
 	 */
-	public void deleteProject(String projectId) throws DatabaseException {
+	public String deleteProject(String projectId) throws DatabaseException {
 		try {
-			// TODO Check if project exists is valid
-			this.update("DELETE FROM projects WHERE ProjectID = " + projectId
-					+ ";");
+			if (!this.query("SELECT * from projects WHERE projectID = '"
+					+ projectId + "';").next()) {
+				return "PROJECT_DOES_NOT_EXIST";
+			}
+			this.update("DELETE FROM projects WHERE ProjectID = '" + projectId
+					+ "';");
+			this.update("DELETE FROM access WHERE ProjectID = '" + projectId
+					+ "';");
+			this.update("DELETE FROM documents WHERE ProjectID = '" + projectId
+					+ "';");
+			this.update("DELETE FROM directories WHERE ProjectID = '"
+					+ projectId + "';");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			// throw new DatabaseException("PROJECT_DOES_NOT_EXIST"); based on
-			// the above checks
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
