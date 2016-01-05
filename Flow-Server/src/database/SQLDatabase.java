@@ -52,21 +52,29 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Getter for all projects associated with the specified UserID, completely
-	 * ignoring whether the user is the owner, or has only edit or view access.
+	 * Getter for all projects associated with the specified username,
+	 * completely ignoring whether the user is the owner, or has only edit or
+	 * view access.
 	 * 
 	 * @param username
 	 *            the ID of the user.
-	 * @return all projects associated with the specified UserID.
+	 * @return all projects associated with the specified username.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
-	public ResultSet getProjects(String username) {
+	public ResultSet getProjects(String username) throws DatabaseException {
 		try {
-			return this.query(
-					"SELECT * FROM access WHERE Username = " + username + ";");
+			if (!this.query(
+					"SELECT * FROM users WHERE Username = '" + username + "';")
+					.next()) {
+				throw new DatabaseException("INVALID_USERNAME");
+			}
+			return this.query("SELECT * FROM access WHERE Username = '"
+					+ username + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
 		}
-		return null;
 	}
 
 	/**
