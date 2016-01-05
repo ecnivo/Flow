@@ -12,8 +12,6 @@ import message.Data;
 import network.DataSocket;
 import struct.FlowDirectory;
 import struct.FlowFile;
-import struct.FlowProject;
-import struct.User;
 import util.DatabaseException;
 import util.Results;
 
@@ -94,15 +92,12 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
-				response = Results.toStringArray(
-						new String[] { "ProjectID", "ProjectName" },
+				response = Results.toStringArray(new String[] { "ProjectID" },
 						this.database.getProjects(
 								username = data.get("username", String.class)));
-				FlowProject[] projects = new FlowProject[response.length];
+				UUID[] projects = new UUID[response.length];
 				for (int i = 0; i < response.length; i++) {
-					projects[i] = new FlowProject(response[i][1],
-							new User(username),
-							UUID.fromString(response[i][0]));
+					projects[i] = UUID.fromString(response[i][0]);
 				}
 				returnData.put("projects", projects);
 				returnData.put("status", "OK");
