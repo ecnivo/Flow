@@ -28,7 +28,7 @@ public class FlowServer implements Runnable {
 
 	public FlowServer() {
 		this._DocumentUpdateCallbacks = new ArrayList<>();
-		this.database = new SQLDatabase("data/FlowDatabse");
+		this.database = new SQLDatabase("data/FlowDatabse.db");
 	}
 
 	public void load() {
