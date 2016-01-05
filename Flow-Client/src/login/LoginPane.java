@@ -123,6 +123,9 @@ public class LoginPane extends JPanel {
 		    case "PASSWORD_INCORRECT":
 			JOptionPane.showConfirmDialog(null, "Whoops! Your password does not match the one we don't have. Try again.", "Incorrect password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
+		    case "INVALID_CREDENTIALS":
+			JOptionPane.showConfirmDialog(null, "Whoops! Your Your credentials are incorrect.\nTry again.", "Invalid credentials", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
 
 		    default:
 			break;
