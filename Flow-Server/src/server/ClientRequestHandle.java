@@ -22,18 +22,18 @@ public class ClientRequestHandle implements Runnable {
 	private FlowServer server;
 	private SQLDatabase database;
 
-    private UUID uuid;
+	private UUID uuid;
 
-    private static Logger L = Logger.getLogger("ClientRequestHandle");
+	private static Logger L = Logger.getLogger("ClientRequestHandle");
 
-    public ClientRequestHandle(FlowServer server, Socket socket)
-            throws IOException {
-        this.socket = socket;
-        this.psocket = new DataSocket(socket);
-        this.uuid = UUID.randomUUID();
-        this.server = server;
-        this.database = this.server.getDatabase();
-    }
+	public ClientRequestHandle(FlowServer server, Socket socket)
+			throws IOException {
+		this.socket = socket;
+		this.psocket = new DataSocket(socket);
+		this.uuid = UUID.randomUUID();
+		this.server = server;
+		this.database = this.server.getDatabase();
+	}
 
 	@Override
 	public void run() {
@@ -92,9 +92,11 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
+				ResultSet temp = this.database
+						.getSessionInfo(data.get("session_id", String.class));
+				temp.next();
 				response = Results.toStringArray(new String[] { "ProjectID" },
-						this.database.getProjects(
-								username = data.get("username", String.class)));
+						this.database.getProjects(temp.getString("Username")));
 				UUID[] projects = new UUID[response.length];
 				for (int i = 0; i < response.length; i++) {
 					projects[i] = UUID.fromString(response[i][0]);
