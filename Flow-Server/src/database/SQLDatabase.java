@@ -81,14 +81,13 @@ public class SQLDatabase {
 	 *            the username which to provide access to.
 	 * @return whether or not the access was successfully granted.
 	 */
-	public boolean updateAccess(int accessLevel, String projectId,
-			String username) throws DatabaseException {
+	public String updateAccess(int accessLevel, String projectId,
+			String username) {
 		// TODO Password project (ask username / password as parameter)
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
 				this.update("INSERT INTO access values('" + projectId + "', '"
 						+ username + "', " + accessLevel + ";");
-				return true;
 			} else if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
 				this.update("UPDATE projects SET OwnerUserName = '" + username
@@ -100,20 +99,17 @@ public class SQLDatabase {
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values(" + projectId + ", "
 						+ username + ", " + OWNER + ");");
-
-				// TODO remove all other permissions (i.e. if they had edit
-				// permissions)
-				return true;
 			} else if (accessLevel == NONE) {
 				this.update("DELETE FROM access WHERE Username = '" + username
 						+ "' AND ProjectID = '" + projectId + "';");
 			} else {
-				throw new DatabaseException("ACCESS_LEVEL_INVALID");
+				return "ACCESS_LEVEL_INVALID";
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return FlowServer.ERROR;
 		}
-		return false;
+		return "OK";
 	}
 
 	/**
@@ -242,15 +238,20 @@ public class SQLDatabase {
 	 * Getter for all of the usernames in the database.
 	 * 
 	 * @return all of the usernames in the database.
+	 * @throws DatabaseException
 	 */
-	public ResultSet getUserNames(String projectId) {
+	public ResultSet getUserNames(String projectId) throws DatabaseException {
 		try {
-			return this.query("SELECT username FROM users WHERE ;");
+			if (!this.query("SELECT * from projects WHERE ProjectID = '"
+					+ projectId + "';").next()) {
+				throw new DatabaseException("");
+			}
+			return this.query("SELECT Username FROM access WHERE ProjectID = '"
+					+ projectId + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// Switch this to an empty resultset if possible
-			return null;
 		}
+		throw new DatabaseException(FlowServer.ERROR);
 	}
 
 	/**
@@ -372,8 +373,7 @@ public class SQLDatabase {
 	 *         </li>
 	 *         </ul>
 	 */
-	public String addUser(String username, String password)
-			throws DatabaseException {
+	public String addUser(String username, String password) {
 		try {
 			// Checks if a user with the specified username already exsists
 			if (this.query("SELECT username FROM users WHERE Username = '"
@@ -440,8 +440,7 @@ public class SQLDatabase {
 	 *             if the specified project UUID doesn't exists in the database
 	 *             or the new name contains invalid characters.
 	 */
-	public String renameProject(String projectId, String newName)
-			throws DatabaseException {
+	public String renameProject(String projectId, String newName) {
 		// TODO Check if name is valid
 		try {
 			if (!this.query("SELECT * from projects WHERE ProjectID = '"
@@ -472,7 +471,7 @@ public class SQLDatabase {
 	 * @throws DatabaseException
 	 *             if the project doesn't exist.
 	 */
-	public String deleteProject(String projectId) throws DatabaseException {
+	public String deleteProject(String projectId) {
 		try {
 			if (!this.query("SELECT * from projects WHERE ProjectID = '"
 					+ projectId + "';").next()) {
@@ -504,7 +503,7 @@ public class SQLDatabase {
 	 * @throws DatabaseException
 	 *             if the username does not exist in the database.
 	 */
-	public String closeAccount(String username) throws DatabaseException {
+	public String closeAccount(String username) {
 		try {
 			if (!this.query(
 					"SELECT * from users WHERE Username = '" + username + "';")
@@ -543,8 +542,7 @@ public class SQLDatabase {
 	 *             if the username does not exist in the system, or the entered
 	 *             password is invalid
 	 */
-	public String changePassword(String username, String newPassword)
-			throws DatabaseException {
+	public String changePassword(String username, String newPassword) {
 		try {
 			if (!this.query(
 					"SELECT * from users WHERE Username = '" + username + "';")
@@ -562,7 +560,7 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Internal method which calls the '{@link Statement#ExecuteQuery} method
+	 * Internal method which calls the {@link Statement#ExecuteQuery} method
 	 * with the specified query.
 	 * 
 	 * @param query
@@ -576,7 +574,7 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Internal method which calls the '{@link Statement#ExecuteUpdate} method
+	 * Internal method which calls the {@link Statement#ExecuteUpdate} method
 	 * with the specified query.
 	 * 
 	 * @param query

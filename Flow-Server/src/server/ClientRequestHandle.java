@@ -53,11 +53,11 @@ public class ClientRequestHandle implements Runnable {
 				password = data.get("password", String.class);
 				if (this.server.getDatabase().authenticate(username,
 						password)) {
+					// Inform server new session was created (server will save
+					// session to database)
 					UUID sessionID = this.server.newSession(username);
 					returnData.put("status", "OK");
-					returnData.put("session_id", sessionID); // TODO store the
-																// session id
-																// somewhere
+					returnData.put("session_id", sessionID);
 				} else {
 					/*
 					 * TODO we need to know whether or not the password was
@@ -76,11 +76,8 @@ public class ClientRequestHandle implements Runnable {
 									data.get("username", String.class),
 									data.get("password", String.class)));
 					/*
-					 * TODO we need to know if the username was taken or not, or
-					 * if the username/password have invalid characters, if
-					 * there was a server error etc. addUser() only returns
-					 * false if the username cannot be made, which is not enough
-					 * detail
+					 * TODO we need to know if the username/password have
+					 * invalid characters
 					 */
 
 					break;
@@ -142,7 +139,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "file_checksum":
-				// TODO implement this
+				// TODO implement this <--NETDEX
 				break;
 			case "new_project":
 				returnData.put("status",
@@ -159,31 +156,21 @@ public class ClientRequestHandle implements Runnable {
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					username = data.get("username", String.class);
-					try {
-						this.database.updateAccess(
-								(int) data.get("access_level", Byte.class),
-								projectId, data.get("username", String.class));
-					} catch (DatabaseException e) {
-						e.printStackTrace();
-						returnData.put("status", e.getMessage());
-					}
+					returnData
+							.put("status",
+									this.database.updateAccess(
+											(int) data.get("access_level",
+													Byte.class),
+											projectId, data.get("username",
+													String.class)));
 					break;
 				case "RENAME_PROJECT":
-					try {
-						this.database.renameProject(projectId,
-								data.get("new_name", String.class));
-					} catch (DatabaseException e) {
-						e.printStackTrace();
-						returnData.put("status", e.getMessage());
-					}
+					returnData.put("status", this.database.renameProject(
+							projectId, data.get("new_name", String.class)));
 					break;
 				case "DELETE_PROJECT":
-					try {
-						this.database.deleteProject(projectId);
-					} catch (DatabaseException e) {
-						e.printStackTrace();
-						returnData.put("status", e.getMessage());
-					}
+					returnData.put("status",
+							this.database.deleteProject(projectId));
 					break;
 				}
 				break;
@@ -194,7 +181,7 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "new_directory":
 				// TODO Implement checking if directory is to be inside another
-				// directory
+				// directoryF
 				this.database.newDirectory(
 						data.get("directory_name", String.class),
 						data.get("project_uuid", UUID.class).toString());
@@ -217,16 +204,30 @@ public class ClientRequestHandle implements Runnable {
 
 			this.psocket.send(returnData);
 			L.info("response: " + returnData.toString());
-		} catch (IOException e) {
+		} catch (
+
+		IOException e)
+
+		{
 			L.warning("communication error: " + e.getMessage());
-		} catch (Exception e) {
+		} catch (
+
+		Exception e)
+
+		{
 			L.severe("internal server error: "
 					+ Arrays.toString(e.getStackTrace()));
 		}
 
-		try {
+		try
+
+		{
 			socket.close();
-		} catch (IOException e) {
+		} catch (
+
+		IOException e)
+
+		{
 			L.severe("failure to close socket");
 		}
 	}
