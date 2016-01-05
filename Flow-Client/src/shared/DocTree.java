@@ -63,8 +63,11 @@ public abstract class DocTree extends JTree {
 
     public void refreshProjectList() {
 	if (FlowClient.NETWORK) {
-	    usersProjectsUUIDs = Communicator.communicate(
-		    new Data("list_projects")).get("projects", UUID[].class);
+	    Data projectList = new Data("list_projects");
+	    projectList.put("session_id", Communicator.getSessionID());
+	    Data reply = Communicator.communicate(projectList);
+	    System.out.println(reply);
+	    usersProjectsUUIDs = reply.get("projects", UUID[].class);
 
 	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
 		    .getRoot();
