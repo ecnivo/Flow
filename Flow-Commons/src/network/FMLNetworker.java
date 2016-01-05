@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Communication for the Client.
@@ -18,7 +19,10 @@ public class FMLNetworker {
     private String ip;
     private int port;
 
+    private static Logger L = Logger.getLogger("FMLNetworker");
+
     public FMLNetworker(String ip, int port) {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
         this.ip = ip;
         this.port = port;
     }
@@ -32,20 +36,26 @@ public class FMLNetworker {
      * @throws ClassNotFoundException When a class is missing client-side
      */
     public Data send(Data data) throws IOException {
+        L.info("initiating send protocol");
         try {
             Socket socket = new Socket(ip, port);
 
+            L.info("writing message: " + data.toString());
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(data);
             oos.flush();
 
+            L.info("reading response...");
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             Data re = (Data) ois.readObject();
+            L.info("response: " + re.toString());
+
             socket.close();
             ois.close();
             oos.close();
             return re;
         } catch (Exception e) {
+            L.severe("error during send operation");
             e.printStackTrace();
             return null;
         }

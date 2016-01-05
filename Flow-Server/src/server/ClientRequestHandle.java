@@ -44,8 +44,8 @@ public class ClientRequestHandle implements Runnable {
             String username, password;
             String[][] response;
             Data data = psocket.receive();
-            L.info(data.toString());
-            L.info("received data from remote user");
+
+            L.info("receive: " + data.toString());
             Data returnData = new Data();
             switch (data.getType()) {
                 case "login":
@@ -201,18 +201,14 @@ public class ClientRequestHandle implements Runnable {
             L.info("response: " + returnData.toString());
         } catch(IOException e){
             L.warning("communication error: " + e.getMessage());
-
         } catch (Exception e) {
             L.severe("internal server error: " + Arrays.toString(e.getStackTrace()));
-            try {
-                Data errorData = new Data();
-                errorData.put("status", "INTERNAL_SERVER_ERROR");
-                this.psocket.send(errorData);
-            } catch (IOException e1) {
-                L.severe("could not send client error message, total catastrophic failure");
-                e1.printStackTrace();
-            }
         }
 
+        try {
+            socket.close();
+        } catch (IOException e) {
+            L.severe("failure to close socket");
+        }
     }
 }
