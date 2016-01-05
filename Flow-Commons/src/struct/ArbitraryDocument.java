@@ -12,8 +12,8 @@ import java.util.Date;
  */
 public class ArbitraryDocument extends FlowDocument {
 
-    private transient File localFile;
-    private byte[] fileBytes;
+    private File localFile;
+    private transient byte[] fileBytes;
 
     public ArbitraryDocument(File localFile, FlowFile parent, Date versionDate) throws IOException {
         super(parent, versionDate);
