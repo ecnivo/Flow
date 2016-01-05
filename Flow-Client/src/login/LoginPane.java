@@ -22,8 +22,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
-import shared.Communicator;
 import message.Data;
+import shared.Communicator;
 
 public class LoginPane extends JPanel {
     private PanelManager panMan;
@@ -114,6 +114,10 @@ public class LoginPane extends JPanel {
 		    System.out.println("sending");
 
 		    Data reply = Communicator.communicate(usernamePass);
+		    if (reply == null) {
+			JOptionPane.showConfirmDialog(null, "The server is currently offline. Please try again at another time.", "Server under maintenance", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
 		    String status = reply.get("status", String.class);
 		    System.out.println("received");
 		    switch (status) {
