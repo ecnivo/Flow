@@ -18,8 +18,7 @@ public class ArbitraryDocument extends FlowDocument {
     public ArbitraryDocument(File localFile, FlowFile parent, Date versionDate) throws IOException {
         super(parent, versionDate);
         this.localFile = localFile;
-        if (localFile != null)
-            fileBytes = Files.readAllBytes(localFile.toPath());
+
     }
 
     public ArbitraryDocument() throws IOException {
@@ -31,8 +30,10 @@ public class ArbitraryDocument extends FlowDocument {
      *
      * @return the contents of this file
      */
-    public byte[] getFileBytes() {
-        return fileBytes;
+    public byte[] getFileBytes() throws IOException {
+        if (localFile != null)
+            fileBytes = Files.readAllBytes(localFile.toPath());
+        return null;
     }
 
     /**

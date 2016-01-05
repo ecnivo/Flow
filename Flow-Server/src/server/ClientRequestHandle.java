@@ -67,9 +67,9 @@ public class ClientRequestHandle implements Runnable {
                     String userCmdType = data.get("user_type", String.class);
                     switch (userCmdType) {
                         case "REGISTER":
-                            if(this.database.addUser(data.get("username", String.class), data.get("password", String.class)))
+                            if (this.database.addUser(data.get("username", String.class), data.get("password", String.class)))
                                 returnData.put("status", "OK");
-                            else{
+                            else {
                                 /*
                                 TODO we need to know if the username was taken or not,
                                 or if the username/password have invalid characters,

@@ -13,8 +13,8 @@ public class FlowProject extends FlowDirectory {
     private UUID projectUUID;
     private String name;
     private User owner;
-    private ArrayList<User> viewers;
-    private ArrayList<User> editors;
+    private transient ArrayList<User> viewers;
+    private transient ArrayList<User> editors;
 
     public FlowProject(String name, User owner, UUID uuid) {
         super(name);
