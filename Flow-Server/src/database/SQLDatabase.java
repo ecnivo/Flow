@@ -424,10 +424,12 @@ public class SQLDatabase {
 	 */
 	public ResultSet getFile(String fileId) throws DatabaseException {
 		try {
-			if (this.query("SELECT * from documents WHERE DocumentID = '"
-					+ fileId + "';").next()) {
-				return this.query("SELECT * FROM documents WHERE DocumentID = '"
-						+ fileId + "';");
+			ResultSet temp;
+			if ((temp = this
+					.query("SELECT * from documents WHERE DocumentID = '"
+							+ fileId + "';")).next()) {
+				temp.previous();
+				return temp;
 			} else {
 				// Throw an exception in this case because the server expects to
 				// use the found file, this prevents a '!=null' check

@@ -8,11 +8,16 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import database.SQLDatabase;
+import struct.FlowDirectory;
+import struct.FlowDocument;
+import struct.FlowFile;
 import struct.FlowProject;
+import struct.TextDocument;
 import struct.User;
 import util.DatabaseException;
 
@@ -72,14 +77,15 @@ public class FlowServer implements Runnable {
 	/**
 	 * Retrieves the FlowProject associated with the specified project UUID.
 	 * 
-	 * @param uuid
+	 * @param projectId
 	 *            the UUID associated with the desired project.
 	 * @return the FlowProject associated with the specified project UUID.
 	 * @throws DatabaseException
 	 *             if there is an error accessing the database.
 	 */
-	protected FlowProject getProject(String uuid) throws DatabaseException {
-		ResultSet temp = this.database.getProjectInfo(uuid);
+	protected FlowProject getProject(String projectId)
+			throws DatabaseException {
+		ResultSet temp = this.database.getProjectInfo(projectId);
 		try {
 			if (!temp.next()) {
 				throw new DatabaseException("PROJECT_NOT_FOUND");
@@ -91,11 +97,65 @@ public class FlowServer implements Runnable {
 		try {
 			return new FlowProject(temp.getString("ProjectName"),
 					new User(temp.getString("OwnerUsername")),
-					UUID.fromString(uuid));
+					UUID.fromString(projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
+	}
+
+	public FlowDocument getFile(String fileId, String projectId)
+			throws DatabaseException {
+		ResultSet fileData = null;
+		try {
+			fileData = this.database.getFile(fileId);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+		ResultSet projectData = null;
+		try {
+			projectData = this.database.getProjectInfo(projectId);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			fileData.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+		try {
+			projectData.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+
+		String parentDirectoryId = null;
+		try {
+			parentDirectoryId = fileData.getString("ParentDirectoryID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		FlowFile file;
+		try {
+			file = new FlowFile(
+					(parentDirectoryId != null
+							? new FlowDirectory(parentDirectoryId)
+							: new FlowProject("",
+									new User(projectData
+											.getString("OwnerUsername")))),
+					fileData.getString("DocumentName"),
+					UUID.fromString(fileId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+
+		// TODO Generate file data from saved file
+		return new TextDocument(file, new Date());
 	}
 
 	protected SQLDatabase getDatabase() {

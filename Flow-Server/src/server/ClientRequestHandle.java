@@ -145,6 +145,11 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("project", this.server
 						.getProject(data.get("project_uuid", String.class)));
 				break;
+			case "request_file":
+				returnData.put("document",
+						this.server.getFile(data.get("file_uuid", String.class),
+								data.get("project_uuid", String.class)));
+				break;
 			case "new_project":
 				returnData.put("status",
 						this.database.newProject(
