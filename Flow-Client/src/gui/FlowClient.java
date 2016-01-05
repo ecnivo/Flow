@@ -18,7 +18,7 @@ public class FlowClient extends JFrame {
 
     public static final boolean NETWORK = true;
 
-    private static final String HOST = "127.0.0.1";
+    private static final String HOST = "localhost";
 
     private static final int PORT = 10244;
 

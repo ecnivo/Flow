@@ -126,13 +126,14 @@ public class LoginPane extends JPanel {
 		    case "INVALID_CREDENTIALS":
 			JOptionPane.showConfirmDialog(null, "Whoops! Your Your credentials are incorrect.\nTry again.", "Invalid credentials", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
-
+		    case "OK":
+			LoginPane.this.panMan.switchToEditor();
+			Communicator.setSessionID(reply.get("session_id", UUID.class));
+			return;
 		    default:
-			break;
+			return;
 		    }
-		    Communicator.setSessionID(reply.get("session_id", UUID.class));
 		}
-		LoginPane.this.panMan.switchToEditor();
 
 	    }
 	});

@@ -22,7 +22,7 @@ public class DataSocket {
         this.os = socket.getOutputStream();
         this.is = socket.getInputStream();
         this.ois = new ObjectInputStream(is);
-        this.oos = new ObjectOutputStream(oos);
+        this.oos = new ObjectOutputStream(os);
     }
 
     /**
@@ -49,6 +49,18 @@ public class DataSocket {
      */
     public <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
         return clazz.cast(ois.readObject());
+    }
+
+    /**
+     * Receives a serializable over the network, auto cast, type infer
+     *
+     * @param <T>   The type of the class of the serializable
+     * @return The serializable from the network
+     * @throws IOException            When something nasty happens
+     * @throws ClassNotFoundException When we don't have a copy of the class from remote
+     */
+    public <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
+        return (T) ois.readObject();
     }
 
 
