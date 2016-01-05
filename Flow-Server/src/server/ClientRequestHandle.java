@@ -141,8 +141,10 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "file_checksum":
 				break;
-			case "":
-
+			case "request_project":
+				returnData.put("project", this.server
+						.getProject(data.get("project_uuid", String.class)));
+				break;
 			case "new_project":
 				returnData.put("status",
 						this.database.newProject(

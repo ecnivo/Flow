@@ -5,11 +5,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import database.SQLDatabase;
+import struct.FlowProject;
+import struct.User;
+import util.DatabaseException;
 
 public class FlowServer implements Runnable {
 
@@ -62,6 +67,26 @@ public class FlowServer implements Runnable {
 		UUID sessionId = UUID.randomUUID();
 		this.database.newSession(username, sessionId.toString());
 		return sessionId;
+	}
+
+	protected FlowProject getProject(String uuid) throws DatabaseException {
+		ResultSet temp = this.database.getProjectInfo(uuid);
+		try {
+			if (!temp.next()) {
+				throw new DatabaseException("PROJECT_NOT_FOUND");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+		try {
+			return new FlowProject(temp.getString("ProjectName"),
+					new User(temp.getString("OwnerUsername")),
+					UUID.fromString(uuid));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
 	}
 
 	protected SQLDatabase getDatabase() {

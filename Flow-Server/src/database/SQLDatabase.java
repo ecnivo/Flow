@@ -619,4 +619,14 @@ public class SQLDatabase {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
+
+	public ResultSet getProjectInfo(String projectId) throws DatabaseException {
+		try {
+			return this.query("SELECT * FROM projects WHERE ProjectID = '"
+					+ projectId + "';");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
 }
