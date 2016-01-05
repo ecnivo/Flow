@@ -181,10 +181,11 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "new_directory":
 				// TODO Implement checking if directory is to be inside another
-				// directoryF
+				// directory
 				this.database.newDirectory(
 						data.get("directory_name", String.class),
-						data.get("project_uuid", UUID.class).toString());
+						data.get("project_uuid", UUID.class).toString(),
+						UUID.randomUUID().toString());
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX

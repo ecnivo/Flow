@@ -213,15 +213,17 @@ public class SQLDatabase {
 	 * @param parentDirectoryId
 	 *            the ID of the directory which to place the directory inside.
 	 */
-	public void newDirectory(String directoryName, String projectId,
-			String parentDirectoryId) {
-		// TODO implement
-		// try {
-		// this.update("INSERT INTO documents(ProjectID, DocumentName) values("
-		// + projectId + ", " + fileName + ")");
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+	public String newDirectory(String directoryName, String directoryId,
+			String projectId, String parentDirectoryId) {
+		try {
+			// TODO Add checks
+			this.update("INSERT INTO directories values('" + directoryId
+					+ "', '" + parentDirectoryId + "', '" + directoryName
+					+ "', '" + projectId + "')");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return "OK";
 	}
 
 	/**
@@ -232,14 +234,18 @@ public class SQLDatabase {
 	 * @param projectId
 	 *            the ID of the project which to place the directory inside.
 	 */
-	public void newDirectory(String directoryName, String projectId) {
-		// TODO implement
-		// try {
-		// this.update("INSERT INTO documents(ProjectID, DocumentName) values("
-		// + projectId + ", " + fileName + ")");
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+	public String newDirectory(String directoryName, String directoryId,
+			String projectId) {
+		try {
+			// TODO Add checks
+			this.update(
+					"INSERT INTO directories(DirectoryID, DirectoryName, ProjectID) values('"
+							+ directoryId + "', '" + directoryName + "', '"
+							+ projectId + "')");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return "OK";
 	}
 
 	/**
