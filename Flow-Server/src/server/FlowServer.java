@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class FlowServer implements Runnable {
 
     private static Logger L = Logger.getLogger("FlowServer");
-
+	public static String ERROR = "INTERNAL_SERVER_ERROR";
     private static final int PORT = 10244;
     private static final int ARC_PORT = 10225;
 
