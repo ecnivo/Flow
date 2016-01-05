@@ -332,16 +332,26 @@ public class SQLDatabase {
 	 *            the id associated with the desired session
 	 * @return the username and serial number associated with the specified
 	 *         session ID
+	 * @throws DatabaseException
+	 *             if the sessionId is invalid ("INVALID_SESSION_ID") or there
+	 *             is an error accessing the database ({@link FlowServer#ERROR}
+	 *             ).
 	 */
-	public ResultSet getSessionInfo(String sessionId) {
+	public ResultSet getSessionInfo(String sessionId) throws DatabaseException {
 		try {
-			return this.query("SELECT * FROM sessions WHERE SessionID = '"
-					+ sessionId + "';");
+			ResultSet temp = this
+					.query("SELECT * FROM sessions WHERE SessionID = '"
+							+ sessionId + "';");
+			if (temp.next()) {
+				temp.previous();
+				return temp;
+			}
+			throw new DatabaseException("INVALID_SESSION_ID");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		throw new DatabaseException(FlowServer.ERROR);
 	}
 
 	/**
@@ -366,8 +376,8 @@ public class SQLDatabase {
 			throws DatabaseException {
 		try {
 			// Checks if a user with the specified username already exsists
-			if (this.query("SELECT username FROM users WHERE username = "
-					+ username + ";").next()) {
+			if (this.query("SELECT username FROM users WHERE Username = '"
+					+ username + "';").next()) {
 				return "USERNAME_TAKEN";
 			}
 		} catch (SQLException e) {
@@ -377,8 +387,8 @@ public class SQLDatabase {
 		}
 
 		try {
-			this.update("INSERT INTO users (username, password) VALUES ("
-					+ username + ", " + password + ");");
+			this.update("INSERT INTO users (username, password) VALUES ('"
+					+ username + "', '" + password + "');");
 		} catch (SQLException e) {
 			System.err.println("Error inserting user into database");
 			e.printStackTrace();
@@ -389,52 +399,32 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Internal method which calls the '{@link Statement#ExecuteQuery} method
-	 * with the specified query.
-	 * 
-	 * @param query
-	 *            the SQL statement to search the database with.
-	 * @return the results returned from the server.
-	 */
-	ResultSet query(String query) throws SQLException {
-		Statement statement = this.connection.createStatement();
-		statement.setQueryTimeout(TIMEOUT);
-		return statement.executeQuery(query);
-	}
-
-	/**
-	 * Internal method which calls the '{@link Statement#ExecuteUpdate} method
-	 * with the specified query.
-	 * 
-	 * @param query
-	 *            the SQL statement to update the database with.
-	 */
-	void update(String query) throws SQLException {
-		Statement statement = this.connection.createStatement();
-		statement.setQueryTimeout(TIMEOUT);
-		statement.executeUpdate(query);
-	}
-
-	/**
 	 * Retrieves all associated data with the specified file.
 	 * 
-	 * @param uuid
-	 *            the UUID of the file.
+	 * @param fileId
+	 *            the UUID of the file to retrieve.
 	 * @return all associated data from the 'documents' SQL table.
 	 * @throws DatabaseException
 	 *             if the file doesn't exists in the database.
 	 */
-	public ResultSet getFile(String uuid) throws DatabaseException {
+	public ResultSet getFile(String fileId) throws DatabaseException {
 		try {
-			// TODO Add check if found
-			return this.query(
-					"SELECT * FROM documents WHERE DocumentID = " + uuid + ";");
+			if (this.query("SELECT * from documents WHERE DocumentID = '"
+					+ fileId + "';").next()) {
+				return this.query("SELECT * FROM documents WHERE DocumentID = '"
+						+ fileId + "';");
+			} else {
+				// Throw an exception in this case because the server expects to
+				// use the found file, this prevents a '!=null' check
+				throw new DatabaseException("DOCUMENT_NAME_INVALID");
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new DatabaseException("DOCUMENT_NAME_INVALID");
-			// return null;
 		}
+		// Throw an exception in this case because the server expects to use
+		// the found file, this prevents a '!=null' check
+		throw new DatabaseException(FlowServer.ERROR);
 	}
 
 	/**
@@ -454,7 +444,7 @@ public class SQLDatabase {
 			throws DatabaseException {
 		// TODO Check if name is valid
 		try {
-			if (!this.query("SELECT * from projects WHERE projectID = '"
+			if (!this.query("SELECT * from projects WHERE ProjectID = '"
 					+ projectId + "';").next()) {
 				return "PROJECT_NAME_INVALID";
 			}
@@ -474,7 +464,7 @@ public class SQLDatabase {
 	 * for <b>all users</b>. <br>
 	 * <br>
 	 * This method should only be called after verifying that the current
-	 * sessions belongs to the user which is the <b>owner</b> of the specified
+	 * session belongs to the user which is the <b>owner</b> of the specified
 	 * project.
 	 * 
 	 * @param projectId
@@ -484,7 +474,7 @@ public class SQLDatabase {
 	 */
 	public String deleteProject(String projectId) throws DatabaseException {
 		try {
-			if (!this.query("SELECT * from projects WHERE projectID = '"
+			if (!this.query("SELECT * from projects WHERE ProjectID = '"
 					+ projectId + "';").next()) {
 				return "PROJECT_DOES_NOT_EXIST";
 			}
@@ -514,9 +504,14 @@ public class SQLDatabase {
 	 * @throws DatabaseException
 	 *             if the username does not exist in the database.
 	 */
-	public void closeAccount(String username) throws DatabaseException {
+	public String closeAccount(String username) throws DatabaseException {
 		try {
-			// TODO Check if project exists is valid
+			if (!this.query(
+					"SELECT * from users WHERE Username = '" + username + "';")
+					.next()) {
+				return "USERNAME_DOES_NOT_EXIST";
+			}
+
 			// TODO Delete all documents using the deleted project IDs
 			this.update(
 					"DELETE FROM users WHERE Username = '" + username + "';");
@@ -526,12 +521,14 @@ public class SQLDatabase {
 					+ "';");
 			this.update(
 					"DELETE FROM access WHERE Username = '" + username + "';");
+
 			// TODO Delete all the actual file data from disk
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
-			// the above checks
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
@@ -546,16 +543,48 @@ public class SQLDatabase {
 	 *             if the username does not exist in the system, or the entered
 	 *             password is invalid
 	 */
-	public void changePassword(String username, String newPassword)
+	public String changePassword(String username, String newPassword)
 			throws DatabaseException {
 		try {
+			if (!this.query(
+					"SELECT * from users WHERE Username = '" + username + "';")
+					.next()) {
+				return "USERNAME_DOES_NOT_EXIST";
+			}
 			this.update("UPDATE users SET Password = '" + newPassword
 					+ "' WHERE Username = '" + username + "';");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			// throw new DatabaseException("USERNAME_DOES_NOT_EXIST"); based on
-			// the above checks
+			return FlowServer.ERROR;
 		}
+		return "OK";
+	}
+
+	/**
+	 * Internal method which calls the '{@link Statement#ExecuteQuery} method
+	 * with the specified query.
+	 * 
+	 * @param query
+	 *            the SQL statement to search the database with.
+	 * @return the results returned from the server.
+	 */
+	ResultSet query(String query) throws SQLException {
+		Statement statement = this.connection.createStatement();
+		statement.setQueryTimeout(TIMEOUT);
+		return statement.executeQuery(query);
+	}
+
+	/**
+	 * Internal method which calls the '{@link Statement#ExecuteUpdate} method
+	 * with the specified query.
+	 * 
+	 * @param query
+	 *            the SQL statement to update the database with.
+	 */
+	void update(String query) throws SQLException {
+		Statement statement = this.connection.createStatement();
+		statement.setQueryTimeout(TIMEOUT);
+		statement.executeUpdate(query);
 	}
 }
