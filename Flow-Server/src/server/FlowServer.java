@@ -27,6 +27,7 @@ public class FlowServer implements Runnable {
 
 	public FlowServer() {
 		this._DocumentUpdateCallbacks = new ArrayList<>();
+		this.database = new SQLDatabase("data/flow-database");
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class FlowServer implements Runnable {
 					++i;
 				} while (threadPool[i] != null);
 
-				System.err.println("Request assigned worker thread " + i);
+				L.info("Request assigned worker thread " + i);
 				Thread t = new Thread(new ClientRequestHandle(this, socket));
 				t.start();
 				threadPool[i] = t;
@@ -68,6 +69,7 @@ public class FlowServer implements Runnable {
 
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
+		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
 		// TEST CODE
