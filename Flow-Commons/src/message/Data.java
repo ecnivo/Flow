@@ -48,7 +48,7 @@ public class Data implements Serializable {
      * @param <T>  The type of the value of the message
      * @return The value of the property of type 'type'
      */
-    public <T> T get(String key, Class<T> type) {
+    public <T extends Serializable> T get(String key, Class<T> type) {
         try {
             return type.cast(stringObjectHashMap.get(key));
         } catch (ClassCastException e) {
@@ -63,7 +63,7 @@ public class Data implements Serializable {
      * @param <T>  The type of the value of the message
      * @return The value of the property of type 'type'
      */
-    public <T> T get(String key){
+    public <T extends Serializable> T get(String key){
         try {
             return (T)stringObjectHashMap.get(key);
         } catch (ClassCastException e) {

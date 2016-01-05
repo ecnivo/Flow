@@ -39,16 +39,14 @@ public class ClientRequestHandle implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.socket.setSoTimeout(100);
 			String username, password;
 			String[][] response;
-			Data data = psocket.receive(Data.class);
+			Data data = psocket.receive();
 			L.info(data.toString());
 			L.info("received data from remote user");
 			Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
-				L.info("request for login message");
 				username = data.get("username", String.class);
 				password = data.get("password", String.class);
 				if (this.server.getDatabase().authenticate(username,
@@ -61,22 +59,18 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "user":
-				L.info("request for user message");
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
 				case "REGISTER":
-					L.info("register user message");
 					this.database.addUser(data.get("username", String.class), data.get("password", String.class));
 					returnData.put("status", "OK");
 					break;
 				case "CLOSE_ACCOUNT":
-					L.info("close account message");
 					this.database
 							.closeAccount(data.get("username", String.class));
 					returnData.put("status", "OK");
 					break;
 				case "CHANGE_PASSWORD":
-					L.info("change password message");
 					this.database.changePassword(
 							data.get("username", String.class),
 							data.get("new_password", String.class));
@@ -85,7 +79,6 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
-				L.info("request for list projects");
 				response = Results.toStringArray(
 						new String[] { "ProjectID", "ProjectName" },
 						this.database.getProjects(
@@ -203,6 +196,7 @@ public class ClientRequestHandle implements Runnable {
 			}
 
 			this.psocket.send(returnData);
+			L.info("response: " + returnData.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
