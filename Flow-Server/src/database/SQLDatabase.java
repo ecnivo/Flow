@@ -145,7 +145,7 @@ public class SQLDatabase {
 	 * @param ownerId
 	 *            ID of the user who creates the project
 	 */
-	public void newProject(String name, String ownerId) {
+	public String newProject(String name, String ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
@@ -153,7 +153,9 @@ public class SQLDatabase {
 					+ name + ", " + ownerId + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
@@ -166,13 +168,16 @@ public class SQLDatabase {
 	 * @param directoryId
 	 *            the ID of the directory which to place the file inside
 	 */
-	public void newFile(String fileName, String projectId, String directoryId) {
+	public String newFile(String fileName, String projectId,
+			String directoryId) {
 		try {
 			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
 					+ projectId + ", " + fileName + ")");
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
@@ -183,13 +188,15 @@ public class SQLDatabase {
 	 * @param projectId
 	 *            the ID of the project which to place the file inside
 	 */
-	public void newFile(String fileName, String projectId) {
+	public String newFile(String fileName, String projectId) {
 		try {
 			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
 					+ projectId + ", " + fileName + ")");
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return FlowServer.ERROR;
 		}
+		return "OK";
 	}
 
 	/**
@@ -259,15 +266,17 @@ public class SQLDatabase {
 	public boolean authenticate(String username, String password) {
 		try {
 			ResultSet pair = this
-					.query("SELECT password FROM users WHERE username = "
-							+ username + ";");
+					.query("SELECT Password FROM users WHERE Username = '"
+							+ username + "';");
 			if (pair.next()) {
 				// TODO Verify
 				return password.equals(pair.getString("password"));
 			}
 		} catch (SQLException e) {
+			// TODO Remove this debuggin message
+			System.err.println("Error authenticating user: " + username
+					+ " with password: " + password);
 			e.printStackTrace();
-			return false;
 		}
 		return false;
 	}
@@ -445,8 +454,8 @@ public class SQLDatabase {
 			throws DatabaseException {
 		// TODO Check if name is valid
 		try {
-			this.update("UPDATE projects SET ProjectName = " + newName
-					+ " WHERE ProjectID = " + uuid + ";");
+			this.update("UPDATE projects SET ProjectName = '" + newName
+					+ "' WHERE ProjectID = '" + uuid + "';");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

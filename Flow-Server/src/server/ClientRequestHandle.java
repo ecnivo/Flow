@@ -145,13 +145,14 @@ public class ClientRequestHandle implements Runnable {
 				// TODO implement this
 				break;
 			case "new_project":
-				this.database
-						.newProject(data.get("project_name", String.class),
+				returnData.put("status",
+						this.database.newProject(
+								data.get("project_name", String.class),
 								Results.toStringArray(
 										new String[] { "OwnerUsername" },
 										this.database.getSessionInfo(
 												data.get("session_id",
-														String.class)))[0][0]);
+														String.class)))[0][0]));
 				break;
 			case "project_modify":
 				String projectId = data.get("project_uuid", String.class);
