@@ -51,21 +51,33 @@ public class ClientRequestHandle implements Runnable {
                 case "login":
                     username = data.get("username", String.class);
                     password = data.get("password", String.class);
-                    if (this.server.getDatabase().authenticate(username,
-                            password)) {
+                    if (this.server.getDatabase().authenticate(username, password)) {
                         UUID sessionID = this.server.newSession(username);
                         returnData.put("status", "OK");
-                        returnData.put("session_id", sessionID);
+                        returnData.put("session_id", sessionID); // TODO store the session id somewhere
                     } else {
-                        returnData.put("status", "INVALID_CREDENTIALS");
+                        /* TODO we need to know whether or not the password
+                        was incorrect or not, or if the username doesn't exist,
+                         but the authenticate method does not let us know that
+                         */
+                        returnData.put("status", "PASSWORD_INCORRECT");
                     }
                     break;
                 case "user":
                     String userCmdType = data.get("user_type", String.class);
                     switch (userCmdType) {
                         case "REGISTER":
-                            this.database.addUser(data.get("username", String.class), data.get("password", String.class));
-                            returnData.put("status", "OK");
+                            if(this.database.addUser(data.get("username", String.class), data.get("password", String.class)))
+                                returnData.put("status", "OK");
+                            else{
+                                /*
+                                TODO we need to know if the username was taken or not,
+                                or if the username/password have invalid characters,
+                                if there was a server error etc. addUser() only returns
+                                false if the username cannot be made, which is not enough detail
+                                 */
+                                returnData.put("status", "USERNAME_TAKEN");
+                            }
                             break;
                         case "CLOSE_ACCOUNT":
                             this.database
@@ -199,7 +211,7 @@ public class ClientRequestHandle implements Runnable {
 
             this.psocket.send(returnData);
             L.info("response: " + returnData.toString());
-        } catch(IOException e){
+        } catch (IOException e) {
             L.warning("communication error: " + e.getMessage());
         } catch (Exception e) {
             L.severe("internal server error: " + Arrays.toString(e.getStackTrace()));
