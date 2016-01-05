@@ -15,6 +15,7 @@ public class DataManagement {
 
     private static DataManagement instance;
     private static Logger L = Logger.getLogger("DataManagement");
+    private File dataFile;
 
     public static DataManagement getInstance() {
         if (instance == null)
@@ -22,48 +23,47 @@ public class DataManagement {
         return instance;
     }
 
-    private ArrayList<User> users;
-    private HashMap<String, User> uDictionary;
-
     private DataManagement() {
-        uDictionary = new HashMap<>();
+
     }
 
-    public void load(File dataFile) {
+    public void init(File dataFile) {
+        this.dataFile = dataFile;
         L.info("loading data files from file");
-        FileSerializer serializer = new FileSerializer();
-        users = serializer.readFromFile(dataFile, ArrayList.class);
-        uDictionary.clear();
-        for (User u : users)
-            uDictionary.put(u.getUsername(), u);
+        if(!dataFile.exists())
+            dataFile.mkdir();
     }
 
-    public void save(File dataFile) {
-        L.info("saving data to file");
-        FileSerializer serializer = new FileSerializer();
-        serializer.writeToFile(dataFile, users);
-    }
-
-    public void newBlank(File dataFile) {
-        L.info("creating blank file");
-        FileSerializer serializer = new FileSerializer();
-        ArrayList<User> u = new ArrayList<>();
-        serializer.writeToFile(dataFile, u);
-    }
-
-    public void addUser(User u) {
+    public boolean addUser(User u) {
         L.info("adding user " + u);
-        users.add(u);
-        uDictionary.put(u.getUsername(), u);
+        File d = new File(dataFile.getAbsolutePath() + File.separator + u.getUsername());
+        if(d.exists())
+            return false;
+        d.mkdir();
+        FileSerializer fs = new FileSerializer();
+        fs.writeToFile(new File(d.getAbsolutePath() + File.separator + "user.flow"), u);
+        return true;
     }
-    public void removeUser(User u){
+
+    public boolean removeUser(String username){
         L.info("removing user");
-        users.remove(u);
-        uDictionary.remove(u.getUsername());
+        for(File f : dataFile.listFiles()){
+            if(f.isDirectory() && f.getName().equals(username)){
+                f.delete();
+                return true;
+            }
+        }
+        return false;
     }
 
     public User getUserByUsername(String username) {
         L.info("getting user " + username + " by username");
-        return uDictionary.get(username);
+        for(File f : dataFile.listFiles()){
+            if(f.isDirectory() && f.getName().equals(username)){
+                FileSerializer fs = new FileSerializer();
+                return fs.readFromFile(new File(f.getAbsolutePath() + File.separator + "user.flow"), User.class);
+            }
+        }
+        return null;
     }
 }
