@@ -205,30 +205,15 @@ public class ClientRequestHandle implements Runnable {
 
 			this.psocket.send(returnData);
 			L.info("response: " + returnData.toString());
-		} catch (
-
-		IOException e)
-
-		{
+		} catch (IOException e) {
 			L.warning("communication error: " + e.getMessage());
-		} catch (
-
-		Exception e)
-
-		{
+		} catch (Exception e) {
 			L.severe("internal server error: "
 					+ Arrays.toString(e.getStackTrace()));
 		}
-
-		try
-
-		{
+		try {
 			socket.close();
-		} catch (
-
-		IOException e)
-
-		{
+		} catch (IOException e) {
 			L.severe("failure to close socket");
 		}
 	}
