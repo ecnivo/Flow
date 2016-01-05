@@ -152,6 +152,9 @@ public class CollabsList extends JPanel {
 
     public void refreshUserList() {
 	FlowProject active = editPane.getTree().getActiveProject();
+	if (active == null){
+	    return;
+	}
 	if (!currProjectUUID.equals(active.getProjectUUID())) {
 	    currProjectUUID = active.getProjectUUID();
 	    userListPanel.removeAll();

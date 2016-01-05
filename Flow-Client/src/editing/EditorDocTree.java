@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import message.Data;
 import shared.Communicator;
@@ -29,22 +30,20 @@ import struct.TextDocument;
 public class EditorDocTree extends DocTree {
 
     private DirectoryNode activeDirectory;
+    private FileNode activeFile;
     private EditPane editPane;
-    private ArrayList<FlowFile> clipboard;
-
-    // private JPopupMenu projectPopup;
-    // private JPopupMenu folderPopup;
-    // private JPopupMenu filePopup;
+    private FlowFile clipboard;
 
     public EditorDocTree(EditPane editPane) {
 	super();
 	this.editPane = editPane;
 
+	JPopupMenu workspacePopup = new JPopupMenu();
 	JPopupMenu projectPopup = new JPopupMenu();
 	JPopupMenu dirPopup = new JPopupMenu();
 	JPopupMenu filePopup = new JPopupMenu();
 
-	// Projects' menu
+	// Workspace menu
 	JMenuItem createProjectButton = new JMenuItem();
 	createProjectButton.setText("New project");
 	createProjectButton.addActionListener(new ActionListener() {
@@ -55,6 +54,9 @@ public class EditorDocTree extends DocTree {
 	    }
 
 	});
+	workspacePopup.add(createProjectButton);
+
+	// Projects' menu
 	projectPopup.add(createProjectButton);
 
 	JMenuItem createFolderOnFolderButton = new JMenuItem();
@@ -123,11 +125,44 @@ public class EditorDocTree extends DocTree {
 	    }
 	});
 	dirPopup.add(pasteOnFolderButton);
+	
+	// Files' menu
+	JMenuItem copyFileButton = new JMenuItem();
+	copyFileButton.setText("Copy");
+	copyFileButton.addActionListener(new ActionListener() {
+	    
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		clipboard = activeFile.getFile();
+	    }
+	});
+	
+	JMenuItem pasteFileButton = new JMenuItem();
+	pasteFileButton.setText("Paste");
+	pasteFileButton.addActionListener(new ActionListener() {
+	    
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		// TODO tell server to add new file in this directory
+		EditorDocTree.this.refreshProjectList();
+	    }
+	});
+	
+	JMenuItem deleteFileButton = new JMenuItem();
+	deleteFileButton.setText("Delete");
+	deleteFileButton.addActionListener(new ActionListener() {
+	    
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		//TODO tell server to delete this  file
+		EditorDocTree.this.refreshProjectList();
+	    }
+	});
 
 	// TODO right click menus: project (new project-new
 	// folder-properties), folders
 	// (new-copy-cut-paste-rename-delete), files
-	// (new-copy-cut-paste-rename-delete-properties)
+	// (copy-cut-paste-rename-delete-properties)
 
 	addMouseListener(new MouseAdapter() {
 	    @Override
@@ -152,11 +187,14 @@ public class EditorDocTree extends DocTree {
 		    FileNode fileNode = (FileNode) selected;
 		    setActiveProject((FlowProject) fileNode.getFile().getParentDirectory().getRootDirectory());
 		    setActiveDirectory((DirectoryNode) ((FileNode) selected).getParent());
+		    setActiveFile(fileNode);
 		    if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 			openFile(fileNode.getFile());
 		    } else if (e.getButton() == MouseEvent.BUTTON3) {
 			filePopup.show(EditorDocTree.this, x, y);
 		    }
+		} else if (selected instanceof DefaultMutableTreeNode && ((DefaultMutableTreeNode) selected).equals("Workspace")) {
+		    workspacePopup.show(EditorDocTree.this, x, y);
 		}
 	    }
 	});
@@ -173,7 +211,7 @@ public class EditorDocTree extends DocTree {
 		// TODO Get the current file checksum, and compare. If it's the
 		// same,
 		// then open this file, if it's not, then skip ahead to the
-		// already-made block. https://goo.gl/vWWtSD
+		// already-made block.
 	    } else {
 		JOptionPane.showConfirmDialog(null, "The project that this file is in cannot be found for some reason.\n" + "Try refreshing the list of projects (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		return;
@@ -210,5 +248,9 @@ public class EditorDocTree extends DocTree {
 
     private void setActiveDirectory(DirectoryNode newActive) {
 	activeDirectory = newActive;
+    }
+    
+    private void setActiveFile(FileNode newActive){
+	activeFile = newActive;
     }
 }
