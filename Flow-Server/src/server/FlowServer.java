@@ -69,6 +69,15 @@ public class FlowServer implements Runnable {
 		return sessionId;
 	}
 
+	/**
+	 * Retrieves the FlowProject associated with the specified project UUID.
+	 * 
+	 * @param uuid
+	 *            the UUID associated with the desired project.
+	 * @return the FlowProject associated with the specified project UUID.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
 	protected FlowProject getProject(String uuid) throws DatabaseException {
 		ResultSet temp = this.database.getProjectInfo(uuid);
 		try {

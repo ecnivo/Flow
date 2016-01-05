@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 import server.FlowServer;
 import util.DatabaseException;
@@ -620,6 +621,15 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Retrieves all associated info with the specified ProjectID.
+	 * 
+	 * @param projectId
+	 *            the {@link UUID#toString toString} of the UUID of the project.
+	 * @return all associated information from the projects table.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
 	public ResultSet getProjectInfo(String projectId) throws DatabaseException {
 		try {
 			return this.query("SELECT * FROM projects WHERE ProjectID = '"
