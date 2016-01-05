@@ -144,7 +144,8 @@ public class FlowServer implements Runnable {
 			file = new FlowFile(
 					(parentDirectoryId != null
 							? new FlowDirectory(parentDirectoryId)
-							: new FlowProject("",
+							: new FlowProject(
+									projectData.getString("ProjectName"),
 									new User(projectData
 											.getString("OwnerUsername")))),
 					fileData.getString("DocumentName"),
