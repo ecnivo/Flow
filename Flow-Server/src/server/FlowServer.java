@@ -27,7 +27,7 @@ public class FlowServer implements Runnable {
 
 	public FlowServer() {
 		this._DocumentUpdateCallbacks = new ArrayList<>();
-		this.database = new SQLDatabase("data/flow-database");
+		this.database = new SQLDatabase("data/FlowDatabse.db");
 	}
 
 	@Override
