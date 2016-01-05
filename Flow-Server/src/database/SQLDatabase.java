@@ -91,7 +91,7 @@ public class SQLDatabase {
 	 */
 	public String updateAccess(int accessLevel, String projectId,
 			String username) {
-		// TODO Password project (ask username / password as parameter)
+		// TODO Implement check for if username exists
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
 				this.update("INSERT INTO access values('" + projectId + "', '"
@@ -598,5 +598,24 @@ public class SQLDatabase {
 		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		statement.executeUpdate(query);
+	}
+
+	/**
+	 * Checks if the specified username exists in the database.
+	 * 
+	 * @param username
+	 *            the user's username (unique)
+	 * @return whether or not the username exists in the database.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public boolean userExists(String username) throws DatabaseException {
+		try {
+			return this.query(
+					"SELECT * FROM users WHERE Username = '" + username + "';")
+					.next();
+		} catch (SQLException e) {
+			throw new DatabaseException(FlowServer.ERROR);
+		}
 	}
 }

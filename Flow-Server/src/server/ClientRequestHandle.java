@@ -51,20 +51,19 @@ public class ClientRequestHandle implements Runnable {
 			case "login":
 				username = data.get("username", String.class);
 				password = data.get("password", String.class);
-				if (this.server.getDatabase().authenticate(username,
-						password)) {
-					// Inform server new session was created (server will save
-					// session to database)
-					UUID sessionID = this.server.newSession(username);
-					returnData.put("status", "OK");
-					returnData.put("session_id", sessionID);
+				if (this.database.userExists(username)) {
+					if (this.server.getDatabase().authenticate(username,
+							password)) {
+						// Inform server new session was created (server will
+						// save session to database)
+						UUID sessionID = this.server.newSession(username);
+						returnData.put("status", "OK");
+						returnData.put("session_id", sessionID);
+					} else {
+						returnData.put("status", "PASSWORD_INCORRECT");
+					}
 				} else {
-					/*
-					 * TODO we need to know whether or not the password was
-					 * incorrect or not, or if the username doesn't exist, but
-					 * the authenticate method does not let us know that
-					 */
-					returnData.put("status", "PASSWORD_INCORRECT");
+					returnData.put("status", "USERNAME_DOES_NOT_EXIST");
 				}
 				break;
 			case "user":
@@ -211,6 +210,7 @@ public class ClientRequestHandle implements Runnable {
 			L.severe("internal server error: "
 					+ Arrays.toString(e.getStackTrace()));
 		}
+
 		try {
 			socket.close();
 		} catch (IOException e) {
