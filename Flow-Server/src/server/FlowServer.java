@@ -13,6 +13,7 @@ import database.SQLDatabase;
 
 public class FlowServer implements Runnable {
 
+	public static final String ERROR = "INTERNAL_SERVER_ERROR";
 	private static Logger L = Logger.getLogger("FlowServer");
 
 	private static final int PORT = 10244;
@@ -38,7 +39,8 @@ public class FlowServer implements Runnable {
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
-				L.info("accepted connection from " + socket.getRemoteSocketAddress());
+				L.info("accepted connection from "
+						+ socket.getRemoteSocketAddress());
 				int i = 0;
 				do {
 					i %= MAX_THREADS;
@@ -69,7 +71,8 @@ public class FlowServer implements Runnable {
 
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
-		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+		System.setProperty("java.util.logging.SimpleFormatter.format",
+				"%4$s: %5$s%n");
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
 		// TEST CODE

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import server.FlowServer;
 import util.DatabaseException;
 
 public class SQLDatabase {
@@ -352,29 +353,30 @@ public class SQLDatabase {
 	 *         </li>
 	 *         </ul>
 	 */
-	public boolean addUser(String username, String password) {
+	public String addUser(String username, String password)
+			throws DatabaseException {
 		try {
 			// Checks if a user with the specified username already exsists
 			if (this.query("SELECT username FROM users WHERE username = "
 					+ username + ";").next()) {
-				return false;
+				return "USERNAME_TAKEN";
 			}
 		} catch (SQLException e) {
 			System.err.println("Error querying database from all users");
 			e.printStackTrace();
-			return false;
+			return FlowServer.ERROR;
 		}
 
 		try {
 			this.update("INSERT INTO users (username, password) VALUES ("
 					+ username + ", " + password + ");");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Error inserting user into database");
 			e.printStackTrace();
-			return false;
+			return FlowServer.ERROR;
 		}
 
-		return true;
+		return "OK";
 	}
 
 	/**
