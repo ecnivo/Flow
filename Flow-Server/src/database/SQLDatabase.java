@@ -615,6 +615,7 @@ public class SQLDatabase {
 					"SELECT * FROM users WHERE Username = '" + username + "';")
 					.next();
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
