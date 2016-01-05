@@ -4,9 +4,6 @@ bin/
 *.iml
 *.eml
 
-# database cmd utility
-sqlite3.exe
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
