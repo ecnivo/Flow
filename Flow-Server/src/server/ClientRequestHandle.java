@@ -3,7 +3,6 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -73,7 +72,8 @@ public class ClientRequestHandle implements Runnable {
 							this.database.addUser(
 									data.get("username", String.class),
 									data.get("password", String.class)));
-                    DataManagement.getInstance().addUser(new User(data.get("username"), data.get("password")));
+					DataManagement.getInstance().addUser(new User(
+							data.get("username"), data.get("password")));
 					/*
 					 * TODO we need to know if the username/password have
 					 * invalid characters
@@ -83,8 +83,9 @@ public class ClientRequestHandle implements Runnable {
 				case "CLOSE_ACCOUNT":
 					this.database
 							.closeAccount(data.get("username", String.class));
-					DataManagement.getInstance().removeUser(DataManagement.getInstance().getUserByUsername(data.get("username")));
-                    returnData.put("status", "OK");
+					DataManagement.getInstance()
+							.removeUser(data.get("username"));
+					returnData.put("status", "OK");
 
 					break;
 				case "CHANGE_PASSWORD":
@@ -139,8 +140,9 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "file_checksum":
-				// TODO implement this <--NETDEX
 				break;
+			case "":
+
 			case "new_project":
 				returnData.put("status",
 						this.database.newProject(
@@ -209,7 +211,7 @@ public class ClientRequestHandle implements Runnable {
 			L.warning("communication error: " + e.getMessage());
 		} catch (Exception e) {
 			L.severe("internal server error: ");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		try {

@@ -1,6 +1,5 @@
 package server;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,17 +30,8 @@ public class FlowServer implements Runnable {
 		this.database = new SQLDatabase("data/FlowDatabse.db");
 	}
 
-	public void load() {
-		File data = new File("data.flow");
-		if (!data.exists())
-			DataManagement.getInstance().newBlank(data);
-		else
-			DataManagement.getInstance().load(data);
-	}
-
 	@Override
 	public void run() {
-		this.load();
 		try {
 			L.info("started listening");
 			ServerSocket serverSocket = new ServerSocket(PORT);
