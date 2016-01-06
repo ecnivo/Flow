@@ -141,6 +141,7 @@ public class FlowServer implements Runnable {
 		}
 		FlowFile file;
 		try {
+			//TODO implement deserialization of current flow file
 			file = new FlowFile(
 					(parentDirectoryId != null
 							? new FlowDirectory(parentDirectoryId)
