@@ -38,15 +38,18 @@ public class EditArea extends JTextPane {
     private Style keywordStyle;
     private Style plainStyle;
     private Style stringStyle;
+    private Style commentsStyle;
 
     private ArrayList<StyleToken> keywordBlocks;
     private ArrayList<StyleToken> plainBlocks;
-    private ArrayList<StyleToken> strings;
+    private ArrayList<StyleToken> stringBlocks;
+    private ArrayList<StyleToken> commentBlocks;
 
     public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
     public static final Color PLAIN_COLOUR = Color.BLACK;
     public static final Color KEYWORD_COLOUR = new Color(0x9213D1);
-    public static final Color STRING_COLOUR = new Color(0xD13313);
+    public static final Color STRING_COLOUR = new Color(0xA30BCF);
+    public static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "try", "void", "volatile", "while" };
 
@@ -80,6 +83,10 @@ public class EditArea extends JTextPane {
 	stringStyle = addStyle("strings", null);
 	StyleConstants.setBold(stringStyle, false);
 	StyleConstants.setForeground(stringStyle, STRING_COLOUR);
+
+	commentsStyle = addStyle("comments", null);
+	StyleConstants.setBold(commentsStyle, false);
+	StyleConstants.setForeground(commentsStyle, COMMENTS_COLOUR);
 
 	addKeyListener(new KeyListener() {
 
@@ -228,7 +235,7 @@ public class EditArea extends JTextPane {
     private void highlightSyntax() {
 	keywordBlocks = new ArrayList<StyleToken>();
 	plainBlocks = new ArrayList<StyleToken>();
-	strings = new ArrayList<StyleToken>();
+	stringBlocks = new ArrayList<StyleToken>();
 
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();
@@ -278,7 +285,7 @@ public class EditArea extends JTextPane {
 			closeQuote = sourceCode.indexOf('"', closeQuote + 1);
 		    }
 		    if (closeQuote > -1) {
-			strings.add(new StyleToken(closeQuote - pos, pos - line));
+			stringBlocks.add(new StyleToken(closeQuote - pos, pos - line));
 			pos = closeQuote;
 		    }
 		}
@@ -295,7 +302,7 @@ public class EditArea extends JTextPane {
 			closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
 		    }
 		    if (closeQuote > -1) {
-			strings.add(new StyleToken(closeQuote - pos, pos - line));
+			stringBlocks.add(new StyleToken(closeQuote - pos, pos - line));
 			pos = closeQuote;
 		    }
 		}
@@ -303,6 +310,20 @@ public class EditArea extends JTextPane {
 
 	    if (sourceCode.charAt(pos) == '\n') {
 		line++;
+	    }
+	}
+
+	for (int pos = 0; pos < sourceLength; pos++) {
+	    if (sourceCode.substring(pos, pos + 1).equals("////")) {
+		int nextLine = sourceCode.indexOf('\n', pos);
+		StyleToken commentToken = new StyleToken((nextLine - pos), pos);
+		commentBlocks.add(commentToken);
+		pos = nextLine;
+	    } else if (sourceCode.substring(pos, pos + 1).equals("//*")) {
+		int end = sourceCode.indexOf("*//", pos);
+		StyleToken commentToken = new StyleToken((end - pos), pos);
+		commentBlocks.add(commentToken);
+		pos = end;
 	    }
 	}
 
@@ -316,10 +337,13 @@ public class EditArea extends JTextPane {
 	    // SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken
 	    // .getPos(), styleToken.getLength()));
 	}
-	for (StyleToken styleToken : strings) {
+	for (StyleToken styleToken : stringBlocks) {
 	    doc.setCharacterAttributes(styleToken.getPos(), styleToken.getLength() + 1, stringStyle, false);
 	    // SwingUtilities.invokeLater(new FormatStringsLater(styleToken
 	    // .getPos(), styleToken.getLength() + 1));
+	}
+	for (StyleToken token : commentBlocks) {
+	    doc.setCharacterAttributes(token.getPos(), token.getLength() + 1, stringStyle, false);
 	}
     }
 

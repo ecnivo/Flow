@@ -1,5 +1,6 @@
 package server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +13,6 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import database.SQLDatabase;
 import struct.FlowDirectory;
 import struct.FlowDocument;
 import struct.FlowFile;
@@ -20,6 +20,7 @@ import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
 import util.DatabaseException;
+import database.SQLDatabase;
 
 public class FlowServer implements Runnable {
 
@@ -42,14 +43,14 @@ public class FlowServer implements Runnable {
 
 	@Override
 	public void run() {
+		DataManagement.getInstance().init(new File("data"));
 		try {
 			L.info("started listening");
 			ServerSocket serverSocket = new ServerSocket(PORT);
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
-				L.info("accepted connection from "
-						+ socket.getRemoteSocketAddress());
+				L.info("accepted connection from " + socket.getRemoteSocketAddress());
 				int i = 0;
 				do {
 					i %= MAX_THREADS;
@@ -63,6 +64,7 @@ public class FlowServer implements Runnable {
 				t.start();
 				threadPool[i] = t;
 			}
+			serverSocket.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,14 +79,11 @@ public class FlowServer implements Runnable {
 	/**
 	 * Retrieves the FlowProject associated with the specified project UUID.
 	 * 
-	 * @param projectId
-	 *            the UUID associated with the desired project.
+	 * @param projectId the UUID associated with the desired project.
 	 * @return the FlowProject associated with the specified project UUID.
-	 * @throws DatabaseException
-	 *             if there is an error accessing the database.
+	 * @throws DatabaseException if there is an error accessing the database.
 	 */
-	protected FlowProject getProject(String projectId)
-			throws DatabaseException {
+	protected FlowProject getProject(String projectId) throws DatabaseException {
 		ResultSet temp = this.database.getProjectInfo(projectId);
 		try {
 			if (!temp.next()) {
@@ -95,17 +94,15 @@ public class FlowServer implements Runnable {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 		try {
-			return new FlowProject(temp.getString("ProjectName"),
-					new User(temp.getString("OwnerUsername")),
-					UUID.fromString(projectId));
+			return new FlowProject(temp.getString("ProjectName"), new User(
+					temp.getString("OwnerUsername")), UUID.fromString(projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 
-	public FlowDocument getFile(String fileId, String projectId)
-			throws DatabaseException {
+	public FlowDocument getFile(String fileId, String projectId) throws DatabaseException {
 		ResultSet fileData = null;
 		try {
 			fileData = this.database.getFile(fileId);
@@ -164,10 +161,9 @@ public class FlowServer implements Runnable {
 		return this.database;
 	}
 
-	public static void main(String[] args) throws IOException,
-			KeyManagementException, NoSuchAlgorithmException {
-		System.setProperty("java.util.logging.SimpleFormatter.format",
-				"%4$s: %5$s%n");
+	public static void main(String[] args) throws IOException, KeyManagementException,
+			NoSuchAlgorithmException {
+		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
 		// TEST CODE
