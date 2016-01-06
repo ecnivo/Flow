@@ -138,10 +138,16 @@ public class FlowServer implements Runnable {
 		}
 		FlowFile file;
 		try {
-			file = new FlowFile((parentDirectoryId != null ? new FlowDirectory(parentDirectoryId)
-					: new FlowProject(projectData.getString("ProjectName"), new User(
-							projectData.getString("OwnerUsername")))),
-					fileData.getString("DocumentName"), UUID.fromString(fileId));
+			//TODO implement deserialization of current flow file
+			file = new FlowFile(
+					(parentDirectoryId != null
+							? new FlowDirectory(parentDirectoryId)
+							: new FlowProject(
+									projectData.getString("ProjectName"),
+									new User(projectData
+											.getString("OwnerUsername")))),
+					fileData.getString("DocumentName"),
+					UUID.fromString(fileId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
