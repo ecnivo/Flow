@@ -37,8 +37,7 @@ public abstract class DocTree extends JTree {
 	scrollView = new JScrollPane(this);
 	model = new DefaultTreeModel(new DefaultMutableTreeNode("Workspace"));
 	setModel(model);
-	getSelectionModel().setSelectionMode(
-		TreeSelectionModel.SINGLE_TREE_SELECTION);
+	getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 	addMouseListener(new MouseAdapter() {
 	    @Override
@@ -46,7 +45,7 @@ public abstract class DocTree extends JTree {
 		refreshProjectList();
 	    }
 	});
-//	refreshProjectList();
+	// refreshProjectList();
     }
 
     public JScrollPane getScrollable() {
@@ -69,15 +68,12 @@ public abstract class DocTree extends JTree {
 	    System.out.println(reply);
 	    usersProjectsUUIDs = reply.get("projects", UUID[].class);
 
-	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model
-		    .getRoot();
+	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 	    // Adds a new project
 	    for (UUID uuid : usersProjectsUUIDs) {
 		boolean projectExistsLocally = false;
-		for (int i = root.getChildCount() - 1; !projectExistsLocally
-			&& i >= 0; i--) {
-		    if (((ProjectNode) root.getChildAt(i)).getProject()
-			    .getProjectUUID().equals(uuid)) {
+		for (int i = root.getChildCount() - 1; !projectExistsLocally && i >= 0; i--) {
+		    if (((ProjectNode) root.getChildAt(i)).getProject().getProjectUUID().equals(uuid)) {
 			projectExistsLocally = true;
 		    }
 		}
@@ -89,10 +85,8 @@ public abstract class DocTree extends JTree {
 	    // Deletes projects that don't exist
 	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
 		boolean projectStillExists = false;
-		for (int j = 0; j < usersProjectsUUIDs.length
-			&& !projectStillExists; j++) {
-		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root
-			    .getChildAt(i)).getProject().getProjectUUID())) {
+		for (int j = 0; j < usersProjectsUUIDs.length && !projectStillExists; j++) {
+		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root.getChildAt(i)).getProject().getProjectUUID())) {
 			projectStillExists = true;
 		    }
 		}
@@ -108,8 +102,7 @@ public abstract class DocTree extends JTree {
 	    Data fileListRequest = new Data("request_project");
 	    fileListRequest.put("project_uuid", projectUUID);
 	    fileListRequest.put("session_id", Communicator.getSessionID());
-	    FlowProject project = Communicator.communicate(fileListRequest)
-		    .get("project", FlowProject.class);
+	    FlowProject project = Communicator.communicate(fileListRequest).get("project", FlowProject.class);
 
 	    ProjectNode newProjectNode = new ProjectNode(project);
 	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
@@ -145,6 +138,10 @@ public abstract class DocTree extends JTree {
 	public FlowProject getProject() {
 	    return project;
 	}
+
+	public String toString() {
+	    return project.toString();
+	}
     }
 
     public class DirectoryNode extends DefaultMutableTreeNode {
@@ -158,6 +155,10 @@ public abstract class DocTree extends JTree {
 	public FlowDirectory getDirectory() {
 	    return folder;
 	}
+
+	public String toString() {
+	    return folder.toString();
+	}
     }
 
     public class FileNode extends DefaultMutableTreeNode {
@@ -169,6 +170,10 @@ public abstract class DocTree extends JTree {
 
 	public FlowFile getFile() {
 	    return file;
+	}
+
+	public String toString() {
+	    return file.toString();
 	}
     }
 }

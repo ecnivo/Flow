@@ -28,7 +28,7 @@ import shared.Communicator;
 public class LoginPane extends JPanel {
     private PanelManager panMan;
 
-    // https://i.imgur.com/19iZW9K.png
+    // Pan Man! https://i.imgur.com/19iZW9K.png
 
     public LoginPane(PanelManager panMan) {
 	setBackground(Color.WHITE);
@@ -106,6 +106,10 @@ public class LoginPane extends JPanel {
 		    if (usernameEntry.getText().length() >= 16) {
 			JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
+		    } else if (usernameEntry.getText().equals("Username")) {
+			JOptionPane.showConfirmDialog(null, "Please enter a username.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
+
 		    }
 
 		    Data usernamePass = new Data("login");
