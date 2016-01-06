@@ -115,8 +115,8 @@ public class DataManagement {
         return true;
     }
 
-    public boolean removeTextFileFromProject(String username, UUID projectUUID, TextDocument textDocumentUUID) {
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator + projectUUID.toString() + File.separator + textDocumentUUID.getParentFile().getParentDirectory().getFullyQualifiedPath() + File.separator + textDocumentUUID.getUUID().toString());
+    public boolean removeTextFileFromProject(String username, UUID projectUUID, TextDocument textDocument) {
+        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator + projectUUID.toString() + File.separator + textDocument.getParentFile().getParentDirectory().getFullyQualifiedPath() + File.separator + textDocument.getUUID().toString());
         if (!f.exists())
             return false;
         f.delete();
