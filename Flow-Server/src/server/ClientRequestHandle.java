@@ -49,19 +49,24 @@ public class ClientRequestHandle implements Runnable {
 			case "login":
 				username = data.get("username", String.class);
 				password = data.get("password", String.class);
-				if (this.database.userExists(username)) {
-					if (this.server.getDatabase().authenticate(username,
-							password)) {
-						// Inform server new session was created (server will
-						// save session to database)
-						UUID sessionID = this.server.newSession(username);
-						returnData.put("status", "OK");
-						returnData.put("session_id", sessionID);
+				try {
+					if (this.database.userExists(username)) {
+						if (this.server.getDatabase().authenticate(username,
+								password)) {
+							// Inform server new session was created (server
+							// will
+							// save session to database)
+							UUID sessionID = this.server.newSession(username);
+							returnData.put("status", "OK");
+							returnData.put("session_id", sessionID);
+						} else {
+							returnData.put("status", "PASSWORD_INCORRECT");
+						}
 					} else {
-						returnData.put("status", "PASSWORD_INCORRECT");
+						returnData.put("status", "USERNAME_DOES_NOT_EXIST");
 					}
-				} else {
-					returnData.put("status", "USERNAME_DOES_NOT_EXIST");
+				} catch (DatabaseException e) {
+					e.printStackTrace();
 				}
 				break;
 			case "user":
@@ -78,15 +83,14 @@ public class ClientRequestHandle implements Runnable {
 					 * TODO we need to know if the username/password have
 					 * invalid characters
 					 */
-
 					break;
 				case "CLOSE_ACCOUNT":
 					this.database
 							.closeAccount(data.get("username", String.class));
-					DataManagement.getInstance()
-							.removeUser(data.get("username"));
-					returnData.put("status", "OK");
-
+					returnData.put("status",
+							DataManagement.getInstance()
+									.removeUser(data.get("username")) ? "OK"
+											: FlowServer.ERROR);
 					break;
 				case "CHANGE_PASSWORD":
 					this.database.changePassword(
@@ -216,9 +220,11 @@ public class ClientRequestHandle implements Runnable {
 			L.info("response: " + returnData.toString());
 		} catch (IOException e) {
 			L.warning("communication error: " + e.getMessage());
+		} catch (ClassNotFoundException e) {
+			L.warning("ClassnotFoundException error: " + e.getMessage());
 		} catch (Exception e) {
-			L.severe("internal server error: ");
-			e.printStackTrace();
+			// TODO REMOVE THIS and catch individual exceptions
+			L.severe("Intenral Server Error: " + e.getMessage());
 		}
 
 		try {
