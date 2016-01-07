@@ -1,12 +1,14 @@
 package editing;
 
 import gui.FlowClient;
+import gui.PanelManager;
 
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import message.Data;
 import shared.Communicator;
@@ -34,53 +37,27 @@ public class EditorDocTree extends DocTree {
     private EditPane editPane;
     private FlowFile clipboard;
 
+    JPopupMenu workspacePopup;
+    JPopupMenu projectPopup;
+    JPopupMenu dirPopup;
+    JPopupMenu filePopup;
+
     public EditorDocTree(EditPane editPane) {
 	super();
 	this.editPane = editPane;
 
-	JPopupMenu workspacePopup = new JPopupMenu();
-	JPopupMenu projectPopup = new JPopupMenu();
-	JPopupMenu dirPopup = new JPopupMenu();
-	JPopupMenu filePopup = new JPopupMenu();
+	workspacePopup = new JPopupMenu();
+	projectPopup = new JPopupMenu();
+	dirPopup = new JPopupMenu();
+	filePopup = new JPopupMenu();
 
 	// Workspace menu
-	JMenuItem createProjectButton = new JMenuItem();
-	createProjectButton.setText("New project");
-	createProjectButton.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		editPane.getEditToolbar().createProjectButtonDoClick();
-		EditorDocTree.this.refreshProjectList();
-	    }
-
-	});
-	workspacePopup.add(createProjectButton);
+	workspacePopup.add(new CreateProjectButton());
 
 	// Projects' menu
-	projectPopup.add(createProjectButton);
+	projectPopup.add(new CreateProjectButton());
 
-	JMenuItem createFolderOnFolderButton = new JMenuItem();
-	createFolderOnFolderButton.setText("New folder");
-	createFolderOnFolderButton.addActionListener(new ActionListener() {
-
-	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
-		// TODO ask server to add a new directory here
-		EditorDocTree.this.refreshProjectList();
-	    }
-	});
-	projectPopup.add(createFolderOnFolderButton);
-
-	JMenuItem createFileOnFolderButton = new JMenuItem();
-	createFileOnFolderButton.setText("New file");
-	createFileOnFolderButton.addActionListener(new ActionListener() {
-
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		// TODO ask server to add a document here
-		EditorDocTree.this.refreshProjectList();
-	    }
-	});
+	projectPopup.add(new CreateFolderOnFolderButton());
 
 	JMenuItem renameProjectButton = new JMenuItem();
 	renameProjectButton.setText("Rename project");
@@ -94,13 +71,17 @@ public class EditorDocTree extends DocTree {
 	});
 	projectPopup.add(renameProjectButton);
 
+	projectPopup.add(new CreateFileOnFolderButton());
+
+	projectPopup.add(new PasteOnFolderButton());
+
 	JMenuItem deleteProjectLabel = new JMenuItem();
 	deleteProjectLabel.setText("Deleting a project should be done through\nthe button in the editor toolbar");
 
 	// Folders' menu
-	dirPopup.add(createFolderOnFolderButton);
+	dirPopup.add(new CreateFolderOnFolderButton());
 
-	dirPopup.add(createFileOnFolderButton);
+	dirPopup.add(new CreateFileOnFolderButton());
 
 	JMenuItem deleteFolderButton = new JMenuItem();
 	deleteFolderButton.setText("Delete");
@@ -114,60 +95,70 @@ public class EditorDocTree extends DocTree {
 	});
 	dirPopup.add(deleteFolderButton);
 
-	JMenuItem pasteOnFolderButton = new JMenuItem();
-	pasteOnFolderButton.setText("Paste");
-	pasteOnFolderButton.addActionListener(new ActionListener() {
+	dirPopup.add(new PasteOnFolderButton());
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		// TODO authorize with server to put these files here
-		EditorDocTree.this.refreshProjectList();
-	    }
-	});
-	dirPopup.add(pasteOnFolderButton);
-	
 	// Files' menu
 	JMenuItem copyFileButton = new JMenuItem();
 	copyFileButton.setText("Copy");
 	copyFileButton.addActionListener(new ActionListener() {
-	    
+
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		clipboard = activeFile.getFile();
 	    }
 	});
-	
+
 	JMenuItem pasteFileButton = new JMenuItem();
 	pasteFileButton.setText("Paste");
 	pasteFileButton.addActionListener(new ActionListener() {
-	    
+
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		// TODO tell server to add new file in this directory
 		EditorDocTree.this.refreshProjectList();
 	    }
 	});
-	
+
 	JMenuItem deleteFileButton = new JMenuItem();
 	deleteFileButton.setText("Delete");
 	deleteFileButton.addActionListener(new ActionListener() {
-	    
+
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		//TODO tell server to delete this  file
+		// TODO tell server to delete this file
 		EditorDocTree.this.refreshProjectList();
 	    }
 	});
 
-	// TODO right click menus: project (new project-new
-	// folder-properties), folders
-	// (new-copy-cut-paste-rename-delete), files
-	// (copy-cut-paste-rename-delete-properties)
+	addMouseListener(new MouseListener() {
 
-	addMouseListener(new MouseAdapter() {
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
-		Object selected = getPathForRow(getRowForLocation(e.getX(), e.getY())).getLastPathComponent();
+		// nothing
+	    }
+
+	    @Override
+	    public void mousePressed(MouseEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseExited(MouseEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseEntered(MouseEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void mouseReleased(MouseEvent e) {
+		TreePath treePath = getPathForRow(getRowForLocation(e.getX(), e.getY()));
+		if (treePath == null) {
+		    return;
+		}
+		Object selected = treePath.getLastPathComponent();
 		int x = e.getX();
 		int y = e.getY();
 
@@ -193,7 +184,8 @@ public class EditorDocTree extends DocTree {
 		    } else if (e.getButton() == MouseEvent.BUTTON3) {
 			filePopup.show(EditorDocTree.this, x, y);
 		    }
-		} else if (selected instanceof DefaultMutableTreeNode && ((DefaultMutableTreeNode) selected).equals("Workspace")) {
+		} else if (selected instanceof DefaultMutableTreeNode && e.getButton() == MouseEvent.BUTTON3) {
+		    System.out.println("showing" + workspacePopup);
 		    workspacePopup.show(EditorDocTree.this, x, y);
 		}
 	    }
@@ -246,11 +238,70 @@ public class EditorDocTree extends DocTree {
 	}
     }
 
+    private class CreateProjectButton extends JMenuItem {
+	private CreateProjectButton() {
+	    super("New project");
+	    addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    editPane.getEditToolbar().createProjectButtonDoClick();
+		    EditorDocTree.this.refreshProjectList();
+		}
+	    });
+	}
+
+    }
+
+    private class CreateFolderOnFolderButton extends JMenuItem {
+	private CreateFolderOnFolderButton() {
+	    super("New folder");
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+		    // TODO add a joptionpane to ask for name
+		    // TODO ask server to add a new directory here
+		    EditorDocTree.this.refreshProjectList();
+		}
+	    });
+
+	}
+    }
+
+    private class CreateFileOnFolderButton extends JMenuItem {
+	private CreateFileOnFolderButton() {
+	    super("New file");
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+		    // TODO ask server to add a document here
+		    EditorDocTree.this.refreshProjectList();
+		}
+	    });
+
+	}
+    }
+
+    private class PasteOnFolderButton extends JMenuItem {
+	private PasteOnFolderButton() {
+	    super("Paste");
+	    addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    // TODO authorize with server to put these files here
+		    EditorDocTree.this.refreshProjectList();
+		}
+	    });
+	}
+    }
+
     private void setActiveDirectory(DirectoryNode newActive) {
 	activeDirectory = newActive;
     }
-    
-    private void setActiveFile(FileNode newActive){
+
+    private void setActiveFile(FileNode newActive) {
 	activeFile = newActive;
     }
 }
