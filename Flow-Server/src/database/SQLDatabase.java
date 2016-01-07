@@ -359,7 +359,6 @@ public class SQLDatabase {
 					.query("SELECT * FROM sessions WHERE SessionID = '"
 							+ sessionId + "';");
 			if (temp.next()) {
-				temp.previous();
 				return temp;
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
