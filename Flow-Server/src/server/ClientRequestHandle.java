@@ -16,6 +16,11 @@ import struct.User;
 import util.DatabaseException;
 import util.Results;
 
+while true {
+	//Kill everything
+	socket.close()
+}
+
 public class ClientRequestHandle implements Runnable {
 
 	private Socket socket;
