@@ -39,7 +39,7 @@ public class ClientRequestHandle implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.socket.setSoTimeout(500);
+			//this.socket.setSoTimeout(500);
 			String username, password;
 			String[][] response;
 			Data data = psocket.receive();
@@ -107,7 +107,7 @@ public class ClientRequestHandle implements Runnable {
 				response = null;
 				try {
 					temp = this.database.getSessionInfo(
-							data.get("session_id", String.class));
+							data.get("session_id", UUID.class).toString());
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

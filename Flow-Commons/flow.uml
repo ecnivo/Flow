@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="1211.1837469165332" y="595.0">editing.EditorToolbar.ExportButton</node>
+    <node x="1809.3504135832" y="95.0">struct.TextDocument</node>
+    <node x="657.9166666666667" y="1350.0">util.Results</node>
+    <node x="560.75" y="990.0">debug.DebugToolbar.StepOutButton</node>
+    <node x="3734.6420802498665" y="595.0">shared.EditArea.StyleToken</node>
+    <node x="2396.808746916533" y="1270.0">debug.DebugPane</node>
+    <node x="4013.1420802498665" y="720.0">shared.EditTabs.CustomTabHeader</node>
+    <node x="3268.7433551873214" y="595.0">server.ClientRequestHandle</node>
+    <node x="2658.351274937455" y="95.0">struct.FlowFile</node>
+    <node x="2143.183746916533" y="305.0">shared.DocTree.DirectoryNode</node>
+    <node x="755.4997455470741" y="595.0">shared.RunStopBar.StopButton</node>
+    <node x="2455.058746916533" y="595.0">history.VersionViewer</node>
+    <node x="3336.3920802498665" y="440.0">server.FlowServer</node>
+    <node x="376.5587469165332" y="1175.0">debug.DebugToolbar</node>
+    <node x="989.8295802498667" y="990.0">shared.NavBar.DebugButton</node>
+    <node x="96.91666666666667" y="1350.0">util.DiffMatchPatch.LinesToCharsResult</node>
+    <node x="2190.433746916533" y="595.0">shared.DocTree</node>
+    <node x="1654.0137904398398" y="595.0">editing.CollabsList.UserInfo</node>
+    <node x="2762.058746916533" y="720.0">settings.SettingsTabs</node>
+    <node x="1416.5379135832" y="845.0">editing.EditPane</node>
+    <node x="2607.058746916533" y="595.0">network.FMLNetworker</node>
+    <node x="2008.1837469165332" y="305.0">struct.FlowProject</node>
+    <node x="2057.933746916533" y="440.0">shared.DocTree.FileNode</node>
+    <node x="3987.6420802498665" y="95.0">struct.ArbitraryDocument</node>
+    <node x="2080.955357142857" y="720.0">editing.EditorDocTree</node>
+    <node x="1701.6837469165332" y="440.0">editing.CollabsList.UserInfo.PermissionRadioButtonListener</node>
+    <node x="508.91666666666674" y="1350.0">util.Checksum</node>
+    <node x="0.6666666666666714" y="1350.0">util.DiffMatchPatch.Patch</node>
+    <node x="1575.0796647111306" y="720.0">editing.CollabsList</node>
+    <node x="4022.6420802498665" y="595.0">shared.EditTabs.CustomTabHeader.CloseTabButton</node>
+    <node x="3567.3920802498665" y="200.0">util.DatabaseException</node>
+    <node x="2965.9338313777976" y="720.0">gui.BackButton</node>
+    <node x="2794.058746916533" y="595.0">settings.SettingsTabs.SettingsTab</node>
+    <node x="2266.337004725554" y="990.0">shared.NavBar.HistoryButton</node>
+    <node x="3163.5588313777976" y="845.0">login.LoginPane</node>
+    <node x="3665.2131952017444" y="720.0">shared.EditArea</node>
+    <node x="3019.6536713922205" y="200.0">struct.FlowDirectory</node>
+    <node x="2176.933746916533" y="440.0">shared.DocTree.ProjectNode</node>
+    <node x="2792.558746916533" y="990.0">shared.NavBar.SettingsButton</node>
+    <node x="2259.767857142857" y="720.0">history.VersionDocTree</node>
+    <node x="62.79629629629628" y="1435.0">util.DiffMatchPatch</node>
+    <node x="2361.962004725554" y="845.0">history.HistoryPane</node>
+    <node x="1136.8295802498667" y="990.0">shared.NavBar.EditButton</node>
+    <node x="28.81018518518519" y="1520.0">util.DiffMatchPatch.Operation</node>
+    <node x="0.0" y="720.0">shared.GenericConsole</node>
+    <node x="3728.3920802498665" y="440.0">database.SQLiteTest</node>
+    <node x="1827.3504135832" y="200.0">compiler.Compiler</node>
+    <node x="45.75" y="990.0">debug.DebugToolbar.StartDebuggingButton</node>
+    <node x="3098.9338313777976" y="720.0">login.UsernameBox</node>
+    <node x="1326.6837469165332" y="440.0">shared.FlowPermission</node>
+    <node x="2865.351274937455" y="0.0">struct.FlowDocument</node>
+    <node x="3874.9036713922205" y="845.0">shared.EditTabs</node>
+    <node x="2947.558746916533" y="990.0">gui.PanelManager</node>
+    <node x="2606.058746916533" y="720.0">shared.Communicator</node>
+    <node x="1065.1837469165332" y="595.0">editing.EditorToolbar.SearchButton</node>
+    <node x="1128.299504725554" y="720.0">editing.EditorToolbar</node>
+    <node x="3509.6420802498665" y="440.0">network.DataSocket</node>
+    <node x="3069.9036713922205" y="305.0">struct.FlowDirectory.InvalidFileNameException</node>
+    <node x="628.4997455470741" y="595.0">shared.RunStopBar.RunButton</node>
+    <node x="918.1837469165332" y="595.0">editing.EditorToolbar.ImportButton</node>
+    <node x="2692.226274937455" y="440.0">message.Data</node>
+    <node x="1824.3504135832" y="305.0">compiler.Debugger</node>
+    <node x="3987.6420802498665" y="440.0">shared.EditTabs.CustomTabHeader.CloseTabButton.CloseButtonMouseListener</node>
+    <node x="323.9166666666667" y="1350.0">util.FileSerializer</node>
+    <node x="1025.3504135832" y="845.0">editing.EditorToolbar.ProjectManageButton</node>
+    <node x="3864.6420802498665" y="595.0">editing.UserCaret</node>
+    <node x="416.75" y="990.0">debug.DebugToolbar.StepInButton</node>
+    <node x="3002.1536713922205" y="95.0">struct.FlowDirectory.DuplicateFileNameException</node>
+    <node x="2357.683746916533" y="440.0">history.VersionViewer.VersionItem</node>
+    <node x="2411.308746916533" y="1175.0">shared.NavBar</node>
+    <node x="3259.6536713922205" y="95.0">server.DocumentUpdateCallback</node>
+    <node x="1486.6837469165332" y="440.0">editing.CollabsList.UserInfo.ButtonHighlightListener</node>
+    <node x="3475.6420802498665" y="595.0">network.FlowDocumentChangeListener</node>
+    <node x="3068.483746916533" y="1175.0">gui.FlowClient</node>
+    <node x="305.9166666666667" y="1435.0">server.DataManagement</node>
+    <node x="253.75" y="990.0">debug.DebugToolbar.StepOverButton</node>
+    <node x="678.25" y="720.0">shared.RunStopBar</node>
+    <node x="2927.483746916533" y="1175.0">debug.VariablesList</node>
+    <node x="2933.267164711131" y="845.0">login.CreateAccountPane</node>
+    <node x="2032.1837469165332" y="200.0">struct.User</node>
+    <node x="3586.8920802498665" y="305.0">database.SQLDatabase</node>
+    <node x="2761.558746916533" y="845.0">settings.SettingsPane</node>
+    <node x="2953.733746916533" y="1270.0">debug.VariablesList.VariablePanel</node>
+    <node x="78.9351851851852" y="1605.0">util.DiffMatchPatch.Diff</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="shared.RunStopBar" target="shared.RunStopBar.StopButton">
+      <point x="14.5" y="-17.5" />
+      <point x="750.75" y="690.0" />
+      <point x="783.7497455470741" y="690.0" />
+      <point x="-28.25" y="17.5" />
+    </edge>
+    <edge source="struct.FlowDirectory.InvalidFileNameException" target="struct.FlowDirectory">
+      <point x="0.0" y="-17.5" />
+      <point x="3174.9036713922205" y="285.0" />
+      <point x="3133.4036713922205" y="285.0" />
+      <point x="48.75" y="17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="settings.SettingsPane">
+      <point x="-23.75" y="-17.5" />
+      <point x="2990.308746916533" y="920.0" />
+      <point x="2823.058746916533" y="920.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.EditTabs.CustomTabHeader" target="shared.EditTabs">
+      <point x="40.5" y="17.5" />
+      <point x="4134.642080249867" y="825.0" />
+      <point x="3954.0703380588875" y="825.0" />
+      <point x="31.666666666666515" y="-17.5" />
+    </edge>
+    <edge source="shared.NavBar" target="shared.NavBar.DebugButton">
+      <point x="-40.470588235294144" y="-17.5" />
+      <point x="2413.838158681239" y="1155.0" />
+      <point x="1010.9962469165334" y="1155.0" />
+      <point x="-42.33333333333337" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar.SettingsButton" target="shared.NavBar">
+      <point x="45.00000000000006" y="17.5" />
+      <point x="2905.058746916533" y="1125.0" />
+      <point x="2489.7205116224154" y="1125.0" />
+      <point x="35.41176470588243" y="-17.5" />
+    </edge>
+    <edge source="network.FMLNetworker" target="message.Data">
+      <point x="0.0" y="-17.5" />
+      <point x="2674.058746916533" y="575.0" />
+      <point x="2723.726274937455" y="575.0" />
+      <point x="-3.5" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.DirectoryNode" target="struct.FlowDirectory">
+      <point x="0.0" y="-17.5" />
+      <point x="2211.183746916533" y="275.0" />
+      <point x="3068.4036713922205" y="275.0" />
+      <point x="-16.25" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.FileNode" target="struct.FlowFile">
+      <point x="0.0" y="-17.5" />
+      <point x="2106.933746916533" y="410.0" />
+      <point x="1995.9337469165332" y="410.0" />
+      <point x="1995.9337469165332" y="170.0" />
+      <point x="2681.351274937455" y="170.0" />
+      <point x="-23.0" y="17.5" />
+    </edge>
+    <edge source="struct.TextDocument" target="struct.FlowDocument">
+      <point x="0.0" y="-17.5" />
+      <point x="1876.8504135832" y="55.0" />
+      <point x="2876.851274937455" y="55.0" />
+      <point x="-57.5" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.Diff" target="util.DiffMatchPatch.Operation">
+      <point x="-7.875000000000014" y="-17.5" />
+      <point x="102.56018518518519" y="1575.0" />
+      <point x="81.31018518518519" y="1575.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree" target="shared.DocTree.ProjectNode">
+      <point x="-5.875" y="-17.5" />
+      <point x="2231.558746916533" y="495.0" />
+      <point x="2207.183746916533" y="495.0" />
+      <point x="-30.25" y="17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="shared.GenericConsole">
+      <point x="-43.63636363636351" y="-17.5" />
+      <point x="1420.9015499468364" y="815.0" />
+      <point x="105.75" y="815.0" />
+      <point x="35.25" y="17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="network.DataSocket">
+      <point x="78.66666666666652" y="-17.5" />
+      <point x="3435.910021853988" y="565.0" />
+      <point x="3552.3920802498665" y="565.0" />
+      <point x="-14.25" y="17.5" />
+    </edge>
+    <edge source="history.VersionDocTree" target="shared.DocTree">
+      <point x="-35.75" y="-17.5" />
+      <point x="2295.517857142857" y="690.0" />
+      <point x="2260.933746916533" y="690.0" />
+      <point x="23.5" y="17.5" />
+    </edge>
+    <edge source="editing.EditorDocTree" target="message.Data">
+      <point x="50.25" y="-17.5" />
+      <point x="2198.205357142857" y="700.0" />
+      <point x="2357.079664711131" y="700.0" />
+      <point x="2357.079664711131" y="565.0" />
+      <point x="2716.726274937455" y="565.0" />
+      <point x="-10.5" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar" target="shared.NavBar.SettingsButton">
+      <point x="30.352941176470722" y="-17.5" />
+      <point x="2484.6616880930037" y="1115.0" />
+      <point x="2860.058746916533" y="1115.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.EditTabs" target="shared.EditArea">
+      <point x="-31.666666666666515" y="-17.5" />
+      <point x="3890.7370047255545" y="825.0" />
+      <point x="3712.7131952017444" y="825.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="history.HistoryPane">
+      <point x="-33.25" y="-17.5" />
+      <point x="2980.808746916533" y="930.0" />
+      <point x="2464.337004725554" y="930.0" />
+      <point x="43.875" y="17.5" />
+    </edge>
+    <edge source="network.FlowDocumentChangeListener" target="network.DataSocket">
+      <point x="-59.75" y="-17.5" />
+      <point x="3535.3920802498665" y="575.0" />
+      <point x="3580.8920802498665" y="575.0" />
+      <point x="14.25" y="17.5" />
+    </edge>
+    <edge source="struct.FlowDirectory.DuplicateFileNameException" target="struct.FlowDirectory">
+      <point x="57.5" y="17.5" />
+      <point x="3174.6536713922205" y="180.0" />
+      <point x="3133.4036713922205" y="180.0" />
+      <point x="48.75" y="-17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar.StartDebuggingButton" target="debug.DebugToolbar">
+      <point x="47.0" y="17.5" />
+      <point x="186.75" y="1145.0" />
+      <point x="401.8712469165332" y="1145.0" />
+      <point x="-42.1875" y="-17.5" />
+    </edge>
+    <edge source="history.HistoryPane" target="history.VersionDocTree">
+      <point x="-46.80000000000018" y="-17.5" />
+      <point x="2373.6620047255537" y="825.0" />
+      <point x="2295.517857142857" y="825.0" />
+      <point x="-35.75" y="17.5" />
+    </edge>
+    <edge source="settings.SettingsPane" target="settings.SettingsTabs">
+      <point x="0.0" y="-17.5" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList" target="editing.CollabsList.UserInfo">
+      <point x="13.625" y="-17.5" />
+      <point x="1643.2046647111306" y="690.0" />
+      <point x="1677.2637904398398" y="690.0" />
+      <point x="-23.25" y="17.5" />
+    </edge>
+    <edge source="struct.ArbitraryDocument" target="struct.FlowDocument">
+      <point x="0.0" y="-17.5" />
+      <point x="4070.1420802498665" y="55.0" />
+      <point x="2991.851274937455" y="55.0" />
+      <point x="57.5" y="17.5" />
+    </edge>
+    <edge source="history.VersionViewer" target="history.HistoryPane">
+      <point x="49.5" y="17.5" />
+      <point x="2570.558746916533" y="700.0" />
+      <point x="2557.580357142857" y="700.0" />
+      <point x="2557.580357142857" y="825.0" />
+      <point x="2467.262004725554" y="825.0" />
+      <point x="46.80000000000018" y="-17.5" />
+    </edge>
+    <edge source="editing.CollabsList" target="editing.EditPane">
+      <point x="36.33333333333326" y="17.5" />
+      <point x="1665.912998044464" y="795.0" />
+      <point x="1481.9924590377454" y="795.0" />
+      <point x="17.454545454545496" y="-17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar" target="editing.EditorToolbar.ExportButton">
+      <point x="18.57142857142867" y="-17.5" />
+      <point x="1211.8709332969827" y="680.0" />
+      <point x="1242.4337469165332" y="680.0" />
+      <point x="-31.25" y="17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar.ProjectManageButton" target="editing.EditorToolbar">
+      <point x="0.0" y="-17.5" />
+      <point x="1116.3504135832" y="825.0" />
+      <point x="1149.9661713922208" y="825.0" />
+      <point x="-43.33333333333326" y="17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="struct.FlowDirectory">
+      <point x="-19.666666666666515" y="-17.5" />
+      <point x="3337.576688520655" y="505.0" />
+      <point x="3028.9661713922205" y="505.0" />
+      <point x="3028.9661713922205" y="285.0" />
+      <point x="3100.9036713922205" y="285.0" />
+      <point x="16.25" y="17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="debug.DebugPane">
+      <point x="-26.59999999999991" y="17.5" />
+      <point x="2987.4587469165335" y="1145.0" />
+      <point x="2905.983746916533" y="1145.0" />
+      <point x="2905.983746916533" y="1230.0" />
+      <point x="2470.7373183451045" y="1230.0" />
+      <point x="16.42857142857156" y="-17.5" />
+    </edge>
+    <edge source="shared.DocTree" target="shared.DocTree.FileNode">
+      <point x="-41.125" y="-17.5" />
+      <point x="2196.308746916533" y="525.0" />
+      <point x="2082.433746916533" y="525.0" />
+      <point x="-24.5" y="17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="editing.EditorToolbar">
+      <point x="-26.181818181818244" y="-17.5" />
+      <point x="1438.3560954013817" y="795.0" />
+      <point x="1193.299504725554" y="795.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree" target="message.Data">
+      <point x="41.125" y="-17.5" />
+      <point x="2278.558746916533" y="555.0" />
+      <point x="2709.726274937455" y="555.0" />
+      <point x="-17.5" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar" target="shared.NavBar.HistoryButton">
+      <point x="5.058823529411711" y="-17.5" />
+      <point x="2459.3675704459447" y="1065.0" />
+      <point x="2330.837004725554" y="1065.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="settings.SettingsPane" target="shared.NavBar">
+      <point x="-41.0" y="17.5" />
+      <point x="2782.058746916533" y="1095.0" />
+      <point x="2474.54404103418" y="1095.0" />
+      <point x="20.235294117646845" y="-17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo" target="editing.CollabsList">
+      <point x="23.25" y="17.5" />
+      <point x="1723.7637904398398" y="700.0" />
+      <point x="1670.4546647111306" y="700.0" />
+      <point x="40.875" y="-17.5" />
+    </edge>
+    <edge source="shared.NavBar.HistoryButton" target="shared.NavBar">
+      <point x="43.0" y="17.5" />
+      <point x="2373.837004725554" y="1055.0" />
+      <point x="2464.4263939753564" y="1055.0" />
+      <point x="10.117647058823422" y="-17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="struct.FlowFile">
+      <point x="-39.333333333333485" y="-17.5" />
+      <point x="3317.910021853988" y="515.0" />
+      <point x="2924.299504725554" y="515.0" />
+      <point x="2924.299504725554" y="180.0" />
+      <point x="2712.017941604121" y="180.0" />
+      <point x="7.666666666666515" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar.DebugButton" target="shared.NavBar">
+      <point x="42.33333333333326" y="17.5" />
+      <point x="1095.6629135832" y="1135.0" />
+      <point x="2423.9558057400623" y="1135.0" />
+      <point x="-30.352941176470722" y="-17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.Diff" target="util.DiffMatchPatch">
+      <point x="23.62499999999999" y="-17.5" />
+      <point x="134.0601851851852" y="1585.0" />
+      <point x="155.3101851851852" y="1585.0" />
+      <point x="155.3101851851852" y="1495.0" />
+      <point x="179.46296296296293" y="1495.0" />
+      <point x="46.666666666666664" y="17.5" />
+    </edge>
+    <edge source="shared.EditTabs.CustomTabHeader.CloseTabButton.CloseButtonMouseListener" target="shared.EditTabs.CustomTabHeader.CloseTabButton">
+      <point x="53.25" y="17.5" />
+      <point x="4147.392080249867" y="575.0" />
+      <point x="4129.892080249867" y="575.0" />
+      <point x="35.75" y="-17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo" target="editing.CollabsList.UserInfo.PermissionRadioButtonListener">
+      <point x="13.28571428571422" y="-17.5" />
+      <point x="1713.799504725554" y="515.0" />
+      <point x="1762.4337469165332" y="515.0" />
+      <point x="-60.75" y="17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="server.FlowServer">
+      <point x="0.0" y="-17.5" />
+      <point x="3357.2433551873214" y="575.0" />
+      <point x="3363.8920802498665" y="575.0" />
+      <point x="-27.5" y="17.5" />
+    </edge>
+    <edge source="server.DataManagement" target="util.FileSerializer">
+      <point x="0.0" y="-17.5" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="editing.EditorDocTree" target="shared.DocTree">
+      <point x="16.75" y="-17.5" />
+      <point x="2164.705357142857" y="690.0" />
+      <point x="2213.933746916533" y="690.0" />
+      <point x="-23.5" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar" target="debug.DebugToolbar.StepInButton">
+      <point x="8.4375" y="-17.5" />
+      <point x="452.4962469165332" y="1155.0" />
+      <point x="447.75" y="1155.0" />
+      <point x="-31.0" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch" target="util.DiffMatchPatch.Patch">
+      <point x="-52.5" y="-17.5" />
+      <point x="80.29629629629628" y="1415.0" />
+      <point x="37.66666666666667" y="1415.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.EditArea.StyleToken" target="shared.EditArea">
+      <point x="36.666666666666515" y="17.5" />
+      <point x="3826.308746916533" y="670.0" />
+      <point x="3712.7131952017444" y="670.0" />
+      <point x="0.0" y="-17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar" target="editing.EditorToolbar.SearchButton">
+      <point x="-18.57142857142867" y="-17.5" />
+      <point x="1174.7280761541253" y="680.0" />
+      <point x="1096.6837469165332" y="680.0" />
+      <point x="-31.5" y="17.5" />
+    </edge>
+    <edge source="history.VersionViewer.VersionItem" target="history.VersionViewer">
+      <point x="29.25" y="17.5" />
+      <point x="2445.433746916533" y="515.0" />
+      <point x="2521.058746916533" y="515.0" />
+      <point x="0.0" y="-17.5" />
+    </edge>
+    <edge source="history.VersionViewer" target="struct.FlowFile">
+      <point x="44.0" y="-17.5" />
+      <point x="2565.058746916533" y="525.0" />
+      <point x="2630.485517128434" y="525.0" />
+      <point x="2630.485517128434" y="180.0" />
+      <point x="2696.684608270788" y="180.0" />
+      <point x="-7.666666666666515" y="17.5" />
+    </edge>
+    <edge source="shared.EditArea" target="editing.UserCaret">
+      <point x="13.571428571428442" y="-17.5" />
+      <point x="3726.284623773173" y="680.0" />
+      <point x="3890.1420802498665" y="680.0" />
+      <point x="-25.5" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar" target="debug.DebugToolbar.StepOutButton">
+      <point x="42.1875" y="-17.5" />
+      <point x="486.2462469165332" y="1145.0" />
+      <point x="594.75" y="1145.0" />
+      <point x="-34.0" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch" target="util.DiffMatchPatch.Diff">
+      <point x="0.0" y="17.5" />
+      <point x="132.79629629629628" y="1495.0" />
+      <point x="144.3101851851852" y="1495.0" />
+      <point x="144.3101851851852" y="1575.0" />
+      <point x="118.31018518518519" y="1575.0" />
+      <point x="7.874999999999986" y="-17.5" />
+    </edge>
+    <edge source="struct.FlowProject" target="struct.FlowDirectory">
+      <point x="38.333333333333485" y="-17.5" />
+      <point x="2104.0170802498665" y="265.0" />
+      <point x="3035.9036713922205" y="265.0" />
+      <point x="-48.75" y="17.5" />
+    </edge>
+    <edge source="login.LoginPane" target="gui.PanelManager">
+      <point x="35.666666666666515" y="17.5" />
+      <point x="3252.725498044464" y="950.0" />
+      <point x="3056.808746916533" y="950.0" />
+      <point x="42.75" y="-17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar" target="message.Data">
+      <point x="55.71428571428578" y="-17.5" />
+      <point x="1249.0137904398398" y="700.0" />
+      <point x="1346.6837469165332" y="700.0" />
+      <point x="1346.6837469165332" y="535.0" />
+      <point x="2695.726274937455" y="535.0" />
+      <point x="-31.5" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo" target="message.Data">
+      <point x="39.85714285714289" y="-17.5" />
+      <point x="1740.3709332969827" y="545.0" />
+      <point x="2702.726274937455" y="545.0" />
+      <point x="-24.5" y="17.5" />
+    </edge>
+    <edge source="shared.RunStopBar" target="shared.RunStopBar.RunButton">
+      <point x="-43.5" y="-17.5" />
+      <point x="692.75" y="700.0" />
+      <point x="655.2497455470741" y="700.0" />
+      <point x="-26.75" y="17.5" />
+    </edge>
+    <edge source="server.FlowServer" target="database.SQLDatabase">
+      <point x="0.0" y="-17.5" />
+      <point x="3391.3920802498665" y="400.0" />
+      <point x="3602.7670802498665" y="400.0" />
+      <point x="-47.625" y="17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="struct.User">
+      <point x="-59.0" y="-17.5" />
+      <point x="3298.2433551873214" y="525.0" />
+      <point x="2913.299504725554" y="525.0" />
+      <point x="2913.299504725554" y="255.0" />
+      <point x="2088.0170802498665" y="255.0" />
+      <point x="22.333333333333485" y="17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar.ImportButton" target="editing.EditorToolbar">
+      <point x="31.75" y="17.5" />
+      <point x="1013.4337469165332" y="690.0" />
+      <point x="1156.156647582697" y="690.0" />
+      <point x="-37.14285714285711" y="-17.5" />
+    </edge>
+    <edge source="server.FlowServer" target="server.DocumentUpdateCallback">
+      <point x="-36.666666666666515" y="-17.5" />
+      <point x="3354.7254135832" y="420.0" />
+      <point x="3365.6536713922205" y="420.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.FileNode" target="shared.DocTree">
+      <point x="24.5" y="17.5" />
+      <point x="2131.433746916533" y="515.0" />
+      <point x="2208.058746916533" y="515.0" />
+      <point x="-29.375" y="-17.5" />
+    </edge>
+    <edge source="shared.DocTree" target="shared.DocTree.DirectoryNode">
+      <point x="17.625" y="-17.5" />
+      <point x="2255.058746916533" y="515.0" />
+      <point x="2336.183746916533" y="515.0" />
+      <point x="2336.183746916533" y="370.0" />
+      <point x="2228.183746916533" y="370.0" />
+      <point x="17.0" y="17.5" />
+    </edge>
+    <edge source="login.LoginPane" target="login.UsernameBox">
+      <point x="-26.75" y="-17.5" />
+      <point x="3190.3088313777976" y="825.0" />
+      <point x="3195.6838313777976" y="825.0" />
+      <point x="32.25" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.LinesToCharsResult" target="util.DiffMatchPatch">
+      <point x="41.0" y="17.5" />
+      <point x="219.91666666666669" y="1415.0" />
+      <point x="185.2962962962963" y="1415.0" />
+      <point x="52.50000000000001" y="-17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar.SearchButton" target="editing.EditorToolbar">
+      <point x="31.5" y="17.5" />
+      <point x="1159.6837469165332" y="670.0" />
+      <point x="1193.299504725554" y="670.0" />
+      <point x="0.0" y="-17.5" />
+    </edge>
+    <edge source="struct.FlowDirectory" target="struct.FlowDirectory.DuplicateFileNameException">
+      <point x="16.25" y="-17.5" />
+      <point x="3100.9036713922205" y="150.0" />
+      <point x="3059.6536713922205" y="150.0" />
+      <point x="-57.5" y="17.5" />
+    </edge>
+    <edge source="struct.FlowDocument" target="struct.FlowFile">
+      <point x="-11.5" y="17.5" />
+      <point x="2922.851274937455" y="75.0" />
+      <point x="2727.351274937455" y="75.0" />
+      <point x="23.0" y="-17.5" />
+    </edge>
+    <edge source="shared.EditTabs.CustomTabHeader" target="shared.EditTabs.CustomTabHeader.CloseTabButton">
+      <point x="-40.5" y="-17.5" />
+      <point x="4053.6420802498665" y="700.0" />
+      <point x="4058.3920802498665" y="700.0" />
+      <point x="-35.75" y="17.5" />
+    </edge>
+    <edge source="login.CreateAccountPane" target="message.Data">
+      <point x="-55.666666666666515" y="-17.5" />
+      <point x="2961.100498044464" y="825.0" />
+      <point x="2936.183746916533" y="825.0" />
+      <point x="2936.183746916533" y="565.0" />
+      <point x="2737.726274937455" y="565.0" />
+      <point x="10.5" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo.ButtonHighlightListener" target="editing.CollabsList.UserInfo">
+      <point x="48.75" y="17.5" />
+      <point x="1632.9337469165332" y="495.0" />
+      <point x="1700.5137904398398" y="495.0" />
+      <point x="0.0" y="-17.5" />
+    </edge>
+    <edge source="history.HistoryPane" target="shared.NavBar">
+      <point x="-14.625" y="17.5" />
+      <point x="2405.837004725554" y="1045.0" />
+      <point x="2469.485217504768" y="1045.0" />
+      <point x="15.176470588235134" y="-17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="login.CreateAccountPane">
+      <point x="-4.75" y="-17.5" />
+      <point x="3009.308746916533" y="900.0" />
+      <point x="2961.100498044464" y="900.0" />
+      <point x="-55.666666666666515" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo.PermissionRadioButtonListener" target="editing.CollabsList.UserInfo">
+      <point x="60.75" y="17.5" />
+      <point x="1883.9337469165332" y="525.0" />
+      <point x="1727.0852190112685" y="525.0" />
+      <point x="26.57142857142867" y="-17.5" />
+    </edge>
+    <edge source="history.VersionDocTree" target="history.VersionViewer">
+      <point x="35.75" y="-17.5" />
+      <point x="2367.017857142857" y="700.0" />
+      <point x="2471.558746916533" y="700.0" />
+      <point x="-49.5" y="17.5" />
+    </edge>
+    <edge source="login.CreateAccountPane" target="gui.PanelManager">
+      <point x="55.666666666666515" y="17.5" />
+      <point x="3072.433831377797" y="920.0" />
+      <point x="3028.308746916533" y="920.0" />
+      <point x="14.25" y="-17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="editing.CollabsList">
+      <point x="0.0" y="-17.5" />
+      <point x="1464.5379135832" y="775.0" />
+      <point x="1593.2463313777976" y="775.0" />
+      <point x="-36.33333333333326" y="17.5" />
+    </edge>
+    <edge source="server.FlowServer" target="server.ClientRequestHandle">
+      <point x="27.5" y="17.5" />
+      <point x="3418.8920802498665" y="535.0" />
+      <point x="3376.910021853988" y="535.0" />
+      <point x="19.666666666666515" y="-17.5" />
+    </edge>
+    <edge source="struct.FlowDirectory" target="struct.FlowFile">
+      <point x="-48.75" y="-17.5" />
+      <point x="3035.9036713922205" y="170.0" />
+      <point x="2727.351274937455" y="170.0" />
+      <point x="23.0" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar" target="debug.DebugToolbar.StepOverButton">
+      <point x="-25.3125" y="-17.5" />
+      <point x="418.7462469165332" y="1135.0" />
+      <point x="289.5" y="1135.0" />
+      <point x="-35.75" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList" target="shared.FlowPermission">
+      <point x="-40.875" y="-17.5" />
+      <point x="1588.7046647111306" y="700.0" />
+      <point x="1368.6837469165332" y="700.0" />
+      <point x="-28.0" y="17.5" />
+    </edge>
+    <edge source="shared.EditArea" target="shared.EditArea.StyleToken">
+      <point x="-27.142857142857338" y="-17.5" />
+      <point x="3685.570338058887" y="650.0" />
+      <point x="3752.9754135832" y="650.0" />
+      <point x="-36.666666666666515" y="17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="shared.RunStopBar">
+      <point x="-34.909090909090764" y="-17.5" />
+      <point x="1429.6288226741092" y="805.0" />
+      <point x="765.25" y="805.0" />
+      <point x="29.0" y="17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="editing.EditPane">
+      <point x="-52.25" y="-17.5" />
+      <point x="2961.808746916533" y="950.0" />
+      <point x="1496.5379135832" y="950.0" />
+      <point x="32.0" y="17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="message.Data">
+      <point x="-78.66666666666652" y="-17.5" />
+      <point x="3278.576688520655" y="535.0" />
+      <point x="2758.726274937455" y="535.0" />
+      <point x="31.5" y="17.5" />
+    </edge>
+    <edge source="debug.DebugPane" target="debug.DebugToolbar">
+      <point x="-32.85714285714266" y="-17.5" />
+      <point x="2421.4516040593903" y="1240.0" />
+      <point x="444.0587469165332" y="1240.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="settings.SettingsTabs" target="settings.SettingsTabs.SettingsTab">
+      <point x="0.0" y="-17.5" />
+      <point x="-29.0" y="17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="editing.EditorDocTree">
+      <point x="26.181818181818244" y="-17.5" />
+      <point x="1490.7197317650182" y="805.0" />
+      <point x="2103.2886904761904" y="805.0" />
+      <point x="-44.666666666666515" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo" target="editing.CollabsList.UserInfo.ButtonHighlightListener">
+      <point x="-13.28571428571422" y="-17.5" />
+      <point x="1687.2280761541256" y="505.0" />
+      <point x="1535.4337469165332" y="505.0" />
+      <point x="-48.75" y="17.5" />
+    </edge>
+    <edge source="editing.EditorDocTree" target="shared.DocTree.DirectoryNode">
+      <point x="-16.75" y="-17.5" />
+      <point x="2131.205357142857" y="690.0" />
+      <point x="2047.4337469165332" y="690.0" />
+      <point x="2047.4337469165332" y="420.0" />
+      <point x="2160.183746916533" y="420.0" />
+      <point x="-51.0" y="17.5" />
+    </edge>
+    <edge source="database.SQLDatabase" target="util.DatabaseException">
+      <point x="0.0" y="-17.5" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar" target="debug.DebugToolbar.StartDebuggingButton">
+      <point x="-59.0625" y="-17.5" />
+      <point x="384.9962469165332" y="1155.0" />
+      <point x="92.75" y="1155.0" />
+      <point x="-47.0" y="17.5" />
+    </edge>
+    <edge source="debug.DebugPane" target="debug.VariablesList">
+      <point x="49.28571428571422" y="-17.5" />
+      <point x="2503.594461202247" y="1250.0" />
+      <point x="2957.733746916533" y="1250.0" />
+      <point x="-30.25" y="17.5" />
+    </edge>
+    <edge source="editing.CollabsList.UserInfo" target="shared.FlowPermission">
+      <point x="-26.57142857142867" y="-17.5" />
+      <point x="1673.9423618684111" y="515.0" />
+      <point x="1452.6837469165332" y="515.0" />
+      <point x="56.0" y="17.5" />
+    </edge>
+    <edge source="struct.FlowProject" target="struct.User">
+      <point x="-38.33333333333326" y="-17.5" />
+      <point x="2027.3504135832" y="285.0" />
+      <point x="2043.3504135832" y="285.0" />
+      <point x="-22.333333333333258" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar.EditButton" target="shared.NavBar">
+      <point x="36.0" y="17.5" />
+      <point x="1226.8295802498667" y="1105.0" />
+      <point x="2439.132276328298" y="1105.0" />
+      <point x="-15.176470588235134" y="-17.5" />
+    </edge>
+    <edge source="shared.EditTabs.CustomTabHeader.CloseTabButton" target="shared.EditTabs.CustomTabHeader.CloseTabButton.CloseButtonMouseListener">
+      <point x="-35.75" y="-17.5" />
+      <point x="4058.3920802498665" y="575.0" />
+      <point x="4040.8920802498665" y="575.0" />
+      <point x="-53.25" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.ProjectNode" target="shared.DocTree.DirectoryNode">
+      <point x="30.25" y="-17.5" />
+      <point x="2267.683746916533" y="380.0" />
+      <point x="2194.183746916533" y="380.0" />
+      <point x="-17.0" y="17.5" />
+    </edge>
+    <edge source="compiler.Compiler" target="struct.TextDocument">
+      <point x="0.0" y="-17.5" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="login.LoginPane" target="message.Data">
+      <point x="26.75" y="-17.5" />
+      <point x="3243.8088313777976" y="825.0" />
+      <point x="3238.4338313777976" y="825.0" />
+      <point x="3238.4338313777976" y="555.0" />
+      <point x="2744.726274937455" y="555.0" />
+      <point x="17.5" y="17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar" target="editing.EditorToolbar.ImportButton">
+      <point x="-55.71428571428578" y="-17.5" />
+      <point x="1137.5852190112682" y="700.0" />
+      <point x="949.9337469165332" y="700.0" />
+      <point x="-31.75" y="17.5" />
+    </edge>
+    <edge source="server.DocumentUpdateCallback" target="struct.FlowDocument">
+      <point x="0.0" y="-17.5" />
+      <point x="3365.6536713922205" y="75.0" />
+      <point x="2945.851274937455" y="75.0" />
+      <point x="11.5" y="17.5" />
+    </edge>
+    <edge source="editing.UserCaret" target="shared.EditArea">
+      <point x="25.5" y="17.5" />
+      <point x="3941.1420802498665" y="690.0" />
+      <point x="3739.8560523446017" y="690.0" />
+      <point x="27.142857142857338" y="-17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="login.LoginPane">
+      <point x="33.25" y="-17.5" />
+      <point x="3047.308746916533" y="940.0" />
+      <point x="3217.0588313777976" y="940.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.Patch" target="util.DiffMatchPatch">
+      <point x="24.66666666666667" y="17.5" />
+      <point x="62.33333333333334" y="1405.0" />
+      <point x="115.29629629629628" y="1405.0" />
+      <point x="-17.5" y="-17.5" />
+    </edge>
+    <edge source="history.HistoryPane" target="history.VersionViewer">
+      <point x="23.40000000000009" y="-17.5" />
+      <point x="2443.862004725554" y="815.0" />
+      <point x="2537.558746916533" y="815.0" />
+      <point x="16.5" y="17.5" />
+    </edge>
+    <edge source="shared.EditTabs.CustomTabHeader.CloseTabButton" target="shared.EditTabs.CustomTabHeader">
+      <point x="35.75" y="17.5" />
+      <point x="4129.892080249867" y="700.0" />
+      <point x="4134.642080249867" y="700.0" />
+      <point x="40.5" y="-17.5" />
+    </edge>
+    <edge source="shared.EditArea" target="struct.FlowDocument">
+      <point x="40.71428571428578" y="-17.5" />
+      <point x="3753.42748091603" y="700.0" />
+      <point x="3977.1420802498665" y="700.0" />
+      <point x="3977.1420802498665" y="65.0" />
+      <point x="2968.851274937455" y="65.0" />
+      <point x="34.5" y="17.5" />
+    </edge>
+    <edge source="debug.DebugPane" target="shared.RunStopBar">
+      <point x="-16.42857142857156" y="-17.5" />
+      <point x="2437.8801754879614" y="1230.0" />
+      <point x="707.25" y="1230.0" />
+      <point x="-29.0" y="17.5" />
+    </edge>
+    <edge source="debug.DebugPane" target="shared.GenericConsole">
+      <point x="-49.28571428571422" y="-17.5" />
+      <point x="2405.0230326308188" y="1250.0" />
+      <point x="35.25" y="1250.0" />
+      <point x="-35.25" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar.StepInButton" target="debug.DebugToolbar">
+      <point x="31.0" y="17.5" />
+      <point x="509.75" y="1135.0" />
+      <point x="469.3712469165332" y="1135.0" />
+      <point x="25.3125" y="-17.5" />
+    </edge>
+    <edge source="editing.EditorDocTree" target="editing.EditPane">
+      <point x="44.666666666666515" y="17.5" />
+      <point x="2192.6220238095234" y="825.0" />
+      <point x="1508.1742772195637" y="825.0" />
+      <point x="43.63636363636374" y="-17.5" />
+    </edge>
+    <edge source="shared.NavBar" target="gui.PanelManager">
+      <point x="40.470588235294144" y="-17.5" />
+      <point x="2494.779335151827" y="1135.0" />
+      <point x="2960.858746916533" y="1135.0" />
+      <point x="-53.19999999999982" y="17.5" />
+    </edge>
+    <edge source="shared.RunStopBar.StopButton" target="shared.RunStopBar">
+      <point x="28.25" y="17.5" />
+      <point x="840.2497455470741" y="700.0" />
+      <point x="779.75" y="700.0" />
+      <point x="43.5" y="-17.5" />
+    </edge>
+    <edge source="debug.DebugPane" target="shared.NavBar">
+      <point x="0.0" y="-17.5" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="shared.EditTabs" target="shared.EditTabs.CustomTabHeader">
+      <point x="0.0" y="-17.5" />
+      <point x="3922.4036713922205" y="815.0" />
+      <point x="4053.6420802498665" y="815.0" />
+      <point x="-40.5" y="17.5" />
+    </edge>
+    <edge source="gui.PanelManager" target="shared.EditTabs">
+      <point x="52.25" y="-17.5" />
+      <point x="3066.308746916533" y="960.0" />
+      <point x="3898.6536713922205" y="960.0" />
+      <point x="-23.75" y="17.5" />
+    </edge>
+    <edge source="gui.FlowClient" target="gui.PanelManager">
+      <point x="26.75" y="-17.5" />
+      <point x="3148.733746916533" y="1145.0" />
+      <point x="3067.258746916533" y="1145.0" />
+      <point x="53.19999999999982" y="17.5" />
+    </edge>
+    <edge source="settings.SettingsTabs.SettingsTab" target="settings.SettingsTabs">
+      <point x="29.0" y="17.5" />
+      <point x="2881.058746916533" y="700.0" />
+      <point x="2863.7254135831995" y="700.0" />
+      <point x="40.666666666666515" y="-17.5" />
+    </edge>
+    <edge source="shared.DocTree" target="struct.FlowProject">
+      <point x="-17.625" y="-17.5" />
+      <point x="2219.808746916533" y="505.0" />
+      <point x="2166.433746916533" y="505.0" />
+      <point x="2166.433746916533" y="400.0" />
+      <point x="2036.9337469165332" y="400.0" />
+      <point x="-28.75" y="17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar.StepOutButton" target="debug.DebugToolbar">
+      <point x="34.0" y="17.5" />
+      <point x="662.75" y="1155.0" />
+      <point x="503.1212469165332" y="1155.0" />
+      <point x="59.0625" y="-17.5" />
+    </edge>
+    <edge source="shared.DocTree.ProjectNode" target="shared.DocTree">
+      <point x="30.25" y="17.5" />
+      <point x="2267.683746916533" y="505.0" />
+      <point x="2243.308746916533" y="505.0" />
+      <point x="5.875" y="-17.5" />
+    </edge>
+    <edge source="shared.EditArea" target="message.Data">
+      <point x="-40.71428571428578" y="-17.5" />
+      <point x="3671.9989094874586" y="700.0" />
+      <point x="3258.2433551873214" y="700.0" />
+      <point x="3258.2433551873214" y="545.0" />
+      <point x="2751.726274937455" y="545.0" />
+      <point x="24.5" y="17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="shared.FlowPermission">
+      <point x="-8.727272727272748" y="-17.5" />
+      <point x="1455.8106408559272" y="775.0" />
+      <point x="1357.6837469165332" y="775.0" />
+      <point x="1357.6837469165332" y="525.0" />
+      <point x="1340.6837469165332" y="525.0" />
+      <point x="-56.0" y="17.5" />
+    </edge>
+    <edge source="shared.NavBar" target="shared.NavBar.EditButton">
+      <point x="-25.29411764705901" y="-17.5" />
+      <point x="2429.014629269474" y="1125.0" />
+      <point x="1154.8295802498667" y="1125.0" />
+      <point x="-36.0" y="17.5" />
+    </edge>
+    <edge source="shared.RunStopBar.RunButton" target="shared.RunStopBar">
+      <point x="26.75" y="17.5" />
+      <point x="708.7497455470741" y="700.0" />
+      <point x="721.75" y="700.0" />
+      <point x="-14.5" y="-17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.Operation" target="util.DiffMatchPatch">
+      <point x="-1.4210854715202004E-14" y="-17.5" />
+      <point x="81.31018518518518" y="1495.0" />
+      <point x="86.12962962962962" y="1495.0" />
+      <point x="-46.66666666666666" y="17.5" />
+    </edge>
+    <edge source="compiler.Debugger" target="compiler.Compiler">
+      <point x="26.25" y="-17.5" />
+      <point x="1903.1004135832" y="285.0" />
+      <point x="1901.6004135832" y="285.0" />
+      <point x="24.75" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch" target="util.DiffMatchPatch.LinesToCharsResult">
+      <point x="17.5" y="-17.5" />
+      <point x="150.29629629629628" y="1415.0" />
+      <point x="137.91666666666669" y="1415.0" />
+      <point x="-41.0" y="17.5" />
+    </edge>
+    <edge source="editing.EditorToolbar.ExportButton" target="editing.EditorToolbar">
+      <point x="31.25" y="17.5" />
+      <point x="1304.9337469165332" y="690.0" />
+      <point x="1230.4423618684111" y="690.0" />
+      <point x="37.14285714285711" y="-17.5" />
+    </edge>
+    <edge source="debug.DebugToolbar.StepOverButton" target="debug.DebugToolbar">
+      <point x="35.75" y="17.5" />
+      <point x="361.0" y="1125.0" />
+      <point x="435.6212469165332" y="1125.0" />
+      <point x="-8.4375" y="-17.5" />
+    </edge>
+    <edge source="debug.VariablesList.VariablePanel" target="debug.VariablesList">
+      <point x="0.0" y="-17.5" />
+      <point x="30.25" y="17.5" />
+    </edge>
+    <edge source="shared.Communicator" target="network.FMLNetworker">
+      <point x="-34.0" y="-17.5" />
+      <point x="-33.5" y="17.5" />
+    </edge>
+    <edge source="login.CreateAccountPane" target="gui.BackButton">
+      <point x="0.0" y="-17.5" />
+      <point x="3016.767164711131" y="825.0" />
+      <point x="3022.4338313777976" y="825.0" />
+      <point x="0.0" y="17.5" />
+    </edge>
+    <edge source="settings.SettingsTabs" target="message.Data">
+      <point x="-40.666666666666515" y="-17.5" />
+      <point x="2782.3920802498665" y="700.0" />
+      <point x="2767.308746916533" y="700.0" />
+      <point x="2767.308746916533" y="575.0" />
+      <point x="2730.726274937455" y="575.0" />
+      <point x="3.5" y="17.5" />
+    </edge>
+    <edge source="editing.EditorDocTree" target="struct.FlowFile">
+      <point x="-50.25" y="-17.5" />
+      <point x="2097.705357142857" y="700.0" />
+      <point x="1955.1837469165332" y="700.0" />
+      <point x="1955.1837469165332" y="160.0" />
+      <point x="2666.017941604121" y="160.0" />
+      <point x="-38.333333333333485" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.DirectoryNode" target="shared.DocTree">
+      <point x="51.0" y="17.5" />
+      <point x="2262.183746916533" y="360.0" />
+      <point x="2347.183746916533" y="360.0" />
+      <point x="2347.183746916533" y="525.0" />
+      <point x="2266.808746916533" y="525.0" />
+      <point x="29.375" y="-17.5" />
+    </edge>
+    <edge source="editing.EditPane" target="shared.NavBar">
+      <point x="-32.0" y="17.5" />
+      <point x="1432.5379135832" y="1095.0" />
+      <point x="2444.1910998577096" y="1095.0" />
+      <point x="-10.117647058823422" y="-17.5" />
+    </edge>
+    <edge source="database.SQLiteTest" target="database.SQLDatabase">
+      <point x="0.0" y="-17.5" />
+      <point x="3782.3920802498665" y="420.0" />
+      <point x="3698.0170802498665" y="420.0" />
+      <point x="47.625" y="17.5" />
+    </edge>
+    <edge source="struct.FlowFile" target="struct.FlowDocument">
+      <point x="-23.0" y="-17.5" />
+      <point x="2681.351274937455" y="65.0" />
+      <point x="2899.851274937455" y="65.0" />
+      <point x="-34.5" y="17.5" />
+    </edge>
+    <edge source="history.VersionViewer" target="history.VersionViewer.VersionItem">
+      <point x="-44.0" y="-17.5" />
+      <point x="2477.058746916533" y="525.0" />
+      <point x="2386.933746916533" y="525.0" />
+      <point x="-29.25" y="17.5" />
+    </edge>
+    <edge source="shared.DocTree.ProjectNode" target="struct.FlowProject">
+      <point x="-30.25" y="-17.5" />
+      <point x="2207.183746916533" y="390.0" />
+      <point x="2094.433746916533" y="390.0" />
+      <point x="28.75" y="17.5" />
+    </edge>
+    <edge source="struct.FlowFile" target="struct.FlowDirectory">
+      <point x="38.333333333333485" y="17.5" />
+      <point x="2742.684608270788" y="160.0" />
+      <point x="3068.4036713922205" y="160.0" />
+      <point x="-16.25" y="-17.5" />
+    </edge>
+    <edge source="server.ClientRequestHandle" target="database.SQLDatabase">
+      <point x="39.333333333333485" y="-17.5" />
+      <point x="3396.576688520655" y="545.0" />
+      <point x="3499.1420802498665" y="545.0" />
+      <point x="3499.1420802498665" y="420.0" />
+      <point x="3666.2670802498665" y="420.0" />
+      <point x="15.875" y="17.5" />
+    </edge>
+    <edge source="util.DiffMatchPatch.Patch" target="util.DiffMatchPatch.Diff">
+      <point x="-24.66666666666667" y="17.5" />
+      <point x="13.0" y="1415.0" />
+      <point x="14.851851851851833" y="1415.0" />
+      <point x="14.851851851851833" y="1585.0" />
+      <point x="86.81018518518519" y="1585.0" />
+      <point x="-23.625000000000014" y="-17.5" />
+    </edge>
+    <edge source="login.CreateAccountPane" target="login.UsernameBox">
+      <point x="55.666666666666515" y="-17.5" />
+      <point x="3072.433831377797" y="825.0" />
+      <point x="3131.1838313777976" y="825.0" />
+      <point x="-32.25" y="17.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.3634209902866619" x="2100.5" y="820.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

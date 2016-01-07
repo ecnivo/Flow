@@ -49,34 +49,27 @@ public class Data implements Serializable {
      * @return The value of the property of type 'type'
      */
     public <T extends Serializable> T get(String key, Class<T> type) {
-        try {
-            return type.cast(stringObjectHashMap.get(key));
-        } catch (ClassCastException e) {
-            return null;
-        }
+        return type.cast(stringObjectHashMap.get(key));
     }
 
     /**
      * Retrieves a property from this message with unchecked auto cast
      *
-     * @param key  The key of the message
-     * @param <T>  The type of the value of the message
+     * @param key The key of the message
+     * @param <T> The type of the value of the message
      * @return The value of the property of type 'type'
      */
-    public <T extends Serializable> T get(String key){
-        try {
-            return (T)stringObjectHashMap.get(key);
-        } catch (ClassCastException e) {
-            return null;
-        }
+    public <T extends Serializable> T get(String key) {
+        return (T) stringObjectHashMap.get(key);
     }
 
     /**
      * Check if this data contains the key
+     *
      * @param key The key to check
      * @return whether this data contains the key
      */
-    public boolean containsKey(String key){
+    public boolean containsKey(String key) {
         return stringObjectHashMap.containsKey(key);
     }
 
