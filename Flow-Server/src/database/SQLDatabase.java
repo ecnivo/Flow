@@ -311,7 +311,8 @@ public class SQLDatabase {
 	 */
 	public boolean newSession(String username, String sessionId) {
 		try {
-			this.update("INSERT INTO sessions VALUES ('" + username + "', '" + sessionId + "');");
+			this.update("INSERT INTO sessions VALUES ('" + username + "', '"
+					+ sessionId + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -358,7 +359,6 @@ public class SQLDatabase {
 					.query("SELECT * FROM sessions WHERE SessionID = '"
 							+ sessionId + "';");
 			if (temp.next()) {
-				temp.previous();
 				return temp;
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
