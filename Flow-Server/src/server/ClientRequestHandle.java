@@ -39,7 +39,7 @@ public class ClientRequestHandle implements Runnable {
 	@Override
 	public void run() {
 		try {
-			//this.socket.setSoTimeout(500);
+			// this.socket.setSoTimeout(500);
 			String username, password;
 			String[][] response;
 			Data data = psocket.receive();
