@@ -359,6 +359,7 @@ public class SQLDatabase {
 					.query("SELECT * FROM sessions WHERE SessionID = '"
 							+ sessionId + "';");
 			if (temp.next()) {
+				temp.previous();
 				return temp;
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
@@ -584,7 +585,8 @@ public class SQLDatabase {
 	 * @return the results returned from the server.
 	 */
 	ResultSet query(String query) throws SQLException {
-		Statement statement = this.connection.createStatement();
+		Statement statement = this.connection.createStatement(
+				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		statement.setQueryTimeout(TIMEOUT);
 		return statement.executeQuery(query);
 	}
