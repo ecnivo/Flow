@@ -586,7 +586,7 @@ public class SQLDatabase {
 	 */
 	ResultSet query(String query) throws SQLException {
 		Statement statement = this.connection.createStatement(
-				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		statement.setQueryTimeout(TIMEOUT);
 		return statement.executeQuery(query);
 	}
