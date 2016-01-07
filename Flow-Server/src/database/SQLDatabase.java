@@ -584,8 +584,7 @@ public class SQLDatabase {
 	 * @return the results returned from the server.
 	 */
 	ResultSet query(String query) throws SQLException {
-		Statement statement = this.connection.createStatement(
-				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		return statement.executeQuery(query);
 	}
