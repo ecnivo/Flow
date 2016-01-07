@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -101,11 +102,35 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "list_projects":
-				ResultSet temp = this.database
-						.getSessionInfo(data.get("session_id", String.class));
-				temp.next();
-				response = Results.toStringArray(new String[] { "ProjectID" },
-						this.database.getProjects(temp.getString("Username")));
+				// Initialized as null to prevent errors
+				ResultSet temp = null;
+				response = null;
+				try {
+					temp = this.database.getSessionInfo(
+							data.get("session_id", String.class));
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					temp.next();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					response = Results.toStringArray(
+							new String[] { "ProjectID" }, this.database
+									.getProjects(temp.getString("Username")));
+				} catch (SQLException e) {
+					e.printStackTrace();
+					// TODO Auto-generated catch block
+					returnData.put("status", FlowServer.ERROR);
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					// TODO Auto-generated catch block
+					returnData.put("status", e.getMessage());
+				}
 				UUID[] projects = new UUID[response.length];
 				for (int i = 0; i < response.length; i++) {
 					projects[i] = UUID.fromString(response[i][0]);
@@ -140,29 +165,56 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("document", file);
 					returnData.put("status", "ok");
 				} catch (DatabaseException e) {
+					e.printStackTrace();
 					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
 			case "file_checksum":
 				break;
 			case "request_project":
-				returnData.put("project", this.server
-						.getProject(data.get("project_uuid", String.class)));
+				try {
+					returnData.put("project", this.server.getProject(
+							data.get("project_uuid", String.class)));
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
 				break;
 			case "request_file":
-				returnData.put("document",
-						this.server.getFile(data.get("file_uuid", String.class),
-								data.get("project_uuid", String.class)));
+				try {
+					returnData.put("document",
+							this.server.getFile(
+									data.get("file_uuid", String.class),
+									data.get("project_uuid", String.class)));
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
 				break;
 			case "new_project":
-				returnData.put("status",
-						this.database.newProject(
-								data.get("project_name", String.class),
-								Results.toStringArray(
-										new String[] { "OwnerUsername" },
-										this.database.getSessionInfo(
-												data.get("session_id",
-														String.class)))[0][0]));
+				try {
+					returnData.put("status", this.database.newProject(
+							data.get("project_name", String.class),
+							Results.toStringArray(
+									new String[] { "OwnerUsername" },
+									this.database.getSessionInfo(
+											data.get("session_id",
+													String.class)))[0][0]));
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
 				break;
 			case "project_modify":
 				String projectId = data.get("project_uuid", String.class);
@@ -222,10 +274,10 @@ public class ClientRequestHandle implements Runnable {
 			L.warning("communication error: " + e.getMessage());
 		} catch (ClassNotFoundException e) {
 			L.warning("ClassnotFoundException error: " + e.getMessage());
-		} catch (Exception e) {
-			// TODO REMOVE THIS and catch individual exceptions
-			L.severe("Intenral Server Error: " + e.getMessage());
-		}
+		} // catch (Exception e) {
+			// // TODO REMOVE THIS and catch individual exceptions
+			// L.severe("Internal Server Error: " + e.getMessage());
+			// }
 
 		try {
 			socket.close();
