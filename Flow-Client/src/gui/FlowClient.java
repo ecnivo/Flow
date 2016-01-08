@@ -15,7 +15,7 @@ public class FlowClient extends JFrame {
     public static final javax.swing.border.Border EMPTY_BORDER = BorderFactory.createEmptyBorder(0, 0, 0, 0);
     public static final int BUTTON_ICON_SIZE = 24;
     public static final int SCROLL_SPEED = 12;
-    private static final String HOST = "10.242.170.164";
+    private static final String HOST = "127.0.0.1";
     private static final int PORT = 10244;
     private PanelManager manager;
 

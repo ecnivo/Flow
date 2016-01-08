@@ -13,6 +13,7 @@ import message.Data;
 import network.DataSocket;
 import struct.FlowDirectory;
 import struct.FlowFile;
+import struct.FlowProject;
 import struct.User;
 import util.DatabaseException;
 import util.Results;
@@ -127,10 +128,12 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					// TODO Auto-generated catch block
 					returnData.put("status", FlowServer.ERROR);
+					break;
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					// TODO Auto-generated catch block
 					returnData.put("status", e.getMessage());
+					break;
 				}
 				UUID[] projects = new UUID[response.length];
 				System.out.println(Arrays.toString(response));
@@ -179,8 +182,11 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "request_project":
 				try {
-					returnData.put("project", this.server.getProject(
-							data.get("project_uuid", UUID.class).toString()));
+					// TODO Move back to one line after debugging
+					FlowProject temp1 = this.server.getProject(
+							data.get("project_uuid", UUID.class).toString());
+					System.out.println(temp1.toString());
+					returnData.put("project", temp1);
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
