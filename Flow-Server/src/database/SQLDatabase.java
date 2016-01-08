@@ -289,7 +289,7 @@ public class SQLDatabase {
 				return password.equals(pair.getString("password"));
 			}
 		} catch (SQLException e) {
-			// TODO Remove this debuggin message
+			// TODO Remove this debugging message
 			System.err.println("Error authenticating user: " + username
 					+ " with password: " + password);
 			e.printStackTrace();
@@ -359,8 +359,10 @@ public class SQLDatabase {
 					.query("SELECT * FROM sessions WHERE SessionID = '"
 							+ sessionId + "';");
 			if (temp.next()) {
-				temp.absolute(0);
-				return temp;
+				// Duplicate query because SQLite doesn't support moving back in
+				// data (i.e. creating non 'TYPE_FORWARD_ONLY' ResultSets)
+				return this.query("SELECT * FROM sessions WHERE SessionID = '"
+						+ sessionId + "';");
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
 		} catch (SQLException e) {
@@ -585,8 +587,7 @@ public class SQLDatabase {
 	 * @return the results returned from the server.
 	 */
 	ResultSet query(String query) throws SQLException {
-		Statement statement = this.connection.createStatement(
-				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+		Statement statement = this.connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
 		return statement.executeQuery(query);
 	}

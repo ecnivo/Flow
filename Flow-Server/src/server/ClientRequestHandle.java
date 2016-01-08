@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -132,6 +133,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				UUID[] projects = new UUID[response.length];
+				System.out.println(Arrays.toString(response));
 				for (int i = 0; i < response.length; i++) {
 					projects[i] = UUID.fromString(response[i][0]);
 				}
@@ -178,7 +180,7 @@ public class ClientRequestHandle implements Runnable {
 			case "request_project":
 				try {
 					returnData.put("project", this.server.getProject(
-							data.get("project_uuid", String.class)));
+							data.get("project_uuid", UUID.class).toString()));
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -187,10 +189,9 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "request_file":
 				try {
-					returnData.put("document",
-							this.server.getFile(
-									data.get("file_uuid", String.class),
-									data.get("project_uuid", String.class)));
+					returnData.put("document", this.server.getFile(
+							data.get("file_uuid", UUID.class).toString(),
+							data.get("project_uuid", UUID.class).toString()));
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
