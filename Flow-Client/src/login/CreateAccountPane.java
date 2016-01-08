@@ -25,6 +25,7 @@ import javax.swing.SwingConstants;
 import shared.Communicator;
 import message.Data;
 
+@SuppressWarnings("serial")
 public class CreateAccountPane extends JPanel {
     private PanelManager manager;
     private JPasswordField passwordField;
@@ -136,8 +137,8 @@ public class CreateAccountPane extends JPanel {
 			return;
 		    }
 		}
-		JOptionPane.showConfirmDialog(null, "Congratulations, you have successfully registered a Flow account!", "Registration successful", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-		CreateAccountPane.this.manager.switchToEditor();
+		JOptionPane.showConfirmDialog(null, "Congratulations, you have successfully registered a Flow account!\nEnter your username and password on the next page to login.", "Registration successful", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+		CreateAccountPane.this.manager.switchToLogin();
 	    }
 	});
     }

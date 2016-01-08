@@ -185,7 +185,6 @@ public class EditorDocTree extends DocTree {
 			filePopup.show(EditorDocTree.this, x, y);
 		    }
 		} else if (selected instanceof DefaultMutableTreeNode && e.getButton() == MouseEvent.BUTTON3) {
-		    System.out.println("showing" + workspacePopup);
 		    workspacePopup.show(EditorDocTree.this, x, y);
 		}
 	    }

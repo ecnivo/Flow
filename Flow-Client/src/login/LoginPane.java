@@ -104,7 +104,6 @@ public class LoginPane extends JPanel {
                     Data usernamePass = new Data("login");
                     usernamePass.put("username", usernameEntry.getText());
                     usernamePass.put("password", String.copyValueOf(passwordEntry.getPassword()));
-                    System.out.println("sending");
 
                     Data reply = Communicator.communicate(usernamePass);
                     if (reply == null) {
@@ -112,7 +111,6 @@ public class LoginPane extends JPanel {
                         return;
                     }
                     String status = reply.get("status", String.class);
-                    System.out.println("received");
                     switch (status) {
                         case "USERNAME_DOES_NOT_EXIST":
                             JOptionPane.showConfirmDialog(null, "The username does not exist.\nPlease enter a username that is valid, or create a new account.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

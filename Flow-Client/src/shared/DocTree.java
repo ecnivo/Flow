@@ -41,8 +41,9 @@ public abstract class DocTree extends JTree {
 
 	addMouseListener(new MouseAdapter() {
 	    @Override
-	    public void mouseEntered(MouseEvent arg0) {
-		refreshProjectList();
+	    public void mouseClicked(MouseEvent e) {
+		if (e.isAltDown())
+		    refreshProjectList();
 	    }
 	});
 	// refreshProjectList();
