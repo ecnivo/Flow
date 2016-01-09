@@ -66,7 +66,6 @@ public abstract class DocTree extends JTree {
 	    Data projectList = new Data("list_projects");
 	    projectList.put("session_id", Communicator.getSessionID());
 	    Data reply = Communicator.communicate(projectList);
-	    System.out.println(reply);
 	    usersProjectsUUIDs = reply.get("projects", UUID[].class);
 	    if (usersProjectsUUIDs == null) {
 		return;
@@ -98,6 +97,12 @@ public abstract class DocTree extends JTree {
 		    root.remove(i);
 		}
 	    }
+
+	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
+		((ProjectNode) root.getChildAt(i)).updateName();
+	    }
+	    revalidate();
+	    repaint();
 	}
     }
 
@@ -145,6 +150,11 @@ public abstract class DocTree extends JTree {
 
 	public String toString() {
 	    return project.toString();
+	}
+
+	private void updateName() {
+	    revalidate();
+	    repaint();
 	}
     }
 
