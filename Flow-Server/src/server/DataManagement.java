@@ -74,7 +74,8 @@ public class DataManagement {
             return false;
         f.mkdir();
         FileSerializer fs = new FileSerializer();
-        fs.writeToFile(f, project);
+        File fff = new File(f, "project.flow");
+        fs.writeToFile(fff, project);
         return true;
     }
 
