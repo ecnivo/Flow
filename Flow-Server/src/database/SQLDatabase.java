@@ -102,8 +102,8 @@ public class SQLDatabase {
 						+ "' AND ProjectID = '" + projectId + "';");
 
 				// Changes the permissions of the user to be an owner
-				this.update("INSERT INTO access values(" + projectId + ", "
-						+ username + ", " + OWNER + ");");
+				this.update("INSERT INTO access values('" + projectId + "', '"
+						+ username + "', '" + OWNER + "');");
 			} else if (accessLevel == NONE) {
 				this.update("DELETE FROM access WHERE Username = '" + username
 						+ "' AND ProjectID = '" + projectId + "';");
