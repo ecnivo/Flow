@@ -17,6 +17,7 @@ public class DataManagement {
 
     private static DataManagement instance;
     private static Logger L = Logger.getLogger("DataManagement");
+    private static FileSerializer fs = new FileSerializer();
     private File dataFile;
 
     public static DataManagement getInstance() {
@@ -38,22 +39,20 @@ public class DataManagement {
 
     public boolean addUser(User u) {
         L.info("adding user " + u);
-        File d = new File(dataFile.getAbsolutePath() + File.separator + u.getUsername());
-        if (d.exists())
+        File userDirectory = new File(dataFile.getAbsolutePath(),u.getUsername());
+        if (userDirectory.exists())
             return false;
-        d.mkdir();
-        FileSerializer fs = new FileSerializer();
-        fs.writeToFile(new File(d.getAbsolutePath() + File.separator + "user.flow"), u);
+        userDirectory.mkdir();
+        fs.writeToFile(new File(userDirectory.getAbsolutePath() + File.separator + "user.flow"), u);
         return true;
     }
 
     public boolean removeUser(String username) {
         L.info("removing user");
-        for (File f : dataFile.listFiles()) {
-            if (f.isDirectory() && f.getName().equals(username)) {
-                f.delete();
-                return true;
-            }
+        File userDirectory = new File(dataFile, username);
+        if(userDirectory.exists()) {
+            userDirectory.delete();
+            return true;
         }
         return false;
     }
@@ -63,47 +62,42 @@ public class DataManagement {
         File dir = new File(dataFile, username);
         if (!dir.exists())
             return null;
-        FileSerializer fs = new FileSerializer();
         return fs.readFromFile(new File(dir, "user.flow"), User.class);
     }
 
     public boolean addProjectToUser(String username, FlowProject project) {
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
-                + project.getProjectUUID().toString());
-        if (f.exists())
+        L.info("adding project " + project.getDirectoryName() + " to user " + username);
+        File projectDirectory = new File(new File(dataFile, username), project.getProjectUUID().toString());
+        if (projectDirectory.exists())
             return false;
-        f.mkdir();
-        FileSerializer fs = new FileSerializer();
-        File fff = new File(f, "project.flow");
-        fs.writeToFile(fff, project);
+        projectDirectory.mkdir();
+        File projectMetadataFile = new File(projectDirectory, "project.flow");
+        fs.writeToFile(projectMetadataFile, project);
         return true;
     }
 
     public boolean removeProjectFromUser(String username, UUID uuid) {
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
-                + uuid.toString());
-        if (!f.exists())
+        L.info("removing project with uuid " + uuid + " from user " + username);
+        File projectDirectory = new File(new File(dataFile, username), uuid.toString());
+        if (!projectDirectory.exists())
             return false;
-        f.delete();
+        projectDirectory.delete();
         return true;
     }
 
     public FlowProject getProjectFromUUID(String username, UUID uuid) {
         L.info("getting project with uuid " + uuid + " owned by " + username);
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
-                + uuid.toString());
-        if (!f.exists())
+        File projectDirectory = new File(new File(dataFile, username), uuid.toString());
+        if (!projectDirectory.exists())
             return null;
-        File fff = new File(f, "project.flow");
-        FileSerializer fs = new FileSerializer();
-        FlowProject p = fs.readFromFile(fff, FlowProject.class);
-        return p;
+        File projectMetadataFile = new File(projectDirectory, "project.flow");
+        FlowProject project = fs.readFromFile(projectMetadataFile, FlowProject.class);
+        return project;
     }
 
-    public boolean addTextFileToProject(String username, UUID projectUUID, TextDocument textDoc) {
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
-                + projectUUID.toString() + File.separator
-                + textDoc.getParentFile().getParentDirectory().getFullyQualifiedPath());
+    public boolean addTextDocumentToProject(String username, UUID projectUUID, TextDocument textDoc) {
+        File projectDirectory = new File(new File(dataFile, username), projectUUID.toString());
+        File f = new File(projectDirectory, textDoc.getParentFile().getParentDirectory().getFullyQualifiedPath());
         if (f.exists())
             return false;
         f.mkdirs();
