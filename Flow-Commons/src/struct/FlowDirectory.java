@@ -28,6 +28,9 @@ public class FlowDirectory implements Serializable {
         this.parent = parent;
     }
 
+    public void setDirectoryName(String newName){
+        this.dirName = newName;
+    }
     /**
      * Gets the parent of this directory, null if root directory
      *

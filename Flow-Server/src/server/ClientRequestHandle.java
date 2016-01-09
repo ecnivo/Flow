@@ -291,6 +291,7 @@ public class ClientRequestHandle implements Runnable {
 											projectId, username));
 					break;
 				case "RENAME_PROJECT":
+					//FlowProject oldProject = DataManagement.getInstance().getProjectFromUUID()
 					returnData.put("status", this.database.renameProject(
 							projectId, data.get("new_name", String.class)));
 					break;
