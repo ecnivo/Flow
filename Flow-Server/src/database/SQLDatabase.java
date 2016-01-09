@@ -547,6 +547,19 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	public String getPath(String fileId) {
+		ResultSet fileData;
+		try {
+			fileData = this.query(String.format(
+					"SELECT * FROM documents WHERE FileID = '%s'", fileId));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "";
+	}
+
 	/**
 	 * Internal method which calls the {@link Statement#ExecuteQuery} method
 	 * with the specified query.
