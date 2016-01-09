@@ -274,8 +274,10 @@ public class ClientRequestHandle implements Runnable {
             L.info("response: " + returnData.toString());
         } catch (IOException e) {
             L.warning("communication error: " + e.getMessage());
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             L.warning("ClassnotFoundException error: " + e.getMessage());
+            e.printStackTrace();
         } // catch (Exception e) {
         // // TODO REMOVE THIS and catch individual exceptions
         // L.severe("Internal Server Error: " + e.getMessage());

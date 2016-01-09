@@ -12,9 +12,9 @@ public class User implements Serializable {
 
     private String username;
     private transient String password;
-    private ImageIcon avatar;
+    private transient ImageIcon avatar; // TODO this breaks stuff right now
 
-    private static final ImageIcon DEFAULT_AVATAR = new ImageIcon(
+    private static final transient ImageIcon DEFAULT_AVATAR = new ImageIcon(
             new ImageIcon("images/icon.png").getImage().getScaledInstance(32,
                     32, Image.SCALE_SMOOTH));
 
