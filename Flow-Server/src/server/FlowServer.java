@@ -94,8 +94,8 @@ public class FlowServer implements Runnable {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 		try {
-			return new FlowProject(temp.getString("ProjectName"), new User(
-					temp.getString("OwnerUsername")), UUID.fromString(projectId));
+			String owner = temp.getString("OwnerUsername");
+			return DataManagement.getInstance().getProjectFromUUID(owner, UUID.fromString(projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
