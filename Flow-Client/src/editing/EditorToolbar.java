@@ -63,7 +63,7 @@ public class EditorToolbar extends JToolBar {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		String projectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
-		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() > 1) {
+		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() < 1) {
 		    projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
