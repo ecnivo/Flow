@@ -68,8 +68,8 @@ public class SQLDatabase {
 			// Note: deleted the checking code, since a user can have no
 			// projects, which would throw an error, checking code moved to
 			// external method
-			return this.query("SELECT * FROM access WHERE Username = '"
-					+ username + "';");
+			return this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s';", username));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -93,15 +93,18 @@ public class SQLDatabase {
 		// TODO Implement check for if username exists
 		try {
 			if (accessLevel == EDIT || accessLevel == VIEW) {
-				this.update("INSERT INTO access values('" + projectId + "', '"
-						+ username + "', " + accessLevel + ";");
+				this.update(String.format(
+						"INSERT INTO access values('%s', '%s', '%s');",
+						projectId, username, accessLevel));
 			} else if (accessLevel == OWNER) {
 				// Changes the owner of the project in the projects table
-				this.update("UPDATE projects SET OwnerUserName = '" + username
-						+ "' WHERE ProjectID = '" + projectId + "';");
+				this.update(String.format(
+						"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
+						username, projectId));
 
-				this.update("DELETE FROM access WHERE Username = '" + username
-						+ "' AND ProjectID = '" + projectId + "';");
+				this.update(String.format(
+						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+						username, projectId));
 
 				// Changes the permissions of the user to be an owner
 				this.update("INSERT INTO access values('" + projectId + "', '"
