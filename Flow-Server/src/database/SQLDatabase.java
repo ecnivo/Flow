@@ -66,11 +66,11 @@ public class SQLDatabase {
 	public ResultSet getProjects(String username) throws DatabaseException {
 		try {
 			if (!this.query(
-					"SELECT * FROM projects WHERE OwnerUsername = '" + username + "';")
+					"SELECT * FROM access WHERE Username = '" + username + "';")
 					.next()) {
 				throw new DatabaseException("INVALID_USERNAME");
 			}
-			return this.query("SELECT * FROM projects WHERE OwnerUsername = '"
+			return this.query("SELECT * FROM access WHERE Username = '"
 					+ username + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
