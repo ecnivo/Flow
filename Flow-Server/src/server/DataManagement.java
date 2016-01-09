@@ -89,12 +89,14 @@ public class DataManagement {
     }
 
     public FlowProject getProjectFromUUID(String username, UUID uuid) {
+        L.info("getting project with uuid " + uuid + " owned by " + username);
         File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
                 + uuid.toString());
         if (!f.exists())
             return null;
+        File fff = new File(f, "project.flow");
         FileSerializer fs = new FileSerializer();
-        FlowProject p = fs.readFromFile(f, FlowProject.class);
+        FlowProject p = fs.readFromFile(fff, FlowProject.class);
         return p;
     }
 

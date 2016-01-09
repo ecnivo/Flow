@@ -200,7 +200,7 @@ public class ClientRequestHandle implements Runnable {
                         // TODO Move back to one line after debugging
                         FlowProject temp1 = this.server.getProject(
                                 data.get("project_uuid", UUID.class).toString());
-                        System.out.println(temp1.toString());
+                            System.out.println(temp1.toString());
                         returnData.put("project", temp1);
                     } catch (DatabaseException e) {
                         // TODO Auto-generated catch block
