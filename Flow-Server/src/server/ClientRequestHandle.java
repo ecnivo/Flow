@@ -291,11 +291,10 @@ public class ClientRequestHandle implements Runnable {
 											projectId, username));
 					break;
 				case "RENAME_PROJECT":
-					String newName = data.get("new_name", String.class);
-					if(!DataManagement.getInstance().renameProject(UUID.fromString(projectId), newName)){
-						L.warning("could not rename project from file system!");
-					}
-					returnData.put("status", this.database.renameProject(projectId, newName));
+					// FlowProject oldProject =
+					// DataManagement.getInstance().getProjectFromUUID()
+					returnData.put("status", this.database.renameProject(
+							projectId, data.get("new_name", String.class)));
 					break;
 				case "DELETE_PROJECT":
 					returnData.put("status",
