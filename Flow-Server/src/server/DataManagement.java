@@ -39,19 +39,19 @@ public class DataManagement {
 
     public boolean addUser(User u) {
         L.info("adding user " + u);
-        File userDirectory = new File(dataFile.getAbsolutePath(),u.getUsername());
+        File userDirectory = new File(dataFile.getAbsolutePath(),"users");
         if (userDirectory.exists())
             return false;
         userDirectory.mkdir();
-        fs.writeToFile(new File(userDirectory.getAbsolutePath() + File.separator + "user.flow"), u);
+        fs.writeToFile(new File(userDirectory.getAbsolutePath(), u.getUsername() + ".flow"), u);
         return true;
     }
 
     public boolean removeUser(String username) {
         L.info("removing user");
-        File userDirectory = new File(dataFile, username);
-        if(userDirectory.exists()) {
-            userDirectory.delete();
+        File userFile = new File(new File(dataFile, "users"), username + ".flow");
+        if(userFile.exists()) {
+            userFile.delete();
             return true;
         }
         return false;
@@ -59,15 +59,15 @@ public class DataManagement {
 
     public User getUserByUsername(String username) {
         L.info("getting user " + username + " by username");
-        File dir = new File(dataFile, username);
-        if (!dir.exists())
+        File userFile = new File(new File(dataFile, "users"), username + ".flow");
+        if (!userFile.exists())
             return null;
-        return fs.readFromFile(new File(dir, "user.flow"), User.class);
+        return fs.readFromFile(userFile, User.class);
     }
 
-    public boolean addProjectToUser(String username, FlowProject project) {
-        L.info("adding project " + project.getDirectoryName() + " to user " + username);
-        File projectDirectory = new File(new File(dataFile, username), project.getProjectUUID().toString());
+    public boolean addProjectToUser(FlowProject project) {
+        L.info("adding project " + project.getDirectoryName());
+        File projectDirectory = new File(new File(dataFile, "projects"), project.getProjectUUID().toString());
         if (projectDirectory.exists())
             return false;
         projectDirectory.mkdir();
@@ -76,18 +76,18 @@ public class DataManagement {
         return true;
     }
 
-    public boolean removeProjectFromUser(String username, UUID uuid) {
-        L.info("removing project with uuid " + uuid + " from user " + username);
-        File projectDirectory = new File(new File(dataFile, username), uuid.toString());
+    public boolean removeProject(UUID uuid) {
+        L.info("removing project with uuid " + uuid);
+        File projectDirectory = new File(new File(dataFile, "projects"), uuid.toString());
         if (!projectDirectory.exists())
             return false;
         projectDirectory.delete();
         return true;
     }
 
-    public FlowProject getProjectFromUUID(String username, UUID uuid) {
-        L.info("getting project with uuid " + uuid + " owned by " + username);
-        File projectDirectory = new File(new File(dataFile, username), uuid.toString());
+    public FlowProject getProjectFromUUID(UUID uuid) {
+        L.info("getting project with uuid " + uuid);
+        File projectDirectory = new File(new File(dataFile, "projects"), uuid.toString());
         if (!projectDirectory.exists())
             return null;
         File projectMetadataFile = new File(projectDirectory, "project.flow");
@@ -95,8 +95,21 @@ public class DataManagement {
         return project;
     }
 
-    public boolean addTextDocumentToProject(String username, UUID projectUUID, TextDocument textDoc) {
-        File projectDirectory = new File(new File(dataFile, username), projectUUID.toString());
+    public boolean renameProject(UUID uuid, String newName){
+        L.info("renaming project with uuid " + uuid);
+        FlowProject oldProject = this.getProjectFromUUID(uuid);
+        if(oldProject == null)
+            return false;
+        oldProject.setDirectoryName(newName);
+        File projectMetadata = new File(new File(new File(dataFile, "projects"), uuid.toString()), "project.flow");
+        if(!projectMetadata.exists())
+            return false;
+        projectMetadata.delete();
+        fs.writeToFile(projectMetadata, oldProject);
+        return true;
+    }
+    public boolean addTextDocumentToProject(UUID projectUUID, TextDocument textDoc) {
+        File projectDirectory = new File(new File(dataFile, "projects"), projectUUID.toString());
         File f = new File(projectDirectory, textDoc.getParentFile().getParentDirectory().getFullyQualifiedPath());
         if (f.exists())
             return false;
@@ -111,6 +124,7 @@ public class DataManagement {
 
     public boolean removeTextFileFromProject(String username, UUID projectUUID,
                                              TextDocument textDocument) {
+        // TODO rewrite this it is wrong
         File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
                 + projectUUID.toString() + File.separator
                 + textDocument.getParentFile().getParentDirectory().getFullyQualifiedPath()
@@ -121,8 +135,10 @@ public class DataManagement {
         return true;
     }
 
-    public FlowFile getFileFromPath(String username, UUID projectUUID, String path, UUID fileUUID) {
-        File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
+    public FlowFile getFileFromPath(UUID projectUUID, String path, UUID fileUUID) {
+
+        //TODO rewrite this to use path concatenation
+        File f = new File(dataFile.getAbsolutePath() + File.separator + "projects" + File.separator
                 + projectUUID.toString() + File.separator + path + File.separator + fileUUID);
         if (!f.exists())
             return null;
@@ -135,6 +151,7 @@ public class DataManagement {
     }
 
     public TextDocument getTextDocumentFromPath(String username, UUID projectUUID, String path, UUID fileUUID, UUID versionUUID) {
+        // TODO rewrite this is wrong
         File f = new File(dataFile.getAbsolutePath() + File.separator + username + File.separator
                 + projectUUID.toString() + File.separator + path + File.separator + fileUUID.toString() + File.separator + versionUUID.toString());
         if (!f.exists())

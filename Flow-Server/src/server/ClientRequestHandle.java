@@ -231,7 +231,7 @@ public class ClientRequestHandle implements Runnable {
 							new String[] { "Username" }, sessInfo)[0][0];
 					FlowProject fp = new FlowProject(projectName, DataManagement
 							.getInstance().getUserByUsername(username));
-					DataManagement.getInstance().addProjectToUser(username, fp);
+					DataManagement.getInstance().addProjectToUser(fp);
 					status = this.database.newProject(
 							fp.getProjectUUID().toString(), projectName,
 							username);
@@ -299,6 +299,9 @@ public class ClientRequestHandle implements Runnable {
 				case "DELETE_PROJECT":
 					returnData.put("status",
 							this.database.deleteProject(projectId));
+					if(!DataManagement.getInstance().removeProject(UUID.fromString(projectId))){
+						L.warning("could not delete project from file system!");
+					}
 					break;
 				}
 				break;
