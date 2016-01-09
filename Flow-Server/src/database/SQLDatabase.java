@@ -163,7 +163,7 @@ public class SQLDatabase {
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
-		return "OK";
+		return this.newDirectory(projectName, projectId, projectId, projectId);
 	}
 
 	/**
@@ -556,7 +556,7 @@ public class SQLDatabase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return "";
 	}
 
