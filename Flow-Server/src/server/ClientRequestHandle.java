@@ -231,7 +231,7 @@ public class ClientRequestHandle implements Runnable {
 							new String[] { "Username" }, sessInfo)[0][0];
 					FlowProject fp = new FlowProject(projectName, DataManagement
 							.getInstance().getUserByUsername(username));
-					DataManagement.getInstance().addProjectToUser(username, fp);
+					DataManagement.getInstance().addProjectToUser(fp);
 					status = this.database.newProject(
 							fp.getProjectUUID().toString(), projectName,
 							username);
@@ -291,13 +291,16 @@ public class ClientRequestHandle implements Runnable {
 											projectId, username));
 					break;
 				case "RENAME_PROJECT":
-					//FlowProject oldProject = DataManagement.getInstance().getProjectFromUUID()
-					returnData.put("status", this.database.renameProject(
-							projectId, data.get("new_name", String.class)));
+					String newName = data.get("new_name", String.class);
+					if(!DataManagement.getInstance().renameProject(UUID.fromString(projectId), newName)){
+						L.warning("could not rename project!");
+					}
+					returnData.put("status", this.database.renameProject(projectId, newName));
 					break;
 				case "DELETE_PROJECT":
 					returnData.put("status",
 							this.database.deleteProject(projectId));
+					DataManagement.getInstance().removeProject(UUID.fromString(projectId));
 					break;
 				}
 				break;
