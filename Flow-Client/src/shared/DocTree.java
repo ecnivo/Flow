@@ -68,6 +68,9 @@ public abstract class DocTree extends JTree {
 	    Data reply = Communicator.communicate(projectList);
 	    System.out.println(reply);
 	    usersProjectsUUIDs = reply.get("projects", UUID[].class);
+	    if (usersProjectsUUIDs == null) {
+		return;
+	    }
 
 	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 	    // Adds a new project
