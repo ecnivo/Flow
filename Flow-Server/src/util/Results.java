@@ -16,7 +16,7 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return (String[][]) list.toArray(new String[][] { {} });
+		return list.toArray(new String[][] { {} });
 	}
 
 	public static String[] toStringArray(String columnName, ResultSet results)
@@ -52,7 +52,7 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return (String[][]) list.toArray(new String[][] { {} });
+		return list.toArray(new String[][] { {} });
 	}
 
 	public static String[] toStringArray(int columnNumber, ResultSet results)
@@ -71,6 +71,6 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return (String[][]) list.toArray(new String[][] { {} });
+		return list.toArray(new String[][] { {} });
 	}
 }
