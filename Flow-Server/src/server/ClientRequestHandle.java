@@ -42,7 +42,7 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			// this.socket.setSoTimeout(500);
-			String username, password, status;
+			String username = null, password = null, status = null;
 			UUID random;
 			String[][] response;
 			Data data = psocket.receive();
@@ -260,14 +260,35 @@ public class ClientRequestHandle implements Runnable {
 						.toString();
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
-					username = data.get("username", String.class);
+					ResultSet sessionInfo = null;
+					try {
+						sessionInfo = this.database
+								.getSessionInfo(data.get("session_id"));
+
+					} catch (DatabaseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					try {
+						sessionInfo.next();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						username = sessionInfo.getString("Username");
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 					returnData
 							.put("status",
 									this.database.updateAccess(
 											(int) data.get("access_level",
 													Byte.class),
-											projectId, data.get("username",
-													String.class)));
+											projectId, username));
 					break;
 				case "RENAME_PROJECT":
 					returnData.put("status", this.database.renameProject(
