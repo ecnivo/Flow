@@ -42,7 +42,8 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			// this.socket.setSoTimeout(500);
-			String username, password;
+			String username, password, status;
+			UUID random;
 			String[][] response;
 			Data data = psocket.receive();
 
@@ -170,6 +171,12 @@ public class ClientRequestHandle implements Runnable {
 																// called on
 																// file
 																// creation!
+																// TODO Format
+																// the above
+																// amazingly
+																// formatted
+																// comment
+																// properly
 					returnData.put("document", file);
 					returnData.put("status", "ok");
 				} catch (DatabaseException e) {
@@ -217,7 +224,7 @@ public class ClientRequestHandle implements Runnable {
 					FlowProject fp = new FlowProject(projectName, DataManagement
 							.getInstance().getUserByUsername(username));
 					DataManagement.getInstance().addProjectToUser(username, fp);
-					String status = this.database.newProject(
+					status = this.database.newProject(
 							fp.getProjectUUID().toString(), projectName,
 							username);
 					if (status != null && status.equals("OK")) {
@@ -225,6 +232,8 @@ public class ClientRequestHandle implements Runnable {
 								this.database.updateAccess(SQLDatabase.OWNER,
 										fp.getProjectUUID().toString(),
 										username));
+						returnData.put("project_uuid",
+								fp.getProjectUUID().toString());
 					} else {
 						returnData.put("status", status);
 					}
@@ -261,18 +270,30 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
-			case "new_document":
-				// TODO Implement checking if file is inside alternate directory
-				this.database.newFile(data.get("file_name", String.class),
-						data.get("project_uuid", UUID.class).toString());
+			case "new_textdocument":
+				// TODO Implement new_arbitrarydocument
+				// TODO Actually create file @netdex
+				random = UUID.randomUUID();
+				status = this.database.newFile(random.toString(),
+						data.get("document_name", String.class),
+						data.get("project_uuid", UUID.class).toString(),
+						data.get("directory_uuid", UUID.class).toString());
+				if (status.equals("OK")) {
+					returnData.put("document_uuid", random);
+				}
+				returnData.put("status", status);
 				break;
 			case "new_directory":
-				// TODO Implement checking if directory is to be inside another
-				// directory
-				this.database.newDirectory(
+				status = this.database.newDirectory(
 						data.get("directory_name", String.class),
+						(random = UUID.randomUUID()).toString(),
 						data.get("project_uuid", UUID.class).toString(),
-						UUID.randomUUID().toString());
+						data.get("parent_directory_uuid", UUID.class)
+								.toString());
+				if (status.equals("OK")) {
+					returnData.put("directory_uuid", random);
+				}
+				returnData.put("status", status);
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX

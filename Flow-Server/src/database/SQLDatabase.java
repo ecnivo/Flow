@@ -145,16 +145,19 @@ public class SQLDatabase {
 	/**
 	 * Creates a new project with the specified name and owner
 	 *
-	 * @param name
+	 * @param projectName
 	 *            name of the project
 	 * @param ownerId
 	 *            ID of the user who creates the project
 	 */
-	public String newProject(String uuid, String name, String ownerId) {
+	public String newProject(String projectId, String projectName,
+			String ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
-			this.update(String.format("INSERT INTO projects(ProjectID, ProjectName, OwnerUsername) values('%s', '%s', '%s');", uuid, name, ownerId));
+			this.update(String.format(
+					"INSERT INTO projects VALUES('%s', '%s', '%s');", projectId,
+					projectName, ownerId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -165,6 +168,9 @@ public class SQLDatabase {
 	/**
 	 * Creates a new file within the specified project.
 	 *
+	 * @param fileId
+	 *            the ID of the file ({@link UUID#toString() string
+	 *            representation} of the UUID associated with file).
 	 * @param fileName
 	 *            the name of the file (including the extension).
 	 * @param projectId
@@ -172,30 +178,11 @@ public class SQLDatabase {
 	 * @param directoryId
 	 *            the ID of the directory which to place the file inside
 	 */
-	public String newFile(String fileName, String projectId,
+	public String newFile(String fileId, String fileName, String projectId,
 			String directoryId) {
 		try {
-			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
-					+ projectId + ", " + fileName + ")");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return FlowServer.ERROR;
-		}
-		return "OK";
-	}
-
-	/**
-	 * Creates a new file within the specified project.
-	 *
-	 * @param fileName
-	 *            the name of the file (including the extension).
-	 * @param projectId
-	 *            the ID of the project which to place the file inside
-	 */
-	public String newFile(String fileName, String projectId) {
-		try {
-			this.update("INSERT INTO documents(ProjectID, DocumentName) values("
-					+ projectId + ", " + fileName + ")");
+			this.update("INSERT INTO documents VALUES(" + fileId + ", "
+					+ projectId + ", " + fileName + ", " + directoryId + ")");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -208,6 +195,9 @@ public class SQLDatabase {
 	 *
 	 * @param directoryName
 	 *            the name of the directory.
+	 * @param directoryId
+	 *            the ID of the directory ({@link UUID#toString() string
+	 *            representation} of the UUID associated with the directory).
 	 * @param projectId
 	 *            the ID of the project which to place the directory inside.
 	 * @param parentDirectoryId
@@ -222,28 +212,7 @@ public class SQLDatabase {
 					+ "', '" + projectId + "')");
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		return "OK";
-	}
-
-	/**
-	 * Creates a new file within the specified project.
-	 *
-	 * @param directoryName
-	 *            the name of the directory.
-	 * @param projectId
-	 *            the ID of the project which to place the directory inside.
-	 */
-	public String newDirectory(String directoryName, String directoryId,
-			String projectId) {
-		try {
-			// TODO Add checks
-			this.update(
-					"INSERT INTO directories(DirectoryID, DirectoryName, ProjectID) values('"
-							+ directoryId + "', '" + directoryName + "', '"
-							+ projectId + "')");
-		} catch (SQLException e) {
-			e.printStackTrace();
+			return FlowServer.ERROR;
 		}
 		return "OK";
 	}
