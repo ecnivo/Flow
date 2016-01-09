@@ -65,7 +65,9 @@ public class SQLDatabase {
 	 */
 	public ResultSet getProjects(String username) throws DatabaseException {
 		try {
-			// Note: deleted the checking code, since a user can have no projects, which would throw an error, checking code moved to external method
+			// Note: deleted the checking code, since a user can have no
+			// projects, which would throw an error, checking code moved to
+			// external method
 			return this.query("SELECT * FROM access WHERE Username = '"
 					+ username + "';");
 		} catch (SQLException e) {
@@ -127,8 +129,8 @@ public class SQLDatabase {
 	public ResultSet getFiles(String projectId) throws DatabaseException {
 		try {
 			// TODO Add check if project is found
-			return this.query("SELECT * FROM documents WHERE ProjectID = "
-					+ projectId + ";");
+			return this.query("SELECT * FROM documents WHERE ProjectID = '"
+					+ projectId + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// TODO: this won't be called for this reason, move this exception
