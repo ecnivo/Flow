@@ -256,7 +256,8 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "project_modify":
-				String projectId = data.get("project_uuid", String.class);
+				String projectId = data.get("project_uuid", UUID.class)
+						.toString();
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					username = data.get("username", String.class);
