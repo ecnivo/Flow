@@ -56,7 +56,7 @@ public class SQLDatabase {
 	 * Getter for all projects associated with the specified username,
 	 * completely ignoring whether the user is the owner, or has only edit or
 	 * view access.
-	 * 
+	 *
 	 * @param username
 	 *            the ID of the user.
 	 * @return all projects associated with the specified username.
@@ -80,7 +80,7 @@ public class SQLDatabase {
 
 	/**
 	 * Specifies the access level to a specific project for a user.
-	 * 
+	 *
 	 * @param accessLevel
 	 *            the level of access provided to the user, either {@link OWNER}
 	 *            , {@link EDIT}, or {@link VIEW}.
@@ -123,7 +123,7 @@ public class SQLDatabase {
 
 	/**
 	 * Getter for all files associated with the specified project.
-	 * 
+	 *
 	 * @param projectId
 	 *            the ID of the project.
 	 * @return all associated files.
@@ -144,7 +144,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new project with the specified name and owner
-	 * 
+	 *
 	 * @param name
 	 *            name of the project
 	 * @param ownerId
@@ -154,8 +154,7 @@ public class SQLDatabase {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
-			this.update("INSERT INTO projects(ProjectName, OwnerID) values("
-					+ name + ", " + ownerId + ");");
+			this.update("INSERT INTO projects(ProjectName, OwnerUsername) values('" + name + "', '" + ownerId + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -165,7 +164,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new file within the specified project.
-	 * 
+	 *
 	 * @param fileName
 	 *            the name of the file (including the extension).
 	 * @param projectId
@@ -187,7 +186,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new file within the specified project.
-	 * 
+	 *
 	 * @param fileName
 	 *            the name of the file (including the extension).
 	 * @param projectId
@@ -206,7 +205,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new file within the specified project.
-	 * 
+	 *
 	 * @param directoryName
 	 *            the name of the directory.
 	 * @param projectId
@@ -229,7 +228,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new file within the specified project.
-	 * 
+	 *
 	 * @param directoryName
 	 *            the name of the directory.
 	 * @param projectId
@@ -251,7 +250,7 @@ public class SQLDatabase {
 
 	/**
 	 * Getter for all of the usernames in the database.
-	 * 
+	 *
 	 * @return all of the usernames in the database.
 	 * @throws DatabaseException
 	 */
@@ -272,7 +271,7 @@ public class SQLDatabase {
 	/**
 	 * Authenticates a user by verifying if the specified username and password
 	 * pair exists in the database.
-	 * 
+	 *
 	 * @param username
 	 *            the user's username.
 	 * @param password
@@ -299,7 +298,7 @@ public class SQLDatabase {
 
 	/**
 	 * Creates a new session for the specified username and serial number.
-	 * 
+	 *
 	 * @param username
 	 *            the UUID of the user.
 	 * @param serialNumber
@@ -322,7 +321,7 @@ public class SQLDatabase {
 
 	/**
 	 * Removes the specified session from the database
-	 * 
+	 *
 	 * @param sessionId
 	 *            the string representation of the UUID of the session
 	 * @return whether or not the session was successfully removed
@@ -343,7 +342,7 @@ public class SQLDatabase {
 	/**
 	 * Getter for the username and serial number associated with the specified
 	 * session ID.
-	 * 
+	 *
 	 * @param sessionId
 	 *            the id associated with the desired session
 	 * @return the username and serial number associated with the specified
@@ -374,7 +373,7 @@ public class SQLDatabase {
 
 	/**
 	 * Add users to the database with the specified username and password.
-	 * 
+	 *
 	 * @param username
 	 *            the desired username
 	 * @param password
@@ -417,7 +416,7 @@ public class SQLDatabase {
 
 	/**
 	 * Retrieves all associated data with the specified file.
-	 * 
+	 *
 	 * @param fileId
 	 *            the UUID of the file to retrieve.
 	 * @return all associated data from the 'documents' SQL table.
@@ -450,7 +449,7 @@ public class SQLDatabase {
 	 * Renames the specified project. This only changes the <b>given</b> project
 	 * name, <b>not the UUID</b>, hence not the internal server directory
 	 * structure either.
-	 * 
+	 *
 	 * @param projectId
 	 *            the UUID of the project to rename.
 	 * @param newName
@@ -484,7 +483,7 @@ public class SQLDatabase {
 	 * This method should only be called after verifying that the current
 	 * session belongs to the user which is the <b>owner</b> of the specified
 	 * project.
-	 * 
+	 *
 	 * @param projectId
 	 *            the UUID of the project to delete.
 	 * @throws DatabaseException
@@ -516,7 +515,7 @@ public class SQLDatabase {
 	 * the owner</b> from the database. This means these projects will <b>no
 	 * longer be accessible</b>. Please change the owner of any projects that
 	 * other users wish to continue developing.
-	 * 
+	 *
 	 * @param username
 	 *            the username associated with the account to close.
 	 * @throws DatabaseException
@@ -551,7 +550,7 @@ public class SQLDatabase {
 
 	/**
 	 * Allows users to change their password.
-	 * 
+	 *
 	 * @param username
 	 *            the username of the user (unique)
 	 * @param newPassword
@@ -581,7 +580,7 @@ public class SQLDatabase {
 	/**
 	 * Internal method which calls the {@link Statement#ExecuteQuery} method
 	 * with the specified query.
-	 * 
+	 *
 	 * @param query
 	 *            the SQL statement to search the database with.
 	 * @return the results returned from the server.
@@ -595,7 +594,7 @@ public class SQLDatabase {
 	/**
 	 * Internal method which calls the {@link Statement#ExecuteUpdate} method
 	 * with the specified query.
-	 * 
+	 *
 	 * @param query
 	 *            the SQL statement to update the database with.
 	 */
@@ -607,7 +606,7 @@ public class SQLDatabase {
 
 	/**
 	 * Checks if the specified username exists in the database.
-	 * 
+	 *
 	 * @param username
 	 *            the user's username (unique)
 	 * @return whether or not the username exists in the database.
@@ -627,7 +626,7 @@ public class SQLDatabase {
 
 	/**
 	 * Retrieves all associated info with the specified ProjectID.
-	 * 
+	 *
 	 * @param projectId
 	 *            the {@link UUID#toString toString} of the UUID of the project.
 	 * @return all associated information from the projects table.
