@@ -78,7 +78,7 @@ public class EditTabs extends JTabbedPane {
 	    public void stateChanged(ChangeEvent e) {
 		if (getParent() instanceof EditPane) {
 		    EditPane editPane = (EditPane) getParent();
-		    editPane.getTree().setActiveProject(
+		    editPane.getDocTree().setActiveProject(
 			    (FlowProject) ((EditArea) getSelectedComponent())
 				    .getFlowDoc().getParentFile()
 				    .getParentDirectory().getRootDirectory());

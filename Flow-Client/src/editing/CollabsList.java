@@ -18,7 +18,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
-import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -46,18 +45,13 @@ public class CollabsList extends JPanel {
     private JPanel userListPanel;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final int USER_ICON_SIZE = 55;
-    private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD,
-	    20);
-    private static final Border TEXT_ENTRY_BORDER = BorderFactory
-	    .createLineBorder(new Color(0xB1ADFF), 2);
-    private static final Border ICON_ENTRY_BORDER = BorderFactory
-	    .createLineBorder(new Color(255, 128, 128), 2);
+    private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
+    private static final Border TEXT_ENTRY_BORDER = BorderFactory.createLineBorder(new Color(0xB1ADFF), 2);
+    private static final Border ICON_ENTRY_BORDER = BorderFactory.createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
-    private UUID currProjectUUID;
 
     public CollabsList(FlowPermission myPermission, EditPane editPane) {
 	this.editPane = editPane;
-	currProjectUUID = null;
 	this.myPermission = myPermission;
 	setMinimumSize(new Dimension(5, 1));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -65,8 +59,7 @@ public class CollabsList extends JPanel {
 	setLayout(new BorderLayout(0, 0));
 
 	searchPane = new JPanel(new BorderLayout(0, 0));
-	searchPane.add(new JLabel("Type a username to seach for them"),
-		BorderLayout.NORTH);
+	searchPane.add(new JLabel("Type a username to seach for them"), BorderLayout.NORTH);
 
 	searchBox = new JTextField();
 	searchBox.setText(SEARCHBOX_TEXT);
@@ -83,8 +76,7 @@ public class CollabsList extends JPanel {
 
 	    @Override
 	    public void focusGained(FocusEvent e) {
-		if (searchBox.getText().equals(SEARCHBOX_TEXT)
-			|| searchBox.getText().trim().equals("")) {
+		if (searchBox.getText().equals(SEARCHBOX_TEXT) || searchBox.getText().trim().equals("")) {
 		    searchBox.setText("");
 		    searchBox.setForeground(Color.BLACK);
 		}
@@ -99,8 +91,7 @@ public class CollabsList extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
 		    refreshUserList();
-		    if (!(searchBox.getText().equals(SEARCHBOX_TEXT) || searchBox
-			    .getText().trim().equals(""))) {
+		    if (!(searchBox.getText().equals(SEARCHBOX_TEXT) || searchBox.getText().trim().equals(""))) {
 			// TODO make a search for a user
 		    }
 		}
@@ -110,9 +101,7 @@ public class CollabsList extends JPanel {
 	add(searchPane, BorderLayout.NORTH);
 
 	userListPanel = new JPanel(new GridLayout(0, 1, 2, 3));
-	userListPanel.setMaximumSize(new Dimension((int) Math
-		.floor(CollabsList.this.getSize().getWidth()),
-		Integer.MAX_VALUE));
+	userListPanel.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth()), Integer.MAX_VALUE));
 	userListPanel.addMouseListener(new MouseListener() {
 
 	    @Override
@@ -141,37 +130,30 @@ public class CollabsList extends JPanel {
 	    }
 	});
 	JScrollPane userListScroll = new JScrollPane(userListPanel);
-	userListScroll.getVerticalScrollBar().setUnitIncrement(
-		FlowClient.SCROLL_SPEED);
-	userListScroll
-		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-	userListScroll
-		.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	userListScroll.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
+	userListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	userListScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	add(userListScroll, BorderLayout.CENTER);
     }
 
     public void refreshUserList() {
-	FlowProject active = editPane.getTree().getActiveProject();
-	if (active == null){
+	FlowProject active = editPane.getDocTree().getActiveProject();
+	if (active == null) {
 	    return;
 	}
-	if (!currProjectUUID.equals(active.getProjectUUID())) {
-	    currProjectUUID = active.getProjectUUID();
+	if (!active.getProjectUUID().equals(active.getProjectUUID())) {
 	    userListPanel.removeAll();
 
-	    userListPanel.add(new UserInfo(active.getOwner(),
-		    new FlowPermission(FlowPermission.OWNER)));
+	    userListPanel.add(new UserInfo(active.getOwner(), new FlowPermission(FlowPermission.OWNER)));
 
 	    Iterator<User> editorIterator = active.getEditors().iterator();
 	    while (editorIterator.hasNext()) {
-		userListPanel.add(new UserInfo(editorIterator.next(),
-			new FlowPermission(FlowPermission.EDIT)));
+		userListPanel.add(new UserInfo(editorIterator.next(), new FlowPermission(FlowPermission.EDIT)));
 	    }
 
 	    Iterator<User> viewerIterator = active.getViewers().iterator();
 	    while (viewerIterator.hasNext()) {
-		userListPanel.add(new UserInfo(viewerIterator.next(),
-			new FlowPermission(FlowPermission.VIEW)));
+		userListPanel.add(new UserInfo(viewerIterator.next(), new FlowPermission(FlowPermission.VIEW)));
 	    }
 
 	    searchBox.setText(SEARCHBOX_TEXT);
@@ -194,10 +176,8 @@ public class CollabsList extends JPanel {
 	public UserInfo(User user, FlowPermission permission) {
 	    userPermission = permission;
 
-	    setMaximumSize(new Dimension((int) Math.floor(CollabsList.this
-		    .getSize().getWidth() * .9), 80));
-	    setPreferredSize(new Dimension((int) Math.floor(CollabsList.this
-		    .getSize().getWidth() * .9), 80));
+	    setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth() * .9), 80));
+	    setPreferredSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth() * .9), 80));
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setLayout(new BorderLayout(2, 0));
@@ -210,15 +190,12 @@ public class CollabsList extends JPanel {
 	    add(switcher, BorderLayout.CENTER);
 
 	    simpleView = new JPanel(new BorderLayout(0, 1));
-	    simpleView.setMaximumSize(new Dimension((int) Math
-		    .floor(CollabsList.this.getSize().getWidth() * .9), 80));
+	    simpleView.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth() * .9), 80));
 	    JLabel name = new JLabel(user.getUsername()) {
 		public void paintComponent(Graphics g) {
 		    Graphics2D g2 = (Graphics2D) g;
-		    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-			    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		    g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-			    RenderingHints.VALUE_RENDER_QUALITY);
+		    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		    super.paintComponent(g2);
 		}
 	    };
@@ -246,13 +223,9 @@ public class CollabsList extends JPanel {
 	    setBackground(userPermission.getPermissionColor());
 
 	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
-		permissionSelectors[permLevel] = new JRadioButton(
-			new FlowPermission(permLevel).toString());
-		permissionSelectors[permLevel]
-			.addActionListener(new PermissionRadioButtonListener(
-				permLevel));
-		permissionSelectors[permLevel]
-			.addMouseListener(new ButtonHighlightListener());
+		permissionSelectors[permLevel] = new JRadioButton(new FlowPermission(permLevel).toString());
+		permissionSelectors[permLevel].addActionListener(new PermissionRadioButtonListener(permLevel));
+		permissionSelectors[permLevel].addMouseListener(new ButtonHighlightListener());
 		permissionSelectors[permLevel].setOpaque(false);
 		permissionGroup.add(permissionSelectors[permLevel]);
 		permissionPanel.add(permissionSelectors[permLevel]);
@@ -272,30 +245,15 @@ public class CollabsList extends JPanel {
 		    }
 
 		    Data changePerm = new Data("project_modify");
-		    changePerm
-			    .put("project_modify_type", "MODIFY_COLLABORATOR");
-		    changePerm.put("project_uuid", editPane.getTree()
-			    .getActiveProject().getProjectUUID());
+		    changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
+		    changePerm.put("project_uuid", editPane.getDocTree().getActiveProject().getProjectUUID());
 		    changePerm.put("username", user.getUsername());
 		    changePerm.put("access_level", changePermission);
-		    if (!Communicator.communicate(changePerm)
-			    .get("status", String.class).equals("OK")) {
-			JOptionPane
-				.showConfirmDialog(
-					null,
-					"Either this project does not exist,\n"
-						+ "the user does not exist,\n"
-						+ "the access level is invalid,\n"
-						+ "or you do not have the access to change permissions.\n\n"
-						+ "Try refreshing the list of projects by moving your mouse cursor to the documents tree\n"
-						+ "and back into this list of users and try again.",
-					"Project out of sync",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE);
+		    if (!Communicator.communicate(changePerm).get("status", String.class).equals("OK")) {
+			JOptionPane.showConfirmDialog(null, "Either this project does not exist,\n" + "the user does not exist,\n" + "the access level is invalid,\n" + "or you do not have the access to change permissions.\n\n" + "Try refreshing the list of projects by moving your mouse cursor to the documents tree\n" + "and back into this list of users and try again.", "Project out of sync", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    }
 
-		    ((CardLayout) switcher.getLayout())
-			    .show(switcher, "simple");
+		    ((CardLayout) switcher.getLayout()).show(switcher, "simple");
 		    updateFields();
 		    CollabsList.this.refreshUserList();
 		}
@@ -328,10 +286,8 @@ public class CollabsList extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 		    if (myPermission.canChangeCollabs())
-			((CardLayout) switcher.getLayout()).show(switcher,
-				"permissions");
-		    permissionSelectors[userPermission.getPermissionLevel()]
-			    .setSelected(true);
+			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
+		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
 		}
 	    });
 	    icon.addMouseListener(new MouseListener() {

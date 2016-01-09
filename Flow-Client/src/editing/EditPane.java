@@ -105,7 +105,7 @@ public class EditPane extends JPanel {
 	return editToolbar;
     }
 
-    public EditorDocTree getTree() {
+    public EditorDocTree getDocTree() {
 	return tree;
     }
 }

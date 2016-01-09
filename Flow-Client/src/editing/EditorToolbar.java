@@ -53,7 +53,7 @@ public class EditorToolbar extends JToolBar {
 		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getTree().refreshProjectList();
+		pane.getDocTree().refreshProjectList();
 	    }
 	});
 	renameProjectButton = new JMenuItem();
@@ -62,14 +62,15 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String projectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		String projectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getDocTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
 		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() < 1) {
 		    projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-		modifyRequest.put("project_uuid", pane.getTree().getActiveProject());
+		modifyRequest.put("project_uuid", pane.getDocTree().getActiveProject().getProjectUUID());
+		modifyRequest.put("session_id", Communicator.getSessionID());
 		modifyRequest.put("new_name", projectName);
 		switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 		case "OK":
@@ -82,7 +83,7 @@ public class EditorToolbar extends JToolBar {
 		    JOptionPane.showConfirmDialog(null, "The project you are trying to rename does not exist.\n" + "Try refreshing the list of projects by moving your mouse cursor into,\n" + "then out of the project list.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
-		pane.getTree().refreshProjectList();
+		pane.getDocTree().refreshProjectList();
 	    }
 	});
 
