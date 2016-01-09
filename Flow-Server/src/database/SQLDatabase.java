@@ -65,11 +65,7 @@ public class SQLDatabase {
 	 */
 	public ResultSet getProjects(String username) throws DatabaseException {
 		try {
-			if (!this.query(
-					"SELECT * FROM access WHERE Username = '" + username + "';")
-					.next()) {
-				throw new DatabaseException("INVALID_USERNAME");
-			}
+			// Note: deleted the checking code, since a user can have no projects, which would throw an error, checking code moved to external method
 			return this.query("SELECT * FROM access WHERE Username = '"
 					+ username + "';");
 		} catch (SQLException e) {
