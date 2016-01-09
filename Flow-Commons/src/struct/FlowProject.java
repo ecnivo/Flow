@@ -11,14 +11,13 @@ import java.util.UUID;
 public class FlowProject extends FlowDirectory {
 
     private UUID projectUUID;
-    private String name;
+
     private User owner;
     private transient ArrayList<User> viewers;
     private transient ArrayList<User> editors;
 
     public FlowProject(String name, User owner, UUID uuid) {
         super(name);
-        this.name = name;
         this.owner = owner;
         this.projectUUID = uuid;
     }
@@ -42,7 +41,7 @@ public class FlowProject extends FlowDirectory {
     }
 
     public String toString() {
-        return name;
+        return this.getDirectoryName();
     }
 
     public ArrayList<User> getViewers() {
