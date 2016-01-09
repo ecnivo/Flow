@@ -83,7 +83,7 @@ public class ClientRequestHandle implements Runnable {
                             DataManagement.getInstance().addUser(new User(
                                     data.get("username"), data.get("password")));
                     /*
-					 * TODO we need to know if the username/password have
+                     * TODO we need to know if the username/password have
 					 * invalid characters
 					 */
                             break;
@@ -114,16 +114,11 @@ public class ClientRequestHandle implements Runnable {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+
                     try {
-                        temp.next();
-                    } catch (SQLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    try {
-                        response = Results.toStringArray(
-                                new String[]{"ProjectID"}, this.database
-                                        .getProjects(temp.getString("Username")));
+                        String unmamedb = temp.getString("Username");
+                        ResultSet projects = this.database.getProjects(unmamedb);
+                        response = Results.toStringArray(new String[]{"ProjectID"}, projects);
                     } catch (SQLException e) {
                         e.printStackTrace();
                         // TODO Auto-generated catch block
@@ -209,7 +204,9 @@ public class ClientRequestHandle implements Runnable {
                         String projectName = data.get("project_name", String.class);
                         ResultSet sessInfo = this.database.getSessionInfo(data.get("session_id", UUID.class).toString());
                         String results = Results.toStringArray(new String[]{"Username"}, sessInfo)[0][0];
-                        String status = this.database.newProject(projectName, results);
+                        FlowProject fp = new FlowProject(projectName, DataManagement.getInstance().getUserByUsername(results));
+                        DataManagement.getInstance().addProjectToUser(results, fp);
+                        String status = this.database.newProject(fp.getProjectUUID().toString(), projectName, results);
                         returnData.put("status", status);
                     } catch (SQLException e) {
                         // TODO Auto-generated catch block

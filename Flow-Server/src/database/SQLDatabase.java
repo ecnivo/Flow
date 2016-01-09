@@ -66,11 +66,11 @@ public class SQLDatabase {
 	public ResultSet getProjects(String username) throws DatabaseException {
 		try {
 			if (!this.query(
-					"SELECT * FROM users WHERE Username = '" + username + "';")
+					"SELECT * FROM projects WHERE OwnerUsername = '" + username + "';")
 					.next()) {
 				throw new DatabaseException("INVALID_USERNAME");
 			}
-			return this.query("SELECT * FROM access WHERE Username = '"
+			return this.query("SELECT * FROM projects WHERE OwnerUsername = '"
 					+ username + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -150,11 +150,11 @@ public class SQLDatabase {
 	 * @param ownerId
 	 *            ID of the user who creates the project
 	 */
-	public String newProject(String name, String ownerId) {
+	public String newProject(String uuid, String name, String ownerId) {
 		try {
 			// TODO Add check to make sure user doesn't have two projects with
 			// same name
-			this.update("INSERT INTO projects(ProjectName, OwnerUsername) values('" + name + "', '" + ownerId + "');");
+			this.update(String.format("INSERT INTO projects(ProjectID, ProjectName, OwnerUsername) values('%s', '%s', '%s');", uuid, name, ownerId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
