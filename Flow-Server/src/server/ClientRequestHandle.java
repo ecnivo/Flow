@@ -293,14 +293,16 @@ public class ClientRequestHandle implements Runnable {
 				case "RENAME_PROJECT":
 					String newName = data.get("new_name", String.class);
 					if(!DataManagement.getInstance().renameProject(UUID.fromString(projectId), newName)){
-						L.warning("could not rename project!");
+						L.warning("could not rename project from file system!");
 					}
 					returnData.put("status", this.database.renameProject(projectId, newName));
 					break;
 				case "DELETE_PROJECT":
 					returnData.put("status",
 							this.database.deleteProject(projectId));
-					DataManagement.getInstance().removeProject(UUID.fromString(projectId));
+					if(!DataManagement.getInstance().removeProject(UUID.fromString(projectId))){
+						L.warning("could not delete project from file system!");
+					}
 					break;
 				}
 				break;
