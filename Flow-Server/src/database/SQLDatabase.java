@@ -287,7 +287,7 @@ public class SQLDatabase {
 	public boolean newSession(String username, String sessionId) {
 		try {
 			this.update(String.format(
-					"INSERT INTO sessions VALUES ('%s', '%s');" + username,
+					"INSERT INTO sessions VALUES ('%s', '%s');" , username,
 					sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
