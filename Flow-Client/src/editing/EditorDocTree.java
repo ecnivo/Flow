@@ -14,7 +14,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
@@ -32,8 +31,6 @@ import struct.TextDocument;
 @SuppressWarnings("serial")
 public class EditorDocTree extends DocTree {
 
-    private DirectoryNode activeDirectory;
-    private FileNode activeFile;
     private EditPane editPane;
     private FlowFile clipboard;
 
@@ -89,9 +86,9 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + activeDirectory.toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + getActiveDirectoryNode().toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.YES_OPTION) {
-		    FlowDirectory flowDir = activeDirectory.getDirectory();
+		    FlowDirectory flowDir = getActiveDirectoryNode().getDirectory();
 		    Data ddr = new Data("directory_modify");
 		    ddr.put("project_uuid", ((FlowProject) flowDir.getRootDirectory()).getProjectUUID());
 		    ddr.put("directory_uuid", flowDir.getDirectoryUUID());
@@ -124,7 +121,7 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		clipboard = activeFile.getFile();
+		clipboard = getActiveFileNode().getFile();
 	    }
 	});
 
@@ -145,7 +142,7 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// TODO tell server to delete this file
+		// TODO confirm deletion and delete file
 		EditorDocTree.this.refreshProjectList();
 	    }
 	});
@@ -183,31 +180,20 @@ public class EditorDocTree extends DocTree {
 		int y = e.getY();
 
 		if (selected instanceof ProjectNode) {
-		    setActiveProject(((ProjectNode) selected).getProject());
-		    setActiveDirectory((ProjectNode) selected);
 		    if (e.getButton() == MouseEvent.BUTTON3) {
 			projectPopup.show(EditorDocTree.this, x, y);
 		    }
 		} else if (selected instanceof DirectoryNode) {
-		    setActiveProject(((FlowProject) ((DirectoryNode) selected).getDirectory().getRootDirectory()));
-		    setActiveDirectory((DirectoryNode) selected);
 		    if (e.getButton() == MouseEvent.BUTTON3) {
 			dirPopup.show(EditorDocTree.this, x, y);
 		    }
 		} else if (selected instanceof FileNode) {
-		    FileNode fileNode = (FileNode) selected;
-		    setActiveProject((FlowProject) fileNode.getFile().getParentDirectory().getRootDirectory());
-		    setActiveDirectory((DirectoryNode) ((FileNode) selected).getParent());
-		    setActiveFile(fileNode);
 		    if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-			openFile(fileNode.getFile());
+			openFile(((FileNode) selected).getFile());
 		    } else if (e.getButton() == MouseEvent.BUTTON3) {
 			filePopup.show(EditorDocTree.this, x, y);
 		    }
 		} else if (selected instanceof DefaultMutableTreeNode) {
-		    if (((DefaultMutableTreeNode) selected).getChildCount() == 0) {
-			refreshProjectList();
-		    }
 		    if (e.getButton() == MouseEvent.BUTTON3)
 			workspacePopup.show(EditorDocTree.this, x, y);
 		}
@@ -286,7 +272,7 @@ public class EditorDocTree extends DocTree {
 		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
 			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
 		    }
-		    FlowDirectory parent = activeDirectory.getDirectory();
+		    FlowDirectory parent = getActiveDirectoryNode().getDirectory();
 		    Data createDirReq = new Data("new_directory");
 		    createDirReq.put("project_uuid", ((FlowProject) parent.getRootDirectory()).getProjectUUID());
 		    createDirReq.put("session_id", Communicator.getSessionID());
@@ -294,9 +280,11 @@ public class EditorDocTree extends DocTree {
 		    createDirReq.put("name", name);
 
 		    Data response = Communicator.communicate(createDirReq);
-		    if (response.get("status", String.class).equals("OK"))
-			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new DirectoryNode(new FlowDirectory(parent, name)), activeDirectory, activeDirectory.getChildCount() - 2);
-		    else
+		    if (response.get("status", String.class).equals("OK")) {
+			reloadProjectFiles(((ProjectNode) getActiveDirectoryNode().getPath()[1]));
+		    } else if (response.get("status", String.class).equals("DIRECTORY_NAME_INVALID")) {
+			JOptionPane.showConfirmDialog(null, "The directory name is invalid. Try another name.\nThe most likely issue is that the name is conflicting with another name.", "Directory name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+		    } else
 			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		}
 	    });
@@ -334,10 +322,10 @@ public class EditorDocTree extends DocTree {
     }
 
     private void setActiveDirectory(DirectoryNode newActive) {
-	activeDirectory = newActive;
+	setActiveDirectoryNode(newActive);
     }
 
     private void setActiveFile(FileNode newActive) {
-	activeFile = newActive;
+	setActiveFileNode(newActive);
     }
 }

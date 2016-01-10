@@ -52,7 +52,7 @@ public class EditorToolbar extends JToolBar {
 		    break;
 
 		case "PROJECT_NAME_INVALID":
-		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project name is invalid. Please choose another one.\nThe most likely case is that your project name conflicts with another project name.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    break;
 		}
 		pane.getDocTree().refreshProjectList();
