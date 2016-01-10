@@ -440,12 +440,14 @@ public class SQLDatabase {
 	public String renameProject(String projectId, String newName) {
 		// TODO Check if name is valid
 		try {
-			if (!this.query("SELECT * from projects WHERE ProjectID = '"
-					+ projectId + "';").next()) {
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectId)).next()) {
 				return "PROJECT_NAME_INVALID";
 			}
-			this.update("UPDATE projects SET ProjectName = '" + newName
-					+ "' WHERE ProjectID = '" + projectId + "';");
+			this.update(String.format(
+					"UPDATE projects SET ProjectName = '%s' WHERE ProjectID = '%s';",
+					newName, projectId));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -470,18 +472,21 @@ public class SQLDatabase {
 	 */
 	public String deleteProject(String projectId) {
 		try {
-			if (!this.query("SELECT * from projects WHERE ProjectID = '"
-					+ projectId + "';").next()) {
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectId)).next()) {
 				return "PROJECT_DOES_NOT_EXIST";
 			}
-			this.update("DELETE FROM projects WHERE ProjectID = '" + projectId
-					+ "';");
-			this.update("DELETE FROM access WHERE ProjectID = '" + projectId
-					+ "';");
-			this.update("DELETE FROM documents WHERE ProjectID = '" + projectId
-					+ "';");
-			this.update("DELETE FROM directories WHERE ProjectID = '"
-					+ projectId + "';");
+			this.update(String.format(
+					"DELETE FROM projects WHERE ProjectID = '%s';", projectId));
+			this.update(String.format(
+					"DELETE FROM access WHERE ProjectID = '%s';", projectId));
+			this.update(String.format(
+					"DELETE FROM documents WHERE ProjectID = '%s';",
+					projectId));
+			this.update(String.format(
+					"DELETE FROM directories WHERE ProjectID = '%s';",
+					projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -502,21 +507,22 @@ public class SQLDatabase {
 	 */
 	public String closeAccount(String username) {
 		try {
-			if (!this.query(
-					"SELECT * from users WHERE Username = '" + username + "';")
+			if (!this.query(String.format(
+					"SELECT * from users WHERE Username = '%s';", username))
 					.next()) {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
 
 			// TODO Delete all documents using the deleted project IDs
-			this.update(
-					"DELETE FROM users WHERE Username = '" + username + "';");
-			this.update("DELETE FROM projects WHERE OwnerUsername = '"
-					+ username + "';");
-			this.update("DELETE FROM sessions WHERE Username = '" + username
-					+ "';");
-			this.update(
-					"DELETE FROM access WHERE Username = '" + username + "';");
+			this.update(String.format(
+					"DELETE FROM users WHERE Username = '%s';", username));
+			this.update(String.format(
+					"DELETE FROM projects WHERE OwnerUsername = '%s';",
+					username));
+			this.update(String.format(
+					"DELETE FROM sessions WHERE Username '%s';", username));
+			this.update(String.format(
+					"DELETE FROM access WHERE Username = '%s';", username));
 
 			// TODO Delete all the actual file data from disk
 
@@ -541,13 +547,14 @@ public class SQLDatabase {
 	 */
 	public String changePassword(String username, String newPassword) {
 		try {
-			if (!this.query(
-					"SELECT * from users WHERE Username = '" + username + "';")
+			if (!this.query(String.format(
+					"SELECT * from users WHERE Username = '%s';", username))
 					.next()) {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
-			this.update("UPDATE users SET Password = '" + newPassword
-					+ "' WHERE Username = '" + username + "';");
+			this.update(String.format(
+					"UPDATE users SET Password = '%s' WHERE Username = '%s';",
+					newPassword, username));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -650,8 +657,9 @@ public class SQLDatabase {
 	 */
 	public ResultSet getProjectInfo(String projectId) throws DatabaseException {
 		try {
-			return this.query("SELECT * FROM projects WHERE ProjectID = '"
-					+ projectId + "';");
+			return this.query(String.format(
+					"SELECT * FROM projects WHERE ProjectID = '%s';",
+					projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -671,8 +679,9 @@ public class SQLDatabase {
 	public ResultSet getDirectoryInfo(String directoryId)
 			throws DatabaseException {
 		try {
-			return this.query("SELECT * FROM directories WHERE DirectoryID = '"
-					+ directoryId + "';");
+			return this.query(String.format(
+					"SELECT * FROM directories WHERE DirectoryID = '%s';",
+					directoryId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
