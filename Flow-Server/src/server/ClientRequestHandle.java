@@ -344,6 +344,11 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
+			case "end_session":
+				// TODO Deregister all associated listeners
+				this.database.removeSession(
+						data.get("session_id", UUID.class).toString());
+				break;
 			default:
 				// For completeness's sake
 				returnData.put("status", "INVALID_REQUEST_TYPE");
