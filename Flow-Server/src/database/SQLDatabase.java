@@ -213,7 +213,7 @@ public class SQLDatabase {
 		try {
 			// TODO Add checks
 			this.update(String.format(
-					"INSERT INTO documents VALUES('%s', '%s', '%s', '%s');",
+					"INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
 					directoryId, parentDirectoryId, directoryName, projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -230,12 +230,14 @@ public class SQLDatabase {
 	 */
 	public ResultSet getUserNames(String projectId) throws DatabaseException {
 		try {
-			if (!this.query("SELECT * from projects WHERE ProjectID = '"
-					+ projectId + "';").next()) {
-				throw new DatabaseException("");
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectId)).next()) {
+				throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
 			}
-			return this.query("SELECT Username FROM access WHERE ProjectID = '"
-					+ projectId + "';");
+			return this.query(String.format(
+					"SELECT Username FROM access WHERE ProjectID = '%s';",
+					projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -254,9 +256,9 @@ public class SQLDatabase {
 	 */
 	public boolean authenticate(String username, String password) {
 		try {
-			ResultSet pair = this
-					.query("SELECT Password FROM users WHERE Username = '"
-							+ username + "';");
+			ResultSet pair = this.query(String.format(
+					"SELECT Password FROM users WHERE Username = '%s';",
+					username));
 			if (pair.next()) {
 				// TODO Verify
 				return password.equals(pair.getString("password"));
@@ -284,8 +286,9 @@ public class SQLDatabase {
 	 */
 	public boolean newSession(String username, String sessionId) {
 		try {
-			this.update("INSERT INTO sessions VALUES ('" + username + "', '"
-					+ sessionId + "');");
+			this.update(String.format(
+					"INSERT INTO sessions VALUES ('%s', '%s');" + username,
+					sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -303,8 +306,8 @@ public class SQLDatabase {
 	public boolean removeSession(String sessionId) {
 		try {
 			// TODO Verify if the session actually exists prior to removal
-			this.update("DELETE FROM sessions WHERE SessionID = '" + sessionId
-					+ "';");
+			this.update(String.format(
+					"DELETE FROM sessions WHERE SessionID = '%s';", sessionId));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,14 +331,15 @@ public class SQLDatabase {
 	 */
 	public ResultSet getSessionInfo(String sessionId) throws DatabaseException {
 		try {
-			ResultSet temp = this
-					.query("SELECT * FROM sessions WHERE SessionID = '"
-							+ sessionId + "';");
+			ResultSet temp = this.query(String.format(
+					"SELECT * FROM sessions WHERE SessionID = '%s';",
+					sessionId));
 			if (temp.next()) {
 				// Duplicate query because SQLite doesn't support moving back in
 				// data (i.e. creating non 'TYPE_FORWARD_ONLY' ResultSets)
-				return this.query("SELECT * FROM sessions WHERE SessionID = '"
-						+ sessionId + "';");
+				return this.query(String.format(
+						"SELECT * FROM sessions WHERE SessionID = '%s';",
+						sessionId));
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
 		} catch (SQLException e) {
@@ -366,8 +370,9 @@ public class SQLDatabase {
 	public String addUser(String username, String password) {
 		try {
 			// Checks if a user with the specified username already exsists
-			if (this.query("SELECT username FROM users WHERE Username = '"
-					+ username + "';").next()) {
+			if (this.query(String.format(
+					"SELECT username FROM users WHERE Username = '%s';",
+					username)).next()) {
 				return "USERNAME_TAKEN";
 			}
 		} catch (SQLException e) {
@@ -377,14 +382,14 @@ public class SQLDatabase {
 		}
 
 		try {
-			this.update("INSERT INTO users (username, password) VALUES ('"
-					+ username + "', '" + password + "');");
+			this.update(String.format(
+					"INSERT INTO users VALUES ('%s', '%s');" + username,
+					password));
 		} catch (SQLException e) {
 			System.err.println("Error inserting user into database");
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
-
 		return "OK";
 	}
 
@@ -400,9 +405,9 @@ public class SQLDatabase {
 	public ResultSet getFile(String fileId) throws DatabaseException {
 		try {
 			ResultSet temp;
-			if ((temp = this
-					.query("SELECT * from documents WHERE DocumentID = '"
-							+ fileId + "';")).next()) {
+			if ((temp = this.query(String.format(
+					"SELECT * from documents WHERE DocumentID = '%s';",
+					fileId))).next()) {
 				temp.previous();
 				return temp;
 			} else {
