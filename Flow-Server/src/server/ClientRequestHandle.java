@@ -229,8 +229,9 @@ public class ClientRequestHandle implements Runnable {
 							data.get("session_id", UUID.class).toString());
 					username = Results.toStringArray(
 							new String[] { "Username" }, sessInfo)[0][0];
-					FlowProject project = new FlowProject(projectName, DataManagement
-							.getInstance().getUserByUsername(username));
+					FlowProject project = new FlowProject(projectName,
+							DataManagement.getInstance()
+									.getUserByUsername(username));
 					DataManagement.getInstance().addProjectToUser(project);
 					status = this.database.newProject(
 							project.getProjectUUID().toString(), projectName,
@@ -240,7 +241,7 @@ public class ClientRequestHandle implements Runnable {
 								this.database.updateAccess(SQLDatabase.OWNER,
 										project.getProjectUUID().toString(),
 										username));
-						returnData.put("project", project);
+						// returnData.put("project", project);
 					} else {
 						returnData.put("status", status);
 					}
@@ -316,9 +317,9 @@ public class ClientRequestHandle implements Runnable {
 						data.get("document_name", String.class),
 						data.get("project_uuid", UUID.class).toString(),
 						data.get("directory_uuid", UUID.class).toString());
-				if (status.equals("OK")) {
-					returnData.put("document_uuid", random);
-				}
+				// if (status.equals("OK")) {
+				// returnData.put("document_uuid", random);
+				// }
 				returnData.put("status", status);
 				break;
 			case "new_directory":
@@ -328,9 +329,9 @@ public class ClientRequestHandle implements Runnable {
 						data.get("project_uuid", UUID.class).toString(),
 						data.get("parent_directory_uuid", UUID.class)
 								.toString());
-				if (status.equals("OK")) {
-					returnData.put("directory_uuid", random);
-				}
+				// if (status.equals("OK")) {
+				// returnData.put("directory_uuid", random);
+				// }
 				returnData.put("status", status);
 				break;
 			// TODO Implement sending messages to active sessions on changes
