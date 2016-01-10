@@ -40,10 +40,10 @@ public class DataManagement {
 	public boolean addUser(User u) {
 		L.info("adding user " + u);
 		File userDirectory = new File(dataFile.getAbsolutePath(), "users");
-		if (userDirectory.exists()) {
-			System.out.println("MOOOOOOO --> User already exists");
-			return false;
-		}
+		//TODO NETDEX FIX THIS AND UN COMMENT
+		// if (userDirectory.exists()) {
+		// return false;
+		// }
 
 		userDirectory.mkdir();
 		fs.writeToFile(new File(userDirectory.getAbsolutePath(),
