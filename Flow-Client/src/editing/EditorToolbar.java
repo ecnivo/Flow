@@ -62,19 +62,20 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String projectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getDocTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
-		while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() < 1) {
-		    projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
+		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getDocTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
+		    modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
 		modifyRequest.put("project_uuid", pane.getDocTree().getActiveProject().getProjectUUID());
 		modifyRequest.put("session_id", Communicator.getSessionID());
-		modifyRequest.put("new_name", projectName);
+		modifyRequest.put("new_name", modifiedProjectName);
 		switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 		case "OK":
-		    JOptionPane.showConfirmDialog(null, "Your project has been succesfully renamed to " + projectName + ".", "Project renaming success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+		    JOptionPane.showConfirmDialog(null, "Your project has been succesfully renamed to " + modifiedProjectName + ".", "Project renaming success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+		    pane.getDocTree().getActiveProject().setDirectoryName(modifiedProjectName);
 		    break;
 		case "PROJECT_NAME_INVALID":
 		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

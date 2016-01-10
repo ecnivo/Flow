@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import message.Data;
@@ -44,6 +45,15 @@ public abstract class DocTree extends JTree {
 	    public void mouseClicked(MouseEvent e) {
 		if (e.isAltDown())
 		    refreshProjectList();
+		// else if (e.isShiftDown()) {
+		// DefaultMutableTreeNode root = (DefaultMutableTreeNode)
+		// model.getRoot();
+		// System.out.println(root);
+		// root.removeAllChildren();
+		// model.reload();
+		// revalidate();
+		// repaint();
+		// }
 	    }
 	});
 	// refreshProjectList();
@@ -62,7 +72,14 @@ public abstract class DocTree extends JTree {
     }
 
     public void refreshProjectList() {
-	if (FlowClient.NETWORK) {
+	if (!FlowClient.NETWORK) {
+	    return;
+	} else {
+	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+	    // root.removeAllChildren();
+	    // model.reload();
+	    // revalidate();
+	    // repaint();
 	    Data projectList = new Data("list_projects");
 	    projectList.put("session_id", Communicator.getSessionID());
 	    Data reply = Communicator.communicate(projectList);
@@ -71,7 +88,10 @@ public abstract class DocTree extends JTree {
 		return;
 	    }
 
-	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+	    // for (UUID uuid : usersProjectsUUIDs) {
+	    // createProjectNode(uuid);
+	    // }
+
 	    // Adds a new project
 	    for (UUID uuid : usersProjectsUUIDs) {
 		boolean projectExistsLocally = false;
@@ -81,32 +101,29 @@ public abstract class DocTree extends JTree {
 		    }
 		}
 		if (!projectExistsLocally) {
-		    createProjectNode(uuid);
+		    System.out.println(createProjectNode(uuid).getProject());
 		}
 	    }
 
 	    // Deletes projects that don't exist
 	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
-		boolean projectStillExists = false;
-		for (int j = 0; j < usersProjectsUUIDs.length && !projectStillExists; j++) {
+		boolean projectExistsRemotely = false;
+		for (int j = 0; j < usersProjectsUUIDs.length && !projectExistsRemotely; j++) {
 		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root.getChildAt(i)).getProject().getProjectUUID())) {
-			projectStillExists = true;
+			projectExistsRemotely = true;
 		    }
 		}
-		if (!projectStillExists) {
-		    root.remove(i);
+		if (!projectExistsRemotely) {
+		    model.removeNodeFromParent((MutableTreeNode) root.getChildAt(i));
 		}
 	    }
-
-	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
-		((ProjectNode) root.getChildAt(i)).updateName();
-	    }
+	    model.reload(root);
 	    revalidate();
 	    repaint();
 	}
     }
 
-    private void createProjectNode(UUID projectUUID) {
+    private ProjectNode createProjectNode(UUID projectUUID) {
 	if (FlowClient.NETWORK) {
 	    Data fileListRequest = new Data("request_project");
 	    fileListRequest.put("project_uuid", projectUUID);
@@ -116,7 +133,9 @@ public abstract class DocTree extends JTree {
 	    ProjectNode newProjectNode = new ProjectNode(project);
 	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
 	    loadProjectFiles(project, newProjectNode);
+	    return newProjectNode;
 	}
+	return null;
     }
 
     private void loadProjectFiles(FlowDirectory fDir, DirectoryNode dir) {
@@ -147,22 +166,13 @@ public abstract class DocTree extends JTree {
 	public FlowProject getProject() {
 	    return project;
 	}
-
-	public String toString() {
-	    return project.toString();
-	}
-
-	private void updateName() {
-	    revalidate();
-	    repaint();
-	}
     }
 
     public class DirectoryNode extends DefaultMutableTreeNode {
 	private FlowDirectory folder;
 
 	public DirectoryNode(FlowDirectory dir) {
-	    super(dir.toString());
+	    super(dir);
 	    this.folder = dir;
 	}
 
