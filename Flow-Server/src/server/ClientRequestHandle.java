@@ -107,10 +107,16 @@ public class ClientRequestHandle implements Runnable {
 					}
 					break;
 				case "CHANGE_PASSWORD":
-					this.database.changePassword(
-							data.get("username", String.class),
-							data.get("new_password", String.class));
-					returnData.put("status", "OK");
+					try {
+						this.database.changePassword(this.database.getUsername(
+								data.get("session_id", UUID.class).toString()),
+								data.get("new_password", String.class));
+						status = "OK";
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						status = e.getMessage();
+					}
+					returnData.put("status", status);
 					break;
 				}
 				break;
