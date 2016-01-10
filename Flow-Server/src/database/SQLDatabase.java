@@ -383,7 +383,7 @@ public class SQLDatabase {
 
 		try {
 			this.update(String.format(
-					"INSERT INTO users VALUES ('%s', '%s');" + username,
+					"INSERT INTO users VALUES ('%s', '%s');", username,
 					password));
 		} catch (SQLException e) {
 			System.err.println("Error inserting user into database");
@@ -416,7 +416,7 @@ public class SQLDatabase {
 				throw new DatabaseException("DOCUMENT_NAME_INVALID");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch blocks
 			e.printStackTrace();
 		}
 		// Throw an exception in this case because the server expects to use
