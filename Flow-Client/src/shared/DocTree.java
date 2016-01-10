@@ -145,7 +145,7 @@ public abstract class DocTree extends JTree {
 		    }
 		}
 		if (!projectExistsLocally) {
-		    System.out.println(createProjectNode(uuid).getProject());
+		    createProjectNode(uuid).getProject();
 		}
 	    }
 
@@ -180,6 +180,23 @@ public abstract class DocTree extends JTree {
 	    return newProjectNode;
 	}
 	return null;
+    }
+
+    private void getProjectFiles(FlowDirectory fDir, DirectoryNode dir) {
+	// adds folders
+	if (!fDir.getDirectories().isEmpty()) {
+	    for (FlowDirectory subDir : fDir.getDirectories()) {
+		DirectoryNode subDirNode = new DirectoryNode(subDir);
+		getProjectFiles(subDir, subDirNode);
+	    }
+	}
+
+	// adds files
+	if (!fDir.getFiles().isEmpty()) {
+	    for (FlowFile file : fDir.getFiles()) {
+		dir.add(new FileNode(file));
+	    }
+	}
     }
 
     public void reloadProjectFiles(ProjectNode projectNode) {
@@ -240,23 +257,6 @@ public abstract class DocTree extends JTree {
 	for (FlowFile remoteFile : fDir.getFiles()) {
 	    if (localFiles.indexOf(remoteFile) == -1) {
 		model.insertNodeInto(new FileNode(remoteFile), dir, 0);
-	    }
-	}
-    }
-
-    private void getProjectFiles(FlowDirectory fDir, DirectoryNode dir) {
-	// adds folders
-	if (!fDir.getDirectories().isEmpty()) {
-	    for (FlowDirectory subDir : fDir.getDirectories()) {
-		DirectoryNode subDirNode = new DirectoryNode(subDir);
-		getProjectFiles(subDir, subDirNode);
-	    }
-	}
-
-	// adds files
-	if (!fDir.getFiles().isEmpty()) {
-	    for (FlowFile file : fDir.getFiles()) {
-		dir.add(new FileNode(file));
 	    }
 	}
     }

@@ -30,12 +30,8 @@ public class UsernameBox extends JTextField {
 
 	    @Override
 	    public void focusGained(FocusEvent e) {
-		UsernameBox box = UsernameBox.this;
-		if (box.getText().trim().equals("")
-			|| box.getText().equals(DEFAULT_TEXT)) {
-		    box.setForeground(Color.BLACK);
-		    box.setText("");
-		}
+		setText("");
+		setForeground(Color.BLACK);
 	    }
 	});
 	this.setColumns(10);

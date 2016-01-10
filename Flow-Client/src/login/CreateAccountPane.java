@@ -11,6 +11,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.Arrays;
 
 import javax.swing.Box;
@@ -22,13 +24,13 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 
-import shared.Communicator;
 import message.Data;
+import shared.Communicator;
 
 @SuppressWarnings("serial")
 public class CreateAccountPane extends JPanel {
     private PanelManager manager;
-    private JPasswordField passwordField;
+    private JPasswordField passwordConfirm;
 
     public final static char[] INVALID_CHARS = { '\\', '/', '?', '%', '*', ':', '|', '"', '<', '>', '.', '#', '&', '{', '}', '$', '@', '=', '`', '+' };
 
@@ -68,6 +70,18 @@ public class CreateAccountPane extends JPanel {
 	passwordEntry.setMaximumSize(new Dimension(128, 24));
 	passwordEntry.setPreferredSize(new Dimension(128, 24));
 	passwordEntry.setToolTipText("The password for Flow");
+	passwordEntry.addFocusListener(new FocusListener() {
+
+	    @Override
+	    public void focusLost(FocusEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void focusGained(FocusEvent e) {
+		passwordEntry.setText("");
+	    }
+	});
 	add(passwordEntry);
 
 	Component verticalStrut_4 = Box.createVerticalStrut(20);
@@ -77,11 +91,23 @@ public class CreateAccountPane extends JPanel {
 	label.setAlignmentX(0.5f);
 	add(label);
 
-	passwordField = new JPasswordField();
-	passwordField.setToolTipText("The password for Flow");
-	passwordField.setPreferredSize(new Dimension(128, 24));
-	passwordField.setMaximumSize(new Dimension(128, 24));
-	add(passwordField);
+	passwordConfirm = new JPasswordField();
+	passwordConfirm.setToolTipText("The password for Flow");
+	passwordConfirm.setPreferredSize(new Dimension(128, 24));
+	passwordConfirm.setMaximumSize(new Dimension(128, 24));
+	passwordConfirm.addFocusListener(new FocusListener() {
+
+	    @Override
+	    public void focusLost(FocusEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void focusGained(FocusEvent e) {
+		passwordConfirm.setText("");
+	    }
+	});
+	add(passwordConfirm);
 
 	Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
@@ -114,7 +140,7 @@ public class CreateAccountPane extends JPanel {
 		    } else if (stringContains(usernameEntry.getText(), INVALID_CHARS)) {
 			JOptionPane.showConfirmDialog(null, "Username contains invalid characters.\nPlease reduce the use of symbols.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
-		    } else if (!Arrays.equals(passwordEntry.getPassword(), passwordField.getPassword())) {
+		    } else if (!Arrays.equals(passwordEntry.getPassword(), passwordConfirm.getPassword())) {
 			JOptionPane.showConfirmDialog(null, "The passwords do not match; try again.", "Invalid password.", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
