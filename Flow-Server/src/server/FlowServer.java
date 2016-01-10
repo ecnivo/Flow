@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import database.SQLDatabase;
 import struct.FlowDirectory;
 import struct.FlowDocument;
 import struct.FlowFile;
@@ -20,14 +21,13 @@ import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
 import util.DatabaseException;
-import database.SQLDatabase;
 
 public class FlowServer implements Runnable {
 
 	private static Logger L = Logger.getLogger("FlowServer");
 	public static String ERROR = "INTERNAL_SERVER_ERROR";
 	private static final int PORT = 10244;
-//	private static final int ARC_PORT = 10225;
+	// private static final int ARC_PORT = 10225;
 
 	private SQLDatabase database;
 
@@ -50,7 +50,8 @@ public class FlowServer implements Runnable {
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
-				L.info("accepted connection from " + socket.getRemoteSocketAddress());
+				L.info("accepted connection from "
+						+ socket.getRemoteSocketAddress());
 				int i = 0;
 				do {
 					i %= MAX_THREADS;
@@ -79,11 +80,14 @@ public class FlowServer implements Runnable {
 	/**
 	 * Retrieves the FlowProject associated with the specified project UUID.
 	 * 
-	 * @param projectId the UUID associated with the desired project.
+	 * @param projectId
+	 *            the UUID associated with the desired project.
 	 * @return the FlowProject associated with the specified project UUID.
-	 * @throws DatabaseException if there is an error accessing the database.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
-	protected FlowProject getProject(String projectId) throws DatabaseException {
+	protected FlowProject getProject(String projectId)
+			throws DatabaseException {
 		ResultSet temp = this.database.getProjectInfo(projectId);
 		try {
 			if (!temp.next()) {
@@ -95,14 +99,16 @@ public class FlowServer implements Runnable {
 		}
 		try {
 			String owner = temp.getString("OwnerUsername");
-			return DataManagement.getInstance().getProjectFromUUID(UUID.fromString(projectId));
+			return DataManagement.getInstance()
+					.getProjectFromUUID(UUID.fromString(projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 
-	public FlowDocument getFile(String fileId, String projectId) throws DatabaseException {
+	public FlowDocument getFile(String fileId, String projectId)
+			throws DatabaseException {
 		ResultSet fileData = null;
 		try {
 			fileData = this.database.getFile(fileId);
@@ -138,7 +144,8 @@ public class FlowServer implements Runnable {
 		}
 		FlowFile file;
 		try {
-			//TODO implement deserialization of current flow file
+			// TODO DEFINITELY CHANGE THIS
+			// TODO implement deserialization of current flow file
 			file = new FlowFile(
 					(parentDirectoryId != null
 							? new FlowDirectory(parentDirectoryId)
@@ -161,9 +168,10 @@ public class FlowServer implements Runnable {
 		return this.database;
 	}
 
-	public static void main(String[] args) throws IOException, KeyManagementException,
-			NoSuchAlgorithmException {
-		System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+	public static void main(String[] args) throws IOException,
+			KeyManagementException, NoSuchAlgorithmException {
+		System.setProperty("java.util.logging.SimpleFormatter.format",
+				"%4$s: %5$s%n");
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
 		// TEST CODE

@@ -117,11 +117,11 @@ public class ClientRequestHandle implements Runnable {
 				}
 
 				try {
-					String unmamedb = temp.getString("Username");
+					username = temp.getString("Username");
 					if (DataManagement.getInstance()
-							.getUserByUsername(unmamedb) == null)
+							.getUserByUsername(username) == null)
 						throw new RuntimeException("User does not exist");
-					ResultSet projects = this.database.getProjects(unmamedb);
+					ResultSet projects = this.database.getProjects(username);
 					response = Results.toStringArray(
 							new String[] { "ProjectID" }, projects);
 				} catch (SQLException e) {
@@ -229,19 +229,18 @@ public class ClientRequestHandle implements Runnable {
 							data.get("session_id", UUID.class).toString());
 					username = Results.toStringArray(
 							new String[] { "Username" }, sessInfo)[0][0];
-					FlowProject fp = new FlowProject(projectName, DataManagement
+					FlowProject project = new FlowProject(projectName, DataManagement
 							.getInstance().getUserByUsername(username));
-					DataManagement.getInstance().addProjectToUser(fp);
+					DataManagement.getInstance().addProjectToUser(project);
 					status = this.database.newProject(
-							fp.getProjectUUID().toString(), projectName,
+							project.getProjectUUID().toString(), projectName,
 							username);
 					if (status != null && status.equals("OK")) {
 						returnData.put("status",
 								this.database.updateAccess(SQLDatabase.OWNER,
-										fp.getProjectUUID().toString(),
+										project.getProjectUUID().toString(),
 										username));
-						returnData.put("project_uuid",
-								fp.getProjectUUID().toString());
+						returnData.put("project", project);
 					} else {
 						returnData.put("status", status);
 					}
@@ -291,17 +290,19 @@ public class ClientRequestHandle implements Runnable {
 											projectId, username));
 					break;
 				case "RENAME_PROJECT":
-                    String newName = data.get("new_name", String.class);
-                    if(!DataManagement.getInstance().renameProject(UUID.fromString(projectId), newName)){
-                        L.warning("could not rename project from file system!");
-                    }
-					returnData.put("status", this.database.renameProject(
-							projectId, newName));
+					String newName = data.get("new_name", String.class);
+					if (!DataManagement.getInstance().renameProject(
+							UUID.fromString(projectId), newName)) {
+						L.warning("could not rename project from file system!");
+					}
+					returnData.put("status",
+							this.database.renameProject(projectId, newName));
 					break;
 				case "DELETE_PROJECT":
 					returnData.put("status",
 							this.database.deleteProject(projectId));
-					if(!DataManagement.getInstance().removeProject(UUID.fromString(projectId))){
+					if (!DataManagement.getInstance()
+							.removeProject(UUID.fromString(projectId))) {
 						L.warning("could not delete project from file system!");
 					}
 					break;
