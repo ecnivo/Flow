@@ -19,7 +19,7 @@ public class SQLDatabase {
 	 */
 	public static final String DRIVER = "org.sqlite.JDBC";
 
-	// TODO Implement the timeout
+	// TODO Properly implement the timeout
 	/**
 	 * Number of seconds to allow for searching before timeout
 	 */
@@ -111,8 +111,9 @@ public class SQLDatabase {
 				this.update("INSERT INTO access values('" + projectId + "', '"
 						+ username + "', '" + OWNER + "');");
 			} else if (accessLevel == NONE) {
-				this.update("DELETE FROM access WHERE Username = '" + username
-						+ "' AND ProjectID = '" + projectId + "';");
+				this.update(String.format(
+						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+						username, projectId));
 			} else {
 				return "ACCESS_LEVEL_INVALID";
 			}
@@ -132,13 +133,14 @@ public class SQLDatabase {
 	 */
 	public ResultSet getFiles(String projectId) throws DatabaseException {
 		try {
-			// TODO Add check if project is found
-			return this.query("SELECT * FROM documents WHERE ProjectID = '"
-					+ projectId + "';");
+			// TODO Add check if for project is exists
+			return this.query(String.format(
+					"SELECT * FROM documents WHERE ProjectID = '%s';",
+					projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// TODO: this won't be called for this reason, move this exception
-			// throw to the check (Above)
+			// TODO: this won't be called for the above reason, move this
+			// exception to the check (Above)
 			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
 		}
 		// return null;
@@ -183,8 +185,9 @@ public class SQLDatabase {
 	public String newFile(String fileId, String fileName, String projectId,
 			String directoryId) {
 		try {
-			this.update("INSERT INTO documents VALUES(" + fileId + ", "
-					+ projectId + ", " + fileName + ", " + directoryId + ")");
+			this.update(String.format(
+					"INSERT INTO documents VALUES('%s', '%s', '%s', '%s');",
+					fileId, projectId, fileName, directoryId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -209,9 +212,9 @@ public class SQLDatabase {
 			String projectId, String parentDirectoryId) {
 		try {
 			// TODO Add checks
-			this.update("INSERT INTO directories values('" + directoryId
-					+ "', '" + parentDirectoryId + "', '" + directoryName
-					+ "', '" + projectId + "')");
+			this.update(String.format(
+					"INSERT INTO documents VALUES('%s', '%s', '%s', '%s');",
+					directoryId, parentDirectoryId, directoryName, projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
