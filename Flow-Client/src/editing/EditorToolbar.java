@@ -20,7 +20,9 @@ import javax.swing.JToolBar;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
+import struct.FlowProject;
 
+@SuppressWarnings("serial")
 public class EditorToolbar extends JToolBar {
     private JPopupMenu popup;
     private JMenuItem createProjectButton;
@@ -94,15 +96,47 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
+		FlowProject project = pane.getDocTree().getActiveProject();
+		if (project == null) {
+		    return;
+		}
 		String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion", JOptionPane.WARNING_MESSAGE);
-		// TODO double check if projects match
-		// TODO get current project, and delete it.
+		if (confirm.equals(project.toString())) {
+		    int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + project.toString() + "?", "Confirm project deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		    if (confirmation == JOptionPane.YES_OPTION) {
+			Data deleteProjectRequest = new Data("project_modify");
+			deleteProjectRequest.put("project_modify_type", "DELETE_PROJECT");
+			deleteProjectRequest.put("project_uuid", project.getProjectUUID());
+			deleteProjectRequest.put("session_id", Communicator.getSessionID());
+
+			Data reply = Communicator.communicate(deleteProjectRequest);
+			String status = reply.get("status", String.class);
+			switch (status) {
+			case "OK":
+			    JOptionPane.showConfirmDialog(null, "Your project has been deleted", "Deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			    project = null;
+			    pane.getDocTree().refreshProjectList();
+			    break;
+
+			default:
+			    break;
+			}
+		    } else
+			return;
+		} else {
+		    JOptionPane.showConfirmDialog(null, "The project name is incorrect.\nNothing has been changed.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
 	    }
 
 	});
 
+	popup.add(createProjectButton);
+	popup.add(renameProjectButton);
+	popup.add(deleteProjectButton);
+
 	add(new SearchButton());
-	// add(new ProjectManageButton());
+	add(new ProjectManageButton());
 	add(new ImportButton());
 	add(new ExportButton());
 	addSeparator();
@@ -130,9 +164,6 @@ public class EditorToolbar extends JToolBar {
 	    });
 	}
     }
-
-    // TODO replace this with a "project management" button that will: 1) create
-    // new, 2) rename current, 3) delete current
 
     private class ProjectManageButton extends JButton {
 	private ProjectManageButton() {
