@@ -350,11 +350,6 @@ public class ClientRequestHandle implements Runnable {
 				this.database.removeSession(
 						data.get("session_id", UUID.class).toString());
 				break;
-			case "close_account":
-				// TODO Call NETDEX's code to remove actual data
-				this.database.closeAccount(
-						data.get("session_id", UUID.class).toString());
-				break;
 			default:
 				// For completeness's sake
 				returnData.put("status", "INVALID_REQUEST_TYPE");
