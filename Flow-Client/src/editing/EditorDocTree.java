@@ -14,8 +14,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
 import shared.DocTree;
@@ -280,9 +282,22 @@ public class EditorDocTree extends DocTree {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    // TODO add a joptionpane to ask for name
-		    // TODO ask server to add a new directory here
-		    EditorDocTree.this.refreshProjectList();
+		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  directory?", "Name", JOptionPane.QUESTION_MESSAGE);
+		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
+			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
+		    }
+		    FlowDirectory parent = activeDirectory.getDirectory();
+		    Data createDirReq = new Data("new_directory");
+		    createDirReq.put("project_uuid", ((FlowProject) parent.getRootDirectory()).getProjectUUID());
+		    createDirReq.put("session_id", Communicator.getSessionID());
+		    createDirReq.put("parent_id", parent.getDirectoryUUID());
+		    createDirReq.put("name", name);
+
+		    Data response = Communicator.communicate(createDirReq);
+		    if (response.get("status", String.class).equals("OK"))
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new DirectoryNode(new FlowDirectory(parent, name)), activeDirectory, activeDirectory.getChildCount() - 2);
+		    else
+			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 
