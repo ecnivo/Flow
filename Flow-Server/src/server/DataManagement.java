@@ -17,7 +17,7 @@ public class DataManagement {
 
     private static DataManagement instance;
     private static Logger L = Logger.getLogger("DataManagement");
-    private static FileSerializer fs = new FileSerializer();
+    private static FileSerializer fileSerializer = new FileSerializer();
     private File dataFile;
 
     public static DataManagement getInstance() {
@@ -46,7 +46,7 @@ public class DataManagement {
         // }
 
         userDirectory.mkdir();
-        fs.writeToFile(new File(userDirectory.getAbsolutePath(),
+        fileSerializer.writeToFile(new File(userDirectory.getAbsolutePath(),
                 u.getUsername() + ".flow"), u);
         return true;
     }
@@ -68,7 +68,7 @@ public class DataManagement {
                 username + ".flow");
         if (!userFile.exists())
             return null;
-        return fs.readFromFile(userFile, User.class);
+        return fileSerializer.readFromFile(userFile, User.class);
     }
 
     public boolean addProjectToUser(FlowProject project) {
@@ -79,7 +79,7 @@ public class DataManagement {
             return false;
         projectDirectory.mkdir();
         File projectMetadataFile = new File(projectDirectory, "project.flow");
-        fs.writeToFile(projectMetadataFile, project);
+        fileSerializer.writeToFile(projectMetadataFile, project);
         return true;
     }
 
@@ -100,7 +100,7 @@ public class DataManagement {
         if (!projectDirectory.exists())
             return null;
         File projectMetadataFile = new File(projectDirectory, "project.flow");
-        FlowProject project = fs.readFromFile(projectMetadataFile,
+        FlowProject project = fileSerializer.readFromFile(projectMetadataFile,
                 FlowProject.class);
         return project;
     }
@@ -117,7 +117,7 @@ public class DataManagement {
         if (!projectMetadata.exists())
             return false;
         projectMetadata.delete();
-        fs.writeToFile(projectMetadata, oldProject);
+        fileSerializer.writeToFile(projectMetadata, oldProject);
         return true;
     }
 
