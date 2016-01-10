@@ -89,8 +89,6 @@ public class LoginPane extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO add something here to send username and password off for
-                // authentication
                 if (FlowClient.NETWORK) {
                     if (usernameEntry.getText().length() >= 16) {
                         JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

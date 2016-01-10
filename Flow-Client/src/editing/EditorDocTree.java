@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
@@ -142,7 +143,27 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// TODO confirm deletion and delete file
+		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + getActiveFileNode().getFile().toString() + "?", "Deletion confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.YES_OPTION) {
+		    FlowFile file = getActiveFileNode().getFile();
+		    Data delFileReq = new Data("file_modify");
+		    delFileReq.put("project_uuid", ((FlowProject) file.getParentDirectory().getRootDirectory()).getProjectUUID());
+		    delFileReq.put("file_uuid", file.getFileUUID());
+		    delFileReq.put("session_id", Communicator.getSessionID());
+		    delFileReq.put("mod_type", "DELETE");
+
+		    String status = Communicator.communicate(delFileReq).get("status", String.class);
+		    switch (status) {
+		    case "OK":
+			break;
+
+		    default:
+			JOptionPane.showConfirmDialog(null, "An error occurred during the deletion.\nTry refreshing the project list again.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			break;
+		    }
+		} else {
+		    JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+		}
 		EditorDocTree.this.refreshProjectList();
 	    }
 	});
@@ -268,7 +289,7 @@ public class EditorDocTree extends DocTree {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  directory?", "Name", JOptionPane.QUESTION_MESSAGE);
+		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  directory?", "Name", JOptionPane.QUESTION_MESSAGE).trim();
 		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
 			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
 		    }
@@ -294,12 +315,40 @@ public class EditorDocTree extends DocTree {
 
     private class CreateFileOnFolderButton extends JMenuItem {
 	private CreateFileOnFolderButton() {
-	    super("New file");
+	    super("New (source code) file");
 	    addActionListener(new ActionListener() {
-
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    // TODO ask server to add a document here
+		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  file?\nInclude extensions such as .java", "Name", JOptionPane.QUESTION_MESSAGE).trim();
+		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
+			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
+		    }
+		    Data createFileRequest = new Data("new_textdocument");
+		    createFileRequest.put("project_uuid", ((FlowProject) getActiveDirectoryNode().getDirectory().getRootDirectory()).getProjectUUID());
+		    createFileRequest.put("document_name", name);
+		    createFileRequest.put("session_id", Communicator.getSessionID());
+		    createFileRequest.put("directory_uuid", getActiveDirectoryNode().getDirectory().getDirectoryUUID());
+
+		    Data reply = Communicator.communicate(createFileRequest);
+		    String status = reply.get("status", String.class);
+		    switch (status) {
+		    case "OK":
+			FlowFile doc = reply.get("file", FlowFile.class);
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new FileNode(doc), getActiveDirectoryNode(), getActiveDirectoryNode().getChildCount());
+			break;
+
+		    case "DIRECTORY_DOES_NOT_EXIST":
+			JOptionPane.showConfirmDialog(null, "The directory you are trying to create this file in does not exist.\nTry refreshing the list of projects by Alt+clicking the projects list.", "Project cannot be found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			break;
+
+		    case "DOCUMENT_NAME_INVALID":
+			JOptionPane.showConfirmDialog(null, "The document name is invalid.\nThis is typically due to a conflict with another document name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			break;
+
+		    default:
+			break;
+		    }
+
 		    EditorDocTree.this.refreshProjectList();
 		}
 	    });
@@ -319,13 +368,5 @@ public class EditorDocTree extends DocTree {
 		}
 	    });
 	}
-    }
-
-    private void setActiveDirectory(DirectoryNode newActive) {
-	setActiveDirectoryNode(newActive);
-    }
-
-    private void setActiveFile(FileNode newActive) {
-	setActiveFileNode(newActive);
     }
 }
