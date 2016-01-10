@@ -6,6 +6,8 @@ import java.awt.CardLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import login.CreateAccountPane;
 import login.LoginPane;
@@ -93,5 +95,10 @@ public class PanelManager extends JPanel {
 
     public LoginPane getLoginPane() {
 	return loginPane;
+    }
+
+    public void resetUI() {
+	((DefaultMutableTreeNode) ((DefaultTreeModel) editPane.getDocTree().getModel()).getRoot()).removeAllChildren();
+	editTabs = new EditTabs();
     }
 }
