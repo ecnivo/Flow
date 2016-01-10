@@ -286,9 +286,9 @@ public class SQLDatabase {
 	 */
 	public boolean newSession(String username, String sessionId) {
 		try {
-			this.update(String.format(
-					"INSERT INTO sessions VALUES ('%s', '%s');" , username,
-					sessionId));
+			this.update(
+					String.format("INSERT INTO sessions VALUES ('%s', '%s');",
+							username, sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -382,9 +382,8 @@ public class SQLDatabase {
 		}
 
 		try {
-			this.update(String.format(
-					"INSERT INTO users VALUES ('%s', '%s');", username,
-					password));
+			this.update(String.format("INSERT INTO users VALUES ('%s', '%s');",
+					username, password));
 		} catch (SQLException e) {
 			System.err.println("Error inserting user into database");
 			e.printStackTrace();
@@ -685,6 +684,16 @@ public class SQLDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	public String getUsername(String session_id) throws DatabaseException {
+		try {
+			return Results.toStringArray("Username",
+					this.getSessionInfo(session_id))[0];
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(e.getMessage());
 		}
 	}
 }
