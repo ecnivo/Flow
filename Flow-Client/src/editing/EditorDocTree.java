@@ -21,6 +21,7 @@ import shared.Communicator;
 import shared.DocTree;
 import shared.EditTabs;
 import struct.ArbitraryDocument;
+import struct.FlowDirectory;
 import struct.FlowDocument;
 import struct.FlowFile;
 import struct.FlowProject;
@@ -86,7 +87,27 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		// TODO send request to server to delete the activedir
+		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + activeDirectory.toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.YES_OPTION) {
+		    FlowDirectory flowDir = activeDirectory.getDirectory();
+		    Data ddr = new Data("directory_modify");
+		    ddr.put("project_uuid", ((FlowProject) flowDir.getRootDirectory()).getProjectUUID());
+		    ddr.put("directory_uuid", flowDir.getDirectoryUUID());
+		    ddr.put("parent_directory_uuid", flowDir.getParent().getDirectoryUUID());
+		    ddr.put("session_id", Communicator.getSessionID());
+		    ddr.put("mod_type", "DELETE");
+
+		    String status = Communicator.communicate(ddr).get("status", String.class);
+		    switch (status) {
+		    case "OK":
+			JOptionPane.showConfirmDialog(null, "Deletion success", "Deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			break;
+
+		    default:
+			JOptionPane.showConfirmDialog(null, "Deletion failed.\nTry refreshing by Alt + clicking on the documents tree, or try again at another time.", "Failed to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			break;
+		    }
+		}
 		EditorDocTree.this.refreshProjectList();
 	    }
 	});
