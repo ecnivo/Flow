@@ -16,7 +16,6 @@ public class FlowDirectory implements Serializable {
     private FlowDirectory parent;
     private ArrayList<FlowDirectory> childDirectories;
     private ArrayList<FlowFile> childFiles;
-    private UUID dirUUID;
 
     private String dirName;
 
@@ -112,16 +111,8 @@ public class FlowDirectory implements Serializable {
 	return cd;
     }
     
-    public void setDirectoryUUID(UUID newUUID){
-	dirUUID = newUUID;
-    }
-
     public String getDirectoryName() {
 	return dirName;
-    }
-
-    public UUID getDirectoryUUID() {
-	return dirUUID;
     }
 
     @Override
