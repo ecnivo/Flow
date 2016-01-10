@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import server.FlowServer;
 import util.DatabaseException;
+import util.Results;
 
 public class SQLDatabase {
 
@@ -547,8 +548,8 @@ public class SQLDatabase {
 		return "OK";
 	}
 
-	public String getPath(String fileId) {
-		ResultSet fileData;
+	public String getPath(String fileId) throws DatabaseException {
+		ResultSet fileData = null;
 		try {
 			fileData = this.query(String.format(
 					"SELECT * FROM documents WHERE FileID = '%s'", fileId));
@@ -557,7 +558,30 @@ public class SQLDatabase {
 			e.printStackTrace();
 		}
 
-		return "";
+		String parentDirectoryId = null, directoryId = null;
+		try {
+			parentDirectoryId = fileData.getString("ParentDirectoryID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// TODO optimize for efficiency
+		StringBuilder path = new StringBuilder();
+		do {
+			directoryId = parentDirectoryId;
+			try {
+				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
+						this.getDirectoryInfo(directoryId))[0];
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw new DatabaseException(e.getMessage());
+			}
+			path.append(directoryId);
+		} while (!parentDirectoryId.equals(directoryId));
+
+		return path.toString();
 	}
 
 	/**
@@ -620,6 +644,27 @@ public class SQLDatabase {
 		try {
 			return this.query("SELECT * FROM projects WHERE ProjectID = '"
 					+ projectId + "';");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	/**
+	 * Retrieves all associated info with the specified ProjectID.
+	 *
+	 * @param directoryId
+	 *            the {@link UUID#toString toString} of the UUID of the
+	 *            directory.
+	 * @return all associated information from the directories table.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public ResultSet getDirectoryInfo(String directoryId)
+			throws DatabaseException {
+		try {
+			return this.query("SELECT * FROM directories WHERE DirectoryID = '"
+					+ directoryId + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
