@@ -198,7 +198,7 @@ public abstract class DocTree extends JTree {
 	    }
 	}
     }
-    
+
     public void reloadProjectFiles(ProjectNode projectNode) {
 	// TODO see if you can combine these two into one loop
 	DefaultMutableTreeNode[] children = new DefaultMutableTreeNode[projectNode.getChildCount()];
@@ -220,47 +220,116 @@ public abstract class DocTree extends JTree {
 
 	System.out.println("starting recursion");
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
+	model.reload();
 
 	projectNode.setProject(reloadedProject);
     }
 
-    private void reloadProjectFilesRecursively(FlowDirectory fDir, DirectoryNode dir) {
-	ArrayList<FlowDirectory> localDirs = new ArrayList<FlowDirectory>();
-	ArrayList<FlowFile> localFiles = new ArrayList<FlowFile>();
+    // private void reloadProjectFilesRecursively(FlowDirectory fDir,
+    // DirectoryNode dir) {
+    // ArrayList<FlowDirectory> localDirs = new ArrayList<FlowDirectory>();
+    // ArrayList<FlowFile> localFiles = new ArrayList<FlowFile>();
+    //
+    // for (int i = 0; i < dir.getChildCount(); i++) {
+    // DefaultMutableTreeNode child = (DefaultMutableTreeNode)
+    // dir.getChildAt(i);
+    // if (child instanceof DirectoryNode) {
+    // int indexInDirectory = fDir.getDirectories().indexOf(((DirectoryNode)
+    // child).getDirectory());
+    // if (indexInDirectory == -1) {
+    // model.removeNodeFromParent(child);
+    // } else {
+    // reloadProjectFilesRecursively(fDir.getDirectories().get(indexInDirectory),
+    // (DirectoryNode) child);
+    // localDirs.add(((DirectoryNode) child).getDirectory());
+    // }
+    // } else if (child instanceof FileNode) {
+    // int indexOfFile = fDir.getFiles().indexOf(((FileNode) child).getFile());
+    // if (indexOfFile == -1) {
+    // model.removeNodeFromParent(child);
+    // } else {
+    // localFiles.add(((FileNode) child).getFile());
+    // }
+    // }
+    // }
+    //
+    // for (FlowDirectory remoteDir : fDir.getDirectories()) {
+    // if (localDirs.indexOf(remoteDir) == -1) {
+    // DirectoryNode newNode = new DirectoryNode(remoteDir);
+    // System.out.println(newNode.getDirectory().toString());
+    // model.insertNodeInto(newNode, dir, 0);
+    // reloadProjectFilesRecursively(remoteDir, newNode);
+    // }
+    // }
+    // for (FlowFile remoteFile : fDir.getFiles()) {
+    // if (localFiles.indexOf(remoteFile) == -1) {
+    // model.insertNodeInto(new FileNode(remoteFile), dir, 0);
+    // }
+    // }
+    // }
 
-	for (int i = 0; i < dir.getChildCount(); i++) {
-	    DefaultMutableTreeNode child = (DefaultMutableTreeNode) dir.getChildAt(i);
-	    if (child instanceof DirectoryNode) {
-		int indexInDirectory = fDir.getDirectories().indexOf(((DirectoryNode) child).getDirectory());
-		if (indexInDirectory == -1) {
-		    model.removeNodeFromParent(child);
-		} else {
-		    reloadProjectFilesRecursively(fDir.getDirectories().get(indexInDirectory), (DirectoryNode) child);
-		    localDirs.add(((DirectoryNode) child).getDirectory());
-		}
-	    } else if (child instanceof FileNode) {
-		int indexOfFile = fDir.getFiles().indexOf(((FileNode) child).getFile());
-		if (indexOfFile == -1) {
-		    model.removeNodeFromParent(child);
-		} else {
-		    localFiles.add(((FileNode) child).getFile());
-		}
+    private void reloadProjectFilesRecursively(FlowDirectory remoteParentDir, DirectoryNode localNode) {
+	ArrayList<DirectoryNode> localDirs = new ArrayList<DirectoryNode>();
+	ArrayList<FileNode> localFiles = new ArrayList<FileNode>();
+	for (int i = 0; i < localNode.getChildCount(); i++) {
+	    DefaultMutableTreeNode child = (DefaultMutableTreeNode) localNode.getChildAt(i);
+	    if (child instanceof FileNode) {
+		localFiles.add((FileNode) child);
+	    } else if (child instanceof DirectoryNode) {
+		localDirs.add((DirectoryNode) child);
 	    }
 	}
 
-	for (FlowDirectory remoteDir : fDir.getDirectories()) {
-	    if (localDirs.indexOf(remoteDir) == -1) {
-		DirectoryNode newNode = new DirectoryNode(remoteDir);
-		System.out.println(newNode.getDirectory().toString());
-		model.insertNodeInto(newNode, dir, 0);
-		reloadProjectFilesRecursively(remoteDir, newNode);
+	for (FileNode localFileNode : localFiles) {
+	    int idx = remoteParentDir.getFiles().indexOf(localFileNode.getFile());
+	    if (idx == -1) {
+		model.removeNodeFromParent(localFileNode);
+		localFiles.remove(localFileNode);
 	    }
 	}
-	for (FlowFile remoteFile : fDir.getFiles()) {
-	    if (localFiles.indexOf(remoteFile) == -1) {
-		model.insertNodeInto(new FileNode(remoteFile), dir, 0);
+	for (DirectoryNode localDirNode : localDirs) {
+	    int idx = remoteParentDir.getDirectories().indexOf(localDirNode.getDirectory());
+	    if (idx == -1) {
+		model.removeNodeFromParent(localDirNode);
+		localDirs.remove(localDirNode);
 	    }
 	}
+
+	for (FlowFile remoteFile : remoteParentDir.getFiles()) {
+	    boolean existsLocally = false;
+	    for (FileNode fileNode : localFiles) {
+		if (fileNode.getFile().equals(remoteFile)) {
+		    existsLocally = true;
+		    break;
+		}
+	    }
+	    if (!existsLocally) {
+		FileNode newFileNode = new FileNode(remoteFile);
+		model.insertNodeInto(newFileNode, localNode, localNode.getChildCount());
+	    }
+	}
+
+	for (FlowDirectory remoteDir : remoteParentDir.getDirectories()) {
+	    boolean existsLocally = false;
+	    DirectoryNode childDirNode = null;
+	    for (DirectoryNode directoryNode : localDirs) {
+		if (directoryNode.getDirectory().equals(directoryNode)) {
+		    existsLocally = true;
+		    break;
+		}
+	    }
+	    if (!existsLocally || childDirNode == null) {
+		DirectoryNode newDirNode = new DirectoryNode(remoteDir);
+		System.out.println("Created directory" + remoteDir.getDirectoryName());
+		model.insertNodeInto(newDirNode, localNode, 0);
+		childDirNode = newDirNode;
+	    }
+
+	    System.out.println("recursing to next level");
+	    reloadProjectFilesRecursively(remoteDir, childDirNode);
+	}
+
+	System.out.println("Finished recursing at this level");
     }
 
     public class ProjectNode extends DirectoryNode {

@@ -108,7 +108,7 @@ public class EditorDocTree extends DocTree {
 			break;
 		    }
 		}
-		EditorDocTree.this.refreshProjectList();
+		    EditorDocTree.this.reloadProjectFiles((ProjectNode) getActiveFileNode().getPath()[1]);
 	    }
 	});
 	dirPopup.add(deleteFolderButton);
@@ -164,7 +164,7 @@ public class EditorDocTree extends DocTree {
 		} else {
 		    JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		}
-		EditorDocTree.this.refreshProjectList();
+		    EditorDocTree.this.reloadProjectFiles((ProjectNode) getActiveDirectoryNode().getPath()[1]);
 	    }
 	});
 
@@ -362,7 +362,7 @@ public class EditorDocTree extends DocTree {
 			break;
 		    }
 
-		    EditorDocTree.this.refreshProjectList();
+		    EditorDocTree.this.reloadProjectFiles((ProjectNode) getActiveDirectoryNode().getPath()[1]);
 		}
 	    });
 
