@@ -519,7 +519,7 @@ public class SQLDatabase {
 					"DELETE FROM projects WHERE OwnerUsername = '%s';",
 					username));
 			this.update(String.format(
-					"DELETE FROM sessions WHERE Username '%s';", username));
+					"DELETE FROM sessions WHERE Username = '%s';", username));
 			this.update(String.format(
 					"DELETE FROM access WHERE Username = '%s';", username));
 
