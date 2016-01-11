@@ -151,6 +151,10 @@ public class SettingsTabs extends JTabbedPane {
 		    closeAccountRequest.put("session_id", Communicator.getSessionID());
 		    if (Communicator.communicate(closeAccountRequest).get("status", String.class).startsWith("OK")) {
 			JOptionPane.showConfirmDialog(null, "Your Flow account has been successfully deleted.", "Account deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			Communicator.setSessionID(null);
+			panMan.switchToLogin();
+			panMan.resetUI();
+			return;
 		    } else {
 			JOptionPane.showConfirmDialog(null, "Your Flow account could not be closed for some reason.\nTry logging out, restarting Flow,\nand if the problem persists, please submit a bug report on Github.", "Account deletion failed.", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    }
