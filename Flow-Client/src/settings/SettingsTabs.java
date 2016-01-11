@@ -147,7 +147,7 @@ public class SettingsTabs extends JTabbedPane {
 		String response = JOptionPane.showInputDialog(null, "WARNING: Deleting your account means that all of the projects that you created will be lost," + "\nand all projects that you have been invited to collaborate will lose you as a collaborator." + "\nBefore closing your account, please make sure to back up all data using the export function." + "\nIf you are sure that you want to close your account, type \"close my account\" into the text box below." + "\n\nTHIS IS YOUR LAST CHANCE TO CHANGE YOUR MIND.", "Confirm account deletion", JOptionPane.WARNING_MESSAGE);
 		if (response != null && response.equals("close my account")) {
 		    Data closeAccountRequest = new Data("user");
-		    closeAccountRequest.put("USER_TYPE", "CLOSE_ACCOUNT");
+		    closeAccountRequest.put("user_type", "CLOSE_ACCOUNT");
 		    closeAccountRequest.put("session_id", Communicator.getSessionID());
 		    if (Communicator.communicate(closeAccountRequest).get("status", String.class).startsWith("OK")) {
 			JOptionPane.showConfirmDialog(null, "Your Flow account has been successfully deleted.", "Account deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
