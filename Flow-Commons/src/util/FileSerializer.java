@@ -23,6 +23,7 @@ public class FileSerializer {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
             oos.writeObject(serializable);
+            oos.close();
             return true;
         } catch (Exception e) {
             return false;
@@ -40,7 +41,9 @@ public class FileSerializer {
     public <T extends Serializable> T readFromFile(File file, Class<T> type) {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-            return type.cast(ois.readObject());
+            T o = type.cast(ois.readObject());
+            ois.close();
+            return o;
         } catch (Exception e) {
             return null;
         }

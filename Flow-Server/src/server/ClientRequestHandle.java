@@ -90,21 +90,17 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
-						this.database.closeAccount(this.database.getUsername(
-								data.get("session_id", UUID.class).toString()));
 						status = "OK";
+						username = this.database.getUsername(data.get("session_id", UUID.class).toString());
+						if(!DataManagement.getInstance().removeUser(username)){
+							status = "INTERNAL_SERVER_ERROR";
+						}
+						this.database.closeAccount(username);
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						status = e.getMessage();
 					}
-					if (status.equals("OK")) {
-						returnData.put("status",
-								DataManagement.getInstance()
-										.removeUser(data.get("username")) ? "OK"
-												: FlowServer.ERROR);
-					} else {
-						returnData.put("status", status);
-					}
+					returnData.put("status", status);
 					break;
 				case "CHANGE_PASSWORD":
 					try {

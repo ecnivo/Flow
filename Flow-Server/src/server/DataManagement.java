@@ -40,11 +40,6 @@ public class DataManagement {
     public boolean addUser(User u) {
         L.info("adding user " + u);
         File userDirectory = new File(dataFile.getAbsolutePath(), "users");
-        //TODO NETDEX FIX THIS AND UN COMMENT
-        // if (userDirectory.exists()) {
-        // return false;
-        // }
-
         userDirectory.mkdir();
         fileSerializer.writeToFile(new File(userDirectory.getAbsolutePath(),
                 u.getUsername() + ".flow"), u);
@@ -53,13 +48,8 @@ public class DataManagement {
 
     public boolean removeUser(String username) {
         L.info("removing user");
-        File userFile = new File(new File(dataFile, "users"),
-                username + ".flow");
-        if (userFile.exists()) {
-            userFile.delete();
-            return true;
-        }
-        return false;
+        File userFile = new File(new File(dataFile, "users"), username + ".flow");
+        return userFile.delete();
     }
 
     public User getUserByUsername(String username) {
@@ -142,6 +132,18 @@ public class DataManagement {
         if (!directory.exists())
             return false;
         directory.delete();
+        return true;
+    }
+
+    public boolean renameFolderInProject(UUID projectUUID, UUID newUUID, UUID... path){
+        String pathstr = "";
+        for (UUID u : path) {
+            pathstr += u + File.separator;
+        }
+        File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
+        if (!directory.exists())
+            return false;
+        directory.renameTo(new File(newUUID.toString()));
         return true;
     }
 
