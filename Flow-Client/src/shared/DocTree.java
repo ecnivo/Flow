@@ -198,7 +198,7 @@ public abstract class DocTree extends JTree {
 	    }
 	}
     }
-
+    
     public void reloadProjectFiles(ProjectNode projectNode) {
 	// TODO see if you can combine these two into one loop
 	DefaultMutableTreeNode[] children = new DefaultMutableTreeNode[projectNode.getChildCount()];
@@ -218,6 +218,7 @@ public abstract class DocTree extends JTree {
 	    return;
 	}
 
+	System.out.println("starting recursion");
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
 
 	projectNode.setProject(reloadedProject);
@@ -250,6 +251,7 @@ public abstract class DocTree extends JTree {
 	for (FlowDirectory remoteDir : fDir.getDirectories()) {
 	    if (localDirs.indexOf(remoteDir) == -1) {
 		DirectoryNode newNode = new DirectoryNode(remoteDir);
+		System.out.println(newNode.getDirectory().toString());
 		model.insertNodeInto(newNode, dir, 0);
 		reloadProjectFilesRecursively(remoteDir, newNode);
 	    }

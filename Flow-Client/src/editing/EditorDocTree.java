@@ -208,6 +208,9 @@ public class EditorDocTree extends DocTree {
 		    if (e.getButton() == MouseEvent.BUTTON3) {
 			dirPopup.show(EditorDocTree.this, x, y);
 		    }
+		    if (e.isShiftDown()) {
+			reloadProjectFiles((ProjectNode) ((DirectoryNode) selected).getPath()[1]);
+		    }
 		} else if (selected instanceof FileNode) {
 		    if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 			openFile(((FileNode) selected).getFile());
@@ -299,7 +302,6 @@ public class EditorDocTree extends DocTree {
 		    }
 
 		    FlowDirectory parent = getActiveDirectoryNode().getDirectory();
-		    System.out.println(parent);
 		    Data createDirReq = new Data("new_directory");
 		    createDirReq.put("project_uuid", ((FlowProject) parent.getRootDirectory()).getProjectUUID());
 		    createDirReq.put("session_id", Communicator.getSessionID());
@@ -316,6 +318,8 @@ public class EditorDocTree extends DocTree {
 			JOptionPane.showConfirmDialog(null, "The directory name is invalid. Try another name.\nThe most likely issue is that the name is conflicting with another name.", "Directory name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    } else
 			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+
+		    reloadProjectFiles((ProjectNode) getActiveDirectoryNode().getPath()[1]);
 		}
 	    });
 
