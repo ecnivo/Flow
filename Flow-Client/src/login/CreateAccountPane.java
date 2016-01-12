@@ -150,7 +150,12 @@ public class CreateAccountPane extends JPanel {
 		    userData.put("username", usernameEntry.getText().trim());
 		    userData.put("password", String.copyValueOf(passwordEntry.getPassword()));
 
-		    String replyMsg = Communicator.communicate(userData).get("status", String.class);
+		    Data reply = Communicator.communicate(userData);
+		    if (reply == null) {
+			JOptionPane.showConfirmDialog(null, "Are you sure the server is running?", "Server is offline", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		    String replyMsg = reply.get("status", String.class);
 		    switch (replyMsg) {
 		    case "USERNAME_TAKEN":
 			JOptionPane.showConfirmDialog(null, "This username has been taken already.\nPlease select another one.", "Username in use", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

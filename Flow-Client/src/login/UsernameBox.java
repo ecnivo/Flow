@@ -21,17 +21,18 @@ public class UsernameBox extends JTextField {
 
 	    @Override
 	    public void focusLost(FocusEvent e) {
-		UsernameBox box = UsernameBox.this;
-		if (box.getText().trim().equals("")) {
-		    box.setForeground(DESELECT);
-		    box.setText(DEFAULT_TEXT);
+		if (getText().trim().equals("")) {
+		    setForeground(DESELECT);
+		    setText(DEFAULT_TEXT);
 		}
 	    }
 
 	    @Override
 	    public void focusGained(FocusEvent e) {
-		setText("");
 		setForeground(Color.BLACK);
+		if (getText().equals("Username")){
+		    setText("");
+		}
 	    }
 	});
 	this.setColumns(10);
