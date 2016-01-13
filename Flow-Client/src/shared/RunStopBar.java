@@ -23,7 +23,7 @@ import struct.TextDocument;
 
 public class RunStopBar extends JToolBar {
 
-    private EditTabs runTarget;
+    private EditTabs editTabs;
 
     public RunStopBar(GenericConsole console) {
 	setBorder(FlowClient.EMPTY_BORDER);
@@ -57,7 +57,7 @@ public class RunStopBar extends JToolBar {
     }
 
     public void setEditTabs(EditTabs tabs) {
-	runTarget = tabs;
+	editTabs = tabs;
     }
 
     private class RunButton extends JButton {
@@ -75,10 +75,10 @@ public class RunStopBar extends JToolBar {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    if (runTarget == null) {
+		    if (editTabs == null) {
 			return;
 		    }
-		    compiler.FlowCompiler flowCompiler = new compiler.FlowCompiler(getFiles((FlowProject) ((EditArea) runTarget.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
+		    compiler.FlowCompiler flowCompiler = new compiler.FlowCompiler(getFiles((FlowProject) ((EditArea) editTabs.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
 		    // System.out.println("Run button pressed");
 		}
 	    });

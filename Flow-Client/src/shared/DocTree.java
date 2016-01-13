@@ -200,7 +200,6 @@ public abstract class DocTree extends JTree {
     }
 
     public void reloadProjectFiles(ProjectNode projectNode) {
-	System.out.println(projectNode.toString());
 	// TODO see if you can combine these two into one loop
 	DefaultMutableTreeNode[] children = new DefaultMutableTreeNode[projectNode.getChildCount()];
 	for (int i = 0; i < projectNode.getChildCount(); i++) {
@@ -220,6 +219,7 @@ public abstract class DocTree extends JTree {
 	}
 
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
+	System.out.println(reloadedProject.getDirectories());
 	model.reload();
 
 	projectNode.setProject(reloadedProject);
@@ -309,7 +309,6 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
-	System.out.println(remoteParentDir.getDirectories());
 	for (FlowDirectory remoteDir : remoteParentDir.getDirectories()) {
 	    System.out.println("remote directory!");
 	    boolean existsLocally = false;

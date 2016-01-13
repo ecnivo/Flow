@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -30,6 +32,7 @@ import shared.Communicator;
 public class LoginPane extends JPanel {
     private PanelManager panMan;
     private JPasswordField passwordEntry;
+    private JButton loginButton;
 
     // Pan Man! https://i.imgur.com/19iZW9K.png
 
@@ -88,13 +91,31 @@ public class LoginPane extends JPanel {
 	    }
 	});
 	passwordEntry.setToolTipText("Your Flow password");
+	passwordEntry.addKeyListener(new KeyListener() {
+
+	    @Override
+	    public void keyTyped(KeyEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void keyReleased(KeyEvent e) {
+		if (e.getKeyChar() == KeyEvent.VK_ENTER)
+		    loginButton.doClick();
+	    }
+
+	    @Override
+	    public void keyPressed(KeyEvent e) {
+		// nothing
+	    }
+	});
 
 	java.awt.Component verticalStrut_1 = Box.createVerticalStrut(20);
 	add(verticalStrut_1);
 
-	JButton logInButton = new JButton("Login");
-	add(logInButton);
-	logInButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+	loginButton = new JButton("Login");
+	add(loginButton);
+	loginButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 
 	java.awt.Component verticalStrut_2 = Box.createVerticalStrut(20);
 	add(verticalStrut_2);
@@ -112,7 +133,7 @@ public class LoginPane extends JPanel {
 		LoginPane.this.panMan.switchToCreateAccount();
 	    }
 	});
-	logInButton.addActionListener(new ActionListener() {
+	loginButton.addActionListener(new ActionListener() {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
