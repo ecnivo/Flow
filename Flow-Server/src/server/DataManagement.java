@@ -32,6 +32,10 @@ public class DataManagement {
 
 	}
 
+	/**
+	 * Initializes the data file directory
+	 * @param dataFile The location of the directory where data is stored
+	 */
 	public void init(File dataFile) {
 		this.dataFile = dataFile;
 		L.info("loading data files from file");
@@ -39,6 +43,11 @@ public class DataManagement {
 			dataFile.mkdir();
 	}
 
+	/**
+	 * Adds a user to the data files
+	 * @param u The user
+	 * @return whether or not the operation succeeded
+	 */
 	public boolean addUser(User u) {
 		L.info("adding user " + u);
 		File userDirectory = new File(dataFile.getAbsolutePath(), "users");
@@ -114,9 +123,9 @@ public class DataManagement {
 		return true;
 	}
 
-	public FlowProject getFolderFromUUID(UUID uuid) {
-		// FIXME NETDEX DO THIS
-		throw new UnsupportedOperationException();
+	public FlowDirectory getFolderFromUUID(UUID projectUUID, String path) {
+		File dirMeta = new File(new File(new File(new File(dataFile, "projects"), projectUUID.toString()), path), "dir.flow");
+		return fileSerializer.readFromFile(dirMeta, FlowDirectory.class);
 	}
 
 	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory) {
@@ -131,6 +140,7 @@ public class DataManagement {
 	}
 
 	public boolean deleteFolderInProject(UUID projectUUID, String pathstr) {
+		L.info("deleted folder in project " + projectUUID + " in path " + pathstr);
 		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
 		if (!directory.exists())
 			return false;
@@ -139,6 +149,7 @@ public class DataManagement {
 	}
 
 	public boolean renameFolderInProject(UUID projectUUID, String newName, String pathstr) {
+		L.info("renamed folder in project " + projectUUID + " to " + newName + " in path " + pathstr);
 		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
 		if (!directory.exists())
 			return false;

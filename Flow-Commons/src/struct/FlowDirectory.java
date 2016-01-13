@@ -113,7 +113,7 @@ public class FlowDirectory implements Serializable {
 		String path = "";
 		FlowDirectory cd = this;
 		while (cd.getParent() != null) {
-			path += cd.getDirectoryName() + "/";
+			path += cd.getDirectoryUUID() + "/";
 			cd = cd.getParent();
 		}
 		return path;

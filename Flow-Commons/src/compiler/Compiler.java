@@ -1,17 +1,25 @@
 package compiler;
 
-import struct.TextDocument;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+
+import struct.TextDocument;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Represents a wrapper around the javac compiler
@@ -49,7 +57,6 @@ public class Compiler {
      * @throws IOException when files cannot be written
      */
     public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
-        /* TODO actually fix this, instead of commenting it out to remove the error
         L.info("Found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
         if (!workingDirectory.exists()) {
@@ -61,14 +68,15 @@ public class Compiler {
             if (doc.getParentFile() == null)
                 throw new IllegalArgumentException("Compiler contains a text document without link to file reference!");
 
-            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getParentFile().getRemotePath() + File.separator + doc.getParentFile().getRemoteName());
+            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getParentFile().getParentDirectory().getFullyQualifiedPath() + File.separator + doc.getParentFile().getFileName());
             if (tempPath.getParentFile().mkdirs()) {
                 L.info("Directory " + tempPath.getParent() + " did not exist, created!");
             }
             paths.add(tempPath);
             PrintStream ps = new PrintStream(tempPath);
             ps.println(doc.getDocumentText());
-            L.info("Wrote " + doc.getParentFile().getRemoteName() + " to temporary path of " + tempPath.getAbsolutePath());
+            ps.close();
+            L.info("Wrote " + doc.getParentFile().getFileName() + " to temporary path of " + tempPath.getAbsolutePath());
         }
 
         try {
@@ -107,7 +115,7 @@ public class Compiler {
         } catch (Exception e) {
             L.severe("Exception occurred while compiling!");
             L.severe(e.getMessage());
-        }*/
+        }
         return null;
     }
 
