@@ -14,6 +14,7 @@ import network.DataSocket;
 import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
+import struct.TextDocument;
 import struct.User;
 import util.DatabaseException;
 import util.Results;
@@ -334,6 +335,13 @@ public class ClientRequestHandle implements Runnable {
 				// if (status.equals("OK")) {
 				// returnData.put("document_uuid", random);
 				// }
+				if (status.equals("OK")) {
+
+					// TODO Change this to actually create text document
+					DataManagement.getInstance().addTextDocumentToProject(
+							data.get("project_uuid", UUID.class),
+							new TextDocument());
+				}
 				returnData.put("status", status);
 				break;
 			case "new_directory":
