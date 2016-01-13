@@ -16,6 +16,9 @@ public class DataModification {
 		StringBuilder path = new StringBuilder();
 		do {
 			directoryId = parentDirectoryId;
+			if (path.length() > 0)
+				path.insert(0, File.separator);
+			path.insert(0, directoryId);
 			try {
 				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
 						SQLDatabase.getInstance()
@@ -25,9 +28,6 @@ public class DataModification {
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());
 			}
-			if (path.length() > 0)
-				path.append(File.separator);
-			path.append(directoryId);
 		} while (!parentDirectoryId.equals(directoryId));
 
 		return path.toString();
@@ -47,6 +47,9 @@ public class DataModification {
 		StringBuilder path = new StringBuilder();
 		do {
 			directoryId = parentDirectoryId;
+			if (path.length() > 0)
+				path.insert(0, File.separator);
+			path.insert(0, directoryId);
 			try {
 				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
 						SQLDatabase.getInstance()
@@ -56,9 +59,6 @@ public class DataModification {
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());
 			}
-			if (path.length() > 0)
-				path.append(File.separator);
-			path.append(directoryId);
 		} while (!parentDirectoryId.equals(directoryId));
 
 		return path.toString();
@@ -69,7 +69,7 @@ public class DataModification {
 		do {
 			directoryId = parentDirectoryId;
 			System.out.println(directoryId + ": ");
-			//	 String[] data = SQLDatabase.getInstance().
+			// String[] data = SQLDatabase.getInstance().
 			try {
 				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
 						SQLDatabase.getInstance()

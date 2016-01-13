@@ -17,7 +17,6 @@ import struct.FlowFile;
 import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
-import util.DataModification;
 import util.DatabaseException;
 import util.Results;
 
@@ -364,15 +363,9 @@ public class ClientRequestHandle implements Runnable {
 				// returnData.put("directory_uuid", random);
 				// }
 				if (status.equals("OK")) {
-					try {
-						DataManagement.getInstance().createFolderInProject(
-								data.get("project_uuid", UUID.class),
-								DataModification
-										.getDirectoryPath(random.toString())
-										.toString());
-					} catch (DatabaseException e) {
-						status = e.getMessage();
-					}
+					DataManagement.getInstance().createFolderInProject(
+							data.get("project_uuid", UUID.class),
+							new FlowDirectory(""));
 				}
 				returnData.put("status", status);
 				break;
