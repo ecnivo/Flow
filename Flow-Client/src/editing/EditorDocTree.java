@@ -287,7 +287,7 @@ public class EditorDocTree extends DocTree {
 
     private class CreateFolderOnFolderButton extends JMenuItem {
 	private CreateFolderOnFolderButton() {
-	    super("New folder");
+	    super("New directory");
 	    addActionListener(new ActionListener() {
 
 		@Override
@@ -296,7 +296,7 @@ public class EditorDocTree extends DocTree {
 			JOptionPane.showConfirmDialog(null, "Please select a directory to put your new directory in first", "No selected directory", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
-		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  directory?", "Name", JOptionPane.QUESTION_MESSAGE).trim();
+		    String name = JOptionPane.showInputDialog(null, "What is the name of your new directory?", "Name", JOptionPane.QUESTION_MESSAGE).trim();
 		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
 			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
 		    }
@@ -310,6 +310,8 @@ public class EditorDocTree extends DocTree {
 		    else
 			createDirReq.put("parent_directory_uuid", parent.getDirectoryUUID());
 		    createDirReq.put("name", name);
+		    
+		    System.out.println("before sending");
 
 		    Data response = Communicator.communicate(createDirReq);
 		    if (response.get("status", String.class).equals("OK")) {

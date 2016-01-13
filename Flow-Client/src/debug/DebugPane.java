@@ -56,7 +56,7 @@ public class DebugPane extends JPanel {
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.DEBUG);
 	buttonPanel.add(navBar);
-	buttonPanel.add(new RunStopBar());
+	buttonPanel.add(new RunStopBar(debugConsole));
 	buttonPanel.add(new DebugToolbar());
 	rightTop.add(new VariablesList(), BorderLayout.CENTER);
     }

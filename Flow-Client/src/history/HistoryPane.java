@@ -50,6 +50,10 @@ public class HistoryPane extends JSplitPane {
     public void addEditTabs(EditTabs editTabs) {
 	setRightComponent(editTabs);
     }
+    
+    public VersionDocTree getTree(){
+	return tree;
+    }
 
     public EditTabs getEditTabs() {
 	if (getRightComponent() instanceof EditTabs) {

@@ -218,7 +218,6 @@ public abstract class DocTree extends JTree {
 	    return;
 	}
 
-	System.out.println("starting recursion");
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
 	model.reload();
 
@@ -325,11 +324,9 @@ public abstract class DocTree extends JTree {
 		childDirNode = newDirNode;
 	    }
 
-	    System.out.println("recursing to next level");
 	    reloadProjectFilesRecursively(remoteDir, childDirNode);
 	}
 
-	System.out.println("Finished recursing at this level");
     }
 
     public class ProjectNode extends DirectoryNode {

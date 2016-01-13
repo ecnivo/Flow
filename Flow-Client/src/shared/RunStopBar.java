@@ -15,27 +15,23 @@ import javax.swing.JButton;
 import javax.swing.JToolBar;
 
 public class RunStopBar extends JToolBar {
-    public RunStopBar() {
+    public RunStopBar(GenericConsole console) {
 	setBorder(FlowClient.EMPTY_BORDER);
 	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-	add(new RunButton());
-	add(new StopButton());
+	add(new RunButton(console));
+	add(new StopButton(console));
 
 	setFloatable(false);
 	setRollover(true);
     }
 
     private class RunButton extends JButton {
-	public RunButton() {
+	public RunButton(GenericConsole console) {
 	    setToolTipText("Compiles, then runs the file currently open in the editor");
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/run.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/run.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
@@ -55,15 +51,11 @@ public class RunStopBar extends JToolBar {
 
     private class StopButton extends JButton {
 
-	public StopButton() {
+	public StopButton(GenericConsole console) {
 	    setToolTipText("Stops the currently running program");
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    try {
-		setIcon(new ImageIcon(
-			ImageIO.read(new File("images/stop.png"))
-				.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-					FlowClient.BUTTON_ICON_SIZE,
-					Image.SCALE_SMOOTH)));
+		setIcon(new ImageIcon(ImageIO.read(new File("images/stop.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }

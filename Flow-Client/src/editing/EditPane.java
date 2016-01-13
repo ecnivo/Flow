@@ -34,36 +34,31 @@ public class EditPane extends JPanel {
 	add(mainSplit, BorderLayout.CENTER);
 	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 	mainSplit.setMinimumSize(new Dimension(0, 0));
-	mainSplit.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-		Integer.MAX_VALUE));
+	mainSplit.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	mainSplit.setContinuousLayout(true);
 	mainSplit.setResizeWeight(0.9);
 	JSplitPane rightSide = new JSplitPane();
 	rightSide.setBorder(FlowClient.EMPTY_BORDER);
 	rightSide.setOrientation(JSplitPane.VERTICAL_SPLIT);
 	rightSide.setMinimumSize(new Dimension(5, 0));
-	rightSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-		Integer.MAX_VALUE));
+	rightSide.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	rightSide.setResizeWeight(0.5);
 	rightSide.setContinuousLayout(true);
 	rightSide.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
 	mainSplit.setRightComponent(rightSide);
 
 	GenericConsole genericConsole = new GenericConsole();
-	genericConsole.getScroll().setPreferredSize(
-		new Dimension(RIGHT_SIDE_WIDTH, 500));
+	genericConsole.getScroll().setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 500));
 	rightSide.setLeftComponent(genericConsole.getScroll());
 
 	leftSide = new JSplitPane();
 	leftSide.setBorder(FlowClient.EMPTY_BORDER);
 	leftSide.setContinuousLayout(true);
 	leftSide.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH, 0));
-	leftSide.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-		Integer.MAX_VALUE));
+	leftSide.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	mainSplit.setLeftComponent(leftSide);
 
-	collabsList = new CollabsList(new FlowPermission(FlowPermission.OWNER),
-		this);
+	collabsList = new CollabsList(new FlowPermission(FlowPermission.OWNER), this);
 	collabsList.setPreferredSize(new Dimension(RIGHT_SIDE_WIDTH, 225));
 	rightSide.setRightComponent(collabsList);
 
@@ -78,7 +73,7 @@ public class EditPane extends JPanel {
 	buttonPanel.add(navBar);
 	editToolbar = new EditorToolbar(this);
 	buttonPanel.add(editToolbar);
-	buttonPanel.add(new RunStopBar());
+	buttonPanel.add(new RunStopBar(genericConsole));
 	treeAndButtons.setLeftComponent(buttonPanel);
 
 	tree = new EditorDocTree(this);

@@ -99,6 +99,7 @@ public class PanelManager extends JPanel {
 
     public void resetUI() {
 	((DefaultMutableTreeNode) ((DefaultTreeModel) editPane.getDocTree().getModel()).getRoot()).removeAllChildren();
+	((DefaultMutableTreeNode) ((DefaultTreeModel) historyPane.getTree().getModel()).getRoot()).removeAllChildren();
 	editTabs = new EditTabs();
     }
 }
