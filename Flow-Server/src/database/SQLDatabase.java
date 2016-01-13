@@ -1,6 +1,5 @@
 package database;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -34,6 +33,8 @@ public class SQLDatabase {
 	 */
 	private Connection connection;
 
+	public static SQLDatabase instance;
+
 	public SQLDatabase(String databaseName) {
 		try {
 			DriverManager.registerDriver(
@@ -52,6 +53,11 @@ public class SQLDatabase {
 			System.out.println(
 					"Error connecting to database located at: " + databaseName);
 		}
+		instance = this;
+	}
+
+	public static SQLDatabase getInstance() {
+		return instance;
 	}
 
 	/**
@@ -408,7 +414,6 @@ public class SQLDatabase {
 			if ((temp = this.query(String.format(
 					"SELECT * from documents WHERE DocumentID = '%s';",
 					fileId))).next()) {
-				temp.previous();
 				return temp;
 			} else {
 				// Throw an exception in this case because the server expects to
@@ -561,68 +566,6 @@ public class SQLDatabase {
 			return FlowServer.ERROR;
 		}
 		return "OK";
-	}
-
-	public String getFilePath(String fileId) throws DatabaseException {
-		ResultSet fileData = null;
-		try {
-			fileData = this.query(String.format(
-					"SELECT * FROM documents WHERE FileID = '%s'", fileId));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String parentDirectoryId = null, directoryId = null;
-		try {
-			parentDirectoryId = fileData.getString("ParentDirectoryID");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// TODO optimize for efficiency
-		StringBuilder path = new StringBuilder();
-		do {
-			directoryId = parentDirectoryId;
-			try {
-				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
-						this.getDirectoryInfo(directoryId))[0];
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new DatabaseException(e.getMessage());
-			}
-			if (path.length() > 0)
-				path.append(File.separator);
-			path.append(directoryId);
-		} while (!parentDirectoryId.equals(directoryId));
-
-		return path.toString();
-	}
-
-	public String getDirectoryPath(String directoryId)
-			throws DatabaseException {
-		String parentDirectoryId = directoryId;
-
-		// TODO optimize for efficiency
-		StringBuilder path = new StringBuilder();
-		do {
-			directoryId = parentDirectoryId;
-			try {
-				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
-						this.getDirectoryInfo(directoryId))[0];
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new DatabaseException(e.getMessage());
-			}
-			if (path.length() > 0)
-				path.append(File.separator);
-			path.append(directoryId);
-		} while (!parentDirectoryId.equals(directoryId));
-
-		return path.toString();
 	}
 
 	/**

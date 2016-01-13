@@ -17,6 +17,7 @@ import struct.FlowFile;
 import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
+import util.DataModification;
 import util.DatabaseException;
 import util.Results;
 
@@ -367,7 +368,7 @@ public class ClientRequestHandle implements Runnable {
 						DataManagement.getInstance()
 								.createFolderInProject(
 										data.get("project_uuid", UUID.class),
-										this.database.getDirectoryPath(data
+										DataModification.getDirectoryPath(data
 												.get("project_uuid", UUID.class)
 												.toString()));
 					} catch (DatabaseException e) {
