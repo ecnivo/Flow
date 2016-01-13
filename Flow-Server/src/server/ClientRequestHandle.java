@@ -365,7 +365,13 @@ public class ClientRequestHandle implements Runnable {
 				if (status.equals("OK")) {
 					DataManagement.getInstance().createFolderInProject(
 							data.get("project_uuid", UUID.class),
-							new FlowDirectory(""));
+							new FlowDirectory(
+									DataManagement.getInstance()
+											.getProjectFromUUID(data.get(
+													"parent_directory_uuid",
+													UUID.class)),
+									data.get("directory_name", String.class),
+									random));
 				}
 				returnData.put("status", status);
 				break;
