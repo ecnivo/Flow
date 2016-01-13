@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import util.FileSerializer;
 
 /**
@@ -114,46 +116,37 @@ public class DataManagement {
 
 	public FlowProject getFolderFromUUID(UUID uuid) {
 		// FIXME NETDEX DO THIS
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
-	public boolean createFolderInProject(UUID projectUUID, String pathstr) {
-		// String pathstr = "";
-		// for (UUID u : path) {
-		// pathstr += u + File.separator;
-		// }
-		File directory = new File(new File(new File(dataFile, "projects"),
-				projectUUID.toString()), pathstr);
+	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory, String pathstr) {
+		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
 		if (directory.exists())
 			return false;
 		directory.mkdirs();
+		File dirMeta = new File(directory, "dir.flow");
+		fileSerializer.writeToFile(dirMeta, theDirectory);
 		return true;
 	}
 
 	public boolean deleteFolderInProject(UUID projectUUID, String pathstr) {
-		// String pathstr = "";
-		// for (UUID u : path) {
-		// pathstr += u + File.separator;
-		// }
-		File directory = new File(new File(new File(dataFile, "projects"),
-				projectUUID.toString()), pathstr);
+		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
 		if (!directory.exists())
 			return false;
 		directory.delete();
 		return true;
 	}
 
-	public boolean renameFolderInProject(UUID projectUUID, UUID newUUID,
-			UUID... path) {
-		String pathstr = "";
-		for (UUID u : path) {
-			pathstr += u + File.separator;
-		}
-		File directory = new File(new File(new File(dataFile, "projects"),
-				projectUUID.toString()), pathstr);
+	public boolean renameFolderInProject(UUID projectUUID, String newName, String pathstr) {
+		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
 		if (!directory.exists())
 			return false;
-		directory.renameTo(new File(newUUID.toString()));
+		File dirMeta = new File(directory, "dir.flow");
+		if(!dirMeta.exists())
+			return false;
+		FlowDirectory dir = fileSerializer.readFromFile(dirMeta, FlowDirectory.class);
+		dir.setDirectoryName(newName);
+		fileSerializer.writeToFile(dirMeta, dir);
 		return true;
 	}
 
@@ -189,9 +182,7 @@ public class DataManagement {
 		return true;
 	}
 
-	public FlowFile getFileFromPath(UUID projectUUID, String path,
-			UUID fileUUID) {
-
+	public FlowFile getFileFromPath(UUID projectUUID, String path, UUID fileUUID) {
 		// TODO rewrite this to use path concatenation
 		File f = new File(dataFile.getAbsolutePath() + File.separator
 				+ "projects" + File.separator + projectUUID.toString()
