@@ -91,8 +91,10 @@ public class ClientRequestHandle implements Runnable {
 				case "CLOSE_ACCOUNT":
 					try {
 						status = "OK";
-						username = this.database.getUsername(data.get("session_id", UUID.class).toString());
-						if(!DataManagement.getInstance().removeUser(username)){
+						username = this.database.getUsername(
+								data.get("session_id", UUID.class).toString());
+						if (!DataManagement.getInstance()
+								.removeUser(username)) {
 							status = "INTERNAL_SERVER_ERROR";
 						}
 						this.database.closeAccount(username);
@@ -344,6 +346,18 @@ public class ClientRequestHandle implements Runnable {
 				// if (status.equals("OK")) {
 				// returnData.put("directory_uuid", random);
 				// }
+				if (status.equals("OK")) {
+					try {
+						DataManagement.getInstance()
+								.createFolderInProject(
+										data.get("project_uuid", UUID.class),
+										this.database.getDirectoryPath(data
+												.get("project_uuid", UUID.class)
+												.toString()));
+					} catch (DatabaseException e) {
+						status = e.getMessage();
+					}
+				}
 				returnData.put("status", status);
 				break;
 			// TODO Implement sending messages to active sessions on changes
