@@ -75,10 +75,10 @@ public class RunStopBar extends JToolBar {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    if (runTarget == null){
+		    if (runTarget == null) {
 			return;
 		    }
-		    Compiler compiler = new Compiler(getFiles((FlowProject)((EditArea)runTarget.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory())));
+		    compiler.FlowCompiler flowCompiler = new compiler.FlowCompiler(getFiles((FlowProject) ((EditArea) runTarget.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
 		    // System.out.println("Run button pressed");
 		}
 	    });

@@ -29,7 +29,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * <p>
  * TODO FIX COMPILER TO USE NEW FILE STRUCTURE
  */
-public class Compiler {
+public class FlowCompiler {
 
     private TextDocument[] textDocuments;
     private UUID dirUUID;
@@ -41,7 +41,7 @@ public class Compiler {
      *
      * @param doc The textDocuments to compile
      */
-    public Compiler(TextDocument... doc) {
+    public FlowCompiler(TextDocument... doc) {
         this.textDocuments = doc;
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());

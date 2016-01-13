@@ -13,7 +13,7 @@ import java.io.PrintStream;
  */
 public class Debugger {
 
-    private Compiler compiler;
+    private FlowCompiler flowCompiler;
     private File workingDirectory;
 
     private Process p;
@@ -21,8 +21,8 @@ public class Debugger {
     private PrintStream out;
 
     public Debugger(TextDocument... flowFiles) {
-        this.compiler = new Compiler(flowFiles);
-        this.workingDirectory = compiler.getWorkingDirectory();
+        this.flowCompiler = new FlowCompiler(flowFiles);
+        this.workingDirectory = flowCompiler.getWorkingDirectory();
         throw new NotImplementedException(); // FIXME: 12/30/2015
     }
 
