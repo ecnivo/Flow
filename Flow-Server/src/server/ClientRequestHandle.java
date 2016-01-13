@@ -337,8 +337,6 @@ public class ClientRequestHandle implements Runnable {
 				// returnData.put("document_uuid", random);
 				// }
 				if (status.equals("OK")) {
-
-					// TODO Change this to actually create text document
 					DataManagement.getInstance().addTextDocumentToProject(
 							data.get("project_uuid", UUID.class),
 							new TextDocument(
