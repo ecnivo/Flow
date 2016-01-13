@@ -18,6 +18,8 @@ import shared.RunStopBar;
 @SuppressWarnings("serial")
 public class DebugPane extends JPanel {
     
+    private RunStopBar runStopBar;
+    
     //TODO if it looks so simple, things still need to be added, such as selecting break points, highlighting the line...
 
     private JSplitPane mainSplit;
@@ -56,12 +58,14 @@ public class DebugPane extends JPanel {
 	NavBar navBar = new NavBar(manager);
 	navBar.disableButton(NavBar.DEBUG);
 	buttonPanel.add(navBar);
-	buttonPanel.add(new RunStopBar(debugConsole));
+	runStopBar = new RunStopBar(debugConsole);
+	buttonPanel.add(runStopBar);
 	buttonPanel.add(new DebugToolbar());
 	rightTop.add(new VariablesList(), BorderLayout.CENTER);
     }
 
     public void addEditTabs(EditTabs editTabs) {
+	runStopBar.setEditTabs(editTabs);
 	mainSplit.setRightComponent(editTabs);
     }
 }

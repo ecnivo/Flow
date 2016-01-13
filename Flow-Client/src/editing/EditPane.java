@@ -22,6 +22,8 @@ public class EditPane extends JPanel {
     private EditorDocTree tree;
     private JSplitPane leftSide;
     private EditorToolbar editToolbar;
+    private EditTabs tempTabs;
+    private RunStopBar runStopBar;
 
     private static final int RIGHT_SIDE_WIDTH = 300;
     private static final int LEFT_SIDE_WIDTH = 300;
@@ -73,7 +75,8 @@ public class EditPane extends JPanel {
 	buttonPanel.add(navBar);
 	editToolbar = new EditorToolbar(this);
 	buttonPanel.add(editToolbar);
-	buttonPanel.add(new RunStopBar(genericConsole));
+	runStopBar = new RunStopBar(genericConsole);
+	buttonPanel.add(runStopBar);
 	treeAndButtons.setLeftComponent(buttonPanel);
 
 	tree = new EditorDocTree(this);
@@ -86,6 +89,7 @@ public class EditPane extends JPanel {
     }
 
     public void addEditTabs(EditTabs editTabs) {
+	runStopBar.setEditTabs(editTabs);
 	leftSide.setRightComponent(editTabs);
     }
 

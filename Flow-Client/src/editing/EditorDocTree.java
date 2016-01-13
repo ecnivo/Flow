@@ -309,10 +309,8 @@ public class EditorDocTree extends DocTree {
 			createDirReq.put("parent_directory_uuid", ((FlowProject) parent).getProjectUUID());
 		    else
 			createDirReq.put("parent_directory_uuid", parent.getDirectoryUUID());
-		    createDirReq.put("name", name);
+		    createDirReq.put("directory_name", name);
 		    
-		    System.out.println("before sending");
-
 		    Data response = Communicator.communicate(createDirReq);
 		    if (response.get("status", String.class).equals("OK")) {
 			reloadProjectFiles(((ProjectNode) getActiveDirectoryNode().getPath()[1]));

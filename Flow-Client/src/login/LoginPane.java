@@ -29,6 +29,7 @@ import shared.Communicator;
 
 public class LoginPane extends JPanel {
     private PanelManager panMan;
+    private JPasswordField passwordEntry;
 
     // Pan Man! https://i.imgur.com/19iZW9K.png
 
@@ -40,6 +41,7 @@ public class LoginPane extends JPanel {
 
 	java.awt.Component verticalStrut_4 = Box.createVerticalStrut(20);
 	add(verticalStrut_4);
+	// TODO wipe password on login and create new account
 	// TODO add background picture
 
 	JLabel title = new JLabel();
@@ -70,7 +72,7 @@ public class LoginPane extends JPanel {
 	add(passwordPrompt);
 	passwordPrompt.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 
-	JPasswordField passwordEntry = new JPasswordField();
+	passwordEntry = new JPasswordField();
 	passwordEntry.setMaximumSize(new Dimension(128, 24));
 	add(passwordEntry);
 	passwordEntry.addFocusListener(new FocusListener() {
@@ -155,5 +157,9 @@ public class LoginPane extends JPanel {
 
 	    }
 	});
+    }
+
+    public void resetPassFields() {
+	passwordEntry.setText("");
     }
 }

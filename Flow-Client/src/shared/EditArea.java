@@ -33,7 +33,7 @@ import struct.User;
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private FlowDocument document;
+    private TextDocument document;
 
     private Style keywordStyle;
     private Style plainStyle;

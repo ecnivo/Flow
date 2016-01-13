@@ -63,6 +63,7 @@ public class PanelManager extends JPanel {
 
     public void switchToLogin() {
 	layout.show(this, "loginPane");
+	loginPane.resetPassFields();
 	revalidate();
 	repaint();
     }

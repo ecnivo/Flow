@@ -176,18 +176,18 @@ public abstract class DocTree extends JTree {
 
 	    ProjectNode newProjectNode = new ProjectNode(project);
 	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
-	    getProjectFiles(project, newProjectNode);
+	    createProjectFileNodes(project, newProjectNode);
 	    return newProjectNode;
 	}
 	return null;
     }
 
-    private void getProjectFiles(FlowDirectory fDir, DirectoryNode dir) {
+    private void createProjectFileNodes(FlowDirectory fDir, DirectoryNode dir) {
 	// adds folders
 	if (!fDir.getDirectories().isEmpty()) {
 	    for (FlowDirectory subDir : fDir.getDirectories()) {
 		DirectoryNode subDirNode = new DirectoryNode(subDir);
-		getProjectFiles(subDir, subDirNode);
+		createProjectFileNodes(subDir, subDirNode);
 	    }
 	}
 
@@ -308,7 +308,9 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
+	System.out.println(remoteParentDir.getDirectories());
 	for (FlowDirectory remoteDir : remoteParentDir.getDirectories()) {
+	    System.out.println("remote directory!");
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;
 	    for (DirectoryNode directoryNode : localDirs) {
