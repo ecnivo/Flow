@@ -119,8 +119,9 @@ public class DataManagement {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory, String pathstr) {
-		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
+	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory) {
+		L.info("creating directory in project " + projectUUID + " called " + theDirectory + " in path " + theDirectory.getFullyQualifiedPath());
+		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), theDirectory.getFullyQualifiedPath());
 		if (directory.exists())
 			return false;
 		directory.mkdirs();
