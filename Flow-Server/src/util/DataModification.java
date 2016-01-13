@@ -64,4 +64,23 @@ public class DataModification {
 		return path.toString();
 	}
 
+	public void fileVisualizer(String directoryId) throws DatabaseException {
+		String parentDirectoryId = directoryId;
+		do {
+			directoryId = parentDirectoryId;
+			System.out.println(directoryId + ": ");
+			//	 String[] data = SQLDatabase.getInstance().
+			try {
+				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
+						SQLDatabase.getInstance()
+								.getDirectoryInfo(directoryId))[0];
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw new DatabaseException(e.getMessage());
+			}
+		} while (!directoryId.equals(parentDirectoryId));
+
+	}
 }

@@ -365,12 +365,11 @@ public class ClientRequestHandle implements Runnable {
 				// }
 				if (status.equals("OK")) {
 					try {
-						DataManagement.getInstance()
-								.createFolderInProject(
-										data.get("project_uuid", UUID.class),
-										DataModification.getDirectoryPath(data
-												.get("project_uuid", UUID.class)
-												.toString()));
+						DataManagement.getInstance().createFolderInProject(
+								data.get("project_uuid", UUID.class),
+								DataModification
+										.getDirectoryPath(random.toString())
+										.toString());
 					} catch (DatabaseException e) {
 						status = e.getMessage();
 					}
