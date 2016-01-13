@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -340,7 +341,16 @@ public class ClientRequestHandle implements Runnable {
 					// TODO Change this to actually create text document
 					DataManagement.getInstance().addTextDocumentToProject(
 							data.get("project_uuid", UUID.class),
-							new TextDocument());
+							new TextDocument(
+									new FlowFile(
+											DataManagement.getInstance()
+													.getFolderFromUUID(data.get(
+															"directory_uuid",
+															UUID.class)),
+											data.get("document_name",
+													String.class),
+											random),
+									random, new Date()));
 				}
 				returnData.put("status", status);
 				break;

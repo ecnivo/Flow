@@ -112,6 +112,10 @@ public class DataManagement {
 		return true;
 	}
 
+	public FlowProject getFolderFromUUID(UUID uuid) {
+		return null;
+	}
+
 	public boolean createFolderInProject(UUID projectUUID, String pathstr) {
 		// String pathstr = "";
 		// for (UUID u : path) {
