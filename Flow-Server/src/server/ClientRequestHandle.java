@@ -272,14 +272,6 @@ public class ClientRequestHandle implements Runnable {
                         UUID parentDirectoryUUID = data.get("parent_directory_uuid", UUID.class);
                         UUID random = UUID.randomUUID();
                         String status = this.database.newDirectory(data.get("directory_name", String.class), random.toString(), projectUUID.toString(), parentDirectoryUUID.toString());
-                        // if (status.equals("OK")) {
-                        // returnData.put("directory_uuid", random);
-                        // }
-                        if (status.equals("OK")) {
-                            // FIXME STILL NEED THIS METHOD NETDEX
-                            // DataManagement.getInstance().createFolderInProject(
-                            // projectUUID, flowDirectory);
-                        }
                         returnData.put("status", status);
                     } catch (Exception e) {
                         e.printStackTrace();
