@@ -10,16 +10,22 @@ import java.util.UUID;
  */
 public class TextDocument implements Serializable, Comparable<TextDocument>{
 
+	private FlowFile parentFile;
+	private UUID uuid;
+	private Date versionDate;
+
 	private ArrayList<String> lines;
 
 	public TextDocument(FlowFile parent, UUID uuid, Date versionDate) {
-		super(parent, uuid, versionDate);
+		this.parentFile = parent;
+		this.uuid = uuid;
+		this.versionDate = versionDate;
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
 
 	public TextDocument(FlowFile parent, Date versionDate) {
-		super(parent, versionDate);
+		this(parent, UUID.randomUUID(), versionDate);
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
@@ -27,29 +33,6 @@ public class TextDocument implements Serializable, Comparable<TextDocument>{
 	public TextDocument() {
 		this(null, new Date());
 	}
-	
-
-    private FlowFile parentFile;
-    private UUID uuid;
-    private Date versionDate;
-
-    protected FlowDocument(FlowFile flowFile, UUID uuid, Date versionDate) {
-        this.parentFile = flowFile;
-        this.uuid = uuid;
-        this.versionDate = versionDate;
-    }
-
-    public FlowDocument(FlowFile flowFile, Date versionDate) {
-        this(flowFile, UUID.randomUUID(), versionDate);
-    }
-
-    public FlowDocument() {
-        this(null, UUID.randomUUID(), new Date());
-    }
-
-    public void setParentFile(FlowFile file) {
-        this.parentFile = file;
-    }
 
     public FlowFile getParentFile() {
         return parentFile;
@@ -64,8 +47,8 @@ public class TextDocument implements Serializable, Comparable<TextDocument>{
     }
 
     @Override
-    public int compareTo(FlowDocument o) {
-        return o.getVersionDate().compareTo(versionDate);
+	public int compareTo(TextDocument o) {
+		return o.getVersionDate().compareTo(versionDate);
     }
 
 
