@@ -361,30 +361,29 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("status", status);
 				break;
 			case "new_directory":
-				// status = this.database.newDirectory(
-				// data.get("directory_name", String.class),
-				// (random = UUID.randomUUID()).toString(),
-				// data.get("project_uuid", UUID.class).toString(),
-				// data.get("parent_directory_uuid", UUID.class)
-				// .toString());
-				// // if (status.equals("OK")) {
-				// // returnData.put("directory_uuid", random);
-				// // }
+				status = this.database.newDirectory(
+						data.get("directory_name", String.class),
+						(random = UUID.randomUUID()).toString(),
+						data.get("project_uuid", UUID.class).toString(),
+						data.get("parent_directory_uuid", UUID.class)
+								.toString());
 				// if (status.equals("OK")) {
-				// UUID projectUUID = data.get("project_uuid", UUID.class);
-				// UUID parentDirectoryUUID = data.get("parent_directory_uuid",
-				// UUID.class);
-				// FlowDirectory parentDirectory =
-				// DataManagement.getInstance().getFolderFromPath(projectUUID,
-				// "path");
-				// String directoryName = data.get("directory_name",
-				// String.class);
-				// FlowDirectory flowDirectory = new
-				// FlowDirectory(directoryName, random);
-				// DataManagement.getInstance().createFolderInProject(projectUUID,
-				// flowDirectory);
+				// returnData.put("directory_uuid", random);
 				// }
-				// returnData.put("status", status);
+				if (status.equals("OK")) {
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+							UUID.class);
+					FlowDirectory parentDirectory = DataManagement.getInstance()
+							.getFolderFromPath(projectUUID, "path");
+					String directoryName = data.get("directory_name",
+							String.class);
+					FlowDirectory flowDirectory = new FlowDirectory(
+							directoryName, random);
+					DataManagement.getInstance()
+							.createFolderInProject(projectUUID, flowDirectory);
+				}
+				returnData.put("status", status);
 				break;
 			case "directory_info":
 				try {

@@ -6,6 +6,7 @@ import java.util.UUID;
 /**
  * Represents a FlowProject, analagous to an eclipse project.
  * <p>
+ * @deprecated
  * Created by Netdex on 12/24/2015.
  */
 public class FlowProject extends FlowDirectory {
