@@ -720,13 +720,37 @@ public class SQLDatabase {
 		throw new DatabaseException(FlowServer.ERROR);
 	}
 
-	public String getUsername(String session_id) throws DatabaseException {
+	public String getUsername(String sessionID) throws DatabaseException {
 		try {
 			return Results.toStringArray("Username",
-					this.getSessionInfo(session_id))[0];
+					this.getSessionInfo(sessionID))[0];
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(e.getMessage());
+		}
+	}
+
+	public boolean verifyPermissions(String sessionID, String projectUUID)
+			throws DatabaseException {
+		ResultSet data = this.getSessionInfo(sessionID);
+		try {
+			if (!data.next())
+				throw new DatabaseException("INVALID_SESSION_ID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+		try {
+			if (!this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+					data.getString("Username"), projectUUID)).next())
+				return false;
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 }

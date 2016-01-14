@@ -310,7 +310,7 @@ public class ClientRequestHandle implements Runnable {
 					String newName = data.get("new_name", String.class);
 					if (!DataManagement.getInstance().renameProject(
 							UUID.fromString(projectId), newName)) {
-						L.warning("could not rename project from file system!");
+						L.warning("Could not rename project from file system!");
 					}
 					returnData.put("status",
 							this.database.renameProject(projectId, newName));
@@ -320,7 +320,7 @@ public class ClientRequestHandle implements Runnable {
 							this.database.deleteProject(projectId));
 					if (!DataManagement.getInstance()
 							.removeProject(UUID.fromString(projectId))) {
-						L.warning("could not delete project from file system!");
+						L.warning("Could not delete project from file system!");
 					}
 					break;
 				}
