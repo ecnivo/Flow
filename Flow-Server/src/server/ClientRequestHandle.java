@@ -1,5 +1,13 @@
 package server;
 
+import database.SQLDatabase;
+import message.Data;
+import network.DataSocket;
+import struct.User;
+import util.DataModification;
+import util.DatabaseException;
+import util.Results;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -7,17 +15,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
-import message.Data;
-import network.DataSocket;
-import struct.FlowDirectory;
-import struct.FlowFile;
-import struct.FlowProject;
-import struct.User;
-import util.DataModification;
-import util.DatabaseException;
-import util.Results;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -179,55 +176,40 @@ public class ClientRequestHandle implements Runnable {
 				// returnData.put("status", "OK");
 				break;
 			case "file_request":
-				// TODO generate byte array using file path (from above)
-				try {
-					ResultSet results = this.database.getFileInfo(
-							data.get("doc_uuid", UUID.class).toString());
-					FlowFile file = new FlowFile(
-							new FlowDirectory(results.getString("Path")),
-							results.getString("DocumentName")); // TODO this is
-					// not how you
-					// get a file!
-					// constructors
-					// are only
-					// called on
-					// file
-					// creation!
-					// TODO Format
-					// the above
-					// amazingly
-					// formatted
-					// comment
-					// properly
-					returnData.put("document", file);
-					returnData.put("status", "ok");
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-					returnData.put("status", e.getMessage());
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
-				}
+				// // TODO generate byte array using file path (from above)
+				// try {
+				// ResultSet results = this.database.getFileInfo(
+				// data.get("doc_uuid", UUID.class).toString());
+				// FlowFile file = new FlowFile(
+				// new FlowDirectory(results.getString("Path")),
+				// results.getString("DocumentName")); // TODO this is
+				// // not how you
+				// // get a file!
+				// // constructors
+				// // are only
+				// // called on
+				// // file
+				// // creation!
+				// // TODO Format
+				// // the above
+				// // amazingly
+				// // formatted
+				// // comment
+				// // properly
+				// returnData.put("document", file);
+				// returnData.put("status", "ok");
+				// } catch (DatabaseException e) {
+				// e.printStackTrace();
+				// returnData.put("status", e.getMessage());
+				// } catch (SQLException e) {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// returnData.put("status", FlowServer.ERROR);
+				// }
 				break;
 			case "file_checksum":
 				break;
-			case "request_project":
-				try {
-					// TODO Move back to one line after debugging
-					FlowProject temp1 = this.server.getProject(
-							data.get("project_uuid", UUID.class).toString());
-					System.out
-							.println(temp1 != null ? temp1.toString() : temp1);
-					returnData.put("project", temp1);
-				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
-				}
-				break;
 			case "request_file":
-				// TODO DECIDE BETWEEN file_request (above) and request_file
 				try {
 					returnData.put("document", this.server.getFile(
 							data.get("file_uuid", UUID.class).toString(),
@@ -384,6 +366,20 @@ public class ClientRequestHandle implements Runnable {
 							.createFolderInProject(projectUUID, flowDirectory);
 				}
 				returnData.put("status", status);
+				break;
+				case "project_info":
+					try {
+						UUID projectUUID = data.get("project_uuid", UUID.class);
+						// TODO Move back to one line after debugging
+						ResultSet databaseResponse = this.database.getProjectInfo(projectUUID.toString());
+						returnData.put("project_name", databaseResponse.getString("ProjectName"));
+						returnData.put("editors", this.database.getEditors());
+						returnData.put("status", "OK");
+					} catch (DatabaseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						returnData.put("status", FlowServer.ERROR);
+					}
 				break;
 			case "directory_info":
 				try {
