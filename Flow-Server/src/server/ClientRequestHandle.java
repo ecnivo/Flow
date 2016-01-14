@@ -37,18 +37,18 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			// this.socket.setSoTimeout(500);
-			String username = null, password = null, status = null;
-			UUID random;
-			String[][] response;
+			// String username = null, password = null, status = null;
+			// UUID random;
+			// String[][] response;
 			Data data = psocket.receive();
 
 			L.info("receive: " + data.toString());
 			Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
-				username = data.get("username", String.class);
-				password = data.get("password", String.class);
 				try {
+					String username = data.get("username", String.class),
+							password = data.get("password", String.class);
 					if (this.database.userExists(username)) {
 						if (this.server.getDatabase().authenticate(username,
 								password)) {
@@ -85,76 +85,66 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
-						status = "OK";
-						username = this.database.getUsername(
-								data.get("session_id", UUID.class).toString());
+						String status = "OK", username = this.database
+								.getUsername(data.get("session_id", UUID.class)
+										.toString());
 						if (!DataManagement.getInstance()
 								.removeUser(username)) {
-							status = "INTERNAL_SERVER_ERROR";
+							returnData.put("status", "INTERNAL_SERVER_ERROR");
+						} else {
+							this.database.closeAccount(username);
+							returnData.put("status", "OK");
 						}
-						this.database.closeAccount(username);
 					} catch (DatabaseException e) {
 						e.printStackTrace();
-						status = e.getMessage();
+						returnData.put("status", e.getMessage());
 					}
-					returnData.put("status", status);
 					break;
 				case "CHANGE_PASSWORD":
 					try {
 						this.database.changePassword(this.database.getUsername(
 								data.get("session_id", UUID.class).toString()),
 								data.get("new_password", String.class));
-						status = "OK";
+						returnData.put("status", "OK");
 					} catch (DatabaseException e) {
 						e.printStackTrace();
-						status = e.getMessage();
+						returnData.put("status", e.getMessage());
 					}
-					returnData.put("status", status);
 					break;
 				}
 				break;
 			case "list_projects":
 				// Initialized as null to prevent errors
-				ResultSet temp = null;
-				response = null;
 				try {
-					temp = this.database.getSessionInfo(
+					ResultSet temp = this.database.getSessionInfo(
 							data.get("session_id", UUID.class).toString());
-				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				try {
-					username = temp.getString("Username");
+					String username = temp.getString("Username");
 					if (DataManagement.getInstance()
 							.getUserByUsername(username) == null)
 						throw new RuntimeException("User does not exist");
 					ResultSet projects = this.database.getProjects(username);
-					response = Results.toStringArray(
+					String[][] response = Results.toStringArray(
 							new String[] { "ProjectID" }, projects);
-				} catch (SQLException e) {
-					e.printStackTrace();
-					// TODO Auto-generated catch block
-					returnData.put("status", FlowServer.ERROR);
-					break;
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-					// TODO Auto-generated catch block
-					returnData.put("status", e.getMessage());
-					break;
-				}
-				UUID[] projects = new UUID[response.length];
-				System.out.println(Arrays.toString(response));
-				if (response == null || response[0] == null) {
-					returnData.put("projects", new UUID[0]);
-				} else {
-					for (int i = 0; i < response.length; i++) {
-						projects[i] = UUID.fromString(response[i][0]);
+					UUID[] projectUUIDs = new UUID[response.length];
+					System.out.println(Arrays.toString(response));
+					if (response == null || response[0] == null) {
+						returnData.put("projects", new UUID[0]);
+					} else {
+						for (int i = 0; i < response.length; i++) {
+							projectUUIDs[i] = UUID.fromString(response[i][0]);
+						}
+						returnData.put("projects", projectUUIDs);
 					}
-					returnData.put("projects", projects);
+					returnData.put("status", "OK");
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
 				}
-				returnData.put("status", "OK");
 				break;
 			case "list_project_files":
 				// TODO Verify if this is not needed and remove case
@@ -221,10 +211,10 @@ public class ClientRequestHandle implements Runnable {
 			case "new_project":
 				try {
 					String projectName = data.get("project_name", String.class);
-					username = this.database.getUsername(
+					String username = this.database.getUsername(
 							data.get("session_id", UUID.class).toString());
 					UUID uuid = UUID.randomUUID();
-					status = this.database.newProject(uuid.toString(),
+					String status = this.database.newProject(uuid.toString(),
 							projectName, username);
 					if (status != null && status.equals("OK")) {
 						returnData.put("status", this.database.updateAccess(
@@ -247,31 +237,22 @@ public class ClientRequestHandle implements Runnable {
 					try {
 						sessionInfo = this.database
 								.getSessionInfo(data.get("session_id"));
-
+						sessionInfo.next();
+						String username = sessionInfo.getString("Username");
+						returnData.put("status",
+								this.database.updateAccess(
+										(int) data.get("access_level",
+												Byte.class),
+										projectId, username));
 					} catch (DatabaseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
-					try {
-						sessionInfo.next();
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						returnData.put("status", FlowServer.ERROR);
 					}
 
-					try {
-						username = sessionInfo.getString("Username");
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					returnData
-							.put("status",
-									this.database.updateAccess(
-											(int) data.get("access_level",
-													Byte.class),
-											projectId, username));
 					break;
 				case "RENAME_PROJECT":
 					String newName = data.get("new_name", String.class);
@@ -324,17 +305,17 @@ public class ClientRequestHandle implements Runnable {
 				// status = e.getMessage();
 				// }
 				// }
-				returnData.put("status", status);
+				// returnData.put("status", status);
 				break;
 			case "new_directory":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
 					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
 							UUID.class);
-					status = this.database.newDirectory(
+					UUID random = UUID.randomUUID();
+					String status = this.database.newDirectory(
 							data.get("directory_name", String.class),
-							(random = UUID.randomUUID()).toString(),
-							projectUUID.toString(),
+							random.toString(), projectUUID.toString(),
 							parentDirectoryUUID.toString());
 					// if (status.equals("OK")) {
 					// returnData.put("directory_uuid", random);
@@ -344,15 +325,14 @@ public class ClientRequestHandle implements Runnable {
 						// DataManagement.getInstance().createFolderInProject(
 						// projectUUID, flowDirectory);
 					}
+					returnData.put("status", status);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				returnData.put("status", status);
 				break;
 			case "project_info":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
-					// TODO Move back to one line after debugging
 					ResultSet databaseResponse = this.database
 							.getProjectInfo(projectUUID.toString());
 					returnData.put("project_name",
