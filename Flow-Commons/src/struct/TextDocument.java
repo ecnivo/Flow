@@ -10,22 +10,20 @@ import java.util.UUID;
  */
 public class TextDocument implements Serializable, Comparable<TextDocument>{
 
-	private FlowFile parentFile;
 	private UUID uuid;
 	private Date versionDate;
 
 	private ArrayList<String> lines;
 
-	public TextDocument(FlowFile parent, UUID uuid, Date versionDate) {
-		this.parentFile = parent;
+	public TextDocument(UUID uuid, Date versionDate) {
 		this.uuid = uuid;
 		this.versionDate = versionDate;
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
 
-	public TextDocument(FlowFile parent, Date versionDate) {
-		this(parent, UUID.randomUUID(), versionDate);
+	public TextDocument(Date versionDate) {
+		this(UUID.randomUUID(), versionDate);
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
@@ -33,10 +31,6 @@ public class TextDocument implements Serializable, Comparable<TextDocument>{
 	public TextDocument() {
 		this(null, new Date());
 	}
-
-    public FlowFile getParentFile() {
-        return parentFile;
-    }
 
     public UUID getUUID() {
         return uuid;
