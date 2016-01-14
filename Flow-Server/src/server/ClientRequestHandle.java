@@ -1,13 +1,5 @@
 package server;
 
-import database.SQLDatabase;
-import message.Data;
-import network.DataSocket;
-import struct.User;
-import util.DataModification;
-import util.DatabaseException;
-import util.Results;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -16,6 +8,14 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import database.SQLDatabase;
+import message.Data;
+import network.DataSocket;
+import struct.User;
+import util.DataModification;
+import util.DatabaseException;
+import util.Results;
+
 public class ClientRequestHandle implements Runnable {
 
 	private Socket socket;
@@ -23,15 +23,12 @@ public class ClientRequestHandle implements Runnable {
 	private FlowServer server;
 	private SQLDatabase database;
 
-	private UUID uuid;
-
 	private static Logger L = Logger.getLogger("ClientRequestHandle");
 
 	public ClientRequestHandle(FlowServer server, Socket socket)
 			throws IOException {
 		this.socket = socket;
 		this.psocket = new DataSocket(socket);
-		this.uuid = UUID.randomUUID();
 		this.server = server;
 		this.database = this.server.getDatabase();
 	}
@@ -210,43 +207,31 @@ public class ClientRequestHandle implements Runnable {
 			case "file_checksum":
 				break;
 			case "request_file":
-				try {
-					returnData.put("document", this.server.getFile(
-							data.get("file_uuid", UUID.class).toString(),
-							data.get("project_uuid", UUID.class).toString()));
-				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
-				}
+				// TODO NETDEX IMLPEMENT THIS
+				// try {
+				// returnData.put("document", this.server.getFile(
+				// data.get("file_uuid", UUID.class).toString(),
+				// data.get("project_uuid", UUID.class).toString()));
+				// } catch (DatabaseException e) {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// returnData.put("status", FlowServer.ERROR);
+				// }
 				break;
 			case "new_project":
 				try {
 					String projectName = data.get("project_name", String.class);
-					ResultSet sessInfo = this.database.getSessionInfo(
+					username = this.database.getUsername(
 							data.get("session_id", UUID.class).toString());
-					username = Results.toStringArray(
-							new String[] { "Username" }, sessInfo)[0][0];
-					FlowProject project = new FlowProject(projectName,
-							DataManagement.getInstance()
-									.getUserByUsername(username));
-					DataManagement.getInstance().addProjectToUser(project);
-					status = this.database.newProject(
-							project.getProjectUUID().toString(), projectName,
-							username);
+					UUID uuid = UUID.randomUUID();
+					status = this.database.newProject(uuid.toString(),
+							projectName, username);
 					if (status != null && status.equals("OK")) {
-						returnData.put("status",
-								this.database.updateAccess(SQLDatabase.OWNER,
-										project.getProjectUUID().toString(),
-										username));
-						// returnData.put("project", project);
+						returnData.put("status", this.database.updateAccess(
+								SQLDatabase.OWNER, uuid.toString(), username));
 					} else {
 						returnData.put("status", status);
 					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -290,20 +275,19 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "RENAME_PROJECT":
 					String newName = data.get("new_name", String.class);
-					if (!DataManagement.getInstance().renameProject(
-							UUID.fromString(projectId), newName)) {
-						L.warning("Could not rename project from file system!");
-					}
-					returnData.put("status",
-							this.database.renameProject(projectId, newName));
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					returnData.put("status", this.database
+							.renameProject(projectUUID.toString(), newName));
 					break;
 				case "DELETE_PROJECT":
 					returnData.put("status",
 							this.database.deleteProject(projectId));
-					if (!DataManagement.getInstance()
-							.removeProject(UUID.fromString(projectId))) {
-						L.warning("Could not delete project from file system!");
-					}
+
+					// TODO This method should still exist NETDEX
+					// if (!DataManagement.getInstance()
+					// .removeProject(UUID.fromString(projectId))) {
+					// L.warning("Could not delete project from file system!");
+					// }
 					break;
 				}
 				break;
@@ -343,43 +327,50 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("status", status);
 				break;
 			case "new_directory":
-				status = this.database.newDirectory(
-						data.get("directory_name", String.class),
-						(random = UUID.randomUUID()).toString(),
-						data.get("project_uuid", UUID.class).toString(),
-						data.get("parent_directory_uuid", UUID.class)
-								.toString());
-				// if (status.equals("OK")) {
-				// returnData.put("directory_uuid", random);
-				// }
-				if (status.equals("OK")) {
+				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
 					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
 							UUID.class);
-					FlowDirectory parentDirectory = DataManagement.getInstance()
-							.getFolderFromPath(projectUUID, "path");
-					String directoryName = data.get("directory_name",
-							String.class);
-					FlowDirectory flowDirectory = new FlowDirectory(
-							directoryName, random);
-					DataManagement.getInstance()
-							.createFolderInProject(projectUUID, flowDirectory);
+					status = this.database.newDirectory(
+							data.get("directory_name", String.class),
+							(random = UUID.randomUUID()).toString(),
+							projectUUID.toString(),
+							parentDirectoryUUID.toString());
+					// if (status.equals("OK")) {
+					// returnData.put("directory_uuid", random);
+					// }
+					if (status.equals("OK")) {
+						// FIXME STILL NEED THIS METHOD NETDEX
+						// DataManagement.getInstance().createFolderInProject(
+						// projectUUID, flowDirectory);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				returnData.put("status", status);
 				break;
-				case "project_info":
-					try {
-						UUID projectUUID = data.get("project_uuid", UUID.class);
-						// TODO Move back to one line after debugging
-						ResultSet databaseResponse = this.database.getProjectInfo(projectUUID.toString());
-						returnData.put("project_name", databaseResponse.getString("ProjectName"));
-						returnData.put("editors", this.database.getEditors());
-						returnData.put("status", "OK");
-					} catch (DatabaseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						returnData.put("status", FlowServer.ERROR);
-					}
+			case "project_info":
+				try {
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					// TODO Move back to one line after debugging
+					ResultSet databaseResponse = this.database
+							.getProjectInfo(projectUUID.toString());
+					returnData.put("project_name",
+							databaseResponse.getString("ProjectName"));
+					returnData.put("editors", this.database.getUsers(
+							projectUUID.toString(), SQLDatabase.EDIT));
+					returnData.put("viewers", this.database.getUsers(
+							projectUUID.toString(), SQLDatabase.VIEW));
+					returnData.put("owner", this.database.getUsers(
+							projectUUID.toString(), SQLDatabase.OWNER));
+					returnData.put("status", "OK");
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
 				break;
 			case "directory_info":
 				try {
