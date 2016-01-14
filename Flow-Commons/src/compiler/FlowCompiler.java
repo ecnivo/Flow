@@ -56,6 +56,8 @@ public class FlowCompiler {
      * @throws IOException when files cannot be written
      */
     public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
+        throw new UnsupportedOperationException();
+        /*
         L.info("Found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
         if (!workingDirectory.exists()) {
@@ -115,7 +117,7 @@ public class FlowCompiler {
             L.severe("Exception occurred while compiling!");
             L.severe(e.getMessage());
         }
-        return null;
+        return null;*/
     }
 
     public Process execute() throws IOException {
