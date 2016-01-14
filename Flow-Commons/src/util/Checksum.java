@@ -1,10 +1,10 @@
 package util;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.nio.file.Files;
 
 /**
@@ -32,6 +32,6 @@ public class Checksum {
         ObjectOutputStream oos = new ObjectOutputStream();
         oos.writeObject(serializable);
         return getByteChecksum(bos.getBytes());*/
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

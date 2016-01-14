@@ -344,7 +344,7 @@ public class ClientRequestHandle implements Runnable {
 								new TextDocument(
 										new FlowFile(
 												DataManagement.getInstance()
-														.getFolderFromUUID(
+														.getFolderFromPath(
 																data.get(
 																		"project_uuid",
 																		UUID.class),
@@ -372,15 +372,13 @@ public class ClientRequestHandle implements Runnable {
 				// returnData.put("directory_uuid", random);
 				// }
 				if (status.equals("OK")) {
-					DataManagement.getInstance().createFolderInProject(
-							data.get("project_uuid", UUID.class),
-							new FlowDirectory(
-									DataManagement.getInstance()
-											.getProjectFromUUID(data.get(
-													"parent_directory_uuid",
-													UUID.class)),
-									data.get("directory_name", String.class),
-									random));
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					UUID parentDirectoryUUID = data.get("parent_directory_uuid", UUID.class);
+					FlowDirectory parentDirectory = DataManagement.getInstance().getFolderFromPath(projectUUID, "path");
+					String directoryName = data.get("directory_name", String.class);
+					FlowDirectory flowDirectory = new FlowDirectory(parentDirectory, directoryName, random);
+					parentDirectory.addDirectory(flowDirectory);
+					DataManagement.getInstance().createFolderInProject(projectUUID, flowDirectory);
 				}
 				returnData.put("status", status);
 				break;

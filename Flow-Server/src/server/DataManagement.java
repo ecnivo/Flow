@@ -1,6 +1,7 @@
 package server;
 
 import java.io.File;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -123,9 +124,21 @@ public class DataManagement {
 		return true;
 	}
 
-	public FlowDirectory getFolderFromUUID(UUID projectUUID, String path) {
+	public FlowDirectory getFolderFromPath(UUID projectUUID, String path) {
 		File dirMeta = new File(new File(new File(new File(dataFile, "projects"), projectUUID.toString()), path), "dir.flow");
 		return fileSerializer.readFromFile(dirMeta, FlowDirectory.class);
+	}
+
+	public FlowDirectory findFolderFromUUID(UUID projectUUID, UUID folderUUID){
+		Stack<FlowDirectory> stack = new Stack<FlowDirectory>();
+		FlowDirectory project = getProjectFromUUID(projectUUID);
+		stack.push(project);
+		while(!stack.empty()){
+			FlowDirectory currentDirectory = stack.pop();
+			//if()
+			stack.addAll(stack.pop().getDirectories());
+		}
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory) {

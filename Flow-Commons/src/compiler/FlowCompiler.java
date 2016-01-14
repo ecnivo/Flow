@@ -19,7 +19,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import struct.TextDocument;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Represents a wrapper around the javac compiler
@@ -47,7 +46,7 @@ public class FlowCompiler {
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**

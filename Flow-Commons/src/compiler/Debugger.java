@@ -1,7 +1,6 @@
 package compiler;
 
 import struct.TextDocument;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +22,7 @@ public class Debugger {
     public Debugger(TextDocument... flowFiles) {
         this.flowCompiler = new FlowCompiler(flowFiles);
         this.workingDirectory = flowCompiler.getWorkingDirectory();
-        throw new NotImplementedException(); // FIXME: 12/30/2015
+        throw new UnsupportedOperationException(); // FIXME: 12/30/2015
     }
 
     public Process begin() throws IOException {
