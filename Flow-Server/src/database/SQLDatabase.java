@@ -822,12 +822,6 @@ public class SQLDatabase {
 		}
 	}
 
-	/**
-	 * 
-	 * @param versionUUID
-	 * @return
-	 * @throws DatabaseException
-	 */
 	public ResultSet getVersionInfo(String versionUUID)
 			throws DatabaseException {
 		try {
@@ -844,6 +838,12 @@ public class SQLDatabase {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param versionUUID
+	 * @return
+	 * @throws DatabaseException
+	 */
 	public int getDate(String versionUUID) throws DatabaseException {
 		ResultSet response = this.getVersionInfo(versionUUID);
 		try {
@@ -855,6 +855,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Easy retrieval of file type given the UUID.
+	 * 
+	 * @param fileUUID
+	 *            the String representation of the UUID of the file.
+	 * @return the type of the file, either {@link ARBITRARY_DOCUMENT} or
+	 *         {@link TEXT_DOCUMENT}.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database or the file
+	 *             doesn't exist.
+	 */
 	public String getFileType(String fileUUID) throws DatabaseException {
 		ResultSet response = this.getFileInfo(fileUUID);
 		try {
