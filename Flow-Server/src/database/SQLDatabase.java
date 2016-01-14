@@ -808,4 +808,17 @@ public class SQLDatabase {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
+
+	public String[] getFileVersions(String fileUUID) throws DatabaseException {
+		try {
+			ResultSet response = this.query(String.format(
+					"SELECT VersionID FROM Versions WHERE FileID = '%s'",
+					fileUUID));
+			return Results.toStringArray("VersionID", response);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
 }

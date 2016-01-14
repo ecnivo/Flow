@@ -371,8 +371,20 @@ public class ClientRequestHandle implements Runnable {
 					L.severe(e.getMessage());
 					returnData.put("status", FlowServer.ERROR);
 				}
-				// TODO Implement sending messages to active sessions on changes
-				// ^-- NETDEX
+			case "file_versions":
+				try {
+					UUID fileUUID = data.get("file_uuid", UUID.class);
+					returnData.put("file_versions",
+							DataModification.getUUIDsFromArray(this.database
+									.getFileVersions(fileUUID.toString())));
+					returnData.put("status", "OK");
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
+				break;
+			// TODO Implement sending messages to active sessions on changes
+			// ^-- NETDEX
 			case "document_modify":
 				switch (data.get("doc_type", String.class)) {
 				case "INSERT":
