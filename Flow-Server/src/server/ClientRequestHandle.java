@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -15,7 +14,6 @@ import network.DataSocket;
 import struct.FlowDirectory;
 import struct.FlowFile;
 import struct.FlowProject;
-import struct.TextDocument;
 import struct.User;
 import util.DataModification;
 import util.DatabaseException;
@@ -327,62 +325,99 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "new_textdocument":
-				// TODO Implement new_arbitrarydocument
-				// TODO Actually create file @netdex
-				random = UUID.randomUUID();
-				status = this.database.newFile(random.toString(),
-						data.get("document_name", String.class),
-						data.get("project_uuid", UUID.class).toString(),
-						data.get("directory_uuid", UUID.class).toString());
+				// // TODO Implement new_arbitrarydocument
+				// // TODO Actually create file @netdex
+				// random = UUID.randomUUID();
+				// status = this.database.newFile(random.toString(),
+				// data.get("document_name", String.class),
+				// data.get("project_uuid", UUID.class).toString(),
+				// data.get("directory_uuid", UUID.class).toString());
+				// // if (status.equals("OK")) {
+				// // returnData.put("document_uuid", random);
+				// // }
 				// if (status.equals("OK")) {
-				// returnData.put("document_uuid", random);
+				// try {
+				// DataManagement.getInstance().addTextDocumentToProject(
+				// data.get("project_uuid", UUID.class),
+				// new TextDocument(
+				// new FlowFile(
+				// DataManagement.getInstance()
+				// .getFolderFromPath(
+				// data.get(
+				// "project_uuid",
+				// UUID.class),
+				// DataModification
+				// .getDirectoryPath(
+				// "directory_uuid")),
+				// data.get("document_name",
+				// String.class),
+				// random),
+				// random, new Date()));
+				// } catch (DatabaseException e) {
+				// status = e.getMessage();
 				// }
-				if (status.equals("OK")) {
-					try {
-						DataManagement.getInstance().addTextDocumentToProject(
-								data.get("project_uuid", UUID.class),
-								new TextDocument(
-										new FlowFile(
-												DataManagement.getInstance()
-														.getFolderFromPath(
-																data.get(
-																		"project_uuid",
-																		UUID.class),
-																DataModification
-																		.getDirectoryPath(
-																				"directory_uuid")),
-												data.get("document_name",
-														String.class),
-												random),
-										random, new Date()));
-					} catch (DatabaseException e) {
-						status = e.getMessage();
-					}
-				}
+				// }
 				returnData.put("status", status);
 				break;
 			case "new_directory":
-				status = this.database.newDirectory(
-						data.get("directory_name", String.class),
-						(random = UUID.randomUUID()).toString(),
-						data.get("project_uuid", UUID.class).toString(),
-						data.get("parent_directory_uuid", UUID.class)
-								.toString());
+				// status = this.database.newDirectory(
+				// data.get("directory_name", String.class),
+				// (random = UUID.randomUUID()).toString(),
+				// data.get("project_uuid", UUID.class).toString(),
+				// data.get("parent_directory_uuid", UUID.class)
+				// .toString());
+				// // if (status.equals("OK")) {
+				// // returnData.put("directory_uuid", random);
+				// // }
 				// if (status.equals("OK")) {
-				// returnData.put("directory_uuid", random);
+				// UUID projectUUID = data.get("project_uuid", UUID.class);
+				// UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+				// UUID.class);
+				// FlowDirectory parentDirectory =
+				// DataManagement.getInstance().getFolderFromPath(projectUUID,
+				// "path");
+				// String directoryName = data.get("directory_name",
+				// String.class);
+				// FlowDirectory flowDirectory = new
+				// FlowDirectory(directoryName, random);
+				// DataManagement.getInstance().createFolderInProject(projectUUID,
+				// flowDirectory);
 				// }
-				if (status.equals("OK")) {
-					UUID projectUUID = data.get("project_uuid", UUID.class);
-					UUID parentDirectoryUUID = data.get("parent_directory_uuid", UUID.class);
-					FlowDirectory parentDirectory = DataManagement.getInstance().getFolderFromPath(projectUUID, "path");
-					String directoryName = data.get("directory_name", String.class);
-					FlowDirectory flowDirectory = new FlowDirectory(directoryName, random);
-					DataManagement.getInstance().createFolderInProject(projectUUID, flowDirectory);
-				}
-				returnData.put("status", status);
+				// returnData.put("status", status);
 				break;
-			// TODO Implement sending messages to active sessions on changes
-			// ^-- NETDEX
+			case "directory_info":
+				UUID projectUUID = data.get("project_uuid"),
+						directoryUUID = data.get("directory_uuid");
+				ResultSet results = null;
+				try {
+					results = this.database
+							.getDirectoryInfo(directoryUUID.toString());
+					returnData.put("parent_directory_uuid",
+							results.getString("ParentDirectoryID"));
+					returnData.put("directory_name",
+							results.getString("DirectoryName"));
+					results = this.database.getFiles(projectUUID.toString(),
+							directoryUUID.toString());
+					returnData.put("child_files",
+							DataModification.getUUIDsFromArray(Results
+									.toStringArray("DocumentID", results)));
+					results = this.database.getDirectories(
+							projectUUID.toString(), directoryUUID.toString());
+					returnData.put("child_directories",
+							DataModification.getUUIDsFromArray(Results
+									.toStringArray("DirectoryID", results)));
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					L.severe(e.getMessage());
+					data.put("status", FlowServer.ERROR);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					L.severe(e.getMessage());
+					data.put("status", e.getMessage());
+				}
+
+				// TODO Implement sending messages to active sessions on changes
+				// ^-- NETDEX
 			case "document_modify":
 				switch (data.get("doc_type", String.class)) {
 				case "INSERT":

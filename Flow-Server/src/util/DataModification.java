@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import database.SQLDatabase;
 
@@ -33,7 +34,7 @@ public class DataModification {
 		return path.toString();
 	}
 
-	public String getFilePath(String fileId) throws DatabaseException {
+	public static String getFilePath(String fileId) throws DatabaseException {
 		ResultSet fileData = SQLDatabase.getInstance().getFile(fileId);
 		String parentDirectoryId = null, directoryId = null;
 		try {
@@ -64,7 +65,8 @@ public class DataModification {
 		return path.toString();
 	}
 
-	public void fileVisualizer(String directoryId) throws DatabaseException {
+	public static void fileVisualizer(String directoryId)
+			throws DatabaseException {
 		String parentDirectoryId = directoryId;
 		do {
 			directoryId = parentDirectoryId;
@@ -81,6 +83,13 @@ public class DataModification {
 				throw new DatabaseException(e.getMessage());
 			}
 		} while (!directoryId.equals(parentDirectoryId));
+	}
 
+	public static UUID[] getUUIDsFromArray(String... uuids) {
+		UUID[] array = new UUID[uuids.length];
+		for (int i = 0; i < uuids.length; i++) {
+			array[i] = UUID.fromString(uuids[i]);
+		}
+		return array;
 	}
 }

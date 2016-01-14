@@ -154,6 +154,56 @@ public class SQLDatabase {
 	}
 
 	/**
+	 * Getter for all files inside the specified directory.
+	 *
+	 * @param projectUUID
+	 *            the UUID of the project in String form.
+	 * @param directoryUUID
+	 *            the UUID of the directory in String form.
+	 * @return all associated files.
+	 */
+	public ResultSet getFiles(String projectUUID, String directoryUUID)
+			throws DatabaseException {
+		try {
+			// TODO Add check if for project is exists
+			return this.query(String.format(
+					"SELECT * FROM documents WHERE ParentDirectoryID = '%s';",
+					directoryUUID));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// TODO: this won't be called for the above reason, move this
+			// exception to the check (Above)
+			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+		}
+		// return null;
+	}
+
+	/**
+	 * Getter for all directories inside the specified directory.
+	 *
+	 * @param projectUUID
+	 *            the UUID of the project in String form.
+	 * @param directoryUUID
+	 *            the UUID of the directory in String form.
+	 * @return all associated files.
+	 */
+	public ResultSet getDirectories(String projectUUID, String directoryUUID)
+			throws DatabaseException {
+		try {
+			// TODO Add check if for project is exists
+			return this.query(String.format(
+					"SELECT * FROM directories WHERE ParentDirectoryID = '%s';",
+					directoryUUID));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// TODO: this won't be called for the above reason, move this
+			// exception to the check (Above)
+			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+		}
+		// return null;
+	}
+
+	/**
 	 * Creates a new project with the specified name and owner
 	 *
 	 * @param projectName
@@ -648,13 +698,15 @@ public class SQLDatabase {
 	public ResultSet getDirectoryInfo(String directoryId)
 			throws DatabaseException {
 		try {
-			return this.query(String.format(
+			ResultSet temp = this.query(String.format(
 					"SELECT * FROM directories WHERE DirectoryID = '%s';",
 					directoryId));
+			if (temp.next())
+				return temp;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new DatabaseException(FlowServer.ERROR);
 		}
+		throw new DatabaseException(FlowServer.ERROR);
 	}
 
 	public String getUsername(String session_id) throws DatabaseException {
