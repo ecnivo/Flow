@@ -838,12 +838,6 @@ public class SQLDatabase {
 		return null;
 	}
 
-	/**
-	 * 
-	 * @param versionUUID
-	 * @return
-	 * @throws DatabaseException
-	 */
 	public int getDate(String versionUUID) throws DatabaseException {
 		ResultSet response = this.getVersionInfo(versionUUID);
 		try {
