@@ -25,8 +25,7 @@ public class SQLDatabase {
 	 */
 	public static final int TIMEOUT = 5;
 
-	public static final int ADD_USER = 0, REMOVE_USER = -1, NONE = 0, VIEW = 1,
-			EDIT = 2, OWNER = 3;
+	public static final int NONE = 0, VIEW = 1, EDIT = 2, OWNER = 3;
 
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
@@ -784,6 +783,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Get all users with the specified access level to the specified project.
+	 * 
+	 * @param projectUUID
+	 *            the UUID, in String form, of the project.
+	 * @param accessLevel
+	 *            the access level, defined in the access constants (
+	 *            {@link OWNER}, {@link VIEW}, {@link EDITOR}).
+	 * @return the usernames of the users which meet the specified criteria.
+	 * @throws DatabaseException
+	 */
 	public String[] getUsers(String projectUUID, int accessLevel)
 			throws DatabaseException {
 		// TODO Auto-generated method stub
