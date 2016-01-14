@@ -244,7 +244,7 @@ public class ClientRequestHandle implements Runnable {
                     break;
                 case "file_info":
                 /*
-				 * Retrieves all associated information
+                 * Retrieves all associated information
 				 */
                     try {
                         // Load the required data from the data packet
@@ -277,7 +277,18 @@ public class ClientRequestHandle implements Runnable {
                 case "request_version": {
                     UUID fileUUID = data.get("file_uuid", UUID.class);
                     UUID versionUUID = data.get("version_uuid", UUID.class);
-                    DataManagement.getInstance().getTextDocument(fileUUID, versionUUID);
+                    byte[] bytes;
+                    try {
+                        String fileType = this.database.getFileType(fileUUID.toString());
+                        if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
+                            TextDocument doc = DataManagement.getInstance().getTextDocument(fileUUID, versionUUID);
+                            bytes = doc.getDocumentText().getBytes();
+                        } else {
+
+                        }
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
                 // TODO Implement sending messages to active sessions on changes

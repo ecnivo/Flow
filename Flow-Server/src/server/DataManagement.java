@@ -106,7 +106,9 @@ public class DataManagement {
         TextDocument td = new TextDocument(versionUUID);
         BufferedReader br = new BufferedReader(new FileReader(textFile));
         String text = "";
-        while ((text += br.readLine() + '\n') != null) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            text += line;
         }
         td.setDocumentText(text);
         return td;
