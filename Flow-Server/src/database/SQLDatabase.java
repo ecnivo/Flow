@@ -822,6 +822,12 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * 
+	 * @param versionUUID
+	 * @return
+	 * @throws DatabaseException
+	 */
 	public ResultSet getVersionInfo(String versionUUID)
 			throws DatabaseException {
 		try {
@@ -842,6 +848,17 @@ public class SQLDatabase {
 		ResultSet response = this.getVersionInfo(versionUUID);
 		try {
 			return response.getInt("Date");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	public String getFileType(String fileUUID) throws DatabaseException {
+		ResultSet response = this.getFileInfo(fileUUID);
+		try {
+			return response.getString("FileType");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
