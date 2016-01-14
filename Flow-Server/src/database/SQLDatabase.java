@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import server.FlowServer;
 import util.DatabaseException;
-import util.Results;
 
 public class SQLDatabase {
 
@@ -730,8 +729,10 @@ public class SQLDatabase {
 
 	public String getUsername(String sessionID) throws DatabaseException {
 		try {
-			return Results.toStringArray("Username",
-					this.getSessionInfo(sessionID))[0];
+			ResultSet data = this.getSessionInfo(sessionID);
+			if (!data.next())
+				throw new DatabaseException("INVALID_SESSION_ID");
+			return data.getString("Username");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(e.getMessage());
@@ -740,19 +741,10 @@ public class SQLDatabase {
 
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
-		ResultSet data = this.getSessionInfo(sessionID);
-		try {
-			if (!data.next())
-				throw new DatabaseException("INVALID_SESSION_ID");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new DatabaseException(FlowServer.ERROR);
-		}
 		try {
 			if (!this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-					data.getString("Username"), projectUUID)).next())
+					this.getUsername(sessionID), projectUUID)).next())
 				return false;
 			return true;
 		} catch (SQLException e) {
