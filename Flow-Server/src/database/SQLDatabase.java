@@ -59,6 +59,11 @@ public class SQLDatabase {
 		instance = this;
 	}
 
+	/**
+	 * Returns the
+	 * 
+	 * @return
+	 */
 	public static SQLDatabase getInstance() {
 		return instance;
 	}
@@ -142,16 +147,18 @@ public class SQLDatabase {
 	 * @return all associated files.
 	 */
 	public ResultSet getFiles(String projectId) throws DatabaseException {
-		try {
-			// TODO Add check if for project is exists
-			return this.query(String.format(
-					"SELECT * FROM documents WHERE ProjectID = '%s';",
-					projectId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			// TODO: this won't be called for the above reason, move this
-			// exception to the check (Above)
-			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+		synchronized (this) {
+			try {
+				// TODO Add check if for project is exists
+				return this.query(String.format(
+						"SELECT * FROM documents WHERE ProjectID = '%s';",
+						projectId));
+			} catch (SQLException e) {
+				e.printStackTrace();
+				// TODO: this won't be called for the above reason, move this
+				// exception to the check (Above)
+				throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+			}
 		}
 		// return null;
 	}
@@ -232,24 +239,25 @@ public class SQLDatabase {
 	/**
 	 * Creates a new file within the specified project.
 	 *
-	 * @param fileId
+	 * @param fileUUID
 	 *            the ID of the file ({@link UUID#toString() string
 	 *            representation} of the UUID associated with file).
 	 * @param fileName
 	 *            the name of the file (including the extension).
-	 * @param projectId
+	 * @param projectUUID
 	 *            the ID of the project which to place the file inside
-	 * @param directoryId
+	 * @param directoryUUID
 	 *            the ID of the directory which to place the file inside
 	 */
-	public String newFile(String fileId, String fileName, String projectId,
-			String directoryId, String fileType) {
+	public String newFile(String fileUUID, String fileName, String projectUUID,
+			String directoryUUID, String fileType) {
 		try {
 			if (fileType.equals(ARBITRARY_DOCUMENT)
 					|| fileType.equals(TEXT_DOCUMENT)) {
 				this.update(String.format(
 						"INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');",
-						fileId, projectId, fileName, directoryId, fileType));
+						fileUUID, projectUUID, fileName, directoryUUID,
+						fileType));
 			} else {
 				// This cannot be the client's error as the type is determined
 				// by the request type (new_arbitrarydocument and
