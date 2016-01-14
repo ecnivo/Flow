@@ -727,6 +727,16 @@ public class SQLDatabase {
 		throw new DatabaseException(FlowServer.ERROR);
 	}
 
+	/**
+	 * Retrieves the username associated with the specified session ID.
+	 * 
+	 * @param sessionID
+	 *            the UUID, in string form, of the session to search for.
+	 * @return the username associated with the specified session ID.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database or the session
+	 *             doesn't exist.
+	 */
 	public String getUsername(String sessionID) throws DatabaseException {
 		try {
 			ResultSet data = this.getSessionInfo(sessionID);
@@ -739,6 +749,18 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Verifies if the user associated with the specified session ID has at
+	 * least VIEW access to the specified project.
+	 * 
+	 * @param sessionID
+	 *            the UUID of the session, in String form.
+	 * @param projectUUID
+	 *            the UUID of the project, in String form.
+	 * @return Whether or not the user has at least VIEW access to the specified
+	 *         project.
+	 * @throws DatabaseException
+	 */
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
 		try {
