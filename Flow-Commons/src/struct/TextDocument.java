@@ -2,28 +2,25 @@ package struct;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
 /**
  * Represents a editable text document Created by Netdex on 12/18/2015.
  */
-public class TextDocument implements Serializable, Comparable<TextDocument>{
+public class TextDocument implements Serializable {
 
 	private UUID uuid;
-	private Date versionDate;
 
 	private ArrayList<String> lines;
 
-	public TextDocument(UUID uuid, Date versionDate) {
+	public TextDocument(UUID uuid) {
 		this.uuid = uuid;
-		this.versionDate = versionDate;
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
 
-	public TextDocument(Date versionDate) {
-		this(UUID.randomUUID(), versionDate);
+	public TextDocument() {
+		this(UUID.randomUUID());
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
@@ -31,16 +28,6 @@ public class TextDocument implements Serializable, Comparable<TextDocument>{
     public UUID getUUID() {
         return uuid;
     }
-
-    public Date getVersionDate() {
-        return versionDate;
-    }
-
-    @Override
-	public int compareTo(TextDocument o) {
-		return o.getVersionDate().compareTo(versionDate);
-    }
-
 
 	/**
 	 * Insert a character at line number at index

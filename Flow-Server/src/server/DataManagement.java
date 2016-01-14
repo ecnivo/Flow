@@ -79,26 +79,27 @@ public class DataManagement {
         return fileSerializer.readFromFile(userFile, User.class);
     }
 
-    public boolean addTextDocument(TextDocument textDoc) {
-        L.info("adding text document of uuid " + textDoc.getUUID());
-        File textFile = new File(fileDir, textDoc.getUUID() + "." + TEXT_FILE_EXT);
+    public boolean addTextDocument(UUID fileUUID, TextDocument textDoc) {
+        L.info("adding text document of uuid " + textDoc.getUUID() + " of file " + fileUUID);
+        File textFile = new File(new File(fileDir, fileUUID.toString()), textDoc.getUUID() + "." + TEXT_FILE_EXT);
         if (textFile.exists())
             return false;
+        textFile.getParentFile().mkdirs();
         fileSerializer.writeToFile(textFile, textDoc);
         return true;
     }
 
-    public boolean removeTextDocument(UUID uuid) {
-        L.info("removing text document of uuid " + uuid);
-        File textFile = new File(fileDir, uuid + "." + TEXT_FILE_EXT);
+    public boolean removeTextDocument(UUID fileUUID, UUID versionUUID) {
+        L.info("removing text document of uuid " + versionUUID + " of file " + fileUUID);
+        File textFile = new File(new File(fileDir, fileUUID.toString()), versionUUID + "." + TEXT_FILE_EXT);
         if (!textFile.exists())
             return false;
         return textFile.delete();
     }
 
-    public TextDocument getTextDocument(UUID uuid) {
-        L.info("getting text document of uuid " + uuid);
-        File textFile = new File(fileDir, uuid + "." + TEXT_FILE_EXT);
+    public TextDocument getTextDocument(UUID fileUUID, UUID versionUUID) {
+        L.info("getting text document of uuid " + versionUUID + " of file " + fileUUID);
+        File textFile = new File(new File(fileDir, fileUUID.toString()), versionUUID + "." + TEXT_FILE_EXT);
         if (!textFile.exists())
             return null;
         return fileSerializer.readFromFile(textFile, TextDocument.class);
