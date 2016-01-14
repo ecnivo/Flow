@@ -97,7 +97,7 @@ public class EditTabs extends JTabbedPane {
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    Data docNameRequest = new Data(");
+//	    Data docNameRequest = new Data(");
 	    
 	    addTab(doc.getParentFile().getFileName(), new EditArea(doc, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
