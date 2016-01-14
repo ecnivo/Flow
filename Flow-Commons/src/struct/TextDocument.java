@@ -28,10 +28,6 @@ public class TextDocument implements Serializable, Comparable<TextDocument>{
 		lines.add("");
 	}
 
-	public TextDocument() {
-		this(null, new Date());
-	}
-
     public UUID getUUID() {
         return uuid;
     }
