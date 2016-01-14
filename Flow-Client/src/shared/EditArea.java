@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.UUID;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -24,8 +25,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import message.Data;
-import struct.FlowDocument;
-import struct.FlowProject;
 import struct.TextDocument;
 import struct.User;
 
@@ -66,6 +65,8 @@ public class EditArea extends JTextPane {
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
+	Data editorListRequest = new Data("request_project");
+	editorListRequest.put("project_uuid", );
 	Iterator<User> userIt = ((FlowProject) textDoc.getParentFile().getParentDirectory().getRootDirectory()).getEditors().iterator();
 	while (userIt.hasNext()) {
 	    UserCaret caret = new UserCaret(userIt.next(), this);
@@ -206,8 +207,8 @@ public class EditArea extends JTextPane {
 	highlightSyntax();
     }
 
-    public FlowDocument getFlowDoc() {
-	return document;
+    public UUID getFlowDocUUID() {
+	return document.getUUID();
     }
 
     public JScrollPane getScrollPane() {

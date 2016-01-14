@@ -20,6 +20,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
@@ -37,7 +38,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import struct.FlowProject;
 import struct.TextDocument;
 
 /**
@@ -78,41 +78,34 @@ public class EditTabs extends JTabbedPane {
 	    public void stateChanged(ChangeEvent e) {
 		if (getParent() instanceof EditPane) {
 		    EditPane editPane = (EditPane) getParent();
-		    editPane.getDocTree().setActiveProject(
-			    (FlowProject) ((EditArea) getSelectedComponent())
-				    .getFlowDoc().getParentFile()
-				    .getParentDirectory().getRootDirectory());
+		    // editPane.getDocTree().setActiveProject(
+		    // (FlowProject) ((EditArea) getSelectedComponent())
+		    // .getFlowDoc().getParentFile()
+		    // .getParentDirectory().getRootDirectory());
 		    editPane.getCollabsList().refreshUserList();
 		}
 	    }
 	});
     }
 
-    public void openTab(TextDocument doc, boolean editable) {
+    public void openTab(TextDocument doc, UUID projectUUID, boolean editable) {
 	int tabs = getTabCount();
 	for (int i = 0; i < tabs; i++) {
-	    if (((EditArea) getComponentAt(i)).getFlowDoc().equals(doc)) {
+	    if (((EditArea) getComponentAt(i)).getFlowDocUUID().equals(doc.getUUID())) {
 		setSelectedIndex(i);
 		return;
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(doc.getParentFile().getFileName(), new EditArea(doc,
-		    editable, this).getScrollPane());
+	    Data docNameRequest = new Data(");
+	    
+	    addTab(doc.getParentFile().getFileName(), new EditArea(doc, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
-	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile()
-		    .getFileName()));
-//	     setToolTipTextAt(idx, doc.getParentFile().getVersions().);
+	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile().getFileName()));
+	    // setToolTipTextAt(idx, doc.getParentFile().getVersions().);
 	    // TODO should be the save date
 	} else {
-	    JOptionPane
-		    .showConfirmDialog(
-			    null,
-			    "The limit on currently open tabs is 25.\n"
-				    + "The reason for doing so is to save processing power and reduce strain on your system.\n"
-				    + "If you need more than 25 tabs at a time, consider reorganizing your workflow.",
-			    "Too many tabs!", JOptionPane.DEFAULT_OPTION,
-			    JOptionPane.WARNING_MESSAGE);
+	    JOptionPane.showConfirmDialog(null, "The limit on currently open tabs is 25.\nThe reason for doing so is to save processing power and reduce strain on your system.\nIf you need more than 25 tabs at a time, consider reorganizing your workflow.", "Too many tabs!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
     }
 
@@ -126,9 +119,7 @@ public class EditTabs extends JTabbedPane {
 
 	    ImageIcon icon = null;
 	    try {
-		icon = new ImageIcon(ImageIO.read(new File("images/file.png"))
-			.getScaledInstance(TAB_ICON_SIZE, TAB_ICON_SIZE,
-				Image.SCALE_SMOOTH));
+		icon = new ImageIcon(ImageIO.read(new File("images/file.png")).getScaledInstance(TAB_ICON_SIZE, TAB_ICON_SIZE, Image.SCALE_SMOOTH));
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }
@@ -153,8 +144,7 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    int i = EditTabs.this
-			    .indexOfTabComponent(CustomTabHeader.this);
+		    int i = EditTabs.this.indexOfTabComponent(CustomTabHeader.this);
 		    if (i != -1) {
 			EditTabs.this.removeTabAt(i);
 		    }
@@ -166,8 +156,7 @@ public class EditTabs extends JTabbedPane {
 		}
 
 		@Override
-		public void removePropertyChangeListener(
-			PropertyChangeListener listener) {
+		public void removePropertyChangeListener(PropertyChangeListener listener) {
 		    // nothing
 
 		}
@@ -191,8 +180,7 @@ public class EditTabs extends JTabbedPane {
 		}
 
 		@Override
-		public void addPropertyChangeListener(
-			PropertyChangeListener listener) {
+		public void addPropertyChangeListener(PropertyChangeListener listener) {
 		    // nothing
 
 		}
@@ -214,8 +202,7 @@ public class EditTabs extends JTabbedPane {
 		}
 
 		@Override
-		public void removePropertyChangeListener(
-			PropertyChangeListener listener) {
+		public void removePropertyChangeListener(PropertyChangeListener listener) {
 		    // nothing
 		}
 
@@ -237,8 +224,7 @@ public class EditTabs extends JTabbedPane {
 		}
 
 		@Override
-		public void addPropertyChangeListener(
-			PropertyChangeListener listener) {
+		public void addPropertyChangeListener(PropertyChangeListener listener) {
 		    // nothing
 		}
 	    });
@@ -269,8 +255,7 @@ public class EditTabs extends JTabbedPane {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		    int i = EditTabs.this
-			    .indexOfTabComponent(CustomTabHeader.this);
+		    int i = EditTabs.this.indexOfTabComponent(CustomTabHeader.this);
 		    if (i != -1) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
 			    EditTabs.this.remove(i);
@@ -279,8 +264,7 @@ public class EditTabs extends JTabbedPane {
 			    EditTabs.this.setSelectedIndex(i);
 
 			} else if (e.getButton() == MouseEvent.BUTTON3) {
-			    rightClickMenu.show(CustomTabHeader.this, e.getX(),
-				    e.getY());
+			    rightClickMenu.show(CustomTabHeader.this, e.getX(), e.getY());
 			}
 		    }
 		}
@@ -331,10 +315,8 @@ public class EditTabs extends JTabbedPane {
 		    g2.setColor(Color.MAGENTA);
 		}
 		int delta = 6;
-		g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight()
-			- delta - 1);
-		g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight()
-			- delta - 1);
+		g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
+		g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
 		g2.dispose();
 	    }
 

@@ -20,9 +20,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import message.Data;
-import struct.FlowDirectory;
-import struct.FlowFile;
-import struct.FlowProject;
 
 @SuppressWarnings("serial")
 public abstract class DocTree extends JTree {
@@ -31,9 +28,10 @@ public abstract class DocTree extends JTree {
     private JScrollPane scrollView;
 
     private UUID[] usersProjectsUUIDs;
-    private FlowProject activeProject;
-    private DirectoryNode activeDirectoryNode;
-    private FileNode activeFileNode;
+
+    // private UUID activeProject;
+    // private DirectoryNode activeDirectoryNode;
+    // private FileNode activeFileNode;
 
     public DocTree() {
 	// TODO
@@ -74,21 +72,24 @@ public abstract class DocTree extends JTree {
 
 		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 
-		if (selected instanceof ProjectNode) {
-		    setActiveProject(((ProjectNode) selected).getProject());
-		    setActiveDirectoryNode((ProjectNode) selected);
-		} else if (selected instanceof DirectoryNode) {
-		    setActiveProject(((FlowProject) ((DirectoryNode) selected).getDirectory().getRootDirectory()));
-		    setActiveDirectoryNode((DirectoryNode) selected);
-		} else if (selected instanceof FileNode) {
-		    FileNode fileNode = (FileNode) selected;
-		    setActiveProject((FlowProject) fileNode.getFile().getParentDirectory().getRootDirectory());
-		    setActiveDirectoryNode((DirectoryNode) ((FileNode) selected).getParent());
-		    setActiveFileNode(fileNode);
-		} else {
-		    if (((DefaultMutableTreeNode) selected).getChildCount() == 0) {
-			refreshProjectList();
-		    }
+		// if (selected instanceof ProjectNode) {
+		// setActiveProject(((ProjectNode) selected).getProject());
+		// setActiveDirectoryNode((ProjectNode) selected);
+		// } else if (selected instanceof DirectoryNode) {
+		// setActiveProject(((FlowProject) ((DirectoryNode)
+		// selected).getDirectory().getRootDirectory()));
+		// setActiveDirectoryNode((DirectoryNode) selected);
+		// } else if (selected instanceof FileNode) {
+		// FileNode fileNode = (FileNode) selected;
+		// setActiveProject((FlowProject)
+		// fileNode.getFile().getParentDirectory().getRootDirectory());
+		// setActiveDirectoryNode((DirectoryNode) ((FileNode)
+		// selected).getParent());
+		// setActiveFileNode(fileNode);
+		// } else {
+		if (((DefaultMutableTreeNode) selected).getChildCount() == 0) {
+		    refreshProjectList();
+		    // }
 
 		}
 	    }
@@ -99,29 +100,29 @@ public abstract class DocTree extends JTree {
 	return scrollView;
     }
 
-    public FlowProject getActiveProject() {
-	return activeProject;
-    }
-
-    public void setActiveProject(FlowProject newActive) {
-	activeProject = newActive;
-    }
-
-    public FileNode getActiveFileNode() {
-	return activeFileNode;
-    }
-
-    public void setActiveFileNode(FileNode activeFileNode) {
-	this.activeFileNode = activeFileNode;
-    }
-
-    public DirectoryNode getActiveDirectoryNode() {
-	return activeDirectoryNode;
-    }
-
-    public void setActiveDirectoryNode(DirectoryNode activeDirectoryNode) {
-	this.activeDirectoryNode = activeDirectoryNode;
-    }
+    // public UUID getActiveProject() {
+    // return activeProject;
+    // }
+    //
+    // public void setActiveProject(UUID newActive) {
+    // activeProject = newActive;
+    // }
+    //
+    // public FileNode getActiveFileNode() {
+    // return activeFileNode;
+    // }
+    //
+    // public void setActiveFileNode(FileNode activeFileNode) {
+    // this.activeFileNode = activeFileNode;
+    // }
+    //
+    // public DirectoryNode getActiveDirectoryNode() {
+    // return activeDirectoryNode;
+    // }
+    //
+    // public void setActiveDirectoryNode(DirectoryNode activeDirectoryNode) {
+    // this.activeDirectoryNode = activeDirectoryNode;
+    // }
 
     public void refreshProjectList() {
 	if (!FlowClient.NETWORK) {
@@ -140,12 +141,12 @@ public abstract class DocTree extends JTree {
 	    for (UUID uuid : usersProjectsUUIDs) {
 		boolean projectExistsLocally = false;
 		for (int i = root.getChildCount() - 1; !projectExistsLocally && i >= 0; i--) {
-		    if (((ProjectNode) root.getChildAt(i)).getProject().getProjectUUID().equals(uuid)) {
+		    if (((ProjectNode) root.getChildAt(i)).getProjectUUID().equals(uuid)) {
 			projectExistsLocally = true;
 		    }
 		}
 		if (!projectExistsLocally) {
-		    createProjectNode(uuid).getProject();
+		    createProjectNode(uuid);
 		}
 	    }
 
@@ -153,7 +154,7 @@ public abstract class DocTree extends JTree {
 	    for (int i = root.getChildCount() - 1; i >= 0; i--) {
 		boolean projectExistsRemotely = false;
 		for (int j = 0; j < usersProjectsUUIDs.length && !projectExistsRemotely; j++) {
-		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root.getChildAt(i)).getProject().getProjectUUID())) {
+		    if (usersProjectsUUIDs[j].equals(((ProjectNode) root.getChildAt(i)).getProjectUUID())) {
 			projectExistsRemotely = true;
 		    }
 		}
@@ -167,40 +168,51 @@ public abstract class DocTree extends JTree {
 	}
     }
 
-    private ProjectNode createProjectNode(UUID projectUUID) {
+    private void createProjectNode(UUID projectUUID) {
 	if (FlowClient.NETWORK) {
 	    Data fileListRequest = new Data("request_project");
 	    fileListRequest.put("project_uuid", projectUUID);
 	    fileListRequest.put("session_id", Communicator.getSessionID());
-	    FlowProject project = Communicator.communicate(fileListRequest).get("project", FlowProject.class);
+	    Data project = Communicator.communicate(fileListRequest);
 
-	    ProjectNode newProjectNode = new ProjectNode(project);
+	    ProjectNode newProjectNode = new ProjectNode(projectUUID, project.get("project_name", String.class));
 	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
-	    createProjectFileNodes(project, newProjectNode);
-	    return newProjectNode;
+	    createProjectFileNodes(projectUUID, newProjectNode);
 	}
-	return null;
     }
 
-    private void createProjectFileNodes(FlowDirectory fDir, DirectoryNode dir) {
+    private void createProjectFileNodes(UUID remoteDirUUID, DirectoryNode localDir) {
+	Data dirInfoRequest = new Data("directory_info");
+	dirInfoRequest.put("session_id", Communicator.getSessionID());
+	dirInfoRequest.put("directory_uuid", remoteDirUUID);
+	Data remoteDir = Communicator.communicate(dirInfoRequest);
+
 	// adds folders
-	if (!fDir.getDirectories().isEmpty()) {
-	    for (FlowDirectory subDir : fDir.getDirectories()) {
-		DirectoryNode subDirNode = new DirectoryNode(subDir);
-		createProjectFileNodes(subDir, subDirNode);
+	UUID[] childDirs = remoteDir.get("child_directories", UUID[].class);
+	if (childDirs.length > 0) {
+	    for (UUID childDirUUID : childDirs) {
+		Data childDirNameRequest = new Data("directory_info");
+		childDirNameRequest.put("session_id", Communicator.getSessionID());
+		String childDirName = Communicator.communicate(childDirNameRequest).get("directory_name", String.class);
+
+		DirectoryNode subDirNode = new DirectoryNode(childDirUUID, childDirName);
+		createProjectFileNodes(childDirUUID, subDirNode);
 	    }
 	}
 
 	// adds files
-	if (!fDir.getFiles().isEmpty()) {
-	    for (FlowFile file : fDir.getFiles()) {
-		dir.add(new FileNode(file));
+	UUID[] childFiles = remoteDir.get("child_files", UUID[].class);
+	if (childFiles.length > 0) {
+	    for (UUID childFileUUID : childFiles) {
+		localDir.add(new FileNode(childFileUUID));
 	    }
 	}
     }
 
     public void reloadProjectFiles(ProjectNode projectNode) {
 	// TODO see if you can combine these two into one loop
+
+	// Makes an array of its children nodes
 	DefaultMutableTreeNode[] children = new DefaultMutableTreeNode[projectNode.getChildCount()];
 	for (int i = 0; i < projectNode.getChildCount(); i++) {
 	    children[i] = (DefaultMutableTreeNode) projectNode.getChildAt(i);
@@ -210,19 +222,17 @@ public abstract class DocTree extends JTree {
 	}
 	model.reload(projectNode);
 
-	Data projectReload = new Data("request_project");
-	projectReload.put("project_uuid", projectNode.getProject().getProjectUUID());
-	FlowProject reloadedProject = Communicator.communicate(projectReload).get("project", FlowProject.class);
+	// Gets the project from the server
+	Data projectReload = new Data("directory_info");
+	projectReload.put("directory_uuid", projectNode.getProjectUUID());
+	Data reloadedProject = Communicator.communicate(projectReload);
 	if (reloadedProject == null) {
 	    JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 	    return;
 	}
 
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
-	System.out.println(reloadedProject.getDirectories());
 	model.reload();
-
-	projectNode.setProject(reloadedProject);
     }
 
     // private void reloadProjectFilesRecursively(FlowDirectory fDir,
@@ -268,9 +278,10 @@ public abstract class DocTree extends JTree {
     // }
     // }
 
-    private void reloadProjectFilesRecursively(FlowDirectory remoteParentDir, DirectoryNode localNode) {
+    private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {
 	ArrayList<DirectoryNode> localDirs = new ArrayList<DirectoryNode>();
 	ArrayList<FileNode> localFiles = new ArrayList<FileNode>();
+
 	for (int i = 0; i < localNode.getChildCount(); i++) {
 	    DefaultMutableTreeNode child = (DefaultMutableTreeNode) localNode.getChildAt(i);
 	    if (child instanceof FileNode) {
@@ -280,25 +291,28 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
+	UUID[] childFiles = remoteParentDir.get("child_files", UUID[].class);
 	for (FileNode localFileNode : localFiles) {
-	    int idx = remoteParentDir.getFiles().indexOf(localFileNode.getFile());
+	    int idx = indexOfArray(childFiles, localFileNode.getFileUUID());
 	    if (idx == -1) {
 		model.removeNodeFromParent(localFileNode);
 		localFiles.remove(localFileNode);
 	    }
 	}
+
+	UUID[] childDirs = remoteParentDir.get("child_directories", UUID[].class);
 	for (DirectoryNode localDirNode : localDirs) {
-	    int idx = remoteParentDir.getDirectories().indexOf(localDirNode.getDirectory());
+	    int idx = indexOfArray(childDirs, localDirNode.getDirectoryUUID());
 	    if (idx == -1) {
 		model.removeNodeFromParent(localDirNode);
 		localDirs.remove(localDirNode);
 	    }
 	}
 
-	for (FlowFile remoteFile : remoteParentDir.getFiles()) {
+	for (UUID remoteFile : remoteParentDir.get("child_files", UUID[].class)) {
 	    boolean existsLocally = false;
 	    for (FileNode fileNode : localFiles) {
-		if (fileNode.getFile().equals(remoteFile)) {
+		if (fileNode.getFileUUID().equals(remoteFile)) {
 		    existsLocally = true;
 		    break;
 		}
@@ -309,75 +323,114 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
-	for (FlowDirectory remoteDir : remoteParentDir.getDirectories()) {
-	    System.out.println("remote directory!");
+	for (UUID remoteDir : remoteParentDir.get("child_directories", UUID[].class)) {
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;
 	    for (DirectoryNode directoryNode : localDirs) {
-		if (directoryNode.getDirectory().equals(directoryNode)) {
+		if (directoryNode.getDirectoryUUID().equals(directoryNode)) {
 		    existsLocally = true;
 		    break;
 		}
 	    }
 	    if (!existsLocally || childDirNode == null) {
 		DirectoryNode newDirNode = new DirectoryNode(remoteDir);
-		System.out.println("Created directory" + remoteDir.getDirectoryName());
+		System.out.println("Created directory" + newDirNode.getName());
 		model.insertNodeInto(newDirNode, localNode, 0);
 		childDirNode = newDirNode;
 	    }
 
-	    reloadProjectFilesRecursively(remoteDir, childDirNode);
-	}
+	    Data remoteChildDirRequest = new Data("directory_info");
+	    remoteChildDirRequest.put("session_id", Communicator.getSessionID());
+	    Data remoteChildDir = Communicator.communicate(remoteChildDirRequest);
 
+	    reloadProjectFilesRecursively(remoteChildDir, childDirNode);
+	}
+    }
+
+    private int indexOfArray(Object[] array, Object target) {
+	for (int i = 0; i < array.length; i++) {
+	    if (array[i].equals(target)) {
+		return i;
+	    }
+	}
+	return -1;
     }
 
     public class ProjectNode extends DirectoryNode {
-	private FlowProject project;
+	private UUID project;
 
-	public ProjectNode(FlowProject project) {
-	    super(project);
+	public ProjectNode(UUID project, String name) {
+	    super(project, name);
 	    this.project = project;
 	}
 
-	public FlowProject getProject() {
+	public UUID getProjectUUID() {
 	    return project;
 	}
 
-	private void setProject(FlowProject newProject) {
-	    project = newProject;
-	}
     }
 
     public class DirectoryNode extends DefaultMutableTreeNode {
-	private FlowDirectory folder;
+	private UUID directory;
+	private String dirName;
 
-	public DirectoryNode(FlowDirectory dir) {
-	    super(dir);
-	    this.folder = dir;
+	public DirectoryNode(UUID dir, String name) {
+	    this.directory = dir;
+	    this.dirName = name;
+	    // TODO each time name gets
+	    // updated locally OR server side, then update the name
 	}
 
-	public FlowDirectory getDirectory() {
-	    return folder;
+	public String getName() {
+	    return dirName;
+	}
+
+	public DirectoryNode(UUID dir) {
+	    this.directory = dir;
+	    Data requestName = new Data("directory_info");
+	    requestName.put("session_id", Communicator.getSessionID());
+	    this.dirName = Communicator.communicate(requestName).get("directory_name", String.class);
+	}
+
+	public UUID getDirectoryUUID() {
+	    return directory;
 	}
 
 	public String toString() {
-	    return folder.toString();
+	    return dirName;
 	}
+
+	// public String toString() {
+	// return directory.toString();
+	// }
     }
 
     public class FileNode extends DefaultMutableTreeNode {
-	private FlowFile file;
+	private UUID file;
+	private String name;
 
-	public FileNode(FlowFile file) {
+	public FileNode(UUID file) {
 	    this.file = file;
+	    Data fileNameRequest = new Data("file_info");
+	    fileNameRequest.put("session_id", Communicator.getSessionID());
+	    name = Communicator.communicate(fileNameRequest).get("file_name", String.class);
 	}
 
-	public FlowFile getFile() {
+	public FileNode(UUID file, String name) {
+	    this.file = file;
+	    this.name = name;
+	}
+
+	public UUID getFileUUID() {
 	    return file;
 	}
 
 	public String toString() {
-	    return file.toString();
+	    return name;
+	}
+	
+	public String getName(){
+	    return name;
 	}
     }
 }
