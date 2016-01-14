@@ -136,14 +136,13 @@ public class DataManagement {
 		while(!stack.empty()){
 			FlowDirectory currentDirectory = stack.pop();
 			//if()
-			stack.addAll(stack.pop().getDirectories());
 		}
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory) {
-		L.info("creating directory in project " + projectUUID + " called " + theDirectory + " in path " + theDirectory.getFullyQualifiedPath());
-		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), theDirectory.getFullyQualifiedPath());
+	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory, String path) {
+		L.info("creating directory in project " + projectUUID + " called " + theDirectory + " in path " + path);
+		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), path);
 		if (directory.exists())
 			return false;
 		directory.mkdirs();
@@ -175,67 +174,21 @@ public class DataManagement {
 		return true;
 	}
 
-	public boolean addTextDocumentToProject(UUID projectUUID,
-			TextDocument textDoc) {
-		File projectDirectory = new File(new File(dataFile, "projects"),
-				projectUUID.toString());
-		File f = new File(projectDirectory, textDoc.getParentFile()
-				.getParentDirectory().getFullyQualifiedPath());
-		if (f.exists())
-			return false;
-		f.mkdirs();
-		FileSerializer fs = new FileSerializer();
-		File ff = new File(
-				f.getAbsolutePath() + File.separator + textDoc.getUUID());
-		if (ff.exists())
-			return false;
-		fs.writeToFile(ff, textDoc);
-		return true;
+	public boolean addTextDocumentToProject(UUID projectUUID, TextDocument textDoc) {
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean removeTextFileFromProject(String username, UUID projectUUID,
 			TextDocument textDocument) {
-		// TODO rewrite this it is wrong
-		File f = new File(dataFile.getAbsolutePath() + File.separator + username
-				+ File.separator + projectUUID.toString() + File.separator
-				+ textDocument.getParentFile().getParentDirectory()
-						.getFullyQualifiedPath()
-				+ File.separator + textDocument.getUUID().toString());
-		if (!f.exists())
-			return false;
-		f.delete();
-		return true;
+		throw new UnsupportedOperationException();
 	}
 
 	public FlowFile getFileFromPath(UUID projectUUID, String path, UUID fileUUID) {
-		// TODO rewrite this to use path concatenation
-		File f = new File(dataFile.getAbsolutePath() + File.separator
-				+ "projects" + File.separator + projectUUID.toString()
-				+ File.separator + path + File.separator + fileUUID);
-		if (!f.exists())
-			return null;
-		File ff = new File(f.getAbsolutePath() + File.separator + "file.flow");
-		if (!ff.exists())
-			return null;
-		FileSerializer fs = new FileSerializer();
-		FlowFile fff = fs.readFromFile(ff, FlowFile.class);
-		return fff;
+		throw new UnsupportedOperationException();
 	}
 
 	public TextDocument getTextDocumentFromPath(String username,
 			UUID projectUUID, String path, UUID fileUUID, UUID versionUUID) {
-		// TODO rewrite this is wrong
-		File f = new File(dataFile.getAbsolutePath() + File.separator + username
-				+ File.separator + projectUUID.toString() + File.separator
-				+ path + File.separator + fileUUID.toString() + File.separator
-				+ versionUUID.toString());
-		if (!f.exists())
-			return null;
-		File ff = new File(f.getAbsolutePath() + File.separator + "file.flow");
-		if (!ff.exists())
-			return null;
-		FileSerializer fs = new FileSerializer();
-		TextDocument fff = fs.readFromFile(ff, TextDocument.class);
-		return fff;
+		throw new UnsupportedOperationException();
 	}
 }
