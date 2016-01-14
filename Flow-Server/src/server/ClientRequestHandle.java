@@ -147,22 +147,6 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
-			case "list_project_files":
-				// TODO Verify if this is not needed and remove case
-				// response = Results.toStringArray(
-				// new String[] { "ProjectID", "ProjectName" },
-				// this.database.getFiles(
-				// username = data.get("username", String.class)));
-				// FlowFile[] files = new FlowFile[response.length];
-				// for (int i = 0; i < response.length; i++) {
-				// files[i] = new FlowFile(new
-				// FlowDirectory(this.database.getPath(data.get(key, type))),
-				// "REPLACE WITH NAME",
-				// UUID.fromString(response[i][0]));
-				// }
-				// returnData.put("files", files);
-				// returnData.put("status", "OK");
-				break;
 			case "file_request":
 				// // TODO generate byte array using file path (from above)
 				// try {
