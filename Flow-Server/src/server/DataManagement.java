@@ -13,10 +13,16 @@ import java.util.logging.Logger;
  */
 public class DataManagement {
 
+    private static final String USER_FILE_EXT = "fusr";
+    private static final String TEXT_FILE_EXT = "ftd";
+
     private static DataManagement instance;
     private static Logger L = Logger.getLogger("DataManagement");
     private static FileSerializer fileSerializer = new FileSerializer();
-    private File dataFile;
+
+    private File dataDir;
+    private File userDir;
+    private File fileDir;
 
     public static DataManagement getInstance() {
         if (instance == null)
@@ -34,10 +40,17 @@ public class DataManagement {
      * @param dataFile The location of the directory where data is stored
      */
     public void init(File dataFile) {
-        this.dataFile = dataFile;
+        this.dataDir = dataFile;
+        this.userDir = new File(dataDir, "users");
+        this.fileDir = new File(dataDir, "files");
+
         L.info("loading data files from file");
         if (!dataFile.exists())
-            dataFile.mkdir();
+            dataFile.mkdirs();
+        if (!userDir.exists())
+            userDir.mkdirs();
+        if (!fileDir.exists())
+            fileDir.mkdirs();
     }
 
     /**
@@ -48,35 +61,46 @@ public class DataManagement {
      */
     public boolean addUser(User u) {
         L.info("adding user " + u);
-        File userDirectory = new File(dataFile.getAbsolutePath(), "users");
-        userDirectory.mkdir();
-        fileSerializer.writeToFile(new File(userDirectory.getAbsolutePath(), u.getUsername() + ".flow"), u);
+        fileSerializer.writeToFile(new File(userDir, u.getUsername() + "." + USER_FILE_EXT), u);
         return true;
     }
 
     public boolean removeUser(String username) {
         L.info("removing user");
-        File userFile = new File(new File(dataFile, "users"), username + ".flow");
+        File userFile = new File(userDir, username + "." + USER_FILE_EXT);
         return userFile.delete();
     }
 
     public User getUserByUsername(String username) {
         L.info("getting user " + username + " by username");
-        File userFile = new File(new File(dataFile, "users"), username + ".flow");
+        File userFile = new File(userDir, username + "." + USER_FILE_EXT);
         if (!userFile.exists())
             return null;
         return fileSerializer.readFromFile(userFile, User.class);
     }
 
-    public boolean addTextDocumentToProject(UUID projectUUID, TextDocument textDoc) {
-        throw new UnsupportedOperationException();
+    public boolean addTextDocument(TextDocument textDoc) {
+        L.info("adding text document of uuid " + textDoc.getUUID());
+        File textFile = new File(fileDir, textDoc.getUUID() + "." + TEXT_FILE_EXT);
+        if (textFile.exists())
+            return false;
+        fileSerializer.writeToFile(textFile, textDoc);
+        return true;
     }
 
-    public boolean removeTextFileFromProject(String username, UUID projectUUID, TextDocument textDocument) {
-        throw new UnsupportedOperationException();
+    public boolean removeTextDocument(UUID uuid) {
+        L.info("removing text document of uuid " + uuid);
+        File textFile = new File(fileDir, uuid + "." + TEXT_FILE_EXT);
+        if (!textFile.exists())
+            return false;
+        return textFile.delete();
     }
 
-    public TextDocument getTextDocumentFromPath(String username, UUID projectUUID, String path, UUID fileUUID, UUID versionUUID) {
-        throw new UnsupportedOperationException();
+    public TextDocument getTextDocument(UUID uuid) {
+        L.info("getting text document of uuid " + uuid);
+        File textFile = new File(fileDir, uuid + "." + TEXT_FILE_EXT);
+        if (!textFile.exists())
+            return null;
+        return fileSerializer.readFromFile(textFile, TextDocument.class);
     }
 }

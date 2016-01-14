@@ -36,7 +36,6 @@ public class FMLNetworker {
      * @throws ClassNotFoundException When a class is missing client-side
      */
     public Data send(Data data) throws IOException {
-        L.info("initiating send protocol");
         try {
             Socket socket = new Socket(ip, port);
 
@@ -73,7 +72,6 @@ public class FMLNetworker {
     public void deregisterFlowDocumentChangeListener(FlowDocumentChangeListener chngListener) {
         Data cancelAsync = new Data("document_async");
         cancelAsync.put("rtype", "deregister");
-
         chngListener.stopListening();
     }
 }
