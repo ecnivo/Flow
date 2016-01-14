@@ -275,8 +275,9 @@ public class ClientRequestHandle implements Runnable {
                     }
                     break;
                 case "request_version": {
+                    UUID fileUUID = data.get("file_uuid", UUID.class);
                     UUID versionUUID = data.get("version_uuid", UUID.class);
-
+                    DataManagement.getInstance().getTextDocument(fileUUID, versionUUID);
                 }
                 break;
                 // TODO Implement sending messages to active sessions on changes

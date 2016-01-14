@@ -4,7 +4,7 @@ import struct.TextDocument;
 import struct.User;
 import util.FileSerializer;
 
-import java.io.File;
+import java.io.*;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -79,13 +79,14 @@ public class DataManagement {
         return fileSerializer.readFromFile(userFile, User.class);
     }
 
-    public boolean addTextDocument(UUID fileUUID, TextDocument textDoc) {
+    public boolean addTextDocument(UUID fileUUID, TextDocument textDoc) throws FileNotFoundException {
         L.info("adding text document of uuid " + textDoc.getUUID() + " of file " + fileUUID);
         File textFile = new File(new File(fileDir, fileUUID.toString()), textDoc.getUUID() + "." + TEXT_FILE_EXT);
         if (textFile.exists())
             return false;
         textFile.getParentFile().mkdirs();
-        fileSerializer.writeToFile(textFile, textDoc);
+        PrintStream ps = new PrintStream(textFile);
+        ps.print(textDoc.getDocumentText());
         return true;
     }
 
@@ -97,11 +98,17 @@ public class DataManagement {
         return textFile.delete();
     }
 
-    public TextDocument getTextDocument(UUID fileUUID, UUID versionUUID) {
+    public TextDocument getTextDocument(UUID fileUUID, UUID versionUUID) throws IOException {
         L.info("getting text document of uuid " + versionUUID + " of file " + fileUUID);
         File textFile = new File(new File(fileDir, fileUUID.toString()), versionUUID + "." + TEXT_FILE_EXT);
         if (!textFile.exists())
             return null;
-        return fileSerializer.readFromFile(textFile, TextDocument.class);
+        TextDocument td = new TextDocument(versionUUID);
+        BufferedReader br = new BufferedReader(new FileReader(textFile));
+        String text = "";
+        while ((text += br.readLine() + '\n') != null) {
+        }
+        td.setDocumentText(text);
+        return td;
     }
 }
