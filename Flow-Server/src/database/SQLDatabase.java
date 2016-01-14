@@ -28,6 +28,9 @@ public class SQLDatabase {
 	public static final int ADD_USER = 0, REMOVE_USER = -1, NONE = 0, VIEW = 1,
 			EDIT = 2, OWNER = 3;
 
+	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
+			TEXT_DOCUMENT = "TEXT_DOCUMENT";
+
 	/**
 	 * Connection to the database.
 	 */
@@ -240,11 +243,19 @@ public class SQLDatabase {
 	 *            the ID of the directory which to place the file inside
 	 */
 	public String newFile(String fileId, String fileName, String projectId,
-			String directoryId) {
+			String directoryId, String fileType) {
 		try {
-			this.update(String.format(
-					"INSERT INTO documents VALUES('%s', '%s', '%s', '%s');",
-					fileId, projectId, fileName, directoryId));
+			if (fileType.equals(ARBITRARY_DOCUMENT)
+					|| fileType.equals(TEXT_DOCUMENT)) {
+				this.update(String.format(
+						"INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');",
+						fileId, projectId, fileName, directoryId, fileType));
+			} else {
+				// This cannot be the client's error as the type is determined
+				// by the request type (new_arbitrarydocument and
+				// new_textdocument), rather than a passed value.
+				return FlowServer.ERROR;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -253,7 +264,7 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Creates a new file within the specified project.
+	 * Creates a new directory within the specified project.
 	 *
 	 * @param directoryName
 	 *            the name of the directory.
@@ -458,12 +469,12 @@ public class SQLDatabase {
 	 * @throws DatabaseException
 	 *             if the file doesn't exists in the database.
 	 */
-	public ResultSet getFile(String fileId) throws DatabaseException {
+	public ResultSet getFileInfo(String fileId) throws DatabaseException {
 		try {
-			ResultSet temp;
-			if ((temp = this.query(String.format(
+			ResultSet temp = this.query(String.format(
 					"SELECT * from documents WHERE DocumentID = '%s';",
-					fileId))).next()) {
+					fileId));
+			if (temp.next()) {
 				return temp;
 			} else {
 				// Throw an exception in this case because the server expects to

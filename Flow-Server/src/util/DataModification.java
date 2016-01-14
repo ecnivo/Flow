@@ -35,7 +35,7 @@ public class DataModification {
 	}
 
 	public static String getFilePath(String fileId) throws DatabaseException {
-		ResultSet fileData = SQLDatabase.getInstance().getFile(fileId);
+		ResultSet fileData = SQLDatabase.getInstance().getFileInfo(fileId);
 		String parentDirectoryId = null, directoryId = null;
 		try {
 			parentDirectoryId = fileData.getString("ParentDirectoryID");

@@ -181,7 +181,7 @@ public class ClientRequestHandle implements Runnable {
 			case "file_request":
 				// TODO generate byte array using file path (from above)
 				try {
-					ResultSet results = this.database.getFile(
+					ResultSet results = this.database.getFileInfo(
 							data.get("doc_uuid", UUID.class).toString());
 					FlowFile file = new FlowFile(
 							new FlowDirectory(results.getString("Path")),
@@ -227,6 +227,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "request_file":
+				// TODO DECIDE BETWEEN file_request (above) and request_file
 				try {
 					returnData.put("document", this.server.getFile(
 							data.get("file_uuid", UUID.class).toString(),
@@ -386,11 +387,10 @@ public class ClientRequestHandle implements Runnable {
 				// returnData.put("status", status);
 				break;
 			case "directory_info":
-				UUID projectUUID = data.get("project_uuid"),
-						directoryUUID = data.get("directory_uuid");
-				ResultSet results = null;
 				try {
-					results = this.database
+					UUID projectUUID = data.get("project_uuid"),
+							directoryUUID = data.get("directory_uuid");
+					ResultSet results = this.database
 							.getDirectoryInfo(directoryUUID.toString());
 					returnData.put("parent_directory_uuid",
 							results.getString("ParentDirectoryID"));
@@ -406,6 +406,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("child_directories",
 							DataModification.getUUIDsFromArray(Results
 									.toStringArray("DirectoryID", results)));
+					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					L.severe(e.getMessage());
@@ -415,7 +416,27 @@ public class ClientRequestHandle implements Runnable {
 					L.severe(e.getMessage());
 					data.put("status", e.getMessage());
 				}
-
+				break;
+			case "file_info":
+				try {
+					UUID projectUUID = data.get("project_uuid"),
+							fileUUID = data.get("file_uuid");
+					ResultSet results = this.database
+							.getFileInfo(fileUUID.toString());
+					returnData.put("file_name",
+							results.getString("DocumentName"));
+					returnData.put("file_type",
+							results.getString("DocumentType"));
+					returnData.put("status", "OK");
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					L.severe(e.getMessage());
+					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					e.printStackTrace();
+					L.severe(e.getMessage());
+					returnData.put("status", FlowServer.ERROR);
+				}
 				// TODO Implement sending messages to active sessions on changes
 				// ^-- NETDEX
 			case "document_modify":

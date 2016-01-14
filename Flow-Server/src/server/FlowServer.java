@@ -111,7 +111,7 @@ public class FlowServer implements Runnable {
 			throws DatabaseException {
 		ResultSet fileData = null;
 		try {
-			fileData = this.database.getFile(fileId);
+			fileData = this.database.getFileInfo(fileId);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
