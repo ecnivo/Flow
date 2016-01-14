@@ -388,24 +388,37 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "directory_info":
 				try {
-					UUID projectUUID = data.get("project_uuid"),
-							directoryUUID = data.get("directory_uuid");
+					// Load the required data from the data packet
+					UUID projectUUID = data.get("project_uuid", UUID.class),
+							directoryUUID = data.get("directory_uuid",
+									UUID.class);
+
+					// Add information from the Directories table
 					ResultSet results = this.database
 							.getDirectoryInfo(directoryUUID.toString());
 					returnData.put("parent_directory_uuid",
 							results.getString("ParentDirectoryID"));
 					returnData.put("directory_name",
 							results.getString("DirectoryName"));
+
+					// Add information from all documents located in the
+					// specified directory
 					results = this.database.getFiles(projectUUID.toString(),
 							directoryUUID.toString());
 					returnData.put("child_files",
 							DataModification.getUUIDsFromArray(Results
 									.toStringArray("DocumentID", results)));
+
+					// Add information from all sub directories located inside
+					// the specified directory
 					results = this.database.getDirectories(
 							projectUUID.toString(), directoryUUID.toString());
 					returnData.put("child_directories",
 							DataModification.getUUIDsFromArray(Results
 									.toStringArray("DirectoryID", results)));
+
+					// If no exceptions were thrown up to this point, no errors
+					// occurred in the data retrieval.
 					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -419,8 +432,11 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "file_info":
 				try {
-					UUID projectUUID = data.get("project_uuid"),
-							fileUUID = data.get("file_uuid");
+					// Load the required data from the data packet
+					UUID projectUUID = data.get("project_uuid", UUID.class),
+							fileUUID = data.get("file_uuid", UUID.class);
+
+					// Add information from the Documents table
 					ResultSet results = this.database
 							.getFileInfo(fileUUID.toString());
 					returnData.put("file_name",

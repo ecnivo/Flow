@@ -35,6 +35,9 @@ public class SQLDatabase {
 	 */
 	private Connection connection;
 
+	/**
+	 * Latest instance of the SQLDatabase
+	 */
 	public static SQLDatabase instance;
 
 	public SQLDatabase(String databaseName) {
@@ -59,9 +62,10 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Returns the
+	 * Returns the latest instance of the SQLDatabase.
 	 * 
-	 * @return
+	 * @return the latest instance of the SQLDatabase or NULL if not yet
+	 *         initialized.
 	 */
 	public static SQLDatabase getInstance() {
 		return instance;
