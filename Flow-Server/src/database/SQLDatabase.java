@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.UUID;
 
 import server.FlowServer;
@@ -823,7 +822,30 @@ public class SQLDatabase {
 		}
 	}
 
-	public Date getDate(String versionUUID) {
+	public ResultSet getVersionInfo(String versionUUID)
+			throws DatabaseException {
+		try {
+			ResultSet response = this.query(String.format(
+					"SELECT * FROM Versions WHERE VersionID = '%s';",
+					versionUUID));
+			if (response.next())
+				return response;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
 		return null;
+	}
+
+	public int getDate(String versionUUID) throws DatabaseException {
+		ResultSet response = this.getVersionInfo(versionUUID);
+		try {
+			return response.getInt("Date");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
 	}
 }
