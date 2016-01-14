@@ -376,8 +376,7 @@ public class ClientRequestHandle implements Runnable {
 					UUID parentDirectoryUUID = data.get("parent_directory_uuid", UUID.class);
 					FlowDirectory parentDirectory = DataManagement.getInstance().getFolderFromPath(projectUUID, "path");
 					String directoryName = data.get("directory_name", String.class);
-					FlowDirectory flowDirectory = new FlowDirectory(parentDirectory, directoryName, random);
-					parentDirectory.addDirectory(flowDirectory);
+					FlowDirectory flowDirectory = new FlowDirectory(directoryName, random);
 					DataManagement.getInstance().createFolderInProject(projectUUID, flowDirectory);
 				}
 				returnData.put("status", status);

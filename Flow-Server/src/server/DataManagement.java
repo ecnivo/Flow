@@ -124,56 +124,6 @@ public class DataManagement {
 		return true;
 	}
 
-	public FlowDirectory getFolderFromPath(UUID projectUUID, String path) {
-		File dirMeta = new File(new File(new File(new File(dataFile, "projects"), projectUUID.toString()), path), "dir.flow");
-		return fileSerializer.readFromFile(dirMeta, FlowDirectory.class);
-	}
-
-	public FlowDirectory findFolderFromUUID(UUID projectUUID, UUID folderUUID){
-		Stack<FlowDirectory> stack = new Stack<FlowDirectory>();
-		FlowDirectory project = getProjectFromUUID(projectUUID);
-		stack.push(project);
-		while(!stack.empty()){
-			FlowDirectory currentDirectory = stack.pop();
-			//if()
-		}
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean createFolderInProject(UUID projectUUID, FlowDirectory theDirectory, String path) {
-		L.info("creating directory in project " + projectUUID + " called " + theDirectory + " in path " + path);
-		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), path);
-		if (directory.exists())
-			return false;
-		directory.mkdirs();
-		File dirMeta = new File(directory, "dir.flow");
-		fileSerializer.writeToFile(dirMeta, theDirectory);
-		return true;
-	}
-
-	public boolean deleteFolderInProject(UUID projectUUID, String pathstr) {
-		L.info("deleted folder in project " + projectUUID + " in path " + pathstr);
-		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
-		if (!directory.exists())
-			return false;
-		directory.delete();
-		return true;
-	}
-
-	public boolean renameFolderInProject(UUID projectUUID, String newName, String pathstr) {
-		L.info("renamed folder in project " + projectUUID + " to " + newName + " in path " + pathstr);
-		File directory = new File(new File(new File(dataFile, "projects"), projectUUID.toString()), pathstr);
-		if (!directory.exists())
-			return false;
-		File dirMeta = new File(directory, "dir.flow");
-		if(!dirMeta.exists())
-			return false;
-		FlowDirectory dir = fileSerializer.readFromFile(dirMeta, FlowDirectory.class);
-		dir.setDirectoryName(newName);
-		fileSerializer.writeToFile(dirMeta, dir);
-		return true;
-	}
-
 	public boolean addTextDocumentToProject(UUID projectUUID, TextDocument textDoc) {
 		throw new UnsupportedOperationException();
 	}
