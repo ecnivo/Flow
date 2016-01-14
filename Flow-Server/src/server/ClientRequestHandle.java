@@ -350,6 +350,9 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "file_info":
+				/*
+				 * Retrieves all associated information
+				 */
 				try {
 					// Load the required data from the data packet
 					UUID fileUUID = data.get("file_uuid", UUID.class);
@@ -383,6 +386,11 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				break;
+			case "request_version": {
+				UUID versionUUID = data.get("version_uuid", UUID.class);
+
+			}
+				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX
 			case "document_modify":
@@ -404,7 +412,6 @@ public class ClientRequestHandle implements Runnable {
 				returnData.put("status", "INVALID_REQUEST_TYPE");
 				break;
 			}
-
 			this.psocket.send(returnData);
 			L.info("response: " + returnData.toString());
 		} catch (IOException e) {
