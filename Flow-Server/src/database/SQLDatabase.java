@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.UUID;
 
 import server.FlowServer;
@@ -820,5 +821,9 @@ public class SQLDatabase {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
+	}
+
+	public Date getDate(String versionUUID) {
+		return null;
 	}
 }
