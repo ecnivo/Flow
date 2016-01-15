@@ -339,13 +339,15 @@ public class ClientRequestHandle implements Runnable {
 				data.put("file_data", bytes);
 			}
 				break;
-			case "document_request": {
-				UUID fileUUID = data.get("file_uuid", UUID.class);
-				UUID versionUUID = UUID.fromString(
-						this.database.getLatestVersion(fileUUID.toString()));
-				returnData.put("version_uuid", versionUUID);
-				byte[] bytes = null;
+			case "document_request":
 				try {
+					UUID fileUUID = data.get("file_uuid", UUID.class);
+					UUID versionUUID = UUID.fromString(this.database
+							.getLatestVersionUUID(fileUUID.toString()));
+
+					returnData.put("version_uuid", versionUUID);
+					byte[] bytes = null;
+
 					String fileType = this.database
 							.getFileType(fileUUID.toString());
 					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
@@ -355,11 +357,11 @@ public class ClientRequestHandle implements Runnable {
 					} else {
 
 					}
+					data.put("file_data", bytes);
 				} catch (DatabaseException e) {
 					e.printStackTrace();
+					returnData.put("status", e.getMessage());
 				}
-				data.put("file_data", bytes);
-			}
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX

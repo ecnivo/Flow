@@ -871,7 +871,21 @@ public class SQLDatabase {
 		}
 	}
 
-	public String getLatestVersion(String string) {
-		return null;
+	public String getLatestVersionUUID(String fileUUID)
+			throws DatabaseException {
+		ResultSet response;
+		try {
+			response = this.query(String.format(
+					"SELECT VersionID from Versions WHERE Date IN (SELECT MAX(Date) FROM Versions WHERE DocumentID = '%s');",
+					fileUUID));
+			if (response.next())
+				return response.getString("FileID");
+			throw new DatabaseException("INVALID_FILE_ID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+
 	}
 }
