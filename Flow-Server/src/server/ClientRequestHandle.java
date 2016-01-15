@@ -322,7 +322,7 @@ public class ClientRequestHandle implements Runnable {
 			case "request_version": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				UUID versionUUID = data.get("version_uuid", UUID.class);
-				byte[] bytes;
+				byte[] bytes = null;
 				try {
 					String fileType = this.database
 							.getFileType(fileUUID.toString());
@@ -336,6 +336,29 @@ public class ClientRequestHandle implements Runnable {
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 				}
+				data.put("file_data", bytes);
+			}
+				break;
+			case "document_request": {
+				UUID fileUUID = data.get("file_uuid", UUID.class);
+				UUID versionUUID = UUID.fromString(
+						this.database.getLatestVersion(fileUUID.toString()));
+				returnData.put("version_uuid", versionUUID);
+				byte[] bytes = null;
+				try {
+					String fileType = this.database
+							.getFileType(fileUUID.toString());
+					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
+						TextDocument doc = DataManagement.getInstance()
+								.getTextDocument(fileUUID, versionUUID);
+						bytes = doc.getDocumentText().getBytes();
+					} else {
+
+					}
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				}
+				data.put("file_data", bytes);
 			}
 				break;
 			// TODO Implement sending messages to active sessions on changes

@@ -870,4 +870,8 @@ public class SQLDatabase {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
+
+	public String getLatestVersion(String string) {
+		return null;
+	}
 }
