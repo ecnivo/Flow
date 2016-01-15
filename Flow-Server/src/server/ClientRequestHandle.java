@@ -179,6 +179,8 @@ public class ClientRequestHandle implements Runnable {
 				this.database.newFile(fileUUID.toString(), documentName,
 						projectUUID.toString(), directoryUUID.toString(),
 						"TEXT_DOCUMENT");
+				this.database.newVersion(fileUUID.toString(),
+						versionUUID.toString());
 				TextDocument newTextDocument = new TextDocument();
 				DataManagement.getInstance().addTextDocumentVersion(fileUUID,
 						versionUUID, newTextDocument);
