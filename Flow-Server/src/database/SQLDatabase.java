@@ -562,6 +562,16 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	/**
+	 * Associates a new name with the specified file.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file to rename.
+	 * @param newName
+	 *            the new name to associated with the specified file.
+	 * @return the status of the operation, either 'OK', 'INVALID_FILE_UUID' (if
+	 *         the file is not found) or {@link FlowServer#ERROR}.
+	 */
 	public String renameFile(String fileUUID, String newName) {
 		try {
 			// TODO Add check for duplicate directory names inside same folder.
@@ -590,7 +600,8 @@ public class SQLDatabase {
 	 * project.
 	 *
 	 * @param projectId
-	 *            the UUID of the project to delete.
+	 *            the string representation of the UUID of the project to
+	 *            delete.
 	 * @throws DatabaseException
 	 *             if the project doesn't exist.
 	 */
@@ -659,6 +670,14 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	/**
+	 * Deletes the specified file from the database.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file to delete.
+	 * @return the status of the deletion, either 'OK', 'INVALID_FILE_UUID' (if
+	 *         the file is not found) or {@link FlowServer#ERROR}.
+	 */
 	public String deleteFile(String fileUUID) {
 		try {
 			if (!this.query(String.format(
