@@ -814,17 +814,17 @@ public class SQLDatabase {
 	/**
 	 * Retrieves all associated info with the specified ProjectID.
 	 *
-	 * @param projectId
+	 * @param projectUUID
 	 *            the {@link UUID#toString toString} of the UUID of the project.
 	 * @return all associated information from the projects table.
 	 * @throws DatabaseException
 	 *             if there is an error accessing the database.
 	 */
-	public ResultSet getProjectInfo(String projectId) throws DatabaseException {
+	public ResultSet getProjectInfo(String projectUUID) throws DatabaseException {
 		try {
 			ResultSet info = this.query(String.format(
 					"SELECT * FROM projects WHERE ProjectID = '%s';",
-					projectId));
+					projectUUID));
 			if (info.next())
 				return info;
 			throw new DatabaseException("PROJECT_NOT_FOUND");
@@ -994,7 +994,7 @@ public class SQLDatabase {
 	 *             if there is an error accessing the database or the version
 	 *             doesn't exist.
 	 */
-	public long getDate(String versionUUID) throws DatabaseException {
+	public long getVersionDate(String versionUUID) throws DatabaseException {
 		ResultSet response = this.getVersionInfo(versionUUID);
 		try {
 			return response.getLong("Date");

@@ -364,9 +364,15 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "version_info": {
-//				UUID versionUUID = data.get("version_uuid", UUID.class);
-//				returnData.put("status",
-//						this.database.getVersionInfo(versionUUID.toString()));
+				UUID versionUUID = data.get("version_uuid", UUID.class);
+				try {
+					returnData.put("status", this.database
+							.getVersionDate(versionUUID.toString()));
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
 			}
 			case "request_version": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
