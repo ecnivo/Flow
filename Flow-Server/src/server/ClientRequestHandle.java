@@ -210,9 +210,9 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "project_modify":
-				String projectId = data.get("project_uuid", UUID.class)
-						.toString();
+			case "project_modify": {
+				UUID projectUUID = data.get("project_uuid", UUID.class),
+						sessionID = data.get("session_id", UUID.class);
 				switch (data.get("project_modify_type", String.class)) {
 				case "MODIFY_COLLABORATOR":
 					ResultSet sessionInfo = null;
@@ -225,7 +225,7 @@ public class ClientRequestHandle implements Runnable {
 								this.database.updateAccess(
 										(int) data.get("access_level",
 												Byte.class),
-										projectId, username));
+								projectUUID.toString(), username));
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						returnData.put("status", e.getMessage());
@@ -234,17 +234,18 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", FlowServer.ERROR);
 					}
 					break;
-				case "RENAME_PROJECT":
+				case "RENAME_PROJECT": {
 					String newName = data.get("new_name", String.class);
-					UUID projectUUID = data.get("project_uuid", UUID.class);
 					returnData.put("status", this.database
 							.renameProject(projectUUID.toString(), newName));
+				}
 					break;
 				case "DELETE_PROJECT":
-					returnData.put("status",
-							this.database.deleteProject(projectId));
+					returnData.put("status", this.database
+							.deleteProject(projectUUID.toString()));
 					break;
 				}
+			}
 				break;
 			case "directory_modify": {
 				UUID directoryUUID = data.get("directory_uuid", UUID.class);
@@ -441,8 +442,7 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX
-			case "text_document_modify":
-				UUID projectUUID = data.get("project_uuid", UUID.class);
+			case "text_document_modify": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				int line = data.get("line", Integer.class);
 				int idx = data.get("idx", Integer.class);
@@ -466,17 +466,19 @@ public class ClientRequestHandle implements Runnable {
 						break;
 					}
 				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
+			}
+				break;
+			case "document_async":
+				String rtype = data.get("rtype", String.class);
+				if (rtype.equals("register")) {
+
+				} else {
 
 				}
 				break;
-				case "document_async":
-					String rtype = data.get("rtype", String.class);
-					if (rtype.equals("register")) {
-
-					} else {
-
-					}
-					break;
 			default:
 				// For completeness's sake
 				returnData.put("status", "INVALID_REQUEST_TYPE");
