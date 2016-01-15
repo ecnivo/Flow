@@ -634,7 +634,10 @@ public class SQLDatabase {
 				return "INVALID_DIRECTORY_UUID";
 			}
 			this.update(String.format(
-					"DELETE FROM documents WHERE ParentDirectoryID = '%s';",
+					"DELETE FROM Directories WHERE DirectoryID = '%s';",
+					directoryUUID));
+			this.update(String.format(
+					"DELETE FROM Documents WHERE ParentDirectoryID = '%s';",
 					directoryUUID));
 			try {
 				ResultSet subDirectories = this
@@ -649,6 +652,23 @@ public class SQLDatabase {
 				e.printStackTrace();
 				return e.getMessage();
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
+	}
+
+	public String deleteFile(String fileUUID) {
+		try {
+			if (!this.query(String.format(
+					"SELECT * from Documents WHERE DocumentID = '%s';",
+					fileUUID)).next()) {
+				return "INVALID_FILE_UUID";
+			}
+			this.update(String.format(
+					"DELETE FROM Documents WHERE DocumentID = '%s';",
+					fileUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;

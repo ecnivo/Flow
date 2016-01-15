@@ -261,8 +261,9 @@ public class ClientRequestHandle implements Runnable {
 										data.get("new_name", String.class)));
 						break;
 					case "DELETE":
-						// TODO delete in Bimesh's code
 						DataManagement.getInstance().removeFileByUUID(fileUUID);
+						returnData.put("status",
+								this.database.deleteFile(fileUUID.toString()));
 						break;
 					}
 				} catch (DatabaseException e) {
