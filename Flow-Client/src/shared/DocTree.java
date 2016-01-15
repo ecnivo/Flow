@@ -235,7 +235,6 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
-	System.out.println(localNode.name + " has " + remoteChildDirs.length + " children directories");
 	for (UUID remoteDir : remoteChildDirs) {
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;

@@ -65,15 +65,15 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		ProjectNode selectedNode = (ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1];
+		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + selectedNode.getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
 		while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
 		    modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-		// modifyRequest.put("project_uuid",
-		// pane.getDocTree().getActiveProject().getProjectUUID());
+		modifyRequest.put("project_uuid", selectedNode.getProjectUUID());
 		modifyRequest.put("session_id", Communicator.getSessionID());
 		modifyRequest.put("new_name", modifiedProjectName);
 		switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
@@ -112,8 +112,7 @@ public class EditorToolbar extends JToolBar {
 		    if (confirmation == JOptionPane.YES_OPTION) {
 			Data deleteProjectRequest = new Data("project_modify");
 			deleteProjectRequest.put("project_modify_type", "DELETE_PROJECT");
-			// deleteProjectRequest.put("project_uuid",
-			// project.getProjectUUID());
+			deleteProjectRequest.put("project_uuid", projectUUID);
 			deleteProjectRequest.put("session_id", Communicator.getSessionID());
 
 			Data reply = Communicator.communicate(deleteProjectRequest);

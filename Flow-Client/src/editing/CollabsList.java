@@ -35,6 +35,7 @@ import javax.swing.tree.TreePath;
 import message.Data;
 import shared.Communicator;
 import shared.DocTree.ProjectNode;
+import shared.EditArea;
 import shared.FlowPermission;
 
 @SuppressWarnings("serial")
@@ -232,8 +233,8 @@ public class CollabsList extends JPanel {
 
 		    Data changePerm = new Data("project_modify");
 		    changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
-		    // changePerm.put("project_uuid",
-		    // editPane.getDocTree().getActiveProject().getProjectUUID());
+		    UUID projectUUID = ((EditArea) editPane.getEditTabs().getSelectedComponent()).getProjectUUID();
+		    changePerm.put("project_uuid", projectUUID);
 		    changePerm.put("username", user);
 		    changePerm.put("access_level", changePermission);
 		    if (!Communicator.communicate(changePerm).get("status", String.class).equals("OK")) {
