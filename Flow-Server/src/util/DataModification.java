@@ -1,11 +1,11 @@
 package util;
 
+import database.SQLDatabase;
+
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-
-import database.SQLDatabase;
 
 public class DataModification {
 
@@ -120,6 +120,8 @@ public class DataModification {
 	 *             string representation as described in {@link UUID#toString()}
 	 */
 	public static UUID[] getUUIDsFromArray(String... uuids) {
+		if (uuids == null)
+			return new UUID[0];
 		UUID[] array = new UUID[uuids.length];
 		for (int i = 0; i < uuids.length; i++) {
 			array[i] = UUID.fromString(uuids[i]);
