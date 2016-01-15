@@ -190,12 +190,18 @@ public class ClientRequestHandle implements Runnable {
 				UUID projectUUID = data.get("project_uuid", UUID.class);
 				UUID parentDirectoryUUID = data.get("parent_directory_uuid",
 						UUID.class);
-				UUID random = UUID.randomUUID();
-				String status = this.database.newDirectory(
-						data.get("directory_name", String.class),
-						random.toString(), projectUUID.toString(),
-						parentDirectoryUUID.toString());
-				returnData.put("status", status);
+				UUID sessionID = data.get("session_id", UUID.class);
+//				if (this.database.verifyPermissions(sessionID.toString(),
+//						projectUUID.toString())) {
+					UUID random = UUID.randomUUID();
+					String status = this.database.newDirectory(
+							data.get("directory_name", String.class),
+							random.toString(), projectUUID.toString(),
+							parentDirectoryUUID.toString());
+					returnData.put("status", status);
+//				} else {
+//					returnData.put("status", "INVALID_SESSION");
+//				}
 			}
 				break;
 			case "project_modify":
@@ -286,8 +292,11 @@ public class ClientRequestHandle implements Runnable {
 							projectUUID.toString(), SQLDatabase.EDIT));
 					returnData.put("viewers", this.database.getUsers(
 							projectUUID.toString(), SQLDatabase.VIEW));
-					returnData.put("owner", this.database.getUsers(
-							projectUUID.toString(), SQLDatabase.OWNER));
+					returnData
+							.put("owner",
+									this.database.getUsers(
+											projectUUID.toString(),
+											SQLDatabase.OWNER)[0]);
 					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
