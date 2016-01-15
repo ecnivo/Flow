@@ -9,16 +9,24 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 
 import message.Data;
 import struct.TextDocument;
 
+import compiler.FlowCompiler;
+
+@SuppressWarnings("serial")
 public class RunStopBar extends JToolBar {
 
     private EditTabs editTabs;
@@ -42,7 +50,6 @@ public class RunStopBar extends JToolBar {
      *            the directory to search for the files
      */
     private TextDocument[] getFiles(UUID directory) {
-	@SuppressWarnings("serial")
 	ArrayList<TextDocument> out = new ArrayList<TextDocument>();
 
 	Data dirInfoRequest = new Data("directory_info");
@@ -50,17 +57,19 @@ public class RunStopBar extends JToolBar {
 	dirInfoRequest.put("directory_uuid", directory);
 	Data dirInfo = Communicator.communicate(dirInfoRequest);
 
-	// FIXME Netdex! How do you create TextDocuments when I can't get them
-	// from the server...?
-	// for (UUID childFileUUID:dirInfo.get("child_files", UUID[].class)) {
-	// Data fileInfoRequest = new Data("file_info");
-	// fileInfoRequest.put("file_uuid", childFileUUID);
-	// fileInfoRequest.put("session_id", Communicator.getSessionID());
-	//
-	// }
-	// for (FlowDirectory childDir : directory.getDirectories()) {
-	// out.addAll(Arrays.asList(getFiles(childDir)));
-	// }
+	for (UUID childFileUUID : dirInfo.get("child_files", UUID[].class)) {
+	    Data documentRequest = new Data("document_request");
+	    documentRequest.put("file_uuid", childFileUUID);
+	    documentRequest.put("session_id", Communicator.getSessionID());
+	    Data document = Communicator.communicate(documentRequest);
+
+	    TextDocument textDocument = new TextDocument();
+	    textDocument.setDocumentText(new String(document.get("file_data", byte[].class)));
+	    out.add(textDocument);
+	}
+	for (UUID childDir : dirInfo.get("child_directories", UUID[].class)) {
+	    out.addAll(Arrays.asList(getFiles(childDir)));
+	}
 
 	TextDocument[] outArray = new TextDocument[out.size()];
 	for (int i = 0; i < out.size(); i++) {
@@ -91,11 +100,16 @@ public class RunStopBar extends JToolBar {
 		    if (editTabs == null) {
 			return;
 		    }
-		    // FIXME Netdex!
-		    // compiler.FlowCompiler flowCompiler = new
-		    // compiler.FlowCompiler(getFiles((FlowProject) ((EditArea)
-		    // editTabs.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
-		    // System.out.println("Run button pressed");
+		    FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
+		    try {
+			List<Diagnostic<? extends JavaFileObject>> errors = flowCompiler.build();
+			flowCompiler.execute();
+		    } catch (IOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		    System.out.println("Run button pressed");
 		}
 	    });
 	}

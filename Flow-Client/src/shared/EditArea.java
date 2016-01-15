@@ -30,6 +30,7 @@ public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
     private UUID document;
+    private UUID projectUUID;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -51,6 +52,7 @@ public class EditArea extends JTextPane {
 
     public EditArea(String textDoc, UUID projectUUID, boolean editable, EditTabs tabs) {
 	setLayout(null);
+	this.projectUUID = projectUUID;
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
@@ -211,6 +213,10 @@ public class EditArea extends JTextPane {
     public JScrollPane getScrollPane() {
 	return scrolling;
     }
+    
+    public UUID getProjectUUID(){
+	return projectUUID;
+    }
 
     private class StyleToken {
 	private int length;
@@ -360,6 +366,8 @@ public class EditArea extends JTextPane {
 	else
 	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
     }
+    
+    
 
     // private class FormatKeywordsLater implements Runnable {
     //
