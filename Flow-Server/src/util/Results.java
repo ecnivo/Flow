@@ -21,10 +21,7 @@ public class Results {
 
 	public static String[] toStringArray(String columnName, ResultSet results)
 			throws SQLException {
-		// TODO fix this hardcoded crap
 		String[] arr = toStringArray(new String[]{columnName}, results)[0];
-		if (arr.length == 1 && arr[0] == null)
-			return new String[0];
 		return arr;
 	}
 
