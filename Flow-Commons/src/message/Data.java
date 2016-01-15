@@ -90,7 +90,8 @@ public class Data implements Serializable {
 				str += key + "=" + Arrays
 						.toString((Object[]) stringObjectHashMap.get(key));
 			} else {
-				str += key + "=" + stringObjectHashMap.get(key).toString();
+				str += key + "=" + (stringObjectHashMap.get(key) == null
+						? "null" : stringObjectHashMap.get(key).toString());
 			}
 			str += ", ";
 		}

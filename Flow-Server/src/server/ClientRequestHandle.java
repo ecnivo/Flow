@@ -338,9 +338,6 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "file_info":
-				/*
-				 * Retrieves all associated information
-				 */
 				try {
 					// Load the required data from the data packet
 					UUID fileUUID = data.get("file_uuid", UUID.class);
@@ -366,6 +363,11 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			case "version_info": {
+//				UUID versionUUID = data.get("version_uuid", UUID.class);
+//				returnData.put("status",
+//						this.database.getVersionInfo(versionUUID.toString()));
+			}
 			case "request_version": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				UUID versionUUID = data.get("version_uuid", UUID.class);
