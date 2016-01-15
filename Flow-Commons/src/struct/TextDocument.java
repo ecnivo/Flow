@@ -2,32 +2,18 @@ package struct;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * Represents a editable text document Created by Netdex on 12/18/2015.
  */
 public class TextDocument implements Serializable {
 
-	private UUID uuid;
-
 	private ArrayList<String> lines;
 
-	public TextDocument(UUID uuid) {
-		this.uuid = uuid;
-		this.lines = new ArrayList<>();
-		lines.add("");
-	}
-
 	public TextDocument() {
-		this(UUID.randomUUID());
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}
-
-    public UUID getUUID() {
-        return uuid;
-    }
 
 	/**
 	 * Insert a character at line number at index
