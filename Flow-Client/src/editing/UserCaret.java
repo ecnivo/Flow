@@ -23,7 +23,7 @@ public class UserCaret extends JComponent {
 
     private static final int SHOW_INFO_DISTANCE = 25;
 
-    public UserCaret(User user, EditArea editArea) {
+    public UserCaret(String user, EditArea editArea) {
 	// TODO whenever usercarets are created, they need to be initialized
 	// with a listener for the caret movements of other users
 	this.editArea = editArea;
@@ -49,7 +49,7 @@ public class UserCaret extends JComponent {
 	}
 	userColor = new Color(red, green, blue, 225);
 
-	infoLabel = new JLabel(user.getUsername());
+	infoLabel = new JLabel(user);
 	infoLabel.setBackground(userColor);
 	infoLabel.setForeground(Color.WHITE);
 	infoLabel.setFont(new Font("Tw Cen MT", Font.PLAIN, 10));

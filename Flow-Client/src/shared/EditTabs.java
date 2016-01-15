@@ -38,8 +38,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import struct.TextDocument;
-
 /**
  * Created by Vince on 2015-12-18.
  */
@@ -88,20 +86,20 @@ public class EditTabs extends JTabbedPane {
 	});
     }
 
-    public void openTab(TextDocument doc, UUID projectUUID, boolean editable) {
+    public void openTab(String tabName, String document, UUID projectUUID, UUID documentUUID, boolean editable) {
 	int tabs = getTabCount();
+	// Checks if the tab is already open, and if it is, will automatically
+	// switch to it
 	for (int i = 0; i < tabs; i++) {
-	    if (((EditArea) getComponentAt(i)).getFlowDocUUID().equals(doc.getUUID())) {
+	    if (((EditArea) getComponentAt(i)).getTextDocumentUUID().equals(documentUUID)) {
 		setSelectedIndex(i);
 		return;
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-//	    Data docNameRequest = new Data(");
-	    
-	    addTab(doc.getParentFile().getFileName(), new EditArea(doc, editable, this).getScrollPane());
+	    addTab(tabName, new EditArea(document, projectUUID, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
-	    setTabComponentAt(idx, new CustomTabHeader(doc.getParentFile().getFileName()));
+	    setTabComponentAt(idx, new CustomTabHeader(tabName));
 	    // setToolTipTextAt(idx, doc.getParentFile().getVersions().);
 	    // TODO should be the save date
 	} else {

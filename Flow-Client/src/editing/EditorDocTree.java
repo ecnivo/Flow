@@ -1,13 +1,9 @@
 package editing;
 
-import gui.FlowClient;
-
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.util.UUID;
 
 import javax.swing.JMenuItem;
@@ -22,7 +18,6 @@ import message.Data;
 import shared.Communicator;
 import shared.DocTree;
 import shared.EditTabs;
-import struct.TextDocument;
 
 @SuppressWarnings("serial")
 public class EditorDocTree extends DocTree {
@@ -226,33 +221,37 @@ public class EditorDocTree extends DocTree {
     }
 
     private void openFile(UUID fileToOpen, UUID projectUUID) {
-	throw new UnsupportedOperationException();
-	if (FlowClient.NETWORK) {
-	    Data fileRequest = new Data("file_request");
-	    fileRequest.put("doc_uuid", fileToOpen);
-	    Data reply = Communicator.communicate(fileRequest);
-	    switch (reply.get("status", String.class)) {
-	    case "OK":
-		FlowDocument document = reply.get("document", FlowDocument.class);
-		if (document instanceof ArbitraryDocument) {
-		    try {
-			Desktop.getDesktop().open(((ArbitraryDocument) document).getLocalFile());
-		    } catch (IOException e1) {
-			e1.printStackTrace();
-		    }
-		} else if (document instanceof TextDocument) {
-		    EditTabs tabs = editPane.getEditTabs();
-		    if (tabs != null)
-			tabs.openTab((TextDocument) document, projectUUID, true);
-		}
-		break;
-	    case "PROJECT_NOT_FOUND":
-		JOptionPane.showConfirmDialog(null, "The project that this file is in cannot be found for some reason.\n" + "Try refreshing the list of projects (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-		return;
-	    case "FILE_NOT_FOUND":
-		JOptionPane.showConfirmDialog(null, "The file you are trying to open cannot be found.\n" + "Try refreshing the list of projects/files (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-		return;
+	Data fileRequest = new Data("file_info");
+	fileRequest.put("file_uuid", fileToOpen);
+	Data fileData = Communicator.communicate(fileRequest);
+
+	Data documentRequest = new Data("document_request");
+	documentRequest.put("session_id", Communicator.getSessionID());
+	documentRequest.put("doc_uuid", fileToOpen);
+	Data documentData = Communicator.communicate(documentRequest);
+
+	switch (documentData.get("status", String.class)) {
+	case "OK":
+	    String type = fileData.get("file_type", String.class);
+	    if (type.contains("ARBIT")) {
+		// try {
+		// //TODO write byte array to local directory
+		// Desktop.getDesktop().open();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// }
+	    } else if (type.contains("TEXT")) {
+		EditTabs tabs = editPane.getEditTabs();
+		if (tabs != null)
+		    tabs.openTab(fileData.get("file_name", String.class), new String(documentRequest.get("file_data", byte[].class)), projectUUID, documentRequest.get("version_uuid", UUID.class), true);
 	    }
+	    break;
+	case "PROJECT_NOT_FOUND":
+	    JOptionPane.showConfirmDialog(null, "The project that this file is in cannot be found for some reason.\n" + "Try refreshing the list of projects (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+	    return;
+	case "FILE_NOT_FOUND":
+	    JOptionPane.showConfirmDialog(null, "The file you are trying to open cannot be found.\n" + "Try refreshing the list of projects/files (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+	    return;
 	}
     }
 
