@@ -193,6 +193,7 @@ public abstract class DocTree extends JTree {
 	    for (UUID childDirUUID : childDirs) {
 		Data childDirNameRequest = new Data("directory_info");
 		childDirNameRequest.put("session_id", Communicator.getSessionID());
+		childDirNameRequest.put("directory_uuid", childDirUUID);
 		String childDirName = Communicator.communicate(childDirNameRequest).get("directory_name", String.class);
 
 		DirectoryNode subDirNode = new DirectoryNode(childDirUUID, childDirName);
@@ -340,6 +341,7 @@ public abstract class DocTree extends JTree {
 	    }
 
 	    Data remoteChildDirRequest = new Data("directory_info");
+	    remoteChildDirRequest.put("directory_uuid", remoteDir);
 	    remoteChildDirRequest.put("session_id", Communicator.getSessionID());
 	    Data remoteChildDir = Communicator.communicate(remoteChildDirRequest);
 
@@ -380,9 +382,10 @@ public abstract class DocTree extends JTree {
 	    this.name = name;
 	}
 
-	public DirectoryNode(UUID dir) {
-	    this.directory = dir;
+	public DirectoryNode(UUID dirUUID) {
+	    this.directory = dirUUID;
 	    Data requestName = new Data("directory_info");
+	    requestName.put("directory_uuid", dirUUID);
 	    requestName.put("session_id", Communicator.getSessionID());
 	    this.name = Communicator.communicate(requestName).get("directory_name", String.class);
 	}
