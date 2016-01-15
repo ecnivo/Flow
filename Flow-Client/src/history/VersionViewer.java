@@ -4,7 +4,6 @@ import gui.FlowClient;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -13,8 +12,6 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -24,17 +21,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import message.Data;
+import shared.Communicator;
 import shared.EditTabs;
-import struct.TextDocument;
 
 @SuppressWarnings("serial")
 public class VersionViewer extends JPanel {
-
-    private ImageIcon first;
     private ImageIcon middle;
 
-    private static final int FIRST = 0;
-    private static final int MIDDLE = 1;
+    private UUID file;
+    private UUID projectUUID;
+
     private static final int ICON_SIZE = 42;
 
     // private FlowFile file;
@@ -51,63 +48,74 @@ public class VersionViewer extends JPanel {
 	scrolling.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	scrolling.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
 	try {
-	    first = new ImageIcon(ImageIO.read(new File("images/firstVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
 	    middle = new ImageIcon(ImageIO.read(new File("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
     }
 
-//    /**
-//     * @deprecated
-//     * @param flowFile
-//     */
-//    public void setFile(FlowFile flowFile) {
-//	file = flowFile;
-//	updateVersions();
-//    }
-//
-//    /**
-//     * @deprecated
-//     */
-//    private void updateVersions() {
-//	removeAll();
-//
-//	TreeSet<FlowDocument> versions = file.getVersions();
-//	Iterator<FlowDocument> versionIterator = versions.iterator();
-//
-//	while (versionIterator.hasNext()) {
-//	    FlowDocument doc = versionIterator.next();
-//	    add(new VersionItem(doc, doc.getVersionDate(), 1));
-//	}
-//
-//	revalidate();
-//	repaint();
-//    }
+    /**
+     * @param flowFile
+     */
+    public void setFile(UUID flowFile, UUID projectUUID) {
+	file = flowFile;
+	this.projectUUID = projectUUID;
+	updateVersions();
+    }
+
+    /**
+     */
+    private void updateVersions() {
+	removeAll();
+
+	Data fileInfoRequest = new Data("file_info");
+	fileInfoRequest.put("file_uuid", file);
+	fileInfoRequest.put("session_id", Communicator.getSessionID());
+	Data fileInfo = Communicator.communicate(fileInfoRequest);
+	UUID[] versions = fileInfo.get("file_versions", UUID[].class);
+	boolean isText = false;
+	switch (fileInfo.get("file_type", String.class)) {
+	case "TEXT_DOCUMENT":
+	    isText = true;
+	    break;
+
+	case "ARBITRARY_DOCUMENT":
+	    isText = false;
+	    break;
+	}
+
+	for (UUID versionUUID : versions) {
+	    Data versionDataRequest = new Data("version_request");
+	    versionDataRequest.put("file_uuid", file);
+	    versionDataRequest.put("version_uuid", versionUUID);
+	    versionDataRequest.put("session_id", Communicator.getSessionID());
+	    byte[] versionData = Communicator.communicate(versionDataRequest).get("version_data", byte[].class);
+
+	    Data versionInfoRequest = new Data("version_info");
+	    versionInfoRequest.put("version_uuid", versionUUID);
+	    versionInfoRequest.put("file_uuid", file);
+	    versionInfoRequest.put("session_id", Communicator.getSessionID());
+	    Date saveDate = Communicator.communicate(versionInfoRequest).get("date", Date.class);
+
+	    VersionItem item = new VersionItem(versionData, saveDate, versionUUID, isText);
+
+	    add(item);
+	}
+
+	revalidate();
+	repaint();
+    }
 
     class VersionItem extends JPanel {
 
-	public VersionItem(UUID doc, Date date, int position) {
-	    // TODO all of versioning
+	public VersionItem(byte[] data, Date date, UUID documentUUID, boolean isText) {
 	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
 	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setBorder(FlowClient.EMPTY_BORDER);
 	    setLayout(new BorderLayout(3, 0));
-	    JLabel icon = null;
-	    switch (position) {
-	    case FIRST:
-		icon = new JLabel(first);
-		break;
-
-	    case MIDDLE:
-		icon = new JLabel(middle);
-		break;
-
-	    default:
-		return;
-	    }
+	    JLabel icon = new JLabel(middle);
 	    add(icon, BorderLayout.WEST);
 
 	    JLabel changeTime = new JLabel(date.toString());
@@ -133,24 +141,19 @@ public class VersionViewer extends JPanel {
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
 		    VersionViewer.this.setBorder(BorderFactory.createLineBorder(new Color(0x5C9EB4), 2));
-//		    updateVersions();
+		    updateVersions();
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
 		    if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-//			if (doc instanceof TextDocument) {
-//			    EditTabs tabs = historyPane.getEditTabs();
-//			    if (tabs != null)
-//				tabs.openTab((TextDocument) doc, false);
-//			} else if (doc instanceof ArbitraryDocument)
-			    try {
-				Desktop.getDesktop().open(new File("blarghs"));
-			    } catch (IOException e1) {
-				e1.printStackTrace();
-			    }
-			// TODO find a way to open past arbitrary files in
-			// desktop
+			if (isText) {
+			    EditTabs tabs = historyPane.getEditTabs();
+			    if (tabs != null)
+				tabs.openTab(date.toString(), new String(data), projectUUID, documentUUID, false);
+			} else
+			    throw new UnsupportedOperationException();
+			// TODO find a way to open past documents in desktop
 		    }
 		}
 	    });

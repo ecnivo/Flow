@@ -9,16 +9,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
-import struct.FlowDirectory;
-import struct.FlowFile;
-import struct.FlowProject;
+import message.Data;
 import struct.TextDocument;
 
 public class RunStopBar extends JToolBar {
@@ -36,18 +34,33 @@ public class RunStopBar extends JToolBar {
 	setRollover(true);
     }
 
-    private TextDocument[] getFiles(FlowDirectory directory) {
+    /**
+     * Used to recursively iterate through the entire tree for a project getting
+     * all text files so that they can be compiled
+     * 
+     * @param directory
+     *            the directory to search for the files
+     */
+    private TextDocument[] getFiles(UUID directory) {
 	@SuppressWarnings("serial")
 	ArrayList<TextDocument> out = new ArrayList<TextDocument>();
 
-	for (FlowFile file : directory.getFiles()) {
-	    if (file.latest() instanceof TextDocument) {
-		out.add((TextDocument) file.latest());
-	    }
-	}
-	for (FlowDirectory childDir : directory.getDirectories()) {
-	    out.addAll(Arrays.asList(getFiles(childDir)));
-	}
+	Data dirInfoRequest = new Data("directory_info");
+	dirInfoRequest.put("session_id", Communicator.getSessionID());
+	dirInfoRequest.put("directory_uuid", directory);
+	Data dirInfo = Communicator.communicate(dirInfoRequest);
+
+	// FIXME Netdex! How do you create TextDocuments when I can't get them
+	// from the server...?
+	// for (UUID childFileUUID:dirInfo.get("child_files", UUID[].class)) {
+	// Data fileInfoRequest = new Data("file_info");
+	// fileInfoRequest.put("file_uuid", childFileUUID);
+	// fileInfoRequest.put("session_id", Communicator.getSessionID());
+	//
+	// }
+	// for (FlowDirectory childDir : directory.getDirectories()) {
+	// out.addAll(Arrays.asList(getFiles(childDir)));
+	// }
 
 	TextDocument[] outArray = new TextDocument[out.size()];
 	for (int i = 0; i < out.size(); i++) {
@@ -78,7 +91,10 @@ public class RunStopBar extends JToolBar {
 		    if (editTabs == null) {
 			return;
 		    }
-		    compiler.FlowCompiler flowCompiler = new compiler.FlowCompiler(getFiles((FlowProject) ((EditArea) editTabs.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
+		    // FIXME Netdex!
+		    // compiler.FlowCompiler flowCompiler = new
+		    // compiler.FlowCompiler(getFiles((FlowProject) ((EditArea)
+		    // editTabs.getSelectedComponent()).getFlowDoc().getParentFile().getParentDirectory().getRootDirectory()));
 		    // System.out.println("Run button pressed");
 		}
 	    });
