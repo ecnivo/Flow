@@ -170,7 +170,7 @@ public abstract class DocTree extends JTree {
 
     private void createProjectNode(UUID projectUUID) {
 	if (FlowClient.NETWORK) {
-	    Data fileListRequest = new Data("request_project");
+	    Data fileListRequest = new Data("project_info");
 	    fileListRequest.put("project_uuid", projectUUID);
 	    fileListRequest.put("session_id", Communicator.getSessionID());
 	    Data project = Communicator.communicate(fileListRequest);
@@ -367,33 +367,33 @@ public abstract class DocTree extends JTree {
 	public UUID getProjectUUID() {
 	    return project;
 	}
-
     }
 
     public class DirectoryNode extends DefaultMutableTreeNode {
+	// TODO each time name gets
+	// updated locally OR server side, then update the name
 	private UUID directory;
-	private String dirName;
+	private String name;
 
 	public DirectoryNode(UUID dir, String name) {
 	    this.directory = dir;
-	    this.dirName = name;
-	    // TODO each time name gets
-	    // updated locally OR server side, then update the name
-	}
-
-	public String getName() {
-	    return dirName;
-	}
-
-	public void setName(String name) {
-	    dirName = name;
+	    this.name = name;
+	    System.out.println("new directory with name " + name);
 	}
 
 	public DirectoryNode(UUID dir) {
 	    this.directory = dir;
 	    Data requestName = new Data("directory_info");
 	    requestName.put("session_id", Communicator.getSessionID());
-	    this.dirName = Communicator.communicate(requestName).get("directory_name", String.class);
+	    this.name = Communicator.communicate(requestName).get("directory_name", String.class);
+	}
+
+	public String getName() {
+	    return name;
+	}
+
+	public void setName(String name) {
+	    this.name = name;
 	}
 
 	public UUID getDirectoryUUID() {
@@ -401,15 +401,12 @@ public abstract class DocTree extends JTree {
 	}
 
 	public String toString() {
-	    return dirName;
+	    return name;
 	}
-
-	// public String toString() {
-	// return directory.toString();
-	// }
     }
 
     public class FileNode extends DefaultMutableTreeNode {
+	// TODO add a listener for file renaming changes
 	private UUID file;
 	private String name;
 

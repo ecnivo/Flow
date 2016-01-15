@@ -144,7 +144,7 @@ public class CollabsList extends JPanel {
 	}
 	UUID activeProjectUUID = ((ProjectNode) activeSelection.getPath()[1]).getProjectUUID();
 
-	Data getProject = new Data("request_project");
+	Data getProject = new Data("project_info");
 	getProject.put("project_uuid", activeProjectUUID);
 	Data activeProject = Communicator.communicate(getProject);
 
