@@ -256,7 +256,9 @@ public class ClientRequestHandle implements Runnable {
 							.getFileType(fileUUID.toString());
 					switch (modType) {
 					case "RENAME":
-						// TODO rename in Bimesh's code
+						returnData.put("status",
+								this.database.renameFile(fileUUID.toString(),
+										data.get("new_name", String.class)));
 						break;
 					case "DELETE":
 						// TODO delete in Bimesh's code

@@ -508,7 +508,7 @@ public class SQLDatabase {
 	 * name, <b>not the UUID</b>, hence not the internal server directory
 	 * structure either.
 	 *
-	 * @param projectId
+	 * @param projectUUID
 	 *            the UUID of the project to rename.
 	 * @param newName
 	 *            the name which to assign to the project.
@@ -516,17 +516,17 @@ public class SQLDatabase {
 	 *             if the specified project UUID doesn't exists in the database
 	 *             or the new name contains invalid characters.
 	 */
-	public String renameProject(String projectId, String newName) {
+	public String renameProject(String projectUUID, String newName) {
 		// TODO Check if name is valid
 		try {
 			if (!this.query(String.format(
 					"SELECT * from projects WHERE ProjectID = '%s';",
-					projectId)).next()) {
+					projectUUID)).next()) {
 				return "INVALID_PROJECT_UUID";
 			}
 			this.update(String.format(
 					"UPDATE projects SET ProjectName = '%s' WHERE ProjectID = '%s';",
-					newName, projectId));
+					newName, projectUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -553,8 +553,26 @@ public class SQLDatabase {
 				return "INVALID_DIRECTORY_UUID";
 			}
 			this.update(String.format(
-					"UPDATE projects SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
+					"UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
 					newName, directoryUUID));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
+	}
+
+	public String renameFile(String fileUUID, String newName) {
+		try {
+			// TODO Add check for duplicate directory names inside same folder.
+			if (!this.query(String.format(
+					"SELECT * from Documents WHERE DocumentID = '%s';",
+					fileUUID)).next()) {
+				return "INVALID_FILE_UUID";
+			}
+			this.update(String.format(
+					"UPDATE Documents SET DocumentName = '%s' WHERE DocumentID = '%s';",
+					newName, fileUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
