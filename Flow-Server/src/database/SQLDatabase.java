@@ -289,9 +289,13 @@ public class SQLDatabase {
 			String projectId, String parentDirectoryId) {
 		try {
 			// TODO Add checks
-			this.update(String.format(
-					"INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
-					directoryId, parentDirectoryId, directoryName, projectId));
+			// TODO Change this to not require parentDirectoryId
+			this.update(String
+					.format("INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
+							directoryId,
+							parentDirectoryId.equals(directoryId) ? "null"
+									: parentDirectoryId,
+							directoryName, projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -886,6 +890,16 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Creates a new version of the specified file with the specified version
+	 * UUID.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file.
+	 * @param versionUUID
+	 * @return
+	 * @throws DatabaseException
+	 */
 	public String newVersion(String fileUUID, String versionUUID)
 			throws DatabaseException {
 		try {
