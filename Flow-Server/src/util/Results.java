@@ -22,6 +22,8 @@ public class Results {
     public static String[] toStringArray(String columnName, ResultSet results)
             throws SQLException {
         String[][] arr = toStringArray(new String[]{columnName}, results);
+        if (arr.length == 1 && arr[0] == null)
+            return new String[0];
         String[] retarr = new String[arr.length];
         for (int i = 0; i < arr.length; i++) {
             retarr[i] = arr[i][0];
