@@ -170,20 +170,33 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "new_textdocument": {
-				UUID projectUUID = data.get("project_uuid", UUID.class);
-				UUID directoryUUID = data.get("directory_uuid", UUID.class);
-				String documentName = data.get("document_name", String.class);
-				UUID fileUUID = UUID.randomUUID();
-				UUID versionUUID = UUID.randomUUID();
-				// TODO add the version to the database
-				this.database.newFile(fileUUID.toString(), documentName,
-						projectUUID.toString(), directoryUUID.toString(),
-						"TEXT_DOCUMENT");
-				this.database.newVersion(fileUUID.toString(),
-						versionUUID.toString());
-				TextDocument newTextDocument = new TextDocument();
-				DataManagement.getInstance().addTextDocumentVersion(fileUUID,
-						versionUUID, newTextDocument);
+				UUID projectUUID = data.get("project_uuid", UUID.class),
+						sessionID = data.get("session_id", UUID.class);
+				try {
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString())) {
+						UUID directoryUUID = data.get("directory_uuid",
+								UUID.class), fileUUID = UUID.randomUUID(),
+								versionUUID = UUID.randomUUID();
+						String documentName = data.get("document_name",
+								String.class);
+						// TODO add the version to the database
+						this.database.newFile(fileUUID.toString(), documentName,
+								projectUUID.toString(),
+								directoryUUID.toString(), "TEXT_DOCUMENT");
+						this.database.newVersion(fileUUID.toString(),
+								versionUUID.toString());
+						TextDocument newTextDocument = new TextDocument();
+						DataManagement.getInstance().addTextDocumentVersion(
+								fileUUID, versionUUID, newTextDocument);
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
 			}
 				break;
 			case "new_directory": {
