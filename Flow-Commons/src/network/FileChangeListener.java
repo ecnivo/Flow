@@ -8,7 +8,7 @@ import java.net.Socket;
 /**
  * Created by Netdex on 12/29/2015.
  */
-public abstract class FlowDocumentChangeListener {
+public abstract class FileChangeListener {
 
     private static final int ARC_PORT = 10225;
     private boolean cont = true;
@@ -16,7 +16,7 @@ public abstract class FlowDocumentChangeListener {
     private Socket socket;
     private DataSocket dsocket;
 
-    public FlowDocumentChangeListener() {
+    public FileChangeListener() {
 
     }
 

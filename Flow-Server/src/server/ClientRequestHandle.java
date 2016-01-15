@@ -462,6 +462,14 @@ public class ClientRequestHandle implements Runnable {
 
 				}
 				break;
+				case "document_async":
+					String rtype = data.get("rtype", String.class);
+					if (rtype.equals("register")) {
+
+					} else {
+
+					}
+					break;
 			default:
 				// For completeness's sake
 				returnData.put("status", "INVALID_REQUEST_TYPE");
