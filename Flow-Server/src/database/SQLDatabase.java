@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.UUID;
 
 import server.FlowServer;
@@ -886,6 +887,19 @@ public class SQLDatabase {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
+	}
 
+	public String newVersion(String fileUUID, String versionUUID)
+			throws DatabaseException {
+		try {
+			this.update(String.format(
+					"INSERT INTO Versions VALUES('%s', '%d', '%s');",
+					versionUUID, new Date().getTime(), fileUUID));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
 	}
 }
