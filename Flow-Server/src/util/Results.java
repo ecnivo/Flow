@@ -21,11 +21,7 @@ public class Results {
 
 	public static String[] toStringArray(String columnName, ResultSet results)
 			throws SQLException {
-		// TODO fix this hardcoded crap
-		String[] arr = toStringArray(new String[]{columnName}, results)[0];
-		if (arr.length == 1 && arr[0] == null)
-			return new String[0];
-		return arr;
+		return toStringArray(new String[] { columnName }, results)[0];
 	}
 
 	public static int[][] toIntArray(String[] columnNames, ResultSet results)
@@ -38,7 +34,7 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return (int[][]) list.toArray();
+		return list.size() > 0 ? (int[][]) list.toArray() : new int[][] { {} };
 	}
 
 	public static int[] toIntArray(String columnName, ResultSet results)
@@ -56,7 +52,8 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return list.toArray(new String[][] { {} });
+		return list.size() > 0 ? list.toArray(new String[][] { {} })
+				: new String[][] { {} };
 	}
 
 	public static String[] toStringArray(int columnNumber, ResultSet results)
@@ -75,6 +72,7 @@ public class Results {
 			}
 			list.add(row);
 		}
-		return list.toArray(new String[][] { {} });
+		return list.size() > 0 ? list.toArray(new String[][] { {} })
+				: new String[][] { {} };
 	}
 }
