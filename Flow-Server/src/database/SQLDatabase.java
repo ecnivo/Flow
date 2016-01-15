@@ -534,9 +534,19 @@ public class SQLDatabase {
 		return "OK";
 	}
 
-	// TODO COMMENT
+	/**
+	 * Associated a new name with the specified directory.
+	 * 
+	 * @param directoryUUID
+	 *            the string representation of the UUID of the directory.
+	 * @param newName
+	 *            the new name which to associated with the directory.
+	 * @return the status of the operation, either 'INVALID_DIRECTORY_UUID' or
+	 *         {@link FlowServer#ERROR} .
+	 */
 	public String renameDirectory(String directoryUUID, String newName) {
 		try {
+			// TODO Add check for duplicate directory names inside same folder.
 			if (!this.query(String.format(
 					"SELECT * from directories WHERE DirectoryID = '%s';",
 					directoryUUID)).next()) {
@@ -590,7 +600,14 @@ public class SQLDatabase {
 		return "OK";
 	}
 
-	// TODO COMMENT
+	/**
+	 * Deletes directory and all sub directories and files.
+	 * 
+	 * @param directoryUUID
+	 *            the string representation of the UUID of the directory to
+	 *            delete.
+	 * @return the status of the deletion.
+	 */
 	public String deleteDirectory(String directoryUUID) {
 		try {
 			if (!this.query(String.format(
