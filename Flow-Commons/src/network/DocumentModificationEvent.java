@@ -53,11 +53,11 @@ public class DocumentModificationEvent {
      * Get the
      * @return
      */
-    private String getAddition() {
+    public String getAddition() {
         return adx;
     }
 
-    private int getLength() {
+    public int getLength() {
         return len;
     }
 }
