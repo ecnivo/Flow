@@ -31,8 +31,14 @@ public abstract class FileChangeListener {
                 try {
                     while (socket.isConnected() && cont) {
                         Data msg = dsocket.receive(Data.class);
+                        DocumentModificationEvent dme = new DocumentModificationEvent(
+                                msg.get("mod_type", String.class),
+                                msg.get("line", Integer.class),
+                                msg.get("idx", Integer.class),
+                                msg.get("str", String.class),
+                                msg.get("len", Integer.class));
                         if (cont)
-                            onFlowDocumentUpdateMessageReceived(msg);
+                            onFileUpdate(dme);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -45,5 +51,5 @@ public abstract class FileChangeListener {
         cont = false;
     }
 
-    public abstract void onFlowDocumentUpdateMessageReceived(Data data);
+    public abstract void onFileUpdate(DocumentModificationEvent event);
 }

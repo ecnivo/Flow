@@ -26,4 +26,8 @@ public class PersistentCallbackManager {
 
     }
 
+    public boolean unregisterPersistentClientHandle(PersistentClientHandle pch) {
+        throw new UnsupportedOperationException();
+    }
+
 }
