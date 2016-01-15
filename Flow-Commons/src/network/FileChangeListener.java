@@ -32,7 +32,9 @@ public abstract class FileChangeListener {
                     while (socket.isConnected() && cont) {
                         Data msg = dsocket.receive(Data.class);
                         DocumentModificationEvent dme = new DocumentModificationEvent(
-                                msg.get("mod_type", String.class),
+                                msg.get("mod_type", String.class).equals("INSERT")
+                                ? DocumentModificationEvent.DocumentModificationType.INSERT
+                                : DocumentModificationEvent.DocumentModificationType.DELETE,
                                 msg.get("line", Integer.class),
                                 msg.get("idx", Integer.class),
                                 msg.get("str", String.class),

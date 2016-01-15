@@ -4,14 +4,19 @@ package network;
  * Created by Netdex on 1/15/2016.
  */
 public class DocumentModificationEvent {
-    private String type;
+    static enum DocumentModificationType {
+        INSERT,
+        DELETE
+    }
+
+    private DocumentModificationType type;
     private int line;
     private int idx;
     private String adx;
     private int len;
 
 
-    public DocumentModificationEvent(String type, int line, int idx, String adx, int len) {
+    public DocumentModificationEvent(DocumentModificationType type, int line, int idx, String adx, int len) {
         this.type = type;
         this.line = line;
         this.idx = idx;
@@ -19,18 +24,35 @@ public class DocumentModificationEvent {
         this.len = len;
     }
 
-    public String getModificationType() {
+    /**
+     * Either INSERT or DELETE
+     *
+     * @return
+     */
+    public DocumentModificationType getModificationType() {
         return type;
     }
 
+    /**
+     * The line number of the operation
+     * @return
+     */
     public int getLineNumber() {
         return line;
     }
 
+    /**
+     * The index of the operation
+     * @return
+     */
     public int getIndex() {
         return idx;
     }
 
+    /**
+     * Get the
+     * @return
+     */
     private String getAddition() {
         return adx;
     }
