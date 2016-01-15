@@ -427,7 +427,7 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX
-			case "document_modify":
+			case "textdocument_modify":
 				switch (data.get("doc_type", String.class)) {
 				case "INSERT":
 					break;
