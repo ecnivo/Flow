@@ -29,6 +29,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import message.Data;
@@ -142,7 +143,11 @@ public class CollabsList extends JPanel {
 	if (activeSelection == null) {
 	    return;
 	}
-	UUID activeProjectUUID = ((ProjectNode) activeSelection.getPath()[1]).getProjectUUID();
+	TreeNode[] path = (TreeNode[]) activeSelection.getPath();
+	if (path.length < 2){
+	    return;
+	}
+	UUID activeProjectUUID = ((ProjectNode) path[1]).getProjectUUID();
 
 	Data getProject = new Data("project_info");
 	getProject.put("project_uuid", activeProjectUUID);

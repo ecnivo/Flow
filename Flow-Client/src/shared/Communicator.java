@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import message.Data;
 import network.FMLNetworker;
+import network.FileChangeListener;
 
 public class Communicator {
 
@@ -27,12 +28,18 @@ public class Communicator {
     }
 
     public static UUID getSessionID() {
-        return sessionID;
+	return sessionID;
     }
 
     public static void setSessionID(UUID sessionID) {
-        Communicator.sessionID = sessionID;
+	Communicator.sessionID = sessionID;
     }
 
-    
+    public static void addFileChangeListener(FileChangeListener listener, UUID docUUID) {
+	packageSender.registerFileChangeListener(listener, docUUID);
+    }
+
+    public static void removeFileChangeListener(FileChangeListener listener) {
+	packageSender.unregisterFileChangeListener(listener);
+    }
 }

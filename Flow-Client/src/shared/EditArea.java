@@ -24,6 +24,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import message.Data;
+import network.DocumentModificationEvent;
+import network.DocumentModificationEvent.DocumentModificationType;
+import network.FileChangeListener;
 
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
@@ -203,6 +206,41 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
+	FileChangeListener fileChangeListener = new FileChangeListener() {
+
+	    @Override
+	    public void onFileUpdate(DocumentModificationEvent event) {
+		int line = event.getLineNumber();
+		int idx = event.getIndex();
+
+		String text = getText();
+		int ln = 0;
+		int charPos = 0;
+		while (ln < line) {
+		    if (text.charAt(charPos) == '\n') {
+			ln++;
+		    }
+		    charPos++;
+		}
+
+		if (event.getModificationType() == DocumentModificationType.INSERT) {
+		    String addition = event.getAddition();
+		    try {
+			doc.insertString(charPos, addition, null);
+		    } catch (BadLocationException e) {
+			e.printStackTrace();
+		    }
+		} else if (event.getModificationType() == DocumentModificationType.DELETE) {
+		    int length = event.getLength();
+		    try {
+			doc.remove(charPos, length);
+		    } catch (BadLocationException e) {
+			e.printStackTrace();
+		    }
+		}
+	    }
+
+	};
 	highlightSyntax();
     }
 
@@ -213,8 +251,8 @@ public class EditArea extends JTextPane {
     public JScrollPane getScrollPane() {
 	return scrolling;
     }
-    
-    public UUID getProjectUUID(){
+
+    public UUID getProjectUUID() {
 	return projectUUID;
     }
 
@@ -366,55 +404,4 @@ public class EditArea extends JTextPane {
 	else
 	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
     }
-    
-    
-
-    // private class FormatKeywordsLater implements Runnable {
-    //
-    // private int pos;
-    // private int nextToken;
-    //
-    // private FormatKeywordsLater(int pos, int nextToken) {
-    // this.pos = pos;
-    // this.nextToken = nextToken;
-    // }
-    //
-    // @Override
-    // public void run() {
-    // doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
-    // }
-    //
-    // }
-    //
-    // private class FormatPlainLater implements Runnable {
-    //
-    // private int pos;
-    // private int nextToken;
-    //
-    // private FormatPlainLater(int pos, int nextToken) {
-    // this.pos = pos;
-    // this.nextToken = nextToken;
-    // }
-    //
-    // @Override
-    // public void run() {
-    // doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
-    // }
-    //
-    // }
-    //
-    // private class FormatStringsLater implements Runnable {
-    // private int pos;
-    // private int nextToken;
-    //
-    // private FormatStringsLater(int pos, int nextToken) {
-    // this.pos = pos;
-    // this.nextToken = nextToken;
-    // }
-    //
-    // @Override
-    // public void run() {
-    // doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
-    // }
-    // }
 }
