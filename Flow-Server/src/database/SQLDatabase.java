@@ -971,7 +971,7 @@ public class SQLDatabase {
 	public String[] getFileVersions(String fileUUID) throws DatabaseException {
 		try {
 			ResultSet response = this.query(String.format(
-					"SELECT VersionID FROM Versions WHERE FileID = '%s'",
+					"SELECT VersionID FROM Versions WHERE DocumentID = '%s'",
 					fileUUID));
 			return Results.toStringArray("VersionID", response);
 		} catch (SQLException e) {
