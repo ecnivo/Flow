@@ -1,13 +1,5 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -16,6 +8,14 @@ import struct.User;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -189,6 +189,8 @@ public class ClientRequestHandle implements Runnable {
 						TextDocument newTextDocument = new TextDocument();
 						DataManagement.getInstance().addTextDocumentVersion(
 								fileUUID, versionUUID, newTextDocument);
+						returnData.put("file_uuid", fileUUID);
+						returnData.put("status", "OK");
 					} else {
 						returnData.put("status", "INVALID_SESSION_ID");
 					}
