@@ -276,7 +276,12 @@ public class EditorDocTree extends DocTree {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
+		    TreePath selectionPath = getSelectionPath();
+		    if (selectionPath == null) {
+			JOptionPane.showConfirmDialog(null, "Please select a directory to put your new directory in first", "No selected directory", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			return;
+		    }
+		    DirectoryNode selectedDir = (DirectoryNode) selectionPath.getLastPathComponent();
 		    if (selectedDir == null) {
 			JOptionPane.showConfirmDialog(null, "Please select a directory to put your new directory in first", "No selected directory", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
@@ -296,8 +301,10 @@ public class EditorDocTree extends DocTree {
 		    // else
 		    // createDirReq.put("parent_directory_uuid",
 		    // parentDir.getDirectoryUUID());
-		    UUID parentDirUUID = ((DirectoryNode) selectedDir.getParent()).getDirectoryUUID();
+		    UUID parentDirUUID = ((DirectoryNode) selectedDir).getDirectoryUUID();
 		    createDirReq.put("parent_directory_uuid", parentDirUUID);
+		    UUID projectUUID = ((ProjectNode) ((DirectoryNode) selectedDir).getPath()[1]).getProjectUUID();
+		    createDirReq.put("project_uuid", projectUUID);
 		    createDirReq.put("directory_name", name);
 
 		    Data response = Communicator.communicate(createDirReq);

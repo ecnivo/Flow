@@ -87,7 +87,7 @@ public abstract class DocTree extends JTree {
 		// selected).getParent());
 		// setActiveFileNode(fileNode);
 		// } else {
-		if (((DefaultMutableTreeNode) selected).getChildCount() == 0) {
+		if (((DefaultMutableTreeNode) selected).getChildCount() == 0 && !(selected instanceof ProjectNode) && !(selected instanceof DirectoryNode) && !(selected instanceof FileNode)) {
 		    refreshProjectList();
 		    // }
 
@@ -378,7 +378,6 @@ public abstract class DocTree extends JTree {
 	public DirectoryNode(UUID dir, String name) {
 	    this.directory = dir;
 	    this.name = name;
-	    System.out.println("new directory with name " + name);
 	}
 
 	public DirectoryNode(UUID dir) {
