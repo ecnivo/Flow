@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.UUID;
 
 import javax.swing.JScrollPane;
@@ -25,14 +24,12 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import message.Data;
-import struct.TextDocument;
-import struct.User;
 
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private TextDocument document;
+    private UUID document;
 
     private Style keywordStyle;
     private Style plainStyle;
@@ -52,25 +49,23 @@ public class EditArea extends JTextPane {
 
     private static final String[] JAVA_KEYWORDS = { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "try", "void", "volatile", "while" };
 
-    public EditArea(TextDocument textDoc, boolean editable, EditTabs tabs) {
+    public EditArea(String textDoc, UUID projectUUID, boolean editable, EditTabs tabs) {
 	setLayout(null);
 	scrolling = new JScrollPane(EditArea.this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
 	setForeground(PLAIN_COLOUR);
-	this.document = textDoc;
-	doc = (StyledDocument) new File(textDoc.getDocumentText());
+	doc = (StyledDocument) new File(textDoc);
 	setStyledDocument(doc);
-	setText(textDoc.getDocumentText());
+	setText(textDoc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
 	Data editorListRequest = new Data("request_project");
-	editorListRequest.put("project_uuid", );
-	Iterator<User> userIt = ((FlowProject) textDoc.getParentFile().getParentDirectory().getRootDirectory()).getEditors().iterator();
-	while (userIt.hasNext()) {
-	    UserCaret caret = new UserCaret(userIt.next(), this);
-	    add(caret);
+	editorListRequest.put("project_uuid", projectUUID);
+	String[] editors = Communicator.communicate(editorListRequest).get("editors", String[].class);
+	for (String editor : editors) {
+	    add(new UserCaret(editor, this));
 	}
 
 	keywordStyle = addStyle("keywords", null);
@@ -131,8 +126,9 @@ public class EditArea extends JTextPane {
 		    e1.printStackTrace();
 		}
 		Data documentModify = new Data("text_document_modify");
-		documentModify.put("project", ((FlowProject) document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", document.getUUID());
+		// documentModify.put("project", ((FlowProject)
+		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
+		documentModify.put("document", document);
 		documentModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
@@ -166,8 +162,9 @@ public class EditArea extends JTextPane {
 		int removedLen = e.getLength();
 
 		Data documentModify = new Data("text_document_modify");
-		documentModify.put("project", ((FlowProject) document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", document.getUUID());
+		// documentModify.put("project", ((FlowProject)
+		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
+		documentModify.put("document", document);
 		documentModify.put("mod_type", "DELETE");
 
 		int lastNewLine;
@@ -207,8 +204,8 @@ public class EditArea extends JTextPane {
 	highlightSyntax();
     }
 
-    public UUID getFlowDocUUID() {
-	return document.getUUID();
+    public UUID getTextDocumentUUID() {
+	return document;
     }
 
     public JScrollPane getScrollPane() {
