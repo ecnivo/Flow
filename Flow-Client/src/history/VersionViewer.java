@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -24,9 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import shared.EditTabs;
-import struct.ArbitraryDocument;
-import struct.FlowDocument;
-import struct.FlowFile;
 import struct.TextDocument;
 
 @SuppressWarnings("serial")
@@ -39,7 +37,7 @@ public class VersionViewer extends JPanel {
     private static final int MIDDLE = 1;
     private static final int ICON_SIZE = 42;
 
-    private FlowFile file;
+    // private FlowFile file;
     private HistoryPane historyPane;
     private JScrollPane scrolling;
 
@@ -47,52 +45,52 @@ public class VersionViewer extends JPanel {
 	historyPane = hp;
 	setBackground(Color.WHITE);
 	setMinimumSize(new Dimension(25, 0));
-//	setBorder(FlowClient.EMPTY_BORDER);
+	// setBorder(FlowClient.EMPTY_BORDER);
 	setLayout(new GridLayout(0, 1, 0, 0));
 	scrolling = new JScrollPane(this);
-	scrolling
-		.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-	scrolling.getVerticalScrollBar().setUnitIncrement(
-		FlowClient.SCROLL_SPEED);
+	scrolling.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	scrolling.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
 	try {
-	    first = new ImageIcon(ImageIO.read(
-		    new File("images/firstVersion.png")).getScaledInstance(
-		    ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
-	    middle = new ImageIcon(ImageIO.read(
-		    new File("images/middleVersion.png")).getScaledInstance(
-		    ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+	    first = new ImageIcon(ImageIO.read(new File("images/firstVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+	    middle = new ImageIcon(ImageIO.read(new File("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
     }
 
-    public void setFile(FlowFile flowFile) {
-	file = flowFile;
-	updateVersions();
-    }
-
-    private void updateVersions() {
-	removeAll();
-
-	TreeSet<FlowDocument> versions = file.getVersions();
-	Iterator<FlowDocument> versionIterator = versions.iterator();
-
-	while (versionIterator.hasNext()) {
-	    FlowDocument doc = versionIterator.next();
-	    add(new VersionItem(doc, doc.getVersionDate(), 1));
-	}
-
-	revalidate();
-	repaint();
-    }
+//    /**
+//     * @deprecated
+//     * @param flowFile
+//     */
+//    public void setFile(FlowFile flowFile) {
+//	file = flowFile;
+//	updateVersions();
+//    }
+//
+//    /**
+//     * @deprecated
+//     */
+//    private void updateVersions() {
+//	removeAll();
+//
+//	TreeSet<FlowDocument> versions = file.getVersions();
+//	Iterator<FlowDocument> versionIterator = versions.iterator();
+//
+//	while (versionIterator.hasNext()) {
+//	    FlowDocument doc = versionIterator.next();
+//	    add(new VersionItem(doc, doc.getVersionDate(), 1));
+//	}
+//
+//	revalidate();
+//	repaint();
+//    }
 
     class VersionItem extends JPanel {
 
-	public VersionItem(FlowDocument doc, Date date, int position) {
-	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this
-		    .getSize().getWidth() * .9), 80));
-	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this
-		    .getSize().getWidth() * .9), 80));
+	public VersionItem(UUID doc, Date date, int position) {
+	    // TODO all of versioning
+	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
+	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setBorder(FlowClient.EMPTY_BORDER);
@@ -134,20 +132,18 @@ public class VersionViewer extends JPanel {
 
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
-		    VersionViewer.this.setBorder(BorderFactory
-			    .createLineBorder(new Color(0x5C9EB4), 2));
-		    updateVersions();
+		    VersionViewer.this.setBorder(BorderFactory.createLineBorder(new Color(0x5C9EB4), 2));
+//		    updateVersions();
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		    if (e.getButton() == MouseEvent.BUTTON1
-			    && e.getClickCount() == 2) {
-			if (doc instanceof TextDocument) {
-			    EditTabs tabs = historyPane.getEditTabs();
-			    if (tabs != null)
-				tabs.openTab((TextDocument) doc, false);
-			} else if (doc instanceof ArbitraryDocument)
+		    if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+//			if (doc instanceof TextDocument) {
+//			    EditTabs tabs = historyPane.getEditTabs();
+//			    if (tabs != null)
+//				tabs.openTab((TextDocument) doc, false);
+//			} else if (doc instanceof ArbitraryDocument)
 			    try {
 				Desktop.getDesktop().open(new File("blarghs"));
 			    } catch (IOException e1) {

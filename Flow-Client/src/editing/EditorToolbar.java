@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -20,7 +21,7 @@ import javax.swing.JToolBar;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
-import struct.FlowProject;
+import shared.DocTree.ProjectNode;
 
 @SuppressWarnings("serial")
 public class EditorToolbar extends JToolBar {
@@ -64,20 +65,21 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + pane.getDocTree().getActiveProject().toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
 		while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
 		    modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
 
 		Data modifyRequest = new Data("project_modify");
 		modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-		modifyRequest.put("project_uuid", pane.getDocTree().getActiveProject().getProjectUUID());
+		// modifyRequest.put("project_uuid",
+		// pane.getDocTree().getActiveProject().getProjectUUID());
 		modifyRequest.put("session_id", Communicator.getSessionID());
 		modifyRequest.put("new_name", modifiedProjectName);
 		switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 		case "OK":
+		    ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).setName(modifiedProjectName);
 		    JOptionPane.showConfirmDialog(null, "Your project has been succesfully renamed to " + modifiedProjectName + ".", "Project renaming success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-		    pane.getDocTree().getActiveProject().setDirectoryName(modifiedProjectName);
 		    break;
 		case "PROJECT_NAME_INVALID":
 		    JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -96,17 +98,22 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		FlowProject project = pane.getDocTree().getActiveProject();
-		if (project == null) {
+		UUID projectUUID = ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).getProjectUUID();
+		if (projectUUID == null) {
 		    return;
 		}
 		String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion", JOptionPane.WARNING_MESSAGE);
-		if (confirm.equals(project.toString())) {
-		    int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + project.toString() + "?", "Confirm project deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		Data projectRequest = new Data("request_project");
+		projectRequest.put("session_id", Communicator.getSessionID());
+		projectRequest.put("project_uuid", projectUUID);
+		Data project = Communicator.communicate(projectRequest);
+		if (confirm.equals(project.get("project_name", String.class))) {
+		    int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + project.get("project_name", String.class) + "?", "Confirm project deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		    if (confirmation == JOptionPane.YES_OPTION) {
 			Data deleteProjectRequest = new Data("project_modify");
 			deleteProjectRequest.put("project_modify_type", "DELETE_PROJECT");
-			deleteProjectRequest.put("project_uuid", project.getProjectUUID());
+			// deleteProjectRequest.put("project_uuid",
+			// project.getProjectUUID());
 			deleteProjectRequest.put("session_id", Communicator.getSessionID());
 
 			Data reply = Communicator.communicate(deleteProjectRequest);

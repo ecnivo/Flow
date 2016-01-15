@@ -385,6 +385,10 @@ public abstract class DocTree extends JTree {
 	    return dirName;
 	}
 
+	public void setName(String name) {
+	    dirName = name;
+	}
+
 	public DirectoryNode(UUID dir) {
 	    this.directory = dir;
 	    Data requestName = new Data("directory_info");
@@ -428,8 +432,8 @@ public abstract class DocTree extends JTree {
 	public String toString() {
 	    return name;
 	}
-	
-	public String getName(){
+
+	public String getName() {
 	    return name;
 	}
     }

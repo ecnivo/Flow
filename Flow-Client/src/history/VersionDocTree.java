@@ -22,7 +22,7 @@ public class VersionDocTree extends DocTree {
 		if (e.getButton() == MouseEvent.BUTTON1
 			&& e.getClickCount() == 2
 			&& selected instanceof FileNode) {
-		    versionViewer.setFile(((FileNode) selected).getFile());
+//		    versionViewer.setFile(((FileNode) selected).getFile());
 		}
 	    }
 	});
