@@ -2,6 +2,8 @@ package editing;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.UUID;
@@ -10,7 +12,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
@@ -137,7 +138,6 @@ public class EditorDocTree extends DocTree {
 		FileNode selectedNode = (FileNode) getSelectionPath().getLastPathComponent();
 		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedNode.getName() + "?", "Deletion confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.YES_OPTION) {
-		    UUID file = selectedNode.getFileUUID();
 		    Data delFileReq = new Data("file_modify");
 		    // delFileReq.put("project_uuid", ((FlowProject)
 		    // file.getParentDirectory().getRootDirectory()).getProjectUUID());
@@ -166,7 +166,7 @@ public class EditorDocTree extends DocTree {
 	addMouseListener(new MouseListener() {
 
 	    @Override
-	    public void mouseClicked(MouseEvent e) {
+	    public void mouseReleased(MouseEvent e) {
 		// nothing
 	    }
 
@@ -186,7 +186,7 @@ public class EditorDocTree extends DocTree {
 	    }
 
 	    @Override
-	    public void mouseReleased(MouseEvent e) {
+	    public void mouseClicked(MouseEvent e) {
 		TreePath treePath = getPathForRow(getRowForLocation(e.getX(), e.getY()));
 		if (treePath == null) {
 		    return;
@@ -218,6 +218,26 @@ public class EditorDocTree extends DocTree {
 		}
 	    }
 	});
+	addKeyListener(new KeyListener() {
+
+	    @Override
+	    public void keyTyped(KeyEvent e) {
+		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
+		if (selected instanceof FileNode && e.getKeyChar() == KeyEvent.VK_ENTER) {
+		    openFile(((FileNode) selected).getFileUUID(), ((ProjectNode) ((FileNode) selected).getPath()[1]).getProjectUUID());
+		}
+	    }
+
+	    @Override
+	    public void keyReleased(KeyEvent e) {
+		// nothing
+	    }
+
+	    @Override
+	    public void keyPressed(KeyEvent e) {
+		// nothing
+	    }
+	});
     }
 
     private void openFile(UUID fileToOpen, UUID projectUUID) {
@@ -227,9 +247,10 @@ public class EditorDocTree extends DocTree {
 
 	Data documentRequest = new Data("document_request");
 	documentRequest.put("session_id", Communicator.getSessionID());
-	documentRequest.put("doc_uuid", fileToOpen);
+	documentRequest.put("file_uuid", fileToOpen);
 	Data documentData = Communicator.communicate(documentRequest);
 
+	System.out.println("got the data");
 	switch (documentData.get("status", String.class)) {
 	case "OK":
 	    String type = fileData.get("file_type", String.class);
@@ -241,6 +262,7 @@ public class EditorDocTree extends DocTree {
 		// e1.printStackTrace();
 		// }
 	    } else if (type.contains("TEXT")) {
+		System.out.println("is text document");
 		EditTabs tabs = editPane.getEditTabs();
 		if (tabs != null)
 		    tabs.openTab(fileData.get("file_name", String.class), new String(documentRequest.get("file_data", byte[].class)), projectUUID, documentRequest.get("version_uuid", UUID.class), true);

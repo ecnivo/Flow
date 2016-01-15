@@ -29,7 +29,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import message.Data;
@@ -104,33 +104,6 @@ public class CollabsList extends JPanel {
 
 	userListPanel = new JPanel(new GridLayout(0, 1, 2, 3));
 	userListPanel.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth()), Integer.MAX_VALUE));
-	userListPanel.addMouseListener(new MouseListener() {
-
-	    @Override
-	    public void mouseReleased(MouseEvent arg0) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mousePressed(MouseEvent arg0) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent arg0) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseEntered(MouseEvent arg0) {
-		refreshUserList();
-	    }
-
-	    @Override
-	    public void mouseClicked(MouseEvent arg0) {
-		// nothing
-	    }
-	});
 	JScrollPane userListScroll = new JScrollPane(userListPanel);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
 	userListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -143,8 +116,8 @@ public class CollabsList extends JPanel {
 	if (activeSelection == null) {
 	    return;
 	}
-	TreeNode[] path = (TreeNode[]) activeSelection.getPath();
-	if (path.length < 2){
+	DefaultMutableTreeNode[] path = (DefaultMutableTreeNode[]) activeSelection.getPath();
+	if (path.length < 2) {
 	    return;
 	}
 	UUID activeProjectUUID = ((ProjectNode) path[1]).getProjectUUID();

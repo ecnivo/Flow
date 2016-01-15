@@ -170,6 +170,7 @@ public class LoginPane extends JPanel {
 		    case "OK":
 			LoginPane.this.panMan.switchToEditor();
 			Communicator.setSessionID(reply.get("session_id", UUID.class));
+			LoginPane.this.panMan.getEditPane().getDocTree().refreshProjectList();
 			return;
 		    default:
 			return;

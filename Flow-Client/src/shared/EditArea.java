@@ -32,7 +32,7 @@ import network.FileChangeListener;
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private UUID document;
+    private UUID documentUUID;
     private UUID projectUUID;
 
     private Style keywordStyle;
@@ -133,7 +133,7 @@ public class EditArea extends JTextPane {
 		Data documentModify = new Data("text_document_modify");
 		// documentModify.put("project", ((FlowProject)
 		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", document);
+		documentModify.put("document", documentUUID);
 		documentModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
@@ -169,7 +169,7 @@ public class EditArea extends JTextPane {
 		Data documentModify = new Data("text_document_modify");
 		// documentModify.put("project", ((FlowProject)
 		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", document);
+		documentModify.put("document", documentUUID);
 		documentModify.put("mod_type", "DELETE");
 
 		int lastNewLine;
@@ -215,25 +215,26 @@ public class EditArea extends JTextPane {
 
 		String text = getText();
 		int ln = 0;
-		int charPos = 0;
+		int posOfChange = 0;
 		while (ln < line) {
-		    if (text.charAt(charPos) == '\n') {
+		    if (text.charAt(posOfChange) == '\n') {
 			ln++;
 		    }
-		    charPos++;
+		    posOfChange++;
 		}
+		posOfChange += idx;
 
 		if (event.getModificationType() == DocumentModificationType.INSERT) {
 		    String addition = event.getAddition();
 		    try {
-			doc.insertString(charPos, addition, null);
+			doc.insertString(posOfChange, addition, null);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
 		    }
 		} else if (event.getModificationType() == DocumentModificationType.DELETE) {
 		    int length = event.getLength();
 		    try {
-			doc.remove(charPos, length);
+			doc.remove(posOfChange, length);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
 		    }
@@ -241,11 +242,12 @@ public class EditArea extends JTextPane {
 	    }
 
 	};
+	Communicator.addFileChangeListener(fileChangeListener, documentUUID);
 	highlightSyntax();
     }
 
     public UUID getTextDocumentUUID() {
-	return document;
+	return documentUUID;
     }
 
     public JScrollPane getScrollPane() {

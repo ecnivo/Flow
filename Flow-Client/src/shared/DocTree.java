@@ -51,15 +51,6 @@ public abstract class DocTree extends JTree {
 	    public void mouseClicked(MouseEvent e) {
 		if (e.isAltDown())
 		    refreshProjectList();
-		// else if (e.isShiftDown()) {
-		// DefaultMutableTreeNode root = (DefaultMutableTreeNode)
-		// model.getRoot();
-		// System.out.println(root);
-		// root.removeAllChildren();
-		// model.reload();
-		// revalidate();
-		// repaint();
-		// }
 	    }
 	});
 	addTreeSelectionListener(new TreeSelectionListener() {
@@ -72,24 +63,8 @@ public abstract class DocTree extends JTree {
 
 		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 
-		// if (selected instanceof ProjectNode) {
-		// setActiveProject(((ProjectNode) selected).getProject());
-		// setActiveDirectoryNode((ProjectNode) selected);
-		// } else if (selected instanceof DirectoryNode) {
-		// setActiveProject(((FlowProject) ((DirectoryNode)
-		// selected).getDirectory().getRootDirectory()));
-		// setActiveDirectoryNode((DirectoryNode) selected);
-		// } else if (selected instanceof FileNode) {
-		// FileNode fileNode = (FileNode) selected;
-		// setActiveProject((FlowProject)
-		// fileNode.getFile().getParentDirectory().getRootDirectory());
-		// setActiveDirectoryNode((DirectoryNode) ((FileNode)
-		// selected).getParent());
-		// setActiveFileNode(fileNode);
-		// } else {
 		if (((DefaultMutableTreeNode) selected).getChildCount() == 0 && !(selected instanceof ProjectNode) && !(selected instanceof DirectoryNode) && !(selected instanceof FileNode)) {
 		    refreshProjectList();
-		    // }
 
 		}
 	    }
@@ -99,30 +74,6 @@ public abstract class DocTree extends JTree {
     public JScrollPane getScrollable() {
 	return scrollView;
     }
-
-    // public UUID getActiveProject() {
-    // return activeProject;
-    // }
-    //
-    // public void setActiveProject(UUID newActive) {
-    // activeProject = newActive;
-    // }
-    //
-    // public FileNode getActiveFileNode() {
-    // return activeFileNode;
-    // }
-    //
-    // public void setActiveFileNode(FileNode activeFileNode) {
-    // this.activeFileNode = activeFileNode;
-    // }
-    //
-    // public DirectoryNode getActiveDirectoryNode() {
-    // return activeDirectoryNode;
-    // }
-    //
-    // public void setActiveDirectoryNode(DirectoryNode activeDirectoryNode) {
-    // this.activeDirectoryNode = activeDirectoryNode;
-    // }
 
     public void refreshProjectList() {
 	if (!FlowClient.NETWORK) {
@@ -190,7 +141,6 @@ public abstract class DocTree extends JTree {
 	// adds folders
 	UUID[] childDirs = remoteDir.get("child_directories", UUID[].class);
 	if (childDirs.length > 0) {
-	    System.out.println("HI");
 	    for (UUID childDirUUID : childDirs) {
 		Data childDirNameRequest = new Data("directory_info");
 		childDirNameRequest.put("session_id", Communicator.getSessionID());
@@ -285,6 +235,7 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
+	System.out.println(localNode.name + " has " + remoteChildDirs.length + " children directories");
 	for (UUID remoteDir : remoteChildDirs) {
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;

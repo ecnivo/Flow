@@ -93,6 +93,10 @@ public class PanelManager extends JPanel {
 	revalidate();
 	repaint();
     }
+    
+    public EditPane getEditPane(){
+	return editPane;
+    }
 
     public LoginPane getLoginPane() {
 	return loginPane;
@@ -100,6 +104,8 @@ public class PanelManager extends JPanel {
 
     public void resetUI() {
 	((DefaultMutableTreeNode) ((DefaultTreeModel) editPane.getDocTree().getModel()).getRoot()).removeAllChildren();
+	editPane.getDocTree().revalidate();
+	editPane.getDocTree().repaint();
 	((DefaultMutableTreeNode) ((DefaultTreeModel) historyPane.getTree().getModel()).getRoot()).removeAllChildren();
 	editTabs = new EditTabs();
     }
