@@ -492,7 +492,7 @@ public class SQLDatabase {
 			} else {
 				// Throw an exception in this case because the server expects to
 				// use the found file, this prevents a '!=null' check
-				throw new DatabaseException("DOCUMENT_NAME_INVALID");
+				throw new DatabaseException("INVALID_FILE_UUID");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch blocks
@@ -811,6 +811,16 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Get all available versions of the specified file.
+	 * 
+	 * @param fileUUID
+	 *            the String representation of the UUID of the file.
+	 * @return array containing the string representations of the UUIDs of the
+	 *         versions.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
 	public String[] getFileVersions(String fileUUID) throws DatabaseException {
 		try {
 			ResultSet response = this.query(String.format(
@@ -824,6 +834,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Retrieve all associated information with the specified version UUID.
+	 * 
+	 * @param versionUUID
+	 *            the String representation of the UUID of the version.
+	 * @return All associated information from columns: 'VersionID', 'Date', and
+	 *         'DocumentID'
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database or the version
+	 *             doesn't exist.
+	 */
 	public ResultSet getVersionInfo(String versionUUID)
 			throws DatabaseException {
 		try {
@@ -832,18 +853,29 @@ public class SQLDatabase {
 					versionUUID));
 			if (response.next())
 				return response;
+			throw new DatabaseException("INVALID_VERSION_UUID");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
-		return null;
 	}
 
-	public int getDate(String versionUUID) throws DatabaseException {
+	/**
+	 * Retrieve save date of the specified version.
+	 * 
+	 * @param versionUUID
+	 *            the String representation of the UUID of the version.
+	 * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT,
+	 *         for when the version was created.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database or the version
+	 *             doesn't exist.
+	 */
+	public long getDate(String versionUUID) throws DatabaseException {
 		ResultSet response = this.getVersionInfo(versionUUID);
 		try {
-			return response.getInt("Date");
+			return response.getLong("Date");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -873,6 +905,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Retrieves UUID of the latest version of the specified document.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file.
+	 * @return the string representation of the UUID of the latest version of
+	 *         the specified file.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database or the file
+	 *             doesn't exist in the database.
+	 */
 	public String getLatestVersionUUID(String fileUUID)
 			throws DatabaseException {
 		ResultSet response;
@@ -897,11 +940,11 @@ public class SQLDatabase {
 	 * @param fileUUID
 	 *            the string representation of the UUID of the file.
 	 * @param versionUUID
-	 * @return
-	 * @throws DatabaseException
+	 *            the string representation of the UUID of the version.
+	 * @return the status of the request, either 'OK' or
+	 *         {@link FlowServer#ERROR}
 	 */
-	public String newVersion(String fileUUID, String versionUUID)
-			throws DatabaseException {
+	public String newVersion(String fileUUID, String versionUUID) {
 		try {
 			this.update(String.format(
 					"INSERT INTO Versions VALUES('%s', '%d', '%s');",
