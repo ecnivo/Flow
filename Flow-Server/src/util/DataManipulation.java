@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class DataModification {
+public class DataManipulation {
 
 	/**
 	 * Returns the path to a directory, including the project folder.

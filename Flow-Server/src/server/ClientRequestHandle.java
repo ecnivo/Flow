@@ -13,7 +13,7 @@ import message.Data;
 import network.DataSocket;
 import struct.TextDocument;
 import struct.User;
-import util.DataModification;
+import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 
@@ -313,7 +313,7 @@ public class ClientRequestHandle implements Runnable {
 					results = this.database
 							.getFilesInDirectory(directoryUUID.toString());
 					returnData.put("child_files",
-							DataModification.getUUIDsFromArray(Results
+							DataManipulation.getUUIDsFromArray(Results
 									.toStringArray("DocumentID", results)));
 
 					// Add information from all sub directories located inside
@@ -321,7 +321,7 @@ public class ClientRequestHandle implements Runnable {
 					results = this.database.getDirectoriesInDirectory(
 							directoryUUID.toString());
 					returnData.put("child_directories",
-							DataModification.getUUIDsFromArray(Results
+							DataManipulation.getUUIDsFromArray(Results
 									.toStringArray("DirectoryID", results)));
 
 					// If no exceptions were thrown up to this point, no errors
@@ -350,7 +350,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("file_type",
 							results.getString("DocumentType"));
 					returnData.put("file_versions",
-							DataModification.getUUIDsFromArray(this.database
+							DataManipulation.getUUIDsFromArray(this.database
 									.getFileVersions(fileUUID.toString())));
 					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
