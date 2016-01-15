@@ -1,12 +1,17 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
+import java.util.UUID;
+
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
-
-import java.sql.*;
-import java.util.Date;
-import java.util.UUID;
 
 public class SQLDatabase {
 
@@ -145,7 +150,8 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	public ResultSet getFilesInProject(String projectId) throws DatabaseException {
+	public ResultSet getFilesInProject(String projectId)
+			throws DatabaseException {
 		synchronized (this) {
 			try {
 				// TODO Add check if for project is exists
@@ -872,7 +878,7 @@ public class SQLDatabase {
 					fileUUID));
 			if (response.next())
 				return response.getString("FileID");
-			throw new DatabaseException("INVALID_FILE_ID");
+			throw new DatabaseException("INVALID_FILE_UUID");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
