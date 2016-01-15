@@ -191,17 +191,23 @@ public class ClientRequestHandle implements Runnable {
 				UUID parentDirectoryUUID = data.get("parent_directory_uuid",
 						UUID.class);
 				UUID sessionID = data.get("session_id", UUID.class);
-//				if (this.database.verifyPermissions(sessionID.toString(),
-//						projectUUID.toString())) {
-					UUID random = UUID.randomUUID();
-					String status = this.database.newDirectory(
-							data.get("directory_name", String.class),
-							random.toString(), projectUUID.toString(),
-							parentDirectoryUUID.toString());
-					returnData.put("status", status);
-//				} else {
-//					returnData.put("status", "INVALID_SESSION");
-//				}
+				try {
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString())) {
+						UUID random = UUID.randomUUID();
+						String status = this.database.newDirectory(
+								data.get("directory_name", String.class),
+								random.toString(), projectUUID.toString(),
+								parentDirectoryUUID.toString());
+						returnData.put("status", status);
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
 			}
 				break;
 			case "project_modify":
