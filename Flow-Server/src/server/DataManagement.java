@@ -192,4 +192,20 @@ public class DataManagement {
         }
         return td;
     }
+
+    public byte[] getArbitraryFileBytes(UUID fileUUID, UUID versionUUID) {
+        L.info("getting arbitrary document of uuid " + versionUUID + " of file" + fileUUID);
+        File textFile = new File(new File(fileDir, fileUUID.toString()),
+                versionUUID + "." + TEXT_FILE_EXT);
+        if (!textFile.exists())
+            return null;
+        try {
+            FileInputStream fis = new FileInputStream(textFile);
+            byte[] buffer = new byte[(int) textFile.length()];
+            fis.read(buffer);
+            return buffer;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

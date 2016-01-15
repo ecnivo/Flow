@@ -1,13 +1,5 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -16,6 +8,14 @@ import struct.User;
 import util.DataModification;
 import util.DatabaseException;
 import util.Results;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -353,7 +353,7 @@ public class ClientRequestHandle implements Runnable {
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
-
+						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -377,7 +377,7 @@ public class ClientRequestHandle implements Runnable {
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
-
+						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					data.put("file_data", bytes);
 				} catch (DatabaseException e) {
