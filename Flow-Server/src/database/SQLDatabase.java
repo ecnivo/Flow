@@ -601,7 +601,19 @@ public class SQLDatabase {
 			this.update(String.format(
 					"DELETE FROM documents WHERE ParentDirectoryID = '%s';",
 					directoryUUID));
-			// TOOD Cycle through all child directories and delete files
+			try {
+				ResultSet subDirectories = this
+						.getDirectoriesInDirectory(directoryUUID);
+
+				// Recursively delete all sub directories and files
+				while (subDirectories.next()) {
+					this.deleteDirectory(
+							subDirectories.getString("DirectoryID"));
+				}
+			} catch (DatabaseException e) {
+				e.printStackTrace();
+				return e.getMessage();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
