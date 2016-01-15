@@ -32,7 +32,7 @@ public class CreateAccountPane extends JPanel {
     private PanelManager manager;
     private JPasswordField passwordConfirm;
 
-    public final static char[] INVALID_CHARS = { '\\', '/', '?', '%', '*', ':', '|', '"', '<', '>', '.', '#', '&', '{', '}', '$', '@', '=', '`', '+' };
+    public final static char[] INVALID_CHARS = { '\\', '/', '?', '%', '*', ':', '|', '"', '<', '>', '#', '&', '{', '}', '$', '@', '=', '`', '+' };
 
     public CreateAccountPane(PanelManager manager) {
 	setBackground(Color.WHITE);
