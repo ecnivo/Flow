@@ -304,6 +304,30 @@ public class SQLDatabase {
 	}
 
 	/**
+	 * Creates a new version of the specified file with the specified version
+	 * UUID.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file.
+	 * @param versionUUID
+	 *            the string representation of the UUID of the version.
+	 * @return the status of the request, either 'OK' or
+	 *         {@link FlowServer#ERROR}
+	 */
+	public String newVersion(String fileUUID, String versionUUID) {
+		try {
+			this.update(String.format(
+					"INSERT INTO Versions VALUES('%s', '%d', '%s');",
+					versionUUID, new Date().getTime(), fileUUID));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
+	}
+
+	/**
 	 * Getter for all of the usernames in the database.
 	 *
 	 * @return all of the usernames in the database.
@@ -500,6 +524,54 @@ public class SQLDatabase {
 		}
 		// Throw an exception in this case because the server expects to use
 		// the found file, this prevents a '!=null' check
+		throw new DatabaseException(FlowServer.ERROR);
+	}
+
+	/**
+	 * Retrieves all associated info with the specified ProjectID.
+	 *
+	 * @param projectUUID
+	 *            the {@link UUID#toString toString} of the UUID of the project.
+	 * @return all associated information from the projects table.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public ResultSet getProjectInfo(String projectUUID)
+			throws DatabaseException {
+		try {
+			ResultSet info = this.query(String.format(
+					"SELECT * FROM projects WHERE ProjectID = '%s';",
+					projectUUID));
+			if (info.next())
+				return info;
+			throw new DatabaseException("PROJECT_NOT_FOUND");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	/**
+	 * Retrieves all associated info with the specified ProjectID.
+	 *
+	 * @param directoryId
+	 *            the {@link UUID#toString toString} of the UUID of the
+	 *            directory.
+	 * @return all associated information from the directories table.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public ResultSet getDirectoryInfo(String directoryId)
+			throws DatabaseException {
+		try {
+			ResultSet temp = this.query(String.format(
+					"SELECT * FROM directories WHERE DirectoryID = '%s';",
+					directoryId));
+			if (temp.next())
+				return temp;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		throw new DatabaseException(FlowServer.ERROR);
 	}
 
@@ -812,53 +884,6 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Retrieves all associated info with the specified ProjectID.
-	 *
-	 * @param projectUUID
-	 *            the {@link UUID#toString toString} of the UUID of the project.
-	 * @return all associated information from the projects table.
-	 * @throws DatabaseException
-	 *             if there is an error accessing the database.
-	 */
-	public ResultSet getProjectInfo(String projectUUID) throws DatabaseException {
-		try {
-			ResultSet info = this.query(String.format(
-					"SELECT * FROM projects WHERE ProjectID = '%s';",
-					projectUUID));
-			if (info.next())
-				return info;
-			throw new DatabaseException("PROJECT_NOT_FOUND");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new DatabaseException(FlowServer.ERROR);
-		}
-	}
-
-	/**
-	 * Retrieves all associated info with the specified ProjectID.
-	 *
-	 * @param directoryId
-	 *            the {@link UUID#toString toString} of the UUID of the
-	 *            directory.
-	 * @return all associated information from the directories table.
-	 * @throws DatabaseException
-	 *             if there is an error accessing the database.
-	 */
-	public ResultSet getDirectoryInfo(String directoryId)
-			throws DatabaseException {
-		try {
-			ResultSet temp = this.query(String.format(
-					"SELECT * FROM directories WHERE DirectoryID = '%s';",
-					directoryId));
-			if (temp.next())
-				return temp;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		throw new DatabaseException(FlowServer.ERROR);
-	}
-
-	/**
 	 * Retrieves the username associated with the specified session ID.
 	 *
 	 * @param sessionID
@@ -1053,29 +1078,5 @@ public class SQLDatabase {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
-	}
-
-	/**
-	 * Creates a new version of the specified file with the specified version
-	 * UUID.
-	 * 
-	 * @param fileUUID
-	 *            the string representation of the UUID of the file.
-	 * @param versionUUID
-	 *            the string representation of the UUID of the version.
-	 * @return the status of the request, either 'OK' or
-	 *         {@link FlowServer#ERROR}
-	 */
-	public String newVersion(String fileUUID, String versionUUID) {
-		try {
-			this.update(String.format(
-					"INSERT INTO Versions VALUES('%s', '%d', '%s');",
-					versionUUID, new Date().getTime(), fileUUID));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return FlowServer.ERROR;
-		}
-		return "OK";
 	}
 }
