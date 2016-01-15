@@ -66,6 +66,12 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 				}
 				break;
+			case "end_session":
+				// TODO Deregister all associated listeners
+				// TODO Call whatever code NETDEX has for this
+				this.database.removeSession(
+						data.get("session_id", UUID.class).toString());
+				break;
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
@@ -163,6 +169,33 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				break;
+			case "new_textdocument": {
+				UUID projectUUID = data.get("project_uuid", UUID.class);
+				UUID directoryUUID = data.get("directory_uuid", UUID.class);
+				String documentName = data.get("document_name", String.class);
+				UUID fileUUID = UUID.randomUUID();
+				UUID versionUUID = UUID.randomUUID();
+				// TODO add the version to the database
+				this.database.newFile(fileUUID.toString(), documentName,
+						projectUUID.toString(), directoryUUID.toString(),
+						"TEXT_DOCUMENT");
+				TextDocument newTextDocument = new TextDocument();
+				DataManagement.getInstance().addTextDocumentVersion(fileUUID,
+						versionUUID, newTextDocument);
+			}
+				break;
+			case "new_directory": {
+				UUID projectUUID = data.get("project_uuid", UUID.class);
+				UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+						UUID.class);
+				UUID random = UUID.randomUUID();
+				String status = this.database.newDirectory(
+						data.get("directory_name", String.class),
+						random.toString(), projectUUID.toString(),
+						parentDirectoryUUID.toString());
+				returnData.put("status", status);
+			}
+				break;
 			case "project_modify":
 				String projectId = data.get("project_uuid", UUID.class)
 						.toString();
@@ -215,31 +248,26 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "new_textdocument": {
-				UUID projectUUID = data.get("project_uuid", UUID.class);
-				UUID directoryUUID = data.get("directory_uuid", UUID.class);
-				String documentName = data.get("document_name", String.class);
-				UUID fileUUID = UUID.randomUUID();
-				UUID versionUUID = UUID.randomUUID();
-				// TODO add the version to the database
-				this.database.newFile(fileUUID.toString(), documentName,
-						projectUUID.toString(), directoryUUID.toString(),
-						"TEXT_DOCUMENT");
-				TextDocument newTextDocument = new TextDocument();
-				DataManagement.getInstance().addTextDocumentVersion(fileUUID,
-						versionUUID, newTextDocument);
-			}
-				break;
-			case "new_directory": {
-				UUID projectUUID = data.get("project_uuid", UUID.class);
-				UUID parentDirectoryUUID = data.get("parent_directory_uuid",
-						UUID.class);
-				UUID random = UUID.randomUUID();
-				String status = this.database.newDirectory(
-						data.get("directory_name", String.class),
-						random.toString(), projectUUID.toString(),
-						parentDirectoryUUID.toString());
-				returnData.put("status", status);
+			case "file_modify": {
+				UUID fileUUID = data.get("file_uuid", UUID.class);
+				String modType = data.get("mod_type", String.class);
+				try {
+					String fileType = this.database
+							.getFileType(fileUUID.toString());
+					switch (modType) {
+					case "RENAME":
+						// TODO rename in Bimesh's code
+						break;
+					case "DELETE":
+						// TODO delete in Bimesh's code
+						DataManagement.getInstance().removeFileByUUID(fileUUID);
+						break;
+					}
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					L.severe(e.getMessage());
+					returnData.put("status", FlowServer.ERROR);
+				}
 			}
 				break;
 			case "project_info":
@@ -335,28 +363,6 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
-			case "file_modify": {
-				UUID fileUUID = data.get("file_uuid", UUID.class);
-				String modType = data.get("mod_type", String.class);
-				try {
-					String fileType = this.database
-							.getFileType(fileUUID.toString());
-					switch (modType) {
-					case "RENAME":
-						// TODO rename in Bimesh's code
-						break;
-					case "DELETE":
-						// TODO delete in Bimesh's code
-						DataManagement.getInstance().removeFileByUUID(fileUUID);
-						break;
-					}
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-					L.severe(e.getMessage());
-					returnData.put("status", FlowServer.ERROR);
-				}
-			}
-				break;
 			case "request_version": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				UUID versionUUID = data.get("version_uuid", UUID.class);
@@ -415,12 +421,6 @@ public class ClientRequestHandle implements Runnable {
 				case "DELETE":
 					break;
 				}
-				break;
-			case "end_session":
-				// TODO Deregister all associated listeners
-				// TODO Call whatever code NETDEX has for this
-				this.database.removeSession(
-						data.get("session_id", UUID.class).toString());
 				break;
 			default:
 				// For completeness's sake
