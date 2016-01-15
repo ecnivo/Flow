@@ -63,7 +63,7 @@ public class EditArea extends JTextPane {
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
 
-	Data editorListRequest = new Data("request_project");
+	Data editorListRequest = new Data("project_info");
 	editorListRequest.put("project_uuid", projectUUID);
 	String[] editors = Communicator.communicate(editorListRequest).get("editors", String[].class);
 	for (String editor : editors) {

@@ -65,7 +65,7 @@ public class EditorToolbar extends JToolBar {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
+		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + ((ProjectNode) pane.getDocTree().getSelectionPath().getPath()[1]).getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
 		while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
 		    modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();
 		}
@@ -103,7 +103,7 @@ public class EditorToolbar extends JToolBar {
 		    return;
 		}
 		String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion", JOptionPane.WARNING_MESSAGE);
-		Data projectRequest = new Data("request_project");
+		Data projectRequest = new Data("project_info");
 		projectRequest.put("session_id", Communicator.getSessionID());
 		projectRequest.put("project_uuid", projectUUID);
 		Data project = Communicator.communicate(projectRequest);
