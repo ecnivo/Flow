@@ -355,10 +355,12 @@ public class ClientRequestHandle implements Runnable {
 					} else {
 						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
 					}
+					data.put("file_data", bytes);
+					data.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
+					data.put("status", e.getMessage());
 				}
-				data.put("file_data", bytes);
 			}
 				break;
 			case "document_request":
@@ -380,6 +382,7 @@ public class ClientRequestHandle implements Runnable {
 						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					data.put("file_data", bytes);
+					data.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
