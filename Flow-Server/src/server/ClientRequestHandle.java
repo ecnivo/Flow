@@ -1,13 +1,5 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -16,6 +8,14 @@ import struct.User;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -427,12 +427,30 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX
-			case "textdocument_modify":
-				switch (data.get("doc_type", String.class)) {
-				case "INSERT":
-					break;
-				case "DELETE":
-					break;
+				case "text_document_modify":
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					UUID fileUUID = data.get("file_uuid", UUID.class);
+					int line = data.get("line", Integer.class);
+					int idx = data.get("idx", Integer.class);
+
+					try {
+						UUID latestVersionUUID = UUID.fromString(this.database.getLatestVersionUUID(fileUUID.toString()));
+						TextDocument td = DataManagement.getInstance().getTextDocument(fileUUID, latestVersionUUID);
+						switch (data.get("mod_type", String.class)) {
+							case "INSERT":
+								String str = data.get("str", String.class);
+								for (char c : str.toCharArray()) {
+									td.insert(c, line, idx--);
+								}
+								break;
+							case "DELETE":
+								int len = data.get("len", Integer.class);
+								while (len-- > 0)
+									td.delete(line, idx);
+								break;
+						}
+					} catch (DatabaseException e) {
+
 				}
 				break;
 			default:

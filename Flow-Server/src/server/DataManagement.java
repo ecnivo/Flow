@@ -103,8 +103,6 @@ public class DataManagement {
     public boolean addTextDocumentVersion(UUID fileUUID, UUID versionUUID, TextDocument textDoc) {
         L.info("adding text document of uuid " + versionUUID + " of file " + fileUUID);
         File textFile = new File(new File(fileDir, fileUUID.toString()), versionUUID + "." + TEXT_FILE_EXT);
-        if (textFile.exists())
-            return false;
         textFile.getParentFile().mkdirs();
         try {
             PrintStream ps = new PrintStream(textFile);
