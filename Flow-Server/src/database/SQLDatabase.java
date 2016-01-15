@@ -1,17 +1,12 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.UUID;
-
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
+
+import java.sql.*;
+import java.util.Date;
+import java.util.UUID;
 
 public class SQLDatabase {
 
@@ -150,7 +145,7 @@ public class SQLDatabase {
 	 *            the ID of the project.
 	 * @return all associated files.
 	 */
-	public ResultSet getFiles(String projectId) throws DatabaseException {
+	public ResultSet getFilesInProject(String projectId) throws DatabaseException {
 		synchronized (this) {
 			try {
 				// TODO Add check if for project is exists
@@ -170,13 +165,11 @@ public class SQLDatabase {
 	/**
 	 * Getter for all files inside the specified directory.
 	 *
-	 * @param projectUUID
-	 *            the UUID of the project in String form.
 	 * @param directoryUUID
 	 *            the UUID of the directory in String form.
 	 * @return all associated files.
 	 */
-	public ResultSet getFiles(String projectUUID, String directoryUUID)
+	public ResultSet getFilesInDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
 			// TODO Add check if for project is exists
@@ -195,13 +188,11 @@ public class SQLDatabase {
 	/**
 	 * Getter for all directories inside the specified directory.
 	 *
-	 * @param projectUUID
-	 *            the UUID of the project in String form.
 	 * @param directoryUUID
 	 *            the UUID of the directory in String form.
 	 * @return all associated files.
 	 */
-	public ResultSet getDirectories(String projectUUID, String directoryUUID)
+	public ResultSet getDirectoriesInDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
 			// TODO Add check if for project is exists

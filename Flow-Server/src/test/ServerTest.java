@@ -7,6 +7,7 @@ import server.FlowServer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -20,27 +21,53 @@ public class ServerTest {
         READS FROM STANDARD INPUT, AND WRITES TO LOCAL SERVER ON NETWORK.
 
         SYNTAX:
+        send
         key1=value1;key2=value2;key3=$uuid1
         ALL ARGUMENTS ARE STRINGS UNLESS PRECEEDED BY A $, WHERE IT BECOMES A UUID.
 
         EX.
+        send
         type=list_projects;session_id=$3ca58930-967d-437f-8f0f-3ac5eee4429b
+
+        set
+        variable_name=VALUE
          */
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         FMLNetworker fmlNetworker = new FMLNetworker("localhost", FlowServer.PORT);
+        HashMap<String, String> variables = new HashMap<>();
         while (true) {
-            String dataStr = br.readLine();
-            Data data = new Data();
-            String[] dataInParse = dataStr.split(";");
-            for (String flag : dataInParse) {
-                String[] flagInParse = flag.split("=");
-                String key = flagInParse[0];
-                Serializable val = flagInParse[1];
-                if (flagInParse[1].startsWith("$"))
-                    val = UUID.fromString(flagInParse[1].substring(1));
-                data.put(key, val);
+            String cmd = br.readLine();
+            switch (cmd) {
+                case "send":
+                    String dataStr = br.readLine();
+                    for (String key : variables.keySet()) {
+                        dataStr = dataStr.replace("%" + key + "%", variables.get(key));
+                    }
+                    Data data = new Data();
+                    String[] dataInParse = dataStr.split(";");
+                    for (String flag : dataInParse) {
+                        String[] parsedFlags = flag.split("=");
+
+                        String key = parsedFlags[0];
+                        String value = parsedFlags[1];
+
+                        Serializable val;
+                        if (value.startsWith("$"))
+                            val = UUID.fromString(parsedFlags[1].substring(1));
+                        else
+                            val = parsedFlags[1];
+                        data.put(key, val);
+                    }
+                    fmlNetworker.send(data);
+                    break;
+                case "set":
+                    String varStr = br.readLine();
+                    String[] parsedVar = varStr.split("=");
+                    variables.put(parsedVar[0], parsedVar[1]);
+                    System.err.println(parsedVar[0] + " set to " + parsedVar[1]);
+                    break;
             }
-            fmlNetworker.send(data);
+
         }
     }
 }

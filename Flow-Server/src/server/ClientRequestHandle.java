@@ -251,9 +251,8 @@ public class ClientRequestHandle implements Runnable {
                 case "directory_info":
                     try {
                         // Load the required data from the data packet
-                        UUID projectUUID = data.get("project_uuid", UUID.class),
-                                directoryUUID = data.get("directory_uuid",
-                                        UUID.class);
+                        UUID directoryUUID = data.get("directory_uuid",
+                                UUID.class);
 
                         // Add information from the Directories table
                         ResultSet results = this.database
@@ -265,16 +264,14 @@ public class ClientRequestHandle implements Runnable {
 
                         // Add information from all documents located in the
                         // specified directory
-                        results = this.database.getFiles(projectUUID.toString(),
-                                directoryUUID.toString());
+                        results = this.database.getFilesInDirectory(directoryUUID.toString());
                         returnData.put("child_files",
                                 DataModification.getUUIDsFromArray(Results
                                         .toStringArray("DocumentID", results)));
 
                         // Add information from all sub directories located inside
                         // the specified directory
-                        results = this.database.getDirectories(
-                                projectUUID.toString(), directoryUUID.toString());
+                        results = this.database.getDirectoriesInDirectory(directoryUUID.toString());
                         returnData.put("child_directories",
                                 DataModification.getUUIDsFromArray(Results
                                         .toStringArray("DirectoryID", results)));
@@ -355,70 +352,70 @@ public class ClientRequestHandle implements Runnable {
                             bytes = doc.getDocumentText().getBytes();
                         } else {
 
-					}
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-				}
-				data.put("file_data", bytes);
-			}
-				break;
-			case "document_request":
-				try {
-					UUID fileUUID = data.get("file_uuid", UUID.class);
-					UUID versionUUID = UUID.fromString(this.database
-							.getLatestVersionUUID(fileUUID.toString()));
+                        }
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                    data.put("file_data", bytes);
+                }
+                break;
+                case "document_request":
+                    try {
+                        UUID fileUUID = data.get("file_uuid", UUID.class);
+                        UUID versionUUID = UUID.fromString(this.database
+                                .getLatestVersionUUID(fileUUID.toString()));
 
-					returnData.put("version_uuid", versionUUID);
-					byte[] bytes = null;
+                        returnData.put("version_uuid", versionUUID);
+                        byte[] bytes = null;
 
-					String fileType = this.database
-							.getFileType(fileUUID.toString());
-					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
-						TextDocument doc = DataManagement.getInstance()
-								.getTextDocument(fileUUID, versionUUID);
-						bytes = doc.getDocumentText().getBytes();
-					} else {
+                        String fileType = this.database
+                                .getFileType(fileUUID.toString());
+                        if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
+                            TextDocument doc = DataManagement.getInstance()
+                                    .getTextDocument(fileUUID, versionUUID);
+                            bytes = doc.getDocumentText().getBytes();
+                        } else {
 
-					}
-					data.put("file_data", bytes);
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-					returnData.put("status", e.getMessage());
-				}
-				break;
-			// TODO Implement sending messages to active sessions on changes
-			// ^-- NETDEX
-			case "document_modify":
-				switch (data.get("doc_type", String.class)) {
-				case "INSERT":
-					break;
-				case "DELETE":
-					break;
-				}
-				break;
-			case "end_session":
-				// TODO Deregister all associated listeners
-				// TODO Call whatever code NETDEX has for this
-				this.database.removeSession(
-						data.get("session_id", UUID.class).toString());
-				break;
-			default:
-				// For completeness's sake
-				returnData.put("status", "INVALID_REQUEST_TYPE");
-				break;
-			}
-			this.psocket.send(returnData);
-			L.info("response: " + returnData.toString());
-		} catch (IOException e) {
-			L.warning("communication error: " + e.getMessage());
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			L.warning("ClassNotFoundException error: " + e.getMessage());
-			e.printStackTrace();
-		} // catch (Exception e) {
-			// // TODO REMOVE THIS and catch individual exceptions
-			// L.severe("Internal Server Error: " + e.getMessage());
-			// }
+                        }
+                        data.put("file_data", bytes);
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                        returnData.put("status", e.getMessage());
+                    }
+                    break;
+                // TODO Implement sending messages to active sessions on changes
+                // ^-- NETDEX
+                case "document_modify":
+                    switch (data.get("doc_type", String.class)) {
+                        case "INSERT":
+                            break;
+                        case "DELETE":
+                            break;
+                    }
+                    break;
+                case "end_session":
+                    // TODO Deregister all associated listeners
+                    // TODO Call whatever code NETDEX has for this
+                    this.database.removeSession(
+                            data.get("session_id", UUID.class).toString());
+                    break;
+                default:
+                    // For completeness's sake
+                    returnData.put("status", "INVALID_REQUEST_TYPE");
+                    break;
+            }
+            this.psocket.send(returnData);
+            L.info("response: " + returnData.toString());
+        } catch (IOException e) {
+            L.warning("communication error: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            L.warning("ClassNotFoundException error: " + e.getMessage());
+            e.printStackTrace();
+        } // catch (Exception e) {
+        // // TODO REMOVE THIS and catch individual exceptions
+        // L.severe("Internal Server Error: " + e.getMessage());
+        // }
 
         try {
             socket.close();
