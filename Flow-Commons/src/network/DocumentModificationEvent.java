@@ -4,7 +4,7 @@ package network;
  * Created by Netdex on 1/15/2016.
  */
 public class DocumentModificationEvent {
-    static enum DocumentModificationType {
+    public static enum DocumentModificationType {
         INSERT,
         DELETE
     }
