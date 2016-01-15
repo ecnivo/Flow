@@ -4,15 +4,9 @@ import message.Data;
 import network.FMLNetworker;
 import server.FlowServer;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
-
-import message.Data;
-import network.FMLNetworker;
-import server.FlowServer;
 
 /**
  * Created by Netdex on 1/14/2016.
@@ -58,7 +52,13 @@ public class ServerTest {
                         Serializable val;
                         if (value.startsWith("$"))
                             val = UUID.fromString(parsedFlags[1].substring(1));
-                        else
+                        else if (value.startsWith("\\")) {
+                            File f = new File(parsedFlags[1].substring(1));
+                            FileInputStream fis = new FileInputStream(f);
+                            byte[] buf = new byte[(int) f.length()];
+                            fis.read(buf);
+                            val = buf;
+                        } else
                             val = parsedFlags[1];
                         data.put(key, val);
                     }
