@@ -1,6 +1,7 @@
 package message;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -75,6 +76,15 @@ public class Data implements Serializable {
 
     @Override
     public String toString() {
-        return stringObjectHashMap.toString();
+        String str = "";
+        for (String key : stringObjectHashMap.keySet()) {
+            if (stringObjectHashMap.get(key) instanceof Object[]) {
+                str += key + "=" + Arrays.toString((Object[]) stringObjectHashMap.get(key));
+            } else {
+                str += key + "=" + stringObjectHashMap.get(key).toString();
+            }
+            str += ", ";
+        }
+        return "{" + str.substring(0, str.length() - 2) + "}";
     }
 }

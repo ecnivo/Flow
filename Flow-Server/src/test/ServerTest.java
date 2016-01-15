@@ -15,6 +15,17 @@ import java.util.UUID;
 public class ServerTest {
 
     public static void main(String[] args) throws Exception {
+        /*
+        SMALL UTILITY TO TEST THE FUNCTION OF THE SERVER.
+        READS FROM STANDARD INPUT, AND WRITES TO LOCAL SERVER ON NETWORK.
+
+        SYNTAX:
+        key1=value1;key2=value2;key3=$uuid1
+        ALL ARGUMENTS ARE STRINGS UNLESS PRECEEDED BY A $, WHERE IT BECOMES A UUID.
+
+        EX.
+        type=list_projects;session_id=$3ca58930-967d-437f-8f0f-3ac5eee4429b
+         */
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         FMLNetworker fmlNetworker = new FMLNetworker("localhost", FlowServer.PORT);
         while (true) {
