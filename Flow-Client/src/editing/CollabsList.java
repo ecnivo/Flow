@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,10 +18,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -100,6 +105,11 @@ public class CollabsList extends JPanel {
 		}
 	    }
 	});
+	try {
+	    searchButton.setIcon(new ImageIcon(ImageIO.read(new File("images/addCollab.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE - 3, FlowClient.BUTTON_ICON_SIZE - 3, Image.SCALE_SMOOTH)));
+	} catch (IOException e1) {
+	    e1.printStackTrace();
+	}
 	searchPane.add(searchButton, BorderLayout.EAST);
 	add(searchPane, BorderLayout.NORTH);
 
@@ -278,34 +288,6 @@ public class CollabsList extends JPanel {
 		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
 		}
 	    });
-	    // icon.addMouseListener(new MouseListener() {
-	    //
-	    // @Override
-	    // public void mouseReleased(MouseEvent e) {
-	    // // nothing
-	    // }
-	    //
-	    // @Override
-	    // public void mousePressed(MouseEvent e) {
-	    // // nothing
-	    // }
-	    //
-	    // @Override
-	    // public void mouseExited(MouseEvent e) {
-	    // setBorder(FlowClient.EMPTY_BORDER);
-	    // }
-	    //
-	    // @Override
-	    // public void mouseEntered(MouseEvent e) {
-	    // setBorder(ICON_ENTRY_BORDER);
-	    // }
-	    //
-	    // @Override
-	    // public void mouseClicked(MouseEvent e) {
-	    // // TODO Scroll the current EditArea to the cursor of this
-	    // // user
-	    // }
-	    // });
 	}
 
 	private void updateFields() {

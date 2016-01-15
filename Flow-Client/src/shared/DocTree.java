@@ -2,12 +2,20 @@ package shared;
 
 import gui.FlowClient;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -16,6 +24,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -27,11 +36,9 @@ public abstract class DocTree extends JTree {
     private DefaultTreeModel model;
     private JScrollPane scrollView;
 
-    private UUID[] usersProjectsUUIDs;
+    private final static int TREE_ICON_SIZE = 16;
 
-    // private UUID activeProject;
-    // private DirectoryNode activeDirectoryNode;
-    // private FileNode activeFileNode;
+    private UUID[] usersProjectsUUIDs;
 
     public DocTree() {
 	// TODO
@@ -69,6 +76,7 @@ public abstract class DocTree extends JTree {
 		}
 	    }
 	});
+	setCellRenderer(new FlowNodeRenderer());
     }
 
     public JScrollPane getScrollable() {
@@ -319,20 +327,21 @@ public abstract class DocTree extends JTree {
 
     public class FileNode extends DefaultMutableTreeNode {
 	// TODO add a listener for file renaming changes
+
 	private UUID file;
 	private String name;
+	private String type;
 
 	public FileNode(UUID fileUUID) {
 	    this.file = fileUUID;
-	    Data fileNameRequest = new Data("file_info");
-	    fileNameRequest.put("file_uuid", fileUUID);
-	    fileNameRequest.put("session_id", Communicator.getSessionID());
-	    name = Communicator.communicate(fileNameRequest).get("file_name", String.class);
-	}
 
-	public FileNode(UUID file, String name) {
-	    this.file = file;
-	    this.name = name;
+	    Data fileDataRequest = new Data("file_info");
+	    fileDataRequest.put("file_uuid", fileUUID);
+	    fileDataRequest.put("session_id", Communicator.getSessionID());
+	    Data fileData = Communicator.communicate(fileDataRequest);
+
+	    name = fileData.get("file_name", String.class);
+	    type = fileData.get("file_type", String.class);
 	}
 
 	public UUID getFileUUID() {
@@ -345,6 +354,68 @@ public abstract class DocTree extends JTree {
 
 	public String getName() {
 	    return name;
+	}
+
+	public String getType() {
+	    return type;
+	}
+    }
+
+    private class FlowNodeRenderer implements TreeCellRenderer {
+
+	private ImageIcon workspaceIcon;
+	private ImageIcon projectIcon;
+	private ImageIcon directoryIcon;
+	private ImageIcon textDocumentIcon;
+	private ImageIcon arbitraryFileIcon;
+
+	private JLabel label;
+
+	public FlowNodeRenderer() {
+	    this.label = new JLabel();
+	    try {
+		workspaceIcon = new ImageIcon(ImageIO.read(new File("images/workspace.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+		projectIcon = new ImageIcon(ImageIO.read(new File("images/icon.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+		directoryIcon = new ImageIcon(ImageIO.read(new File("images/folder.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+		textDocumentIcon = new ImageIcon(ImageIO.read(new File("images/textDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+		arbitraryFileIcon = new ImageIcon(ImageIO.read(new File("images/arbitDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	@Override
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+	    Object node = (DefaultMutableTreeNode) value;
+	    if (node instanceof ProjectNode) {
+		ProjectNode projectNode = (ProjectNode) node;
+		label.setText(projectNode.getName());
+		label.setIcon(projectIcon);
+	    } else if (node instanceof DirectoryNode) {
+		DirectoryNode dirNode = (DirectoryNode) node;
+		label.setText(dirNode.getName());
+		label.setIcon(directoryIcon);
+	    } else if (node instanceof FileNode) {
+		FileNode fileNode = (FileNode) node;
+		label.setText(fileNode.getName());
+		if (fileNode.getType().equals("TEXT_DOCUMENT")) {
+		    label.setIcon(textDocumentIcon);
+		} else if (fileNode.getType().equals("ARBITRARY_DOCUMENT")) {
+		    label.setIcon(arbitraryFileIcon);
+		}
+	    } else {
+		label.setText(node.toString());
+		label.setIcon(workspaceIcon);
+	    }
+	    if (selected){
+		label.setBackground(new Color(118,118,118,120));
+		label.setOpaque(true);
+	    }
+	    else{
+		label.setBackground(Color.WHITE);
+		label.setOpaque(false);
+	    }
+	    return label;
 	}
     }
 }
