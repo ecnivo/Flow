@@ -190,6 +190,7 @@ public abstract class DocTree extends JTree {
 	// adds folders
 	UUID[] childDirs = remoteDir.get("child_directories", UUID[].class);
 	if (childDirs.length > 0) {
+	    System.out.println("HI");
 	    for (UUID childDirUUID : childDirs) {
 		Data childDirNameRequest = new Data("directory_info");
 		childDirNameRequest.put("session_id", Communicator.getSessionID());
@@ -197,6 +198,7 @@ public abstract class DocTree extends JTree {
 		String childDirName = Communicator.communicate(childDirNameRequest).get("directory_name", String.class);
 
 		DirectoryNode subDirNode = new DirectoryNode(childDirUUID, childDirName);
+		localDir.add(subDirNode);
 		createProjectFileNodes(childDirUUID, subDirNode);
 	    }
 	}
@@ -236,49 +238,6 @@ public abstract class DocTree extends JTree {
 	model.reload();
     }
 
-    // private void reloadProjectFilesRecursively(FlowDirectory fDir,
-    // DirectoryNode dir) {
-    // ArrayList<FlowDirectory> localDirs = new ArrayList<FlowDirectory>();
-    // ArrayList<FlowFile> localFiles = new ArrayList<FlowFile>();
-    //
-    // for (int i = 0; i < dir.getChildCount(); i++) {
-    // DefaultMutableTreeNode child = (DefaultMutableTreeNode)
-    // dir.getChildAt(i);
-    // if (child instanceof DirectoryNode) {
-    // int indexInDirectory = fDir.getDirectories().indexOf(((DirectoryNode)
-    // child).getDirectory());
-    // if (indexInDirectory == -1) {
-    // model.removeNodeFromParent(child);
-    // } else {
-    // reloadProjectFilesRecursively(fDir.getDirectories().get(indexInDirectory),
-    // (DirectoryNode) child);
-    // localDirs.add(((DirectoryNode) child).getDirectory());
-    // }
-    // } else if (child instanceof FileNode) {
-    // int indexOfFile = fDir.getFiles().indexOf(((FileNode) child).getFile());
-    // if (indexOfFile == -1) {
-    // model.removeNodeFromParent(child);
-    // } else {
-    // localFiles.add(((FileNode) child).getFile());
-    // }
-    // }
-    // }
-    //
-    // for (FlowDirectory remoteDir : fDir.getDirectories()) {
-    // if (localDirs.indexOf(remoteDir) == -1) {
-    // DirectoryNode newNode = new DirectoryNode(remoteDir);
-    // System.out.println(newNode.getDirectory().toString());
-    // model.insertNodeInto(newNode, dir, 0);
-    // reloadProjectFilesRecursively(remoteDir, newNode);
-    // }
-    // }
-    // for (FlowFile remoteFile : fDir.getFiles()) {
-    // if (localFiles.indexOf(remoteFile) == -1) {
-    // model.insertNodeInto(new FileNode(remoteFile), dir, 0);
-    // }
-    // }
-    // }
-
     private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {
 	ArrayList<DirectoryNode> localDirs = new ArrayList<DirectoryNode>();
 	ArrayList<FileNode> localFiles = new ArrayList<FileNode>();
@@ -292,25 +251,27 @@ public abstract class DocTree extends JTree {
 	    }
 	}
 
-	UUID[] childFiles = remoteParentDir.get("child_files", UUID[].class);
+	// Removes nodes
+	UUID[] remoteChildFiles = remoteParentDir.get("child_files", UUID[].class);
 	for (FileNode localFileNode : localFiles) {
-	    int idx = indexOfArray(childFiles, localFileNode.getFileUUID());
+	    int idx = indexOfArray(remoteChildFiles, localFileNode.getFileUUID());
 	    if (idx == -1) {
 		model.removeNodeFromParent(localFileNode);
 		localFiles.remove(localFileNode);
 	    }
 	}
 
-	UUID[] childDirs = remoteParentDir.get("child_directories", UUID[].class);
+	UUID[] remoteChildDirs = remoteParentDir.get("child_directories", UUID[].class);
 	for (DirectoryNode localDirNode : localDirs) {
-	    int idx = indexOfArray(childDirs, localDirNode.getDirectoryUUID());
+	    int idx = indexOfArray(remoteChildDirs, localDirNode.getDirectoryUUID());
 	    if (idx == -1) {
 		model.removeNodeFromParent(localDirNode);
 		localDirs.remove(localDirNode);
 	    }
 	}
 
-	for (UUID remoteFile : remoteParentDir.get("child_files", UUID[].class)) {
+	// Adds nodes
+	for (UUID remoteFile : remoteChildFiles) {
 	    boolean existsLocally = false;
 	    for (FileNode fileNode : localFiles) {
 		if (fileNode.getFileUUID().equals(remoteFile)) {
@@ -320,11 +281,11 @@ public abstract class DocTree extends JTree {
 	    }
 	    if (!existsLocally) {
 		FileNode newFileNode = new FileNode(remoteFile);
-		model.insertNodeInto(newFileNode, localNode, localNode.getChildCount());
+		localNode.add(newFileNode);
 	    }
 	}
 
-	for (UUID remoteDir : remoteParentDir.get("child_directories", UUID[].class)) {
+	for (UUID remoteDir : remoteChildDirs) {
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;
 	    for (DirectoryNode directoryNode : localDirs) {
@@ -335,8 +296,7 @@ public abstract class DocTree extends JTree {
 	    }
 	    if (!existsLocally || childDirNode == null) {
 		DirectoryNode newDirNode = new DirectoryNode(remoteDir);
-		System.out.println("Created directory" + newDirNode.getName());
-		model.insertNodeInto(newDirNode, localNode, 0);
+		localNode.add(newDirNode);
 		childDirNode = newDirNode;
 	    }
 
@@ -412,9 +372,10 @@ public abstract class DocTree extends JTree {
 	private UUID file;
 	private String name;
 
-	public FileNode(UUID file) {
-	    this.file = file;
+	public FileNode(UUID fileUUID) {
+	    this.file = fileUUID;
 	    Data fileNameRequest = new Data("file_info");
+	    fileNameRequest.put("file_uuid", fileUUID);
 	    fileNameRequest.put("session_id", Communicator.getSessionID());
 	    name = Communicator.communicate(fileNameRequest).get("file_name", String.class);
 	}

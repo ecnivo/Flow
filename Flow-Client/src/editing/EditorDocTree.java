@@ -333,6 +333,8 @@ public class EditorDocTree extends DocTree {
 			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
 		    }
 		    Data createFileRequest = new Data("new_textdocument");
+		    UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
+		    createFileRequest.put("project_uuid", projectUUID);
 		    // createFileRequest.put("project_uuid", ((FlowProject)
 		    // getActiveDirectoryNode().getDirectoryUUID().getRootDirectory()).getProjectUUID());
 		    createFileRequest.put("document_name", name);
@@ -344,7 +346,7 @@ public class EditorDocTree extends DocTree {
 		    switch (status) {
 		    case "OK":
 			UUID docUUID = reply.get("file_uuid", UUID.class);
-			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new FileNode(docUUID), selectedDir, selectedDir.getChildCount());
+			selectedDir.add(new FileNode(docUUID));
 			break;
 
 		    case "DIRECTORY_DOES_NOT_EXIST":
