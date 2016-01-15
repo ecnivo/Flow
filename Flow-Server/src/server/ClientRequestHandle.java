@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -8,14 +16,6 @@ import struct.User;
 import util.DataModification;
 import util.DatabaseException;
 import util.Results;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -199,6 +199,22 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
+			case "directory_modify": {
+				UUID directoryUUID = data.get("directory_uuid", UUID.class);
+				String type = data.get("mod_type", String.class);
+				switch (type) {
+				case "RENAME":
+					String newName = data.get("new_name", String.class);
+					returnData.put("status", this.database.renameDirectory(
+							directoryUUID.toString(), newName));
+					break;
+				case "DELETE":
+					returnData.put("status", this.database
+							.deleteDirectory(directoryUUID.toString()));
+					break;
+				}
+			}
+				break;
 			case "new_textdocument": {
 				UUID projectUUID = data.get("project_uuid", UUID.class);
 				UUID directoryUUID = data.get("directory_uuid", UUID.class);
@@ -353,7 +369,8 @@ public class ClientRequestHandle implements Runnable {
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
-						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
+						bytes = DataManagement.getInstance()
+								.getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					data.put("file_data", bytes);
 					data.put("status", "OK");
@@ -379,7 +396,8 @@ public class ClientRequestHandle implements Runnable {
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
-						bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
+						bytes = DataManagement.getInstance()
+								.getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					data.put("file_data", bytes);
 					data.put("status", "OK");

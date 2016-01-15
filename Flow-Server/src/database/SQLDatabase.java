@@ -522,13 +522,30 @@ public class SQLDatabase {
 			if (!this.query(String.format(
 					"SELECT * from projects WHERE ProjectID = '%s';",
 					projectId)).next()) {
-				return "PROJECT_NAME_INVALID";
+				return "INVALID_PROJECT_UUID";
 			}
 			this.update(String.format(
 					"UPDATE projects SET ProjectName = '%s' WHERE ProjectID = '%s';",
 					newName, projectId));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
+	}
+
+	// TODO COMMENT
+	public String renameDirectory(String directoryUUID, String newName) {
+		try {
+			if (!this.query(String.format(
+					"SELECT * from directories WHERE DirectoryID = '%s';",
+					directoryUUID)).next()) {
+				return "INVALID_DIRECTORY_UUID";
+			}
+			this.update(String.format(
+					"UPDATE projects SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
+					newName, directoryUUID));
+		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
@@ -554,7 +571,7 @@ public class SQLDatabase {
 			if (!this.query(String.format(
 					"SELECT * from projects WHERE ProjectID = '%s';",
 					projectId)).next()) {
-				return "PROJECT_DOES_NOT_EXIST";
+				return "INVALID_PROJECT_UUID";
 			}
 			this.update(String.format(
 					"DELETE FROM projects WHERE ProjectID = '%s';", projectId));
@@ -566,6 +583,25 @@ public class SQLDatabase {
 			this.update(String.format(
 					"DELETE FROM directories WHERE ProjectID = '%s';",
 					projectId));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return FlowServer.ERROR;
+		}
+		return "OK";
+	}
+
+	// TODO COMMENT
+	public String deleteDirectory(String directoryUUID) {
+		try {
+			if (!this.query(String.format(
+					"SELECT * from Directories WHERE DirectoryID = '%s';",
+					directoryUUID)).next()) {
+				return "INVALID_DIRECTORY_UUID";
+			}
+			this.update(String.format(
+					"DELETE FROM documents WHERE ParentDirectoryID = '%s';",
+					directoryUUID));
+			// TOOD Cycle through all child directories and delete files
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
