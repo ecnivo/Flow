@@ -529,7 +529,6 @@ public class SQLDatabase {
 				throw new DatabaseException("INVALID_FILE_UUID");
 			}
 		} catch (SQLException e) {
-			s
 			e.printStackTrace();
 		}
 		// Throw an exception in this case because the server expects to use
