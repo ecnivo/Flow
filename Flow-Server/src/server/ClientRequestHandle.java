@@ -184,7 +184,7 @@ public class ClientRequestHandle implements Runnable {
 					UUID projectUUID = data.get("project_uuid", UUID.class),
 							sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID directoryUUID = data.get("directory_uuid",
 								UUID.class), fileUUID = UUID.randomUUID(),
 								versionUUID = UUID.randomUUID();
@@ -217,7 +217,7 @@ public class ClientRequestHandle implements Runnable {
 							UUID.class);
 					UUID sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID random = UUID.randomUUID();
 						String status = this.database.newDirectory(
 								data.get("directory_name", String.class),
@@ -241,7 +241,7 @@ public class ClientRequestHandle implements Runnable {
 						sessionID = data.get("session_id", UUID.class);
 				try {
 					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+							projectUUID.toString(), SQLDatabase.OWNER)) {
 						switch (data.get("project_modify_type", String.class)) {
 						case "MODIFY_COLLABORATOR":
 							ResultSet sessionInfo = null;
@@ -293,7 +293,7 @@ public class ClientRequestHandle implements Runnable {
 											directoryUUID.toString());
 
 					if (this.database.verifyPermissions(sessionID,
-							projectUUID)) {
+							projectUUID, SQLDatabase.EDIT)) {
 						String type = data.get("mod_type", String.class);
 						switch (type) {
 						case "RENAME":
@@ -325,7 +325,7 @@ public class ClientRequestHandle implements Runnable {
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
 					if (this.database.verifyPermissions(sessionID,
-							projectUUID)) {
+							projectUUID, SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
 						switch (modType) {
 						case "RENAME":
