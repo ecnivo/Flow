@@ -10,7 +10,7 @@ import callback.TextModificationListener;
 public class Communicator {
 
     private static UUID sessionID;
-
+    private static String username;
     private static FMLNetworker networker;
 
     public static void initComms(String host, int port) {
@@ -49,5 +49,13 @@ public class Communicator {
 
     public static void removeFileChangeListener(UUID fileUUID) {
         networker.unregisterCallbackListener(fileUUID);
+    }
+    
+    public static String getUsername() {
+        return username;
+    }
+
+    public static void setUsername(String username) {
+        Communicator.username = username;
     }
 }
