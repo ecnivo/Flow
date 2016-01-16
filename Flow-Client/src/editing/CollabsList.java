@@ -34,12 +34,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import message.Data;
 import shared.Communicator;
-import shared.DocTree.ProjectNode;
 import shared.EditArea;
 import shared.FlowPermission;
 
@@ -123,18 +120,12 @@ public class CollabsList extends JPanel {
     }
 
     public void refreshUserList() {
-	TreePath activeSelection = editPane.getDocTree().getSelectionPath();
-	if (activeSelection == null) {
-	    return;
-	}
-	DefaultMutableTreeNode[] path = (DefaultMutableTreeNode[]) activeSelection.getPath();
-	if (path.length < 2) {
-	    return;
-	}
-	UUID activeProjectUUID = ((ProjectNode) path[1]).getProjectUUID();
+	UUID activeProjectUUID = ((EditArea) ((JScrollPane) editPane.getEditTabs().getSelectedComponent()).getViewport().getView()).getProjectUUID();
 
 	Data getProject = new Data("project_info");
+	getProject.put("session_id", Communicator.getSessionID());
 	getProject.put("project_uuid", activeProjectUUID);
+	System.out.println("getting user list");
 	Data activeProject = Communicator.communicate(getProject);
 
 	userListPanel.removeAll();

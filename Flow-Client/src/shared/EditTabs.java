@@ -33,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -91,13 +92,13 @@ public class EditTabs extends JTabbedPane {
 	// Checks if the tab is already open, and if it is, will automatically
 	// switch to it
 	for (int i = 0; i < tabs; i++) {
-	    if (((EditArea) getComponentAt(i)).getVersionTextUUID().equals(versionTextUUID)) {
+	    if (((EditArea) ((JScrollPane) getComponentAt(i)).getViewport().getView()).getVersionTextUUID().equals(versionTextUUID)) {
 		setSelectedIndex(i);
 		return;
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(tabName, new EditArea(text, fileUUID, projectUUID, versionTextUUID, editable, this).getScrollPane());
+	    addTab(tabName, new EditArea(text, projectUUID, fileUUID, versionTextUUID, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
 	    setTabComponentAt(idx, new CustomTabHeader(tabName));
 	    // TODO tool tip should be the save date
