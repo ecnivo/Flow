@@ -26,7 +26,7 @@ public class AsyncServer implements Runnable {
                 new Thread(pch).start();
             }
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 }

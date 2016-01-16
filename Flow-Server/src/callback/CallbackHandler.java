@@ -7,15 +7,21 @@ import java.io.IOException;
 
 /**
  * Represents a handler that handles a callback event
- *
+ * <p>
  * Created by Netdex on 1/15/2016.
  */
 public class CallbackHandler {
 
-    private PersistentClientHandle handle;
+    public enum HandleType {
+        TEXT_MODIFY
+    }
 
-    public CallbackHandler(PersistentClientHandle handle) {
+    private PersistentClientHandle handle;
+    private HandleType type;
+
+    public CallbackHandler(PersistentClientHandle handle, HandleType type) {
         this.handle = handle;
+        this.type = type;
     }
 
     public PersistentClientHandle getHandle() {
@@ -36,5 +42,9 @@ public class CallbackHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public HandleType getType() {
+        return type;
     }
 }

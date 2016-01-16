@@ -2,6 +2,7 @@ package network;
 
 import callback.CallbackListener;
 import callback.EventPusher;
+import callback.TextModificationListener;
 import message.Data;
 
 import java.io.IOException;
@@ -76,6 +77,9 @@ public class FMLNetworker {
         }
         try {
             Data asyncCallbackRequest = new Data("async");
+            if(chngListener instanceof TextModificationListener){
+                asyncCallbackRequest.put("ltype", "TEXT_MODIFY");
+            }
             asyncCallbackRequest.put("rtype", "REGISTER");
             asyncCallbackRequest.put("uuid", assocUUID);
             asyncSocket.send(asyncCallbackRequest);

@@ -20,9 +20,9 @@ public class DataManagement {
 	private static Logger L = Logger.getLogger("DataManagement");
 	private static FileSerializer fileSerializer = new FileSerializer();
 
-	private File dataDir;
-	private File userDir;
-	private File fileDir;
+	public File dataDir;
+	public File userDir;
+	public File fileDir;
 
 	public static DataManagement getInstance() {
 		if (instance == null)

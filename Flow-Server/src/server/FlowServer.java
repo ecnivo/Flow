@@ -13,6 +13,11 @@ import java.util.logging.Logger;
 
 public class FlowServer implements Runnable {
 
+	public static FlowServer instance;
+
+	public static FlowServer getInstance() {
+		return instance;
+	}
 	private static Logger L = Logger.getLogger("FlowServer");
 
 	/**
@@ -32,6 +37,7 @@ public class FlowServer implements Runnable {
 
 	public FlowServer() {
 		this.database = new SQLDatabase("data/FlowDatabse.db");
+		instance = this;
 	}
 
 	@Override
@@ -75,7 +81,7 @@ public class FlowServer implements Runnable {
 	 * 
 	 * @return the associated SQLDatabase instance.
 	 */
-	protected SQLDatabase getDatabase() {
+	public SQLDatabase getDatabase() {
 		return this.database;
 	}
 

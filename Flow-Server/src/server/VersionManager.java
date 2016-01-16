@@ -59,18 +59,24 @@ public class VersionManager {
         // TODO doesn't remove versions that were deleted!
         for (UUID versionUUID : loadedDocuments.keySet()) {
             UUID parentFileUUID = parentFile.get(versionUUID);
-            File versionPath = new File(new File(fileDir, parentFileUUID.toString())
-                    , versionUUID.toString() + "." + DataManagement.TEXT_FILE_EXT);
-            versionPath.getParentFile().mkdirs();
-            VersionText versionText = loadedDocuments.get(versionUUID);
-            try {
-                PrintStream ps = new PrintStream(versionPath);
-                ps.print(versionText.getDocumentText());
-            } catch (Exception e) {
+            if (!flushToDisk(fileDir, parentFileUUID, versionUUID))
                 return false;
-            }
         }
         return true;
+    }
+
+    public boolean flushToDisk(File fileDir, UUID fileUUID, UUID versionUUID) {
+        File versionPath = new File(new File(fileDir, fileUUID.toString())
+                , versionUUID.toString() + "." + DataManagement.TEXT_FILE_EXT);
+        versionPath.getParentFile().mkdirs();
+        VersionText versionText = loadedDocuments.get(versionUUID);
+        try {
+            PrintStream ps = new PrintStream(versionPath);
+            ps.print(versionText.getDocumentText());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {

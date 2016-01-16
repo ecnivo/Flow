@@ -14,7 +14,7 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
     private UUID documentUUID;
 
     public DocumentUpdateCallbackHandler(PersistentClientHandle handle, UUID documentUUID) {
-        super(handle);
+        super(handle, HandleType.TEXT_MODIFY);
         this.documentUUID = documentUUID;
     }
 
