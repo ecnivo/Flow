@@ -82,12 +82,12 @@ public class FMLNetworker {
         }
     }
 
-    public boolean unregisterTextModificationListener(UUID versionFileUUID) {
+    public boolean unregisterCallbackListener(UUID assocUUID) {
         try {
             Data cancelAsync = new Data("async");
             cancelAsync.put("rtype", "UNREGISTER");
             asyncSocket.send(cancelAsync);
-            pusher.unregisterListener(versionFileUUID);
+            pusher.unregisterListener(assocUUID);
             return true;
         } catch (IOException e) {
             return false;

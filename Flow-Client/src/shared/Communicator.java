@@ -1,8 +1,8 @@
 package shared;
 
+import callback.TextModificationListener;
 import message.Data;
 import network.FMLNetworker;
-import network.TextFileChangeListener;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -14,7 +14,7 @@ public class Communicator {
     private static FMLNetworker packageSender;
 
     public static void initComms(String host, int port) {
-	packageSender = new FMLNetworker(host, port);
+        packageSender = new FMLNetworker(host, port, 10225);// TODO hardcoded
     }
 
     @SuppressWarnings("unchecked")
@@ -35,11 +35,11 @@ public class Communicator {
 	Communicator.sessionID = sessionID;
     }
 
-    public static void addFileChangeListener(TextFileChangeListener listener, UUID fileUUID) {
-	packageSender.registerCallbackListener(listener, fileUUID);
+    public static void addFileChangeListener(TextModificationListener listener, UUID fileUUID) {
+        packageSender.registerCallbackListener(listener, fileUUID);
     }
 
-    public static void removeFileChangeListener(TextFileChangeListener listener) {
-	packageSender.unregisterTextModificationListener(listener);
+    public static void removeFileChangeListener(UUID fileUUID) {
+        packageSender.unregisterCallbackListener(fileUUID);
     }
 }

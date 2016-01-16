@@ -1,11 +1,10 @@
 package shared;
 
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
 import editing.UserCaret;
 import gui.FlowClient;
 import message.Data;
-import network.DocumentModificationEvent;
-import network.DocumentModificationEvent.DocumentModificationType;
-import network.TextFileChangeListener;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -209,12 +208,12 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
-		TextFileChangeListener fileChangeListener = new TextFileChangeListener() {
+		TextModificationListener fileChangeListener = new TextModificationListener() {
 
 	    @Override
-	    public void onFileUpdate(DocumentModificationEvent event) {
-		int line = event.getLineNumber();
-		int idx = event.getIndex();
+		public void onDocumentUpdate(DocumentCallbackEvent event) {
+			int line = event.LINE;
+			int idx = event.INDEX;
 
 		String text = getText();
 		int ln = 0;
@@ -227,16 +226,16 @@ public class EditArea extends JTextPane {
 		}
 		posOfChange += idx;
 
-		if (event.getModificationType() == DocumentModificationType.INSERT) {
-		    String addition = event.getAddition();
-		    try {
+			if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
+				String addition = event.ADDITION;
+				try {
 			doc.insertString(posOfChange, addition, null);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
 		    }
-		} else if (event.getModificationType() == DocumentModificationType.DELETE) {
-		    int length = event.getLength();
-		    try {
+			} else if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
+				int length = event.REMOVAL_LENGTH;
+				try {
 			doc.remove(posOfChange, length);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
