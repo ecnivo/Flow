@@ -343,7 +343,7 @@ public class ClientRequestHandle implements Runnable {
 		    returnData.put("status", e.getMessage());
 		}
 	    }
-	    case "request_version": {
+	    case "version_request": {
 		UUID fileUUID = data.get("file_uuid", UUID.class);
 		UUID versionUUID = data.get("version_uuid", UUID.class);
 		byte[] bytes = null;
@@ -355,7 +355,7 @@ public class ClientRequestHandle implements Runnable {
 		    } else {
 			bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
 		    }
-		    returnData.put("file_data", bytes);
+		    returnData.put("version_data", bytes);
 		    returnData.put("status", "OK");
 		} catch (DatabaseException e) {
 		    e.printStackTrace();
