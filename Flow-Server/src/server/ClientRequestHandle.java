@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -10,14 +18,6 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -95,10 +95,10 @@ public class ClientRequestHandle implements Runnable {
 								data.get("session_id", UUID.class).toString());
 						if (!DataManagement.getInstance()
 								.removeUser(username)) {
-							returnData.put("status", "INTERNAL_SERVER_ERROR");
+							returnData.put("status", FlowServer.ERROR);
 						} else {
-							this.database.closeAccount(username);
-							returnData.put("status", "OK");
+							returnData.put("status",
+									this.database.closeAccount(username));
 						}
 					} catch (DatabaseException e) {
 						e.printStackTrace();
@@ -107,10 +107,15 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CHANGE_PASSWORD":
 					try {
-						this.database.changePassword(this.database.getUsername(
-								data.get("session_id", UUID.class).toString()),
-								data.get("new_password", String.class));
-						returnData.put("status", "OK");
+						returnData
+								.put("status",
+										this.database.changePassword(
+												this.database.getUsername(data
+														.get("session_id",
+																UUID.class)
+														.toString()),
+										data.get("new_password",
+												String.class)));
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						returnData.put("status", e.getMessage());
