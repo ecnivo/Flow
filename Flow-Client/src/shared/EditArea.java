@@ -38,7 +38,7 @@ public class EditArea extends JTextPane {
 
     public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
     public static final Color PLAIN_COLOUR = Color.BLACK;
-    public static final Color KEYWORD_COLOUR = new Color(0x9213D1);
+    public static final Color KEYWORD_COLOUR = new Color(0x38761D);
     public static final Color STRING_COLOUR = new Color(0xA30BCF);
     public static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
@@ -58,7 +58,6 @@ public class EditArea extends JTextPane {
 	setEditable(editable);
 
 	Data editorListRequest = new Data("project_info");
-	System.out.println("editorlistrequest");
 	editorListRequest.put("project_uuid", projectUUID);
 	Data editorListData = Communicator.communicate(editorListRequest);
 	if (!editorListData.get("status", String.class).equals("OK")) {
@@ -122,7 +121,7 @@ public class EditArea extends JTextPane {
 	    public void insertUpdate(DocumentEvent e) {
 		String insertedString = "";
 		int strLen = e.getLength();
-		int startPos = getCaretPosition() - strLen+1;
+		int startPos = getCaretPosition();
 		System.out.println("styledoc pos at " + startPos + " length " + strLen);
 		try {
 		    insertedString = doc.getText(startPos, strLen);
@@ -147,7 +146,11 @@ public class EditArea extends JTextPane {
 			lines++;
 		}
 		fileModify.put("line", lines);
-		int idx = getCaretPosition() - strLen - lastNewLine;
+		int idx;
+		if (lastNewLine != -1)
+		    idx = getCaretPosition() - lastNewLine;
+		else
+		    idx = startPos;
 		fileModify.put("idx", idx);
 		fileModify.put("str", insertedString);
 
@@ -165,6 +168,7 @@ public class EditArea extends JTextPane {
 	    @Override
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
+		int caretPos = getCaretPosition() - removedLen;
 
 		Data metadataModify = new Data("file_metadata_modify");
 		metadataModify.put("file_uuid", fileUUID);
@@ -173,7 +177,7 @@ public class EditArea extends JTextPane {
 
 		int lastNewLine;
 		try {
-		    lastNewLine = doc.getText(0, EditArea.this.getCaretPosition()).lastIndexOf('\n');
+		    lastNewLine = doc.getText(0, caretPos).lastIndexOf('\n');
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		    return;
@@ -185,7 +189,7 @@ public class EditArea extends JTextPane {
 			lines++;
 		}
 		metadataModify.put("line", lines);
-		metadataModify.put("idx", EditArea.this.getCaretPosition() - lastNewLine);
+		metadataModify.put("idx", caretPos - lastNewLine);
 		metadataModify.put("len", removedLen);
 
 		Data response = Communicator.communicate(metadataModify);

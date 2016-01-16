@@ -61,8 +61,18 @@ public class EditTabs extends JTabbedPane {
 
 	    @Override
 	    public void keyReleased(KeyEvent e) {
-		if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_W) {
+		if (!e.isControlDown()) {
+		    System.out.println("HI");
+		    return;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_W) {
 		    removeTabAt(getSelectedIndex());
+		} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP && getSelectedIndex() > 0) {
+		    System.out.println("switch left");
+		    setSelectedComponent(getComponentAt(getSelectedIndex() - 1));
+		} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && getSelectedIndex() < getTabCount() - 1) {
+		    System.out.println("switch right");
+		    setSelectedComponent(getComponentAt(getSelectedIndex() + 1));
 		}
 	    }
 
@@ -77,10 +87,6 @@ public class EditTabs extends JTabbedPane {
 	    public void stateChanged(ChangeEvent e) {
 		if (getParent() instanceof EditPane) {
 		    EditPane editPane = (EditPane) getParent();
-		    // editPane.getDocTree().setActiveProject(
-		    // (FlowProject) ((EditArea) getSelectedComponent())
-		    // .getFlowDoc().getParentFile()
-		    // .getParentDirectory().getRootDirectory());
 		    editPane.getCollabsList().refreshUserList();
 		}
 	    }
