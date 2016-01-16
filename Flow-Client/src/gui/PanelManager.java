@@ -110,6 +110,7 @@ public class PanelManager extends JPanel {
 	((DefaultMutableTreeNode) ((DefaultTreeModel) editPane.getDocTree().getModel()).getRoot()).removeAllChildren();
 	((DefaultTreeModel) editPane.getDocTree().getModel()).reload();
 	((DefaultMutableTreeNode) ((DefaultTreeModel) historyPane.getTree().getModel()).getRoot()).removeAllChildren();
-	editTabs = new EditTabs();
+	editTabs.removeAll();
+	editTabs.revalidate();
     }
 }
