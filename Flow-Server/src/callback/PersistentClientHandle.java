@@ -2,9 +2,6 @@ package callback;
 
 import message.Data;
 import network.DataSocket;
-import server.DataManagement;
-import server.FlowServer;
-import server.VersionManager;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -50,24 +47,22 @@ public class PersistentClientHandle implements Runnable {
                 switch (data.get("type", String.class)) {
                     case "async":
                         UUID uuid = data.get("uuid", UUID.class);
-                        String ltype = data.get("ltype", String.class);
-                        switch (data.get("rtype", String.class)) {
-                            case "REGISTER": {
+                        CallbackEvent.CallbackEventType ltype = data.get("ltype", CallbackEvent.CallbackEventType.class);
+                        switch (data.get("rtype", RegisterEvent.RegisterType.class)) {
+                            case REGISTER: {
                                 CallbackHandler handler = null;
-                                if (ltype.equals("TEXT_MODIFY")) {
-                                    handler = new CallbackHandler(this, CallbackHandler.HandleType.TEXT_MODIFY);
+                                if (ltype == CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK) {
+                                    handler = new DocumentUpdateCallbackHandler(this, uuid);
                                 }
+                                handler.onRegister(new RegisterEvent(uuid, RegisterEvent.RegisterType.REGISTER));
                                 handlers.put(uuid, handler);
                                 PersistentHandleManager.getInstance().registerCallbackHandler(uuid, handler);
                             }
                             break;
 
-                            case "UNREGISTER": {
+                            case UNREGISTER: {
                                 CallbackHandler handler = handlers.get(uuid);
-                                if (handler.getType() == CallbackHandler.HandleType.TEXT_MODIFY) {
-                                    VersionManager.getInstance().flushToDisk(DataManagement.getInstance().fileDir, uuid, UUID.fromString(FlowServer.getInstance().getDatabase().getLatestVersionUUID(uuid.toString())));
-                                    L.info("flushing changes to " + uuid + " to disk");
-                                }
+                                handler.onUnregister(new RegisterEvent(uuid, RegisterEvent.RegisterType.UNREGISTER));
                                 PersistentHandleManager.getInstance().unregisterCallbackHandler(uuid, handler);
                             }
                             break;
