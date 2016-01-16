@@ -178,7 +178,7 @@ public class EditArea extends JTextPane {
 		int removedLen = e.getLength();
 		int caretPos = getCaretPosition() - removedLen;
 
-		Data metadataModify = new Data("file_metadata_modify");
+		Data metadataModify = new Data("file_text_modify");
 		metadataModify.put("file_uuid", fileUUID);
 		metadataModify.put("session_id", Communicator.getSessionID());
 		metadataModify.put("mod_type", "DELETE");
