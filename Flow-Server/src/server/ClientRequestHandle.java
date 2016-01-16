@@ -202,10 +202,10 @@ public class ClientRequestHandle implements Runnable {
                             switch (data.get("project_modify_type", String.class)) {
                                 case "MODIFY_COLLABORATOR":
                                     ResultSet sessionInfo = null;
-
                                     sessionInfo = this.database.getSessionInfo(data.get("session_id").toString());
                                     sessionInfo.next();
-                                    String username = sessionInfo.getString("Username");
+                                    // TODO something is not right with this session check
+                                    String username = data.get("username", String.class);
                                     returnData.put("status", this.database.updateAccess((int) data.get("access_level", Byte.class), projectUUID.toString(), username));
 
                                     break;
