@@ -331,6 +331,8 @@ public class ClientRequestHandle implements Runnable {
 									.deleteFile(fileUUID.toString()));
 							break;
 						}
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -342,20 +344,28 @@ public class ClientRequestHandle implements Runnable {
 			case "project_info":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
-					ResultSet databaseResponse = this.database
-							.getProjectInfo(projectUUID.toString());
-					returnData.put("project_name",
-							databaseResponse.getString("ProjectName"));
-					returnData.put("editors", this.database.getUsers(
-							projectUUID.toString(), SQLDatabase.EDIT));
-					returnData.put("viewers", this.database.getUsers(
-							projectUUID.toString(), SQLDatabase.VIEW));
-					returnData
-							.put("owner",
-									this.database.getUsers(
-											projectUUID.toString(),
-											SQLDatabase.OWNER)[0]);
-					returnData.put("status", "OK");
+					String sessionID = data.get("session_id", UUID.class)
+							.toString();
+
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID.toString())) {
+						ResultSet databaseResponse = this.database
+								.getProjectInfo(projectUUID.toString());
+						returnData.put("project_name",
+								databaseResponse.getString("ProjectName"));
+						returnData.put("editors", this.database.getUsers(
+								projectUUID.toString(), SQLDatabase.EDIT));
+						returnData.put("viewers", this.database.getUsers(
+								projectUUID.toString(), SQLDatabase.VIEW));
+						returnData
+								.put("owner",
+										this.database.getUsers(
+												projectUUID.toString(),
+												SQLDatabase.OWNER)[0]);
+						returnData.put("status", "OK");
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
@@ -369,33 +379,48 @@ public class ClientRequestHandle implements Runnable {
 					// Load the required data from the data packet
 					UUID directoryUUID = data.get("directory_uuid", UUID.class);
 
-					// Add information from the Directories table
-					ResultSet results = this.database
-							.getDirectoryInfo(directoryUUID.toString());
-					returnData.put("parent_directory_uuid",
-							results.getString("ParentDirectoryID"));
-					returnData.put("directory_name",
-							results.getString("DirectoryName"));
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromDirectory(
+											directoryUUID.toString());
 
-					// Add information from all documents located in the
-					// specified directory
-					results = this.database
-							.getFilesInDirectory(directoryUUID.toString());
-					returnData.put("child_files",
-							DataManipulation.getUUIDsFromArray(Results
-									.toStringArray("DocumentID", results)));
+					// Verify is the user has at least view access
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						// Add information from the Directories table
+						ResultSet results = this.database
+								.getDirectoryInfo(directoryUUID.toString());
+						returnData.put("parent_directory_uuid",
+								results.getString("ParentDirectoryID"));
+						returnData.put("directory_name",
+								results.getString("DirectoryName"));
 
-					// Add information from all sub directories located inside
-					// the specified directory
-					results = this.database.getDirectoriesInDirectory(
-							directoryUUID.toString());
-					returnData.put("child_directories",
-							DataManipulation.getUUIDsFromArray(Results
-									.toStringArray("DirectoryID", results)));
+						// Add information from all documents located in the
+						// specified directory
+						results = this.database
+								.getFilesInDirectory(directoryUUID.toString());
+						returnData.put("child_files",
+								DataManipulation.getUUIDsFromArray(Results
+										.toStringArray("DocumentID", results)));
 
-					// If no exceptions were thrown up to this point, no errors
-					// occurred in the data retrieval.
-					returnData.put("status", "OK");
+						// Add information from all sub directories located
+						// inside
+						// the specified directory
+						results = this.database.getDirectoriesInDirectory(
+								directoryUUID.toString());
+						returnData.put("child_directories",
+								DataManipulation.getUUIDsFromArray(
+										Results.toStringArray("DirectoryID",
+												results)));
+
+						// If no exceptions were thrown up to this point, no
+						// errors
+						// occurred in the data retrieval.
+						returnData.put("status", "OK");
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					L.severe(e.getMessage());
@@ -409,18 +434,29 @@ public class ClientRequestHandle implements Runnable {
 			case "file_info":
 				try {
 					// Load the required data from the data packet
-					UUID fileUUID = data.get("file_uuid", UUID.class);
+					String fileUUID = data.get("file_uuid", UUID.class)
+							.toString(),
+							sessionID = data.get("session_id", UUID.class)
+									.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromFile(fileUUID);
 
-					// Add information from the Documents table
-					ResultSet results = this.database
-							.getFileInfo(fileUUID.toString());
-					returnData.put("file_name",
-							results.getString("DocumentName"));
-					returnData.put("file_type", results.getString("FileType"));
-					returnData.put("file_versions",
-							DataManipulation.getUUIDsFromArray(this.database
-									.getFileVersions(fileUUID.toString())));
-					returnData.put("status", "OK");
+					// Verify is the user has at least view access
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						// Add information from the Documents table
+						ResultSet results = this.database.getFileInfo(fileUUID);
+						returnData.put("file_name",
+								results.getString("DocumentName"));
+						returnData.put("file_type",
+								results.getString("FileType"));
+						returnData.put("file_versions",
+								DataManipulation.getUUIDsFromArray(this.database
+										.getFileVersions(fileUUID)));
+						returnData.put("status", "OK");
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					L.severe(e.getMessage());
@@ -432,33 +468,54 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "version_info": {
-				UUID versionUUID = data.get("version_uuid", UUID.class);
 				try {
-					returnData.put("date", this.database
-							.getVersionDate(versionUUID.toString()));
-					returnData.put("status", "OK");
+					String versionUUID = data.get("version_uuid", UUID.class)
+							.toString(),
+							sessionID = data.get("session_id", UUID.class)
+									.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromVersion(versionUUID);
+
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						returnData.put("date",
+								this.database.getVersionDate(versionUUID));
+						returnData.put("status", "OK");
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
+					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
 			}
 			case "request_version": {
-				UUID fileUUID = data.get("file_uuid", UUID.class);
-				UUID versionUUID = data.get("version_uuid", UUID.class);
-				byte[] bytes = null;
 				try {
-					String fileType = this.database
-							.getFileType(fileUUID.toString());
-					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
-						VersionText doc = VersionManager.getInstance()
-								.getTextByVersionUUID(versionUUID);
-						bytes = doc.getDocumentText().getBytes();
+					UUID fileUUID = data.get("file_uuid", UUID.class),
+							versionUUID = data.get("version_uuid", UUID.class);
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						byte[] bytes = null;
+						String fileType = this.database
+								.getFileType(fileUUID.toString());
+						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
+							VersionText doc = VersionManager.getInstance()
+									.getTextByVersionUUID(versionUUID);
+							bytes = doc.getDocumentText().getBytes();
+						} else {
+							bytes = DataManagement.getInstance()
+									.getArbitraryFileBytes(fileUUID,
+											versionUUID);
+						}
+						returnData.put("file_data", bytes);
+						returnData.put("status", "OK");
 					} else {
-						bytes = DataManagement.getInstance()
-								.getArbitraryFileBytes(fileUUID, versionUUID);
+						returnData.put("status", "INVALID_SESSION_ID");
 					}
-					returnData.put("file_data", bytes);
-					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
@@ -468,22 +525,30 @@ public class ClientRequestHandle implements Runnable {
 			case "file_request":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
-					UUID versionUUID = UUID.fromString(this.database
-							.getLatestVersionUUID(fileUUID.toString()));
-					returnData.put("version_uuid", versionUUID);
-					byte[] bytes = null;
-					String fileType = this.database
-							.getFileType(fileUUID.toString());
-					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
-						VersionText doc = VersionManager.getInstance()
-								.getTextByVersionUUID(versionUUID);
-						bytes = doc.getDocumentText().getBytes();
-					} else {
-						bytes = DataManagement.getInstance()
-								.getArbitraryFileBytes(fileUUID, versionUUID);
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						UUID versionUUID = UUID.fromString(this.database
+								.getLatestVersionUUID(fileUUID.toString()));
+						returnData.put("version_uuid", versionUUID);
+						byte[] bytes = null;
+						String fileType = this.database
+								.getFileType(fileUUID.toString());
+						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
+							VersionText doc = VersionManager.getInstance()
+									.getTextByVersionUUID(versionUUID);
+							bytes = doc.getDocumentText().getBytes();
+						} else {
+							bytes = DataManagement.getInstance()
+									.getArbitraryFileBytes(fileUUID,
+											versionUUID);
+						}
+						returnData.put("status", "OK");
+						returnData.put("file_data", bytes);
 					}
-					returnData.put("status", "OK");
-					returnData.put("file_data", bytes);
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
