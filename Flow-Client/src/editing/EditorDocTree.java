@@ -86,7 +86,8 @@ public class EditorDocTree extends DocTree {
 		    // flowDir.getRootDirectory()).getProjectUUID());
 		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
 		    ddr.put("directory_uuid", selectedDir.getDirectoryUUID());
-//		    ddr.put("parent_directory_uuid", ((DirectoryNode) selectedDir.getParent()).getDirectoryUUID());
+		    // ddr.put("parent_directory_uuid", ((DirectoryNode)
+		    // selectedDir.getParent()).getDirectoryUUID());
 		    ddr.put("session_id", Communicator.getSessionID());
 		    ddr.put("mod_type", "DELETE");
 
@@ -269,8 +270,8 @@ public class EditorDocTree extends DocTree {
 		    String fileName = fileData.get("file_name", String.class);
 		    byte[] bytes = fileContents.get("file_data", byte[].class);
 		    String fileContentsString = new String(bytes);
-		    UUID fileUUID = fileContents.get("version_uuid", UUID.class);
-		    tabs.openTab(fileName, fileContentsString, projectUUID, fileUUID, true);
+		    UUID versionUUID = fileContents.get("version_uuid", UUID.class);
+		    tabs.openTab(fileName, fileContentsString, projectUUID, fileToOpen, versionUUID, true);
 		}
 	    }
 	    break;

@@ -9,7 +9,7 @@ import java.io.PrintStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import struct.TextFile;
+import struct.VersionText;
 import struct.User;
 import util.FileSerializer;
 
@@ -113,7 +113,7 @@ public class DataManagement {
 	 * @return whether or not the addition was successful
 	 */
 	public boolean addTextDocumentVersion(UUID fileUUID, UUID versionUUID,
-			TextFile textDoc) {
+			VersionText textDoc) {
 		L.info("adding text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -195,14 +195,14 @@ public class DataManagement {
 	 *            The UUID of the version
 	 * @return The text document
 	 */
-	public TextFile getTextDocument(UUID fileUUID, UUID versionUUID) {
+	public VersionText getTextDocument(UUID fileUUID, UUID versionUUID) {
 		L.info("getting text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
 				versionUUID + "." + TEXT_FILE_EXT);
 		if (!textFile.exists())
 			return null;
-		TextFile td = new TextFile();
+		VersionText td = new VersionText();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(textFile));
 			String text = "";

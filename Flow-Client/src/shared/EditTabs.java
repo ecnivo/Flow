@@ -86,18 +86,18 @@ public class EditTabs extends JTabbedPane {
 	});
     }
 
-    public void openTab(String tabName, String text, UUID projectUUID, UUID textFileUUID, boolean editable) {
+    public void openTab(String tabName, String text, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable) {
 	int tabs = getTabCount();
 	// Checks if the tab is already open, and if it is, will automatically
 	// switch to it
 	for (int i = 0; i < tabs; i++) {
-	    if (((EditArea) getComponentAt(i)).getTextDocumentUUID().equals(textFileUUID)) {
+	    if (((EditArea) getComponentAt(i)).getVersionTextUUID().equals(versionTextUUID)) {
 		setSelectedIndex(i);
 		return;
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(tabName, new EditArea(text, projectUUID, editable, this).getScrollPane());
+	    addTab(tabName, new EditArea(text, fileUUID, projectUUID, versionTextUUID, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
 	    setTabComponentAt(idx, new CustomTabHeader(tabName));
 	    // TODO tool tip should be the save date

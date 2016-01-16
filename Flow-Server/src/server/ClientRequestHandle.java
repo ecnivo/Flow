@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
-import struct.TextFile;
+import struct.VersionText;
 import struct.User;
 import util.DataManipulation;
 import util.DatabaseException;
@@ -186,7 +186,7 @@ public class ClientRequestHandle implements Runnable {
 								directoryUUID.toString(), "TEXT_DOCUMENT");
 						this.database.newVersion(fileUUID.toString(),
 								versionUUID.toString());
-						TextFile newTextDocument = new TextFile();
+						VersionText newTextDocument = new VersionText();
 						DataManagement.getInstance().addTextDocumentVersion(
 								fileUUID, versionUUID, newTextDocument);
 						returnData.put("file_uuid", fileUUID);
@@ -417,7 +417,7 @@ public class ClientRequestHandle implements Runnable {
 					String fileType = this.database
 							.getFileType(fileUUID.toString());
 					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
-						TextFile doc = DataManagement.getInstance()
+						VersionText doc = DataManagement.getInstance()
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
@@ -442,7 +442,7 @@ public class ClientRequestHandle implements Runnable {
 					String fileType = this.database
 							.getFileType(fileUUID.toString());
 					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
-						TextFile doc = DataManagement.getInstance()
+						VersionText doc = DataManagement.getInstance()
 								.getTextDocument(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
@@ -466,7 +466,7 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
-					TextFile td = DataManagement.getInstance()
+					VersionText td = DataManagement.getInstance()
 							.getTextDocument(fileUUID, latestVersionUUID);
 					switch (data.get("mod_type", String.class)) {
 					case "INSERT":

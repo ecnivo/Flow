@@ -6,11 +6,11 @@ import java.util.ArrayList;
 /**
  * Represents a editable text document Created by Netdex on 12/18/2015.
  */
-public class TextFile implements Serializable {
+public class VersionText implements Serializable {
 
 	private ArrayList<String> lines;
 
-	public TextFile() {
+	public VersionText() {
 		this.lines = new ArrayList<>();
 		lines.add("");
 	}

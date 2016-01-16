@@ -22,7 +22,7 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 import message.Data;
-import struct.TextFile;
+import struct.VersionText;
 
 import compiler.FlowCompiler;
 
@@ -49,8 +49,8 @@ public class RunStopBar extends JToolBar {
      * @param directory
      *            the directory to search for the files
      */
-    private TextFile[] getFiles(UUID directory) {
-	ArrayList<TextFile> out = new ArrayList<TextFile>();
+    private VersionText[] getFiles(UUID directory) {
+	ArrayList<VersionText> out = new ArrayList<VersionText>();
 
 	Data dirInfoRequest = new Data("directory_info");
 	dirInfoRequest.put("session_id", Communicator.getSessionID());
@@ -63,15 +63,15 @@ public class RunStopBar extends JToolBar {
 	    fileRequest.put("session_id", Communicator.getSessionID());
 	    Data file = Communicator.communicate(fileRequest);
 
-	    TextFile textFile = new TextFile();
-	    textFile.setDocumentText(new String(file.get("file_data", byte[].class)));
-	    out.add(textFile);
+	    VersionText versionText = new VersionText();
+	    versionText.setDocumentText(new String(file.get("file_data", byte[].class)));
+	    out.add(versionText);
 	}
 	for (UUID childDir : dirInfo.get("child_directories", UUID[].class)) {
 	    out.addAll(Arrays.asList(getFiles(childDir)));
 	}
 
-	TextFile[] outArray = new TextFile[out.size()];
+	VersionText[] outArray = new VersionText[out.size()];
 	for (int i = 0; i < out.size(); i++) {
 	    outArray[i] = out.get(i);
 	}

@@ -29,7 +29,7 @@ import shared.EditTabs;
 public class VersionViewer extends JPanel {
     private ImageIcon middle;
 
-    private UUID file;
+    private UUID fileUUID;
     private UUID projectUUID;
 
     private static final int ICON_SIZE = 42;
@@ -55,10 +55,10 @@ public class VersionViewer extends JPanel {
     }
 
     /**
-     * @param flowFile
+     * @param flowFileUUID
      */
-    public void setFile(UUID flowFile, UUID projectUUID) {
-	file = flowFile;
+    public void setFile(UUID flowFileUUID, UUID projectUUID) {
+	fileUUID = flowFileUUID;
 	this.projectUUID = projectUUID;
 	updateVersions();
     }
@@ -69,7 +69,7 @@ public class VersionViewer extends JPanel {
 	removeAll();
 
 	Data fileInfoRequest = new Data("file_info");
-	fileInfoRequest.put("file_uuid", file);
+	fileInfoRequest.put("file_uuid", fileUUID);
 	fileInfoRequest.put("session_id", Communicator.getSessionID());
 	Data fileInfo = Communicator.communicate(fileInfoRequest);
 	UUID[] versions = fileInfo.get("file_versions", UUID[].class);
@@ -86,14 +86,14 @@ public class VersionViewer extends JPanel {
 
 	for (UUID versionUUID : versions) {
 	    Data versionDataRequest = new Data("version_request");
-	    versionDataRequest.put("file_uuid", file);
+	    versionDataRequest.put("file_uuid", fileUUID);
 	    versionDataRequest.put("version_uuid", versionUUID);
 	    versionDataRequest.put("session_id", Communicator.getSessionID());
 	    byte[] versionData = Communicator.communicate(versionDataRequest).get("version_data", byte[].class);
 
 	    Data versionInfoRequest = new Data("version_info");
 	    versionInfoRequest.put("version_uuid", versionUUID);
-	    versionInfoRequest.put("file_uuid", file);
+	    versionInfoRequest.put("file_uuid", fileUUID);
 	    versionInfoRequest.put("session_id", Communicator.getSessionID());
 	    Date saveDate = Communicator.communicate(versionInfoRequest).get("date", Date.class);
 
@@ -150,7 +150,7 @@ public class VersionViewer extends JPanel {
 			if (isText) {
 			    EditTabs tabs = historyPane.getEditTabs();
 			    if (tabs != null)
-				tabs.openTab(date.toString(), new String(data), projectUUID, versionUUID, false);
+				tabs.openTab(date.toString(), new String(data), projectUUID, fileUUID, versionUUID, false);
 			} else
 			    throw new UnsupportedOperationException();
 			// TODO find a way to open past arbit files in desktop
