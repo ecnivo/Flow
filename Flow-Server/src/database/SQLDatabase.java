@@ -31,6 +31,10 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
+	public enum ObjectType {
+		PROJECT, DIRECTORY, FILE, VERSION;
+	}
+
 	/**
 	 * Connection to the database.
 	 */
@@ -1095,5 +1099,10 @@ public class SQLDatabase {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
+	}
+
+	public UUID getProjectUUID(String UUID, ObjectType type) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

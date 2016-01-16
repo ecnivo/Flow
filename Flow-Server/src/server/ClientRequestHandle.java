@@ -91,9 +91,8 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
-						String status = "OK", username = this.database
-								.getUsername(data.get("session_id", UUID.class)
-										.toString());
+						String username = this.database.getUsername(
+								data.get("session_id", UUID.class).toString());
 						if (!DataManagement.getInstance()
 								.removeUser(username)) {
 							returnData.put("status", "INTERNAL_SERVER_ERROR");
@@ -233,53 +232,75 @@ public class ClientRequestHandle implements Runnable {
 			case "project_modify": {
 				UUID projectUUID = data.get("project_uuid", UUID.class),
 						sessionID = data.get("session_id", UUID.class);
-				switch (data.get("project_modify_type", String.class)) {
-				case "MODIFY_COLLABORATOR":
-					ResultSet sessionInfo = null;
-					try {
-						sessionInfo = this.database
-								.getSessionInfo(data.get("session_id"));
-						sessionInfo.next();
-						String username = sessionInfo.getString("Username");
-						returnData.put("status",
-								this.database.updateAccess(
-										(int) data.get("access_level",
-												Byte.class),
-								projectUUID.toString(), username));
-					} catch (DatabaseException e) {
-						e.printStackTrace();
-						returnData.put("status", e.getMessage());
-					} catch (SQLException e) {
-						e.printStackTrace();
-						returnData.put("status", FlowServer.ERROR);
+				try {
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString())) {
+						switch (data.get("project_modify_type", String.class)) {
+						case "MODIFY_COLLABORATOR":
+							ResultSet sessionInfo = null;
+
+							sessionInfo = this.database
+									.getSessionInfo(data.get("session_id"));
+							sessionInfo.next();
+							String username = sessionInfo.getString("Username");
+							returnData.put("status",
+									this.database.updateAccess(
+											(int) data.get("access_level",
+													Byte.class),
+									projectUUID.toString(), username));
+
+							break;
+						case "RENAME_PROJECT": {
+							String newName = data.get("new_name", String.class);
+							returnData.put("status",
+									this.database.renameProject(
+											projectUUID.toString(), newName));
+						}
+							break;
+						case "DELETE_PROJECT":
+							returnData.put("status", this.database
+									.deleteProject(projectUUID.toString()));
+							break;
+						}
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
 					}
-					break;
-				case "RENAME_PROJECT": {
-					String newName = data.get("new_name", String.class);
-					returnData.put("status", this.database
-							.renameProject(projectUUID.toString(), newName));
-				}
-					break;
-				case "DELETE_PROJECT":
-					returnData.put("status", this.database
-							.deleteProject(projectUUID.toString()));
-					break;
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
 				}
 			}
 				break;
 			case "directory_modify": {
-				UUID directoryUUID = data.get("directory_uuid", UUID.class);
-				String type = data.get("mod_type", String.class);
-				switch (type) {
-				case "RENAME":
-					String newName = data.get("new_name", String.class);
-					returnData.put("status", this.database.renameDirectory(
-							directoryUUID.toString(), newName));
-					break;
-				case "DELETE":
-					returnData.put("status", this.database
-							.deleteDirectory(directoryUUID.toString()));
-					break;
+				UUID directoryUUID = data.get("directory_uuid", UUID.class),
+						sessionID = data.get("session_id", UUID.class),
+						projectUUID = this.database.getProjectUUID(
+								directoryUUID.toString(),
+								SQLDatabase.ObjectType.DIRECTORY);
+				try {
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString())) {
+						String type = data.get("mod_type", String.class);
+						switch (type) {
+						case "RENAME":
+							String newName = data.get("new_name", String.class);
+							returnData.put("status",
+									this.database.renameDirectory(
+											directoryUUID.toString(), newName));
+							break;
+						case "DELETE":
+							returnData.put("status", this.database
+									.deleteDirectory(directoryUUID.toString()));
+							break;
+						}
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
 				}
 			}
 				break;
