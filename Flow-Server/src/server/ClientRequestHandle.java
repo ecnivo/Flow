@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -10,14 +18,6 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -170,10 +170,10 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				break;
-			case "new_text_file": {
-				UUID projectUUID = data.get("project_uuid", UUID.class),
-						sessionID = data.get("session_id", UUID.class);
+			case "new_text_file":
 				try {
+					UUID projectUUID = data.get("project_uuid", UUID.class),
+							sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString())) {
 						UUID directoryUUID = data.get("directory_uuid",
@@ -200,14 +200,13 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", FlowServer.ERROR);
 				}
-			}
 				break;
-			case "new_directory": {
-				UUID projectUUID = data.get("project_uuid", UUID.class);
-				UUID parentDirectoryUUID = data.get("parent_directory_uuid",
-						UUID.class);
-				UUID sessionID = data.get("session_id", UUID.class);
+			case "new_directory":
 				try {
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+							UUID.class);
+					UUID sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString())) {
 						UUID random = UUID.randomUUID();
@@ -227,7 +226,6 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", FlowServer.ERROR);
 				}
-			}
 				break;
 			case "project_modify": {
 				UUID projectUUID = data.get("project_uuid", UUID.class),
@@ -308,7 +306,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "file_metadata_modify": {
+			case "file_metadata_modify":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
 					String sessionID = data.get("session_id", UUID.class)
@@ -339,7 +337,6 @@ public class ClientRequestHandle implements Runnable {
 					L.severe(e.getMessage());
 					returnData.put("status", FlowServer.ERROR);
 				}
-			}
 				break;
 			case "project_info":
 				try {
@@ -467,7 +464,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
-			case "version_info": {
+			case "version_info":
 				try {
 					String versionUUID = data.get("version_uuid", UUID.class)
 							.toString(),
@@ -488,8 +485,8 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-			}
-			case "request_version": {
+
+			case "request_version":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class),
 							versionUUID = data.get("version_uuid", UUID.class);
@@ -520,7 +517,7 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-			}
+
 				break;
 			case "file_request":
 				try {
@@ -554,11 +551,10 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				break;
-			case "file_text_modify": {
-				UUID fileUUID = data.get("file_uuid", UUID.class);
-				int idx = data.get("idx", Integer.class);
-
+			case "file_text_modify":
 				try {
+					UUID fileUUID = data.get("file_uuid", UUID.class);
+					int idx = data.get("idx", Integer.class);
 					String username = this.database.getUsername(
 							data.get("session_id", UUID.class).toString());
 					UUID latestVersionUUID = UUID.fromString(this.database
@@ -595,7 +591,6 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-			}
 				break;
 			default:
 				// For completeness's sake
