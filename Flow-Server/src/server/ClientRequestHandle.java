@@ -1,5 +1,15 @@
 package server;
 
+import callback.VersionManager;
+import database.SQLDatabase;
+import message.Data;
+import network.DataSocket;
+import struct.User;
+import struct.VersionText;
+import util.DataManipulation;
+import util.DatabaseException;
+import util.Results;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -7,15 +17,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
-import message.Data;
-import network.DataSocket;
-import struct.VersionText;
-import struct.User;
-import util.DataManipulation;
-import util.DatabaseException;
-import util.Results;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -187,7 +188,7 @@ public class ClientRequestHandle implements Runnable {
 						this.database.newVersion(fileUUID.toString(),
 								versionUUID.toString());
 						VersionText newTextDocument = new VersionText();
-						DataManagement.getInstance().addTextDocumentVersion(
+						DataManagement.getInstance().addTextVersion(
 								fileUUID, versionUUID, newTextDocument);
 						returnData.put("file_uuid", fileUUID);
 						returnData.put("status", "OK");
@@ -418,7 +419,7 @@ public class ClientRequestHandle implements Runnable {
 							.getFileType(fileUUID.toString());
 					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
 						VersionText doc = DataManagement.getInstance()
-								.getTextDocument(fileUUID, versionUUID);
+								.getTextDocumentFromFile(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
 						bytes = DataManagement.getInstance()
@@ -443,7 +444,7 @@ public class ClientRequestHandle implements Runnable {
 							.getFileType(fileUUID.toString());
 					if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
 						VersionText doc = DataManagement.getInstance()
-								.getTextDocument(fileUUID, versionUUID);
+								.getTextDocumentFromFile(fileUUID, versionUUID);
 						bytes = doc.getDocumentText().getBytes();
 					} else {
 						bytes = DataManagement.getInstance()
@@ -466,8 +467,7 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
-					VersionText td = DataManagement.getInstance()
-							.getTextDocument(fileUUID, latestVersionUUID);
+					VersionText td = VersionManager.getInstance().getTextByVersionUUID(latestVersionUUID);
 					switch (data.get("mod_type", String.class)) {
 					case "INSERT":
 						String str = data.get("str", String.class);

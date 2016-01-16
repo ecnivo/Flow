@@ -1,17 +1,13 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.PrintStream;
+import callback.VersionManager;
+import struct.User;
+import struct.VersionText;
+import util.FileSerializer;
+
+import java.io.*;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import struct.VersionText;
-import struct.User;
-import util.FileSerializer;
 
 /**
  * Created by Netdex on 1/5/2016.
@@ -57,6 +53,8 @@ public class DataManagement {
 			userDir.mkdirs();
 		if (!fileDir.exists())
 			fileDir.mkdirs();
+
+		VersionManager.getInstance().loadAllDocuments(fileDir);
 	}
 
 	/**
@@ -112,8 +110,8 @@ public class DataManagement {
 	 *            The text document
 	 * @return whether or not the addition was successful
 	 */
-	public boolean addTextDocumentVersion(UUID fileUUID, UUID versionUUID,
-			VersionText textDoc) {
+	public boolean addTextVersion(UUID fileUUID, UUID versionUUID,
+								  VersionText textDoc) {
 		L.info("adding text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -125,6 +123,7 @@ public class DataManagement {
 		} catch (Exception e) {
 			return false;
 		}
+		VersionManager.getInstance().addTextVersion(versionUUID, textDoc);
 		return true;
 	}
 
@@ -137,11 +136,12 @@ public class DataManagement {
 	 *            The UUID of the version of the file
 	 * @return whether or not the removal was successful
 	 */
-	public boolean removeDocumentVersion(UUID fileUUID, UUID versionUUID) {
+	public boolean removeTextVersion(UUID fileUUID, UUID versionUUID) {
 		L.info("removing document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
 				versionUUID + "." + TEXT_FILE_EXT);
+		VersionManager.getInstance().removeTextVersion(versionUUID);
 		return textFile.delete();
 	}
 
@@ -195,7 +195,7 @@ public class DataManagement {
 	 *            The UUID of the version
 	 * @return The text document
 	 */
-	public VersionText getTextDocument(UUID fileUUID, UUID versionUUID) {
+	public VersionText getTextDocumentFromFile(UUID fileUUID, UUID versionUUID) {
 		L.info("getting text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
