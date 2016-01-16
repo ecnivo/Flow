@@ -439,6 +439,7 @@ public class ClientRequestHandle implements Runnable {
 							.getLatestVersionUUID(fileUUID.toString()));
 					System.out.println("bob3");
 					returnData.put("version_uuid", versionUUID);
+					data.put("status", "OK");
 					byte[] bytes = null;
 					String fileType = this.database
 							.getFileType(fileUUID.toString());
@@ -451,7 +452,6 @@ public class ClientRequestHandle implements Runnable {
 								.getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					System.out.println("bob7");
-					data.put("status", "OK");
 					data.put("file_data", bytes);
 					System.out.println("bob9");
 				} catch (DatabaseException e) {
