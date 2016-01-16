@@ -43,10 +43,6 @@ public abstract class DocTree extends JTree {
     private UUID[] usersProjectsUUIDs;
 
     public DocTree() {
-	// TODO
-	// UIManager.put("Tree.closedIcon", icon);
-	// UIManager.put("Tree.openIcon", icon);
-	// UIManager.put("Tree.leafIcon", icon);
 	setMinimumSize(new Dimension(100, 0));
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setBorder(FlowClient.EMPTY_BORDER);
@@ -61,6 +57,7 @@ public abstract class DocTree extends JTree {
 		    refreshProjectList();
 	    }
 	});
+	setSelectionRow(0);
 	addTreeSelectionListener(new TreeSelectionListener() {
 
 	    @Override
