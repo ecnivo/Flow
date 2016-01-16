@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
@@ -70,7 +71,11 @@ public class EditorToolbar extends JToolBar {
 		if (path == null) {
 		    return;
 		}
-		ProjectNode selectedNode = (ProjectNode) path.getPath()[1];
+		DefaultMutableTreeNode[] treePath = (DefaultMutableTreeNode[]) path.getPath();
+		if (treePath == null) {
+		    return;
+		}
+		ProjectNode selectedNode = (ProjectNode) treePath[1];
 		String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + selectedNode.getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE).trim();
 		while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
 		    modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE).trim();

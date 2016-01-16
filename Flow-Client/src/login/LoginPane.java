@@ -96,12 +96,12 @@ public class LoginPane extends JPanel {
 	passwordEntry.addKeyListener(new KeyListener() {
 
 	    @Override
-	    public void keyTyped(KeyEvent e) {
+	    public void keyReleased(KeyEvent e) {
 		// nothing
 	    }
 
 	    @Override
-	    public void keyReleased(KeyEvent e) {
+	    public void keyTyped(KeyEvent e) {
 		if (e.getKeyChar() == KeyEvent.VK_ENTER)
 		    loginButton.doClick();
 	    }

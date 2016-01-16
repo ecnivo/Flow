@@ -18,7 +18,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import struct.TextDocument;
+import struct.TextFile;
 
 /**
  * Represents a wrapper around the javac compiler
@@ -30,7 +30,7 @@ import struct.TextDocument;
  */
 public class FlowCompiler {
 
-    private TextDocument[] textDocuments;
+    private TextFile[] textFiles;
     private UUID dirUUID;
     private File workingDirectory;
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
@@ -40,8 +40,8 @@ public class FlowCompiler {
      *
      * @param doc The textDocuments to compile
      */
-    public FlowCompiler(TextDocument... doc) {
-        this.textDocuments = doc;
+    public FlowCompiler(TextFile... doc) {
+        this.textFiles = doc;
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
@@ -149,8 +149,8 @@ public class FlowCompiler {
         return workingDirectory;
     }
 
-    protected TextDocument[] getFlowFiles() {
-        return textDocuments;
+    protected TextFile[] getFlowFiles() {
+        return textFiles;
     }
 
     protected static String removeExtension(String s) {

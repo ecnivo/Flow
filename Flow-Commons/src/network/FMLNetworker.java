@@ -62,8 +62,8 @@ public class FMLNetworker {
 
     public boolean registerFileChangeListener(FileChangeListener chngListener, UUID flowDocumentUUID) {
         try {
-            Data asyncCallbackRequest = new Data("document_async");
-            asyncCallbackRequest.put("rtype", "register");
+            Data asyncCallbackRequest = new Data("file_async");
+            asyncCallbackRequest.put("rtype", "REGISTER");
             asyncCallbackRequest.put("doc_id", flowDocumentUUID);
             send(asyncCallbackRequest);
             chngListener.init(ip);

@@ -1,6 +1,6 @@
 package compiler;
 
-import struct.TextDocument;
+import struct.TextFile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,7 +19,7 @@ public class Debugger {
     private BufferedReader in;
     private PrintStream out;
 
-    public Debugger(TextDocument... flowFiles) {
+    public Debugger(TextFile... flowFiles) {
         this.flowCompiler = new FlowCompiler(flowFiles);
         this.workingDirectory = flowCompiler.getWorkingDirectory();
         throw new UnsupportedOperationException(); // FIXME: 12/30/2015

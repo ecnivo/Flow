@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -60,8 +59,7 @@ public class EditArea extends JTextPane {
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
 	setForeground(PLAIN_COLOUR);
-	doc = (StyledDocument) new File(textDoc);
-	setStyledDocument(doc);
+	doc = getStyledDocument();
 	setText(textDoc);
 	doc.putProperty(PlainDocument.tabSizeAttribute, 4);
 	setEditable(editable);
@@ -130,11 +128,9 @@ public class EditArea extends JTextPane {
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		}
-		Data documentModify = new Data("text_document_modify");
-		// documentModify.put("project", ((FlowProject)
-		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", documentUUID);
-		documentModify.put("mod_type", "INSERT");
+		Data fileModify = new Data("file_text_modify");
+		fileModify.put("file_uuid", documentUUID);
+		fileModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
 		try {
@@ -149,11 +145,11 @@ public class EditArea extends JTextPane {
 		    if (Character.isWhitespace(text.charAt(i)))
 			lines++;
 		}
-		documentModify.put("line", lines);
-		documentModify.put("idx", EditArea.this.getCaretPosition() - e.getLength() - lastNewLine);
-		documentModify.put("str", insertedString);
+		fileModify.put("line", lines);
+		fileModify.put("idx", EditArea.this.getCaretPosition() - e.getLength() - lastNewLine);
+		fileModify.put("str", insertedString);
 
-		Data response = Communicator.communicate(documentModify);
+		Data response = Communicator.communicate(fileModify);
 		String status = response.get("status", String.class);
 		if (!status.equals("OK")) {
 		    return;
@@ -166,10 +162,9 @@ public class EditArea extends JTextPane {
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
 
-		Data documentModify = new Data("text_document_modify");
-		// documentModify.put("project", ((FlowProject)
-		// document.getParentFile().getParentDirectory().getRootDirectory()).getProjectUUID());
-		documentModify.put("document", documentUUID);
+		Data documentModify = new Data("file_metadata_modify");
+		documentModify.put("file_uuid", documentUUID);
+		documentModify.put("session_id", Communicator.getSessionID());
 		documentModify.put("mod_type", "DELETE");
 
 		int lastNewLine;
@@ -280,6 +275,7 @@ public class EditArea extends JTextPane {
 	keywordBlocks = new ArrayList<StyleToken>();
 	plainBlocks = new ArrayList<StyleToken>();
 	stringBlocks = new ArrayList<StyleToken>();
+	commentBlocks = new ArrayList<StyleToken>();
 
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();

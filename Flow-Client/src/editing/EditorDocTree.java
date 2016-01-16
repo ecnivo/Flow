@@ -86,7 +86,7 @@ public class EditorDocTree extends DocTree {
 		    // flowDir.getRootDirectory()).getProjectUUID());
 		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
 		    ddr.put("directory_uuid", selectedDir.getDirectoryUUID());
-		    ddr.put("parent_directory_uuid", ((DirectoryNode) selectedDir.getParent()).getDirectoryUUID());
+//		    ddr.put("parent_directory_uuid", ((DirectoryNode) selectedDir.getParent()).getDirectoryUUID());
 		    ddr.put("session_id", Communicator.getSessionID());
 		    ddr.put("mod_type", "DELETE");
 
@@ -139,7 +139,7 @@ public class EditorDocTree extends DocTree {
 		FileNode selectedNode = (FileNode) getSelectionPath().getLastPathComponent();
 		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedNode.getName() + "?", "Deletion confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.YES_OPTION) {
-		    Data delFileReq = new Data("file_modify");
+		    Data delFileReq = new Data("file_metadata_modify");
 		    // delFileReq.put("project_uuid", ((FlowProject)
 		    // file.getParentDirectory().getRootDirectory()).getProjectUUID());
 		    delFileReq.put("file_uuid", selectedNode.getFileUUID());
@@ -244,6 +244,7 @@ public class EditorDocTree extends DocTree {
     private void openFile(UUID fileToOpen, UUID projectUUID) {
 	Data fileRequest = new Data("file_info");
 	fileRequest.put("file_uuid", fileToOpen);
+	fileRequest.put("session_id", Communicator.getSessionID());
 	Data fileData = Communicator.communicate(fileRequest);
 
 	Data documentRequest = new Data("document_request");
@@ -251,8 +252,8 @@ public class EditorDocTree extends DocTree {
 	documentRequest.put("file_uuid", fileToOpen);
 	Data documentData = Communicator.communicate(documentRequest);
 
-	System.out.println("got the data");
-	switch (documentData.get("status", String.class)) {
+	String status = documentData.get("status", String.class);
+	switch (status) {
 	case "OK":
 	    String type = fileData.get("file_type", String.class);
 	    if (type.contains("ARBIT")) {
@@ -263,10 +264,15 @@ public class EditorDocTree extends DocTree {
 		// e1.printStackTrace();
 		// }
 	    } else if (type.contains("TEXT")) {
-		System.out.println("is text document");
 		EditTabs tabs = editPane.getEditTabs();
-		if (tabs != null)
-		    tabs.openTab(fileData.get("file_name", String.class), new String(documentRequest.get("file_data", byte[].class)), projectUUID, documentRequest.get("version_uuid", UUID.class), true);
+		if (tabs != null) {
+		    String fileName = fileData.get("file_name", String.class);
+		    byte[] bytes = documentData.get("file_data", byte[].class);
+		    System.out.println(bytes);
+		    String docContents = new String(bytes);
+		    UUID docUUID = documentData.get("version_uuid", UUID.class);
+		    tabs.openTab(fileName, docContents, projectUUID, docUUID, true);
+		}
 	    }
 	    break;
 	case "PROJECT_NOT_FOUND":
@@ -350,12 +356,12 @@ public class EditorDocTree extends DocTree {
 		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
 			name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE).trim();
 		    }
-		    Data createFileRequest = new Data("new_textdocument");
+		    Data createFileRequest = new Data("new_text_file");
 		    UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 		    createFileRequest.put("project_uuid", projectUUID);
 		    // createFileRequest.put("project_uuid", ((FlowProject)
 		    // getActiveDirectoryNode().getDirectoryUUID().getRootDirectory()).getProjectUUID());
-		    createFileRequest.put("document_name", name);
+		    createFileRequest.put("file_name", name);
 		    createFileRequest.put("session_id", Communicator.getSessionID());
 		    createFileRequest.put("directory_uuid", selectedDir.getDirectoryUUID());
 
