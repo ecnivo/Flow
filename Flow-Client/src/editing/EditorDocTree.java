@@ -85,12 +85,8 @@ public class EditorDocTree extends DocTree {
 		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + ((DirectoryNode) getSelectionPath().getLastPathComponent()).getName() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.YES_OPTION) {
 		    Data ddr = new Data("directory_modify");
-		    // ddr.put("project_uuid", ((FlowProject)
-		    // flowDir.getRootDirectory()).getProjectUUID());
 		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
 		    ddr.put("directory_uuid", selectedDir.getDirectoryUUID());
-		    // ddr.put("parent_directory_uuid", ((DirectoryNode)
-		    // selectedDir.getParent()).getDirectoryUUID());
 		    ddr.put("session_id", Communicator.getSessionID());
 		    ddr.put("mod_type", "DELETE");
 
@@ -144,8 +140,6 @@ public class EditorDocTree extends DocTree {
 		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedNode.getName() + "?", "Deletion confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.YES_OPTION) {
 		    Data delFileReq = new Data("file_metadata_modify");
-		    // delFileReq.put("project_uuid", ((FlowProject)
-		    // file.getParentDirectory().getRootDirectory()).getProjectUUID());
 		    delFileReq.put("file_uuid", selectedNode.getFileUUID());
 		    delFileReq.put("session_id", Communicator.getSessionID());
 		    delFileReq.put("mod_type", "DELETE");
@@ -399,8 +393,6 @@ public class EditorDocTree extends DocTree {
 		    Data createFileRequest = new Data("new_text_file");
 		    UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 		    createFileRequest.put("project_uuid", projectUUID);
-		    // createFileRequest.put("project_uuid", ((FlowProject)
-		    // getActiveDirectoryNode().getDirectoryUUID().getRootDirectory()).getProjectUUID());
 		    createFileRequest.put("file_name", name);
 		    createFileRequest.put("session_id", Communicator.getSessionID());
 		    createFileRequest.put("directory_uuid", selectedDir.getDirectoryUUID());
