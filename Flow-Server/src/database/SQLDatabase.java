@@ -118,6 +118,12 @@ public class SQLDatabase {
 			if (this.query(String.format(
 					"SELECT Username FROM Users WHERE Username = '%s';",
 					username)).next()) {
+				
+				// Remove any old access status
+				this.update(String.format(
+						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+						username, projectId));
+
 				if (accessLevel == EDIT || accessLevel == VIEW) {
 					this.update(String.format(
 							"INSERT INTO access values('%s', '%s', '%s');",
@@ -126,10 +132,6 @@ public class SQLDatabase {
 					// Changes the owner of the project in the projects table
 					this.update(String.format(
 							"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
-							username, projectId));
-
-					this.update(String.format(
-							"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
 							username, projectId));
 
 					// Changes the permissions of the user to be an owner
