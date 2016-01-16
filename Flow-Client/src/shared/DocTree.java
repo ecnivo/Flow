@@ -310,7 +310,7 @@ public abstract class DocTree extends JTree {
 	private UUID directory;
 	private String name;
 
-	public DirectoryNode(UUID dir, String name) {
+	private DirectoryNode(UUID dir, String name) {
 	    this.directory = dir;
 	    this.name = name;
 	}

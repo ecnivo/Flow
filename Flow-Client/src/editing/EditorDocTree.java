@@ -324,7 +324,8 @@ public class EditorDocTree extends DocTree {
 
 		    Data response = Communicator.communicate(createDirReq);
 		    if (response.get("status", String.class).equals("OK")) {
-			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new DirectoryNode(response.get("directory_uuid", UUID.class)), selectedDir, selectedDir.getChildCount());
+			UUID newDirUUID = response.get("directory_uuid", UUID.class);
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new DirectoryNode(newDirUUID), selectedDir, selectedDir.getChildCount());
 		    } else if (response.get("status", String.class).equals("DIRECTORY_NAME_INVALID")) {
 			JOptionPane.showConfirmDialog(null, "The directory name is invalid. Try another name.\nThe most likely issue is that the name is conflicting with another name.", "Directory name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    } else
