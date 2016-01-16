@@ -204,6 +204,7 @@ public class EditArea extends JTextPane {
 			e1.printStackTrace();
 		    }
 		}
+		
 	    }
 
 	};

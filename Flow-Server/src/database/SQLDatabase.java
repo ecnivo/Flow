@@ -333,7 +333,6 @@ public class SQLDatabase {
 					"INSERT INTO Versions VALUES('%s', '%d', '%s');",
 					versionUUID, new Date().getTime(), fileUUID));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
@@ -427,7 +426,6 @@ public class SQLDatabase {
 			this.update(String.format(
 					"DELETE FROM sessions WHERE SessionID = '%s';", sessionId));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -461,7 +459,6 @@ public class SQLDatabase {
 			}
 			throw new DatabaseException("INVALID_SESSION_ID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		throw new DatabaseException(FlowServer.ERROR);
@@ -532,7 +529,6 @@ public class SQLDatabase {
 				throw new DatabaseException("INVALID_FILE_UUID");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch blocks
 			e.printStackTrace();
 		}
 		// Throw an exception in this case because the server expects to use
@@ -850,7 +846,6 @@ public class SQLDatabase {
 					"UPDATE users SET Password = '%s' WHERE Username = '%s';",
 					newPassword, username));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
@@ -947,7 +942,6 @@ public class SQLDatabase {
 				return false;
 			return true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -966,14 +960,12 @@ public class SQLDatabase {
 	 */
 	public String[] getUsers(String projectUUID, int accessLevel)
 			throws DatabaseException {
-		// TODO Auto-generated method stub
 		try {
 			return Results.toStringArray("Username",
 					this.query(String.format(
 							"SELECT Username FROM Access WHERE ProjectID = '%s' AND AccessLevel = '%d';",
 							projectUUID, accessLevel)));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -996,7 +988,6 @@ public class SQLDatabase {
 					fileUUID));
 			return Results.toStringArray("VersionID", response);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -1023,7 +1014,6 @@ public class SQLDatabase {
 				return response;
 			throw new DatabaseException("INVALID_VERSION_UUID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -1045,7 +1035,6 @@ public class SQLDatabase {
 		try {
 			return response.getLong("Date");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -1067,7 +1056,6 @@ public class SQLDatabase {
 		try {
 			return response.getString("FileType");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
@@ -1095,12 +1083,22 @@ public class SQLDatabase {
 				return response.getString("VersionID");
 			throw new DatabaseException("INVALID_FILE_UUID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified directory.
+	 * 
+	 * @param directoryUUID
+	 *            the string representation of the UUID of the directory.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the directory UUID is invalid, or there is an error
+	 *             accessing the database.
+	 */
 	public String getProjectUUIDFromDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
@@ -1112,12 +1110,22 @@ public class SQLDatabase {
 			}
 			throw new DatabaseException("INVALID_DIRECTORY_UUID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified file.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the file UUID is invalid, or there is an error accessing
+	 *             the database.
+	 */
 	public String getProjectUUIDFromFile(String fileUUID)
 			throws DatabaseException {
 		try {
@@ -1129,12 +1137,22 @@ public class SQLDatabase {
 			}
 			throw new DatabaseException("INVALID_FILE_UUID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified version.
+	 * 
+	 * @param versionUUID
+	 *            the string representation of the UUID of the version.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the version UUID is invalid, or there is an error
+	 *             accessing the database.
+	 */
 	public String getProjectUUIDFromVersion(String versionUUID)
 			throws DatabaseException {
 		try {
@@ -1146,7 +1164,6 @@ public class SQLDatabase {
 			}
 			throw new DatabaseException("INVALID_VERSION_UUID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
 		}
