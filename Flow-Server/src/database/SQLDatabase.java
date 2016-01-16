@@ -342,7 +342,8 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Getter for all of the usernames in the database.
+	 * Getter for all of the usernames in the database who have access to the
+	 * specified project.
 	 *
 	 * @return all of the usernames in the database.
 	 * @throws DatabaseException
