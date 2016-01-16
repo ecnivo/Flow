@@ -24,7 +24,6 @@ import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -47,9 +46,8 @@ public class CollabsList extends JPanel {
     private JTextField searchBox;
     private JButton searchButton;
     private EditPane editPane;
-    private UUID activeProject;
+    private UUID activeProjectUUID;
     private JPanel userList;
-    private DefaultListModel<UserInfo> userListModel;
     private static final String SEARCHBOX_TEXT = "Search...";
     private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
     // private static final int USER_ICON_SIZE = 55;
@@ -102,7 +100,7 @@ public class CollabsList extends JPanel {
 			Data collabMod = new Data("project_modify");
 			collabMod.put("session_id", Communicator.getSessionID());
 			collabMod.put("project_modify_type", "MODIFY_COLLABORATOR");
-			collabMod.put("project_uuid", activeProject);
+			collabMod.put("project_uuid", activeProjectUUID);
 			collabMod.put("username", query);
 			collabMod.put("access_level", (byte) 1);
 
@@ -149,26 +147,26 @@ public class CollabsList extends JPanel {
 	Data getProject = new Data("project_info");
 	getProject.put("session_id", Communicator.getSessionID());
 	try {
-	    activeProject = getActiveUUID();
+	    activeProjectUUID = getActiveUUID();
 	} catch (NoActiveProjectException e) {
 	    e.printStackTrace();
 	}
-	getProject.put("project_uuid", activeProject);
+	getProject.put("project_uuid", activeProjectUUID);
 
 	Data activeProject = Communicator.communicate(getProject);
 
-	userListModel.clear();
+	userList.removeAll();
 
-	userListModel.addElement(new UserInfo(activeProject.get("owner", String.class), new FlowPermission(FlowPermission.OWNER)));
+	userList.add(new UserInfo(activeProject.get("owner", String.class), new FlowPermission(FlowPermission.OWNER)));
 
 	String[] editors = activeProject.get("editors", String[].class);
 	for (String editor : editors) {
-	    userListModel.addElement(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
+	    userList.add(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
 	}
 
 	String[] viewers = activeProject.get("viewers", String[].class);
 	for (String viewer : viewers) {
-	    userListModel.addElement(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
+	    userList.add(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
 	}
 
 	userList.revalidate();
@@ -282,7 +280,7 @@ public class CollabsList extends JPanel {
 
 		    Data changePerm = new Data("project_modify");
 		    changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
-		    UUID projectUUID = ((EditArea) editPane.getEditTabs().getSelectedComponent()).getProjectUUID();
+		    UUID projectUUID = activeProjectUUID;
 		    changePerm.put("project_uuid", projectUUID);
 		    changePerm.put("session_id", Communicator.getSessionID());
 		    changePerm.put("username", user);
