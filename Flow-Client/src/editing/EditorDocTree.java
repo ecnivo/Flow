@@ -189,7 +189,7 @@ public class EditorDocTree extends DocTree {
 
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
-		TreePath treePath = getPathForRow(getRowForLocation(e.getX(), e.getY()));
+		TreePath treePath = getSelectionPath();
 		if (treePath == null) {
 		    return;
 		}
@@ -360,7 +360,7 @@ public class EditorDocTree extends DocTree {
 		public void actionPerformed(ActionEvent arg0) {
 		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
 		    String name = JOptionPane.showInputDialog(null, "What is the name of your new  file?\nInclude extensions such as .java", "Name", JOptionPane.QUESTION_MESSAGE);
-		    if (name == null){
+		    if (name == null) {
 			return;
 		    }
 		    while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.trim().length() < 1) {
