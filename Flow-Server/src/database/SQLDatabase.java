@@ -1103,7 +1103,6 @@ public class SQLDatabase {
 
 	public String getProjectUUIDFromDirectory(String directoryUUID)
 			throws DatabaseException {
-		// TODO Auto-generated method stub
 		try {
 			ResultSet response = this.query(String.format(
 					"SELECT ProjectID FROM Directories WHERE DirectoryID = '%s';",
@@ -1112,6 +1111,40 @@ public class SQLDatabase {
 				return response.getString("ProjectID");
 			}
 			throw new DatabaseException("INVALID_DIRECTORY_UUID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	public String getProjectUUIDFromFile(String fileUUID)
+			throws DatabaseException {
+		try {
+			ResultSet response = this.query(String.format(
+					"SELECT ProjectID FROM Documents WHERE DocumentID = '%s';",
+					fileUUID));
+			if (response.next()) {
+				return response.getString("ProjectID");
+			}
+			throw new DatabaseException("INVALID_FILE_UUID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	public String getProjectUUIDFromVersion(String versionUUID)
+			throws DatabaseException {
+		try {
+			ResultSet response = this.query(String.format(
+					"SELECT ProjectID FROM Documents WHERE DocumentID IN (SELECT DocumentID FROM Versions WHERE VersionID = '%s');",
+					versionUUID));
+			if (response.next()) {
+				return response.getString("ProjectID");
+			}
+			throw new DatabaseException("INVALID_VERSION_UUID");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

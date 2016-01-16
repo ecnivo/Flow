@@ -309,22 +309,28 @@ public class ClientRequestHandle implements Runnable {
 			}
 				break;
 			case "file_metadata_modify": {
-				UUID fileUUID = data.get("file_uuid", UUID.class);
-				String modType = data.get("mod_type", String.class);
 				try {
-					String fileType = this.database
-							.getFileType(fileUUID.toString());
-					switch (modType) {
-					case "RENAME":
-						returnData.put("status",
-								this.database.renameFile(fileUUID.toString(),
-										data.get("new_name", String.class)));
-						break;
-					case "DELETE":
-						DataManagement.getInstance().removeFileByUUID(fileUUID);
-						returnData.put("status",
-								this.database.deleteFile(fileUUID.toString()));
-						break;
+					UUID fileUUID = data.get("file_uuid", UUID.class);
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
+						String modType = data.get("mod_type", String.class);
+						switch (modType) {
+						case "RENAME":
+							returnData.put("status", this.database.renameFile(
+									fileUUID.toString(),
+									data.get("new_name", String.class)));
+							break;
+						case "DELETE":
+							DataManagement.getInstance()
+									.removeFileByUUID(fileUUID);
+							returnData.put("status", this.database
+									.deleteFile(fileUUID.toString()));
+							break;
+						}
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
