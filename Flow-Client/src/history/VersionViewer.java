@@ -95,7 +95,7 @@ public class VersionViewer extends JPanel {
 	    versionInfoRequest.put("version_uuid", versionUUID);
 	    versionInfoRequest.put("file_uuid", fileUUID);
 	    versionInfoRequest.put("session_id", Communicator.getSessionID());
-	    Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", long.class));
+	    Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", Long.class).longValue());
 
 	    VersionItem item = new VersionItem(versionData, saveDate, versionUUID, isText);
 
@@ -141,16 +141,19 @@ public class VersionViewer extends JPanel {
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
 		    VersionViewer.this.setBorder(BorderFactory.createLineBorder(new Color(0x5C9EB4), 2));
-		    updateVersions();
+		    // updateVersions();
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		    if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+		    if (e.getButton() == MouseEvent.BUTTON1) {
 			if (isText) {
 			    EditTabs tabs = historyPane.getEditTabs();
-			    if (tabs != null)
-				tabs.openTab(date.toString(), new String(data), projectUUID, fileUUID, versionUUID, false);
+			    if (tabs == null)
+				return;
+			    String stringDate = date.toString();
+			    String stringData = new String(data);
+			    tabs.openTab(stringDate, stringData, projectUUID, fileUUID, versionUUID, false);
 			} else
 			    throw new UnsupportedOperationException();
 			// TODO find a way to open past arbit files in desktop

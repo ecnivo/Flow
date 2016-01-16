@@ -243,7 +243,6 @@ public class EditorDocTree extends DocTree {
     }
 
     private void openFile(UUID fileToOpen, UUID projectUUID) {
-	System.out.println("opening project with uuid " + projectUUID);
 	Data fileRequest = new Data("file_info");
 	fileRequest.put("file_uuid", fileToOpen);
 	fileRequest.put("session_id", Communicator.getSessionID());
