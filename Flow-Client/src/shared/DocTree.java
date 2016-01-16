@@ -200,6 +200,7 @@ public abstract class DocTree extends JTree {
 	// Gets the project from the server
 	Data projectReload = new Data("directory_info");
 	projectReload.put("directory_uuid", projectNode.getProjectUUID());
+	projectReload.put("session_id", Communicator.getSessionID());
 	Data reloadedProject = Communicator.communicate(projectReload);
 	if (reloadedProject == null) {
 	    JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

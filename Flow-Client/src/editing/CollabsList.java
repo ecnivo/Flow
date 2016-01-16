@@ -300,6 +300,7 @@ public class CollabsList extends JPanel {
 		    changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
 		    UUID projectUUID = ((EditArea) editPane.getEditTabs().getSelectedComponent()).getProjectUUID();
 		    changePerm.put("project_uuid", projectUUID);
+		    changePerm.put("session_id", Communicator.getSessionID());
 		    changePerm.put("username", userName);
 		    changePerm.put("access_level", changePermission);
 		    if (!Communicator.communicate(changePerm).get("status", String.class).equals("OK")) {
