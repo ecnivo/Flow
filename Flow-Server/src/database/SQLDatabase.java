@@ -1080,7 +1080,7 @@ public class SQLDatabase {
 					"SELECT VersionID from Versions WHERE Date IN (SELECT MAX(Date) FROM Versions WHERE DocumentID = '%s');",
 					fileUUID));
 			if (response.next())
-				return response.getString("DocumentID");
+				return response.getString("VersionID");
 			throw new DatabaseException("INVALID_FILE_UUID");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
