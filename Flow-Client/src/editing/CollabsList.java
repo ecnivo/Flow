@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +38,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.tree.TreePath;
 
@@ -144,9 +146,58 @@ public class CollabsList extends JPanel {
 	userListModel = new DefaultListModel<UserInfo>();
 	userList = new JList<UserInfo>(userListModel);
 	userList.setCellRenderer(new UserListRenderer());
-	for (MouseListener listener : userList.getMouseListeners()) {
-	    userList.removeMouseListener(listener);
-	}
+	userList.addMouseListener(new MouseListener() {
+
+	    @Override
+	    public void mouseReleased(MouseEvent e) {
+
+	    }
+
+	    @Override
+	    public void mousePressed(MouseEvent e) {
+
+	    }
+
+	    @Override
+	    public void mouseExited(MouseEvent e) {
+
+	    }
+
+	    @Override
+	    public void mouseEntered(MouseEvent e) {
+
+	    }
+
+	    @Override
+	    public void mouseClicked(MouseEvent e) {
+		Component target = userList.getModel().getElementAt(userList.locationToIndex(e.getPoint()));
+		if (target instanceof UserInfo) {
+		    UserInfo clicked = (UserInfo) target;
+		    if (myPermission.canChangeCollabs()) {
+			((CardLayout) clicked.getSwitcher().getLayout()).show(clicked.getSwitcher(), "permissions");
+			clicked.getPermissionSelectors()[clicked.getUserPermission().getPermissionLevel()].setSelected(true);
+		    }
+		    userList.revalidate();
+		    userList.repaint();
+		} else {
+		    int index = userList.locationToIndex(e.getPoint());
+		    UserInfo value = userList.getModel().getElementAt(index);
+		    Component component = userList.getCellRenderer().getListCellRendererComponent(userList, value, index, true, true);
+		    component.setBounds(userList.getCellBounds(index, index));
+		    Point contextPoint = SwingUtilities.convertPoint(userList, e.getPoint(), component);
+		    target = component.getComponentAt(contextPoint);
+
+		    if (target instanceof PermissionRadioButton) {
+			PermissionRadioButton clicked = (PermissionRadioButton) target;
+			clicked.setSelected(true);
+			((UserInfo) clicked.getParent().getParent().getParent().getParent()).userPermission.setPermission(clicked.getPermissionLevel());
+		    } else if (target instanceof JButton) {
+			JButton clicked = (JButton) target;
+			clicked.doClick();
+		    }
+		}
+	    }
+	});
 	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth()), Integer.MAX_VALUE));
 	JScrollPane userListScroll = new JScrollPane(userList);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
@@ -192,7 +243,7 @@ public class CollabsList extends JPanel {
 	JScrollPane selectedScrollPane = (JScrollPane) editPane.getEditTabs().getSelectedComponent();
 	if (selectedScrollPane == null) {
 	    TreePath treePath = editPane.getDocTree().getSelectionPath();
-	    if (treePath == null)
+	    if (treePath == null || treePath.getPath().length < 2)
 		throw new NoActiveProjectException();
 	    return ((ProjectNode) treePath.getPath()[1]).getProjectUUID();
 	}
@@ -210,8 +261,13 @@ public class CollabsList extends JPanel {
 
 	private FlowPermission userPermission;
 
+	public FlowPermission getUserPermission() {
+	    return userPermission;
+	}
+
 	private JPanel simpleView;
 	private JPanel permissionsView;
+	private JPanel switcher;
 
 	private JLabel permissionLabel;
 	private ButtonGroup permissionGroup;
@@ -231,13 +287,15 @@ public class CollabsList extends JPanel {
 
 	    setLayout(new BorderLayout(2, 0));
 	    setBorder(TILE_BORDER);
+	    setEnabled(true);
+	    setFocusable(true);
 	    // JLabel icon = new JLabel(user.getAvatar());
 	    // icon.setPreferredSize(new Dimension(USER_ICON_SIZE,
 	    // USER_ICON_SIZE));
 	    // icon.setMinimumSize(new Dimension(USER_ICON_SIZE,
 	    // USER_ICON_SIZE));
 	    // add(icon, BorderLayout.WEST);
-	    JPanel switcher = new JPanel(new CardLayout(0, 0));
+	    switcher = new JPanel(new CardLayout(0, 0));
 	    switcher.setOpaque(false);
 	    add(switcher, BorderLayout.CENTER);
 
@@ -275,9 +333,11 @@ public class CollabsList extends JPanel {
 	    setBackground(userPermission.getPermissionColor());
 
 	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
-		permissionSelectors[permLevel] = new JRadioButton(new FlowPermission(permLevel).toString());
-		permissionSelectors[permLevel].addActionListener(new PermissionRadioButtonListener(permLevel));
-		permissionSelectors[permLevel].addMouseListener(new ButtonHighlightListener());
+		permissionSelectors[permLevel] = new PermissionRadioButton(new FlowPermission(permLevel));
+		// permissionSelectors[permLevel].addActionListener(new
+		// PermissionRadioButtonListener(permLevel));
+		// permissionSelectors[permLevel].addMouseListener(new
+		// ButtonHighlightListener());
 		permissionSelectors[permLevel].setOpaque(false);
 		permissionGroup.add(permissionSelectors[permLevel]);
 		permissionPanel.add(permissionSelectors[permLevel]);
@@ -314,41 +374,8 @@ public class CollabsList extends JPanel {
 		    userList.repaint();
 		}
 	    });
-	    saveButton.addMouseListener(new ButtonHighlightListener());
+	    // saveButton.addMouseListener(new ButtonHighlightListener());
 	    permissionPanel.add(saveButton);
-
-	    addMouseListener(new MouseListener() {
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-		    setBackground(userPermission.getPermissionColor());
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-		    setBackground(new Color(0xB1ADFF));
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-		    setBorder(TILE_BORDER);
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-		    setBorder(TEXT_ENTRY_BORDER);
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e) {
-		    System.out.println("clicked!");
-		    if (myPermission.canChangeCollabs())
-			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
-		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
-		    userList.revalidate();
-		    userList.repaint();
-		}
-	    });
 	}
 
 	private void updateFields() {
@@ -357,34 +384,42 @@ public class CollabsList extends JPanel {
 	    revalidate();
 	}
 
-	class ButtonHighlightListener implements MouseListener {
-
-	    @Override
-	    public void mouseClicked(MouseEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent e) {
-		setBorder(FlowClient.EMPTY_BORDER);
-	    }
-
-	    @Override
-	    public void mouseEntered(MouseEvent e) {
-		setBorder(TEXT_ENTRY_BORDER);
-	    }
-
-	    @Override
-	    public void mousePressed(MouseEvent e) {
-		// nothing
-	    }
-
-	    @Override
-	    public void mouseReleased(MouseEvent e) {
-		// nothing
-	    }
-
+	private JPanel getSwitcher() {
+	    return switcher;
 	}
+
+	public JRadioButton[] getPermissionSelectors() {
+	    return permissionSelectors;
+	}
+
+	// class ButtonHighlightListener implements MouseListener {
+	//
+	// @Override
+	// public void mouseClicked(MouseEvent e) {
+	// // nothing
+	// }
+	//
+	// @Override
+	// public void mouseExited(MouseEvent e) {
+	// setBorder(FlowClient.EMPTY_BORDER);
+	// }
+	//
+	// @Override
+	// public void mouseEntered(MouseEvent e) {
+	// setBorder(TEXT_ENTRY_BORDER);
+	// }
+	//
+	// @Override
+	// public void mousePressed(MouseEvent e) {
+	// // nothing
+	// }
+	//
+	// @Override
+	// public void mouseReleased(MouseEvent e) {
+	// // nothing
+	// }
+	//
+	// }
 
 	class PermissionRadioButtonListener implements ActionListener {
 
@@ -398,6 +433,19 @@ public class CollabsList extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		userPermission.setPermission(permLevel);
 	    }
+	}
+    }
+
+    private class PermissionRadioButton extends JRadioButton {
+	byte permissionLevel;
+
+	private PermissionRadioButton(FlowPermission level) {
+	    super(level.toString());
+	    permissionLevel = level.getPermissionLevel();
+	}
+
+	private byte getPermissionLevel() {
+	    return permissionLevel;
 	}
     }
 
