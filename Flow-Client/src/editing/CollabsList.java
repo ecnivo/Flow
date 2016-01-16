@@ -192,7 +192,7 @@ public class CollabsList extends JPanel {
 	JScrollPane selectedScrollPane = (JScrollPane) editPane.getEditTabs().getSelectedComponent();
 	if (selectedScrollPane == null) {
 	    TreePath treePath = editPane.getDocTree().getSelectionPath();
-	    if (treePath == null)
+	    if (treePath == null || treePath.getPath().length < 2)
 		throw new NoActiveProjectException();
 	    return ((ProjectNode) treePath.getPath()[1]).getProjectUUID();
 	}
