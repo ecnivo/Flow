@@ -1101,6 +1101,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified directory.
+	 * 
+	 * @param directoryUUID
+	 *            the string representation of the UUID of the directory.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the directory UUID is invalid, or there is an error
+	 *             accessing the database.
+	 */
 	public String getProjectUUIDFromDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
@@ -1118,6 +1129,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified file.
+	 * 
+	 * @param fileUUID
+	 *            the string representation of the UUID of the file.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the file UUID is invalid, or there is an error accessing
+	 *             the database.
+	 */
 	public String getProjectUUIDFromFile(String fileUUID)
 			throws DatabaseException {
 		try {
@@ -1135,6 +1157,17 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Get the string representation of the UUID of the project associated with
+	 * the specified version.
+	 * 
+	 * @param versionUUID
+	 *            the string representation of the UUID of the version.
+	 * @return the string representation of the UUID of the project.
+	 * @throws DatabaseException
+	 *             if the version UUID is invalid, or there is an error
+	 *             accessing the database.
+	 */
 	public String getProjectUUIDFromVersion(String versionUUID)
 			throws DatabaseException {
 		try {
