@@ -184,6 +184,8 @@ public abstract class DocTree extends JTree {
 		((DefaultTreeModel) getModel()).insertNodeInto(new FileNode(childFileUUID), localDir, localDir.getChildCount());
 	    }
 	}
+	
+	expandRow(0);
     }
 
     public void reloadProjectFiles(ProjectNode projectNode) {
