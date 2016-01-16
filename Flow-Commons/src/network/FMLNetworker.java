@@ -1,8 +1,6 @@
 package network;
 
-import callback.CallbackListener;
-import callback.EventPusher;
-import callback.TextModificationListener;
+import callback.*;
 import message.Data;
 
 import java.io.IOException;
@@ -78,9 +76,9 @@ public class FMLNetworker {
         try {
             Data asyncCallbackRequest = new Data("async");
             if(chngListener instanceof TextModificationListener){
-                asyncCallbackRequest.put("ltype", "TEXT_MODIFY");
+                asyncCallbackRequest.put("ltype", CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK);
             }
-            asyncCallbackRequest.put("rtype", "REGISTER");
+            asyncCallbackRequest.put("rtype", RegisterEvent.RegisterType.REGISTER);
             asyncCallbackRequest.put("uuid", assocUUID);
             asyncSocket.send(asyncCallbackRequest);
             pusher.registerListener(assocUUID, chngListener);
@@ -99,7 +97,7 @@ public class FMLNetworker {
         }
         try {
             Data cancelAsync = new Data("async");
-            cancelAsync.put("rtype", "UNREGISTER");
+            cancelAsync.put("rtype", RegisterEvent.RegisterType.UNREGISTER);
             cancelAsync.put("uuid", assocUUID);
             asyncSocket.send(cancelAsync);
             pusher.unregisterListener(assocUUID);
