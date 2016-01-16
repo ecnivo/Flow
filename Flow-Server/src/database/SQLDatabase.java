@@ -253,6 +253,11 @@ public class SQLDatabase {
 	public String newFile(String fileUUID, String fileName, String projectUUID,
 			String directoryUUID, String fileType) {
 		try {
+			if (this.query(String.format(
+					"SELECT * FROM Documents WHERE ParentDirectoryID = '%s' AND DocumentName = '%s';",
+					directoryUUID, fileName)).next()) {
+				return "FILE_NAME_INVALID";
+			}
 			if (fileType.equals(ARBITRARY_DOCUMENT)
 					|| fileType.equals(TEXT_DOCUMENT)) {
 				this.update(String.format(
@@ -622,7 +627,6 @@ public class SQLDatabase {
 	 */
 	public String renameDirectory(String directoryUUID, String newName) {
 		try {
-			// TODO Add check for duplicate directory names inside same folder.
 			if (!this.query(String.format(
 					"SELECT * from directories WHERE DirectoryID = '%s';",
 					directoryUUID)).next()) {
@@ -655,11 +659,15 @@ public class SQLDatabase {
 	 */
 	public String renameFile(String fileUUID, String newName) {
 		try {
-			// TODO Add check for duplicate directory names inside same folder.
 			if (!this.query(String.format(
 					"SELECT * from Documents WHERE DocumentID = '%s';",
 					fileUUID)).next()) {
 				return "INVALID_FILE_UUID";
+			}
+			if (this.query(String.format(
+					"SELECT * FROM Documents WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Documents WHERE DocumentID = '%s') AND DocumentName = '%s';",
+					fileUUID, newName)).next()) {
+				return "FILE_NAME_INVALID";
 			}
 			this.update(String.format(
 					"UPDATE Documents SET DocumentName = '%s' WHERE DocumentID = '%s';",
