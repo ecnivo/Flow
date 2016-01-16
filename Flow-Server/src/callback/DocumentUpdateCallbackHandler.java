@@ -2,6 +2,10 @@ package callback;
 
 import message.Data;
 import network.DataSocket;
+import server.DataManagement;
+import server.FlowServer;
+import server.VersionManager;
+import util.DatabaseException;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -14,7 +18,7 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
     private UUID documentUUID;
 
     public DocumentUpdateCallbackHandler(PersistentClientHandle handle, UUID documentUUID) {
-        super(handle, HandleType.TEXT_MODIFY);
+        super(handle, CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK);
         this.documentUUID = documentUUID;
     }
 
@@ -36,6 +40,23 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
         try {
             dataSocket.send(data);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRegister(RegisterEvent event) {
+
+    }
+
+    @Override
+    public void onUnregister(RegisterEvent event) {
+        try {
+            VersionManager.getInstance().flushToDisk(
+                    DataManagement.getInstance().fileDir,
+                    event.UUID,
+                    UUID.fromString(FlowServer.getInstance().getDatabase().getLatestVersionUUID(event.UUID.toString())));
+        } catch (DatabaseException e) {
             e.printStackTrace();
         }
     }
