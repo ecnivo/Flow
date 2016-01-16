@@ -1,13 +1,5 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -18,6 +10,14 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -556,7 +556,6 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "file_text_modify": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
-				int line = data.get("line", Integer.class);
 				int idx = data.get("idx", Integer.class);
 
 				try {
@@ -570,11 +569,11 @@ public class ClientRequestHandle implements Runnable {
 					case "INSERT": {
 						String str = data.get("str", String.class);
 						for (char c : str.toCharArray()) {
-							td.insert(c, line, idx--);
+							td.insert(c, idx--);
 						}
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.INSERT,
-								fileUUID, username, line, idx, str, -1);
+								fileUUID, username, idx, str, -1);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 					}
@@ -582,10 +581,10 @@ public class ClientRequestHandle implements Runnable {
 					case "DELETE": {
 						int len = data.get("len", Integer.class);
 						while (len-- > 0)
-							td.delete(line, idx);
+							td.delete(idx);
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.DELETE,
-								fileUUID, username, line, idx, null, len);
+								fileUUID, username, idx, null, len);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 					}
