@@ -1,6 +1,5 @@
 package server;
 
-import callback.VersionManager;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -414,14 +413,6 @@ public class ClientRequestHandle implements Runnable {
                     }
                 }
                 break;
-                case "file_async":
-                    String rtype = data.get("rtype", String.class);
-                    if (rtype.equals("register")) {
-
-                    } else {
-
-                    }
-                    break;
                 default:
                     // For completeness's sake
                     returnData.put("status", "INVALID_REQUEST_TYPE");

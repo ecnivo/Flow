@@ -1,5 +1,7 @@
 package server;
 
+import database.SQLDatabase;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,8 +10,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
 
 public class FlowServer implements Runnable {
 
@@ -22,8 +22,7 @@ public class FlowServer implements Runnable {
 
 	public static final int PORT = 10244;
 
-	// NETDEX WHAT IS THIS FOR?
-	// private static final int ARC_PORT = 10225;
+	private static final int ARC_PORT = 10225;
 
 	private SQLDatabase database;
 
@@ -86,6 +85,7 @@ public class FlowServer implements Runnable {
 				"%4$s: %5$s%n");
 		FlowServer server = new FlowServer();
 		new Thread(server).start();
+		new Thread(new AsyncServer(ARC_PORT)).start();
 		// TEST CODE
 	}
 }

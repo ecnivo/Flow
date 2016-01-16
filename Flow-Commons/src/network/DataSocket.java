@@ -1,6 +1,9 @@
 package network;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 
 /**
@@ -12,17 +15,13 @@ public class DataSocket {
 
     private Socket socket;
 
-    private OutputStream os;
-    private InputStream is;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
 
     public DataSocket(Socket socket) throws IOException {
         this.socket = socket;
-        this.os = socket.getOutputStream();
-        this.is = socket.getInputStream();
-        this.ois = new ObjectInputStream(is);
-        this.oos = new ObjectOutputStream(os);
+        this.ois = new ObjectInputStream(socket.getInputStream());
+        this.oos = new ObjectOutputStream(socket.getOutputStream());
     }
 
     /**
@@ -61,6 +60,11 @@ public class DataSocket {
      */
     public <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
         return (T) ois.readObject();
+    }
+
+    public void close() throws IOException {
+        oos.close();
+        ois.close();
     }
 
 

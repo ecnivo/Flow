@@ -1,6 +1,5 @@
-package callback;
+package server;
 
-import server.DataManagement;
 import struct.VersionText;
 
 import java.io.*;
@@ -57,6 +56,7 @@ public class VersionManager {
     }
 
     public boolean flushToDisk(File fileDir) {
+        // TODO doesn't remove versions that were deleted!
         for (UUID versionUUID : loadedDocuments.keySet()) {
             UUID parentFileUUID = parentFile.get(versionUUID);
             File versionPath = new File(new File(fileDir, parentFileUUID.toString())

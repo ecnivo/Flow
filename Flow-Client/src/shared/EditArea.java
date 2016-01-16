@@ -2,31 +2,22 @@ package shared;
 
 import editing.UserCaret;
 import gui.FlowClient;
+import message.Data;
+import network.DocumentModificationEvent;
+import network.DocumentModificationEvent.DocumentModificationType;
+import network.TextFileChangeListener;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import message.Data;
-import network.DocumentModificationEvent;
-import network.DocumentModificationEvent.DocumentModificationType;
-import network.FileChangeListener;
+import javax.swing.text.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.UUID;
 
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
@@ -214,7 +205,7 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
-	FileChangeListener fileChangeListener = new FileChangeListener() {
+		TextFileChangeListener fileChangeListener = new TextFileChangeListener() {
 
 	    @Override
 	    public void onFileUpdate(DocumentModificationEvent event) {

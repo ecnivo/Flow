@@ -1,10 +1,10 @@
 package network;
 
+import callback.CallbackListener;
+import callback.EventPusher;
 import message.Data;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -18,13 +18,18 @@ public class FMLNetworker {
 
     private String ip;
     private int port;
+    private int arcport;
+
+    private DataSocket asyncSocket;
+    private EventPusher pusher;
 
     private static Logger L = Logger.getLogger("FMLNetworker");
 
-    public FMLNetworker(String ip, int port) {
+    public FMLNetworker(String ip, int port, int arcport) {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
         this.ip = ip;
         this.port = port;
+        this.arcport = arcport;
     }
 
     /**
@@ -38,20 +43,17 @@ public class FMLNetworker {
     public Data send(Data data) throws IOException {
         try {
             Socket socket = new Socket(ip, port);
+            DataSocket ds = new DataSocket(socket);
 
             L.info("writing message: " + data.toString());
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject(data);
-            oos.flush();
+            ds.send(data);
 
             L.info("reading response...");
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            Data re = (Data) ois.readObject();
+            Data re = ds.receive(Data.class);
             L.info("response: " + re.toString());
 
             socket.close();
-            ois.close();
-            oos.close();
+            ds.close();
             return re;
         } catch (Exception e) {
             L.severe("error during send operation");
@@ -60,26 +62,32 @@ public class FMLNetworker {
         }
     }
 
-    public boolean registerFileChangeListener(FileChangeListener chngListener, UUID flowDocumentUUID) {
+    public void initAsync() throws IOException {
+        Socket socket = new Socket(ip, arcport);
+        this.asyncSocket = new DataSocket(socket);
+        this.pusher = new EventPusher(asyncSocket);
+        new Thread(pusher).start();
+    }
+
+    public boolean registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
         try {
-            Data asyncCallbackRequest = new Data("file_async");
+            Data asyncCallbackRequest = new Data("async");
             asyncCallbackRequest.put("rtype", "REGISTER");
-            asyncCallbackRequest.put("doc_id", flowDocumentUUID);
-            send(asyncCallbackRequest);
-            chngListener.init(ip);
-            chngListener.listen();
+            asyncCallbackRequest.put("uuid", assocUUID);
+            asyncSocket.send(asyncCallbackRequest);
+            pusher.registerListener(assocUUID, chngListener);
             return true;
         } catch (IOException e) {
             return false;
         }
     }
 
-    public boolean unregisterFileChangeListener(FileChangeListener chngListener) {
+    public boolean unregisterTextModificationListener(UUID versionFileUUID) {
         try {
-            Data cancelAsync = new Data("document_async");
-            cancelAsync.put("rtype", "deregister");
-            send(cancelAsync);
-            chngListener.stopListening();
+            Data cancelAsync = new Data("async");
+            cancelAsync.put("rtype", "UNREGISTER");
+            asyncSocket.send(cancelAsync);
+            pusher.unregisterListener(versionFileUUID);
             return true;
         } catch (IOException e) {
             return false;

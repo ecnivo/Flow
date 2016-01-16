@@ -1,6 +1,5 @@
 package server;
 
-import callback.VersionManager;
 import struct.User;
 import struct.VersionText;
 import util.FileSerializer;

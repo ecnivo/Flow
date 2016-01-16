@@ -1,11 +1,11 @@
 package shared;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import message.Data;
 import network.FMLNetworker;
-import network.FileChangeListener;
+import network.TextFileChangeListener;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class Communicator {
 
@@ -35,11 +35,11 @@ public class Communicator {
 	Communicator.sessionID = sessionID;
     }
 
-    public static void addFileChangeListener(FileChangeListener listener, UUID fileUUID) {
-	packageSender.registerFileChangeListener(listener, fileUUID);
+    public static void addFileChangeListener(TextFileChangeListener listener, UUID fileUUID) {
+	packageSender.registerCallbackListener(listener, fileUUID);
     }
 
-    public static void removeFileChangeListener(FileChangeListener listener) {
-	packageSender.unregisterFileChangeListener(listener);
+    public static void removeFileChangeListener(TextFileChangeListener listener) {
+	packageSender.unregisterTextModificationListener(listener);
     }
 }

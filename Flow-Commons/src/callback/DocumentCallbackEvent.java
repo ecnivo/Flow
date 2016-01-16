@@ -1,6 +1,10 @@
 package callback;
 
+import java.util.UUID;
+
 /**
+ * Represents a specific callback event in which a document is modified, and clients need to know
+ *
  * Created by Netdex on 1/15/2016.
  */
 public class DocumentCallbackEvent extends CallbackEvent {
@@ -15,7 +19,8 @@ public class DocumentCallbackEvent extends CallbackEvent {
     public String ADDITION;
     public int REMOVAL_LENGTH;
 
-    public DocumentCallbackEvent(DocumentCallbackType TYPE, int LINE, int INDEX, String ADDITION, int REMOVAL_LENGTH) {
+    public DocumentCallbackEvent(DocumentCallbackType TYPE, UUID documentUUID, int LINE, int INDEX, String ADDITION, int REMOVAL_LENGTH) {
+        super(CallbackEventType.DOCUMENT_CALLBACK, documentUUID);
         this.TYPE = TYPE;
         this.LINE = LINE;
         this.INDEX = INDEX;
