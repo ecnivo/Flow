@@ -214,7 +214,9 @@ public class ClientRequestHandle implements Runnable {
 								data.get("directory_name", String.class),
 								random.toString(), projectUUID.toString(),
 								parentDirectoryUUID.toString());
-						returnData.put("directory_uuid", random);
+						if (status.equals("OK")) {
+							returnData.put("directory_uuid", random);
+						}
 						returnData.put("status", status);
 					} else {
 						returnData.put("status", "INVALID_SESSION_ID");
