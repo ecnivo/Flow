@@ -69,8 +69,8 @@ public class ClientRequestHandle implements Runnable {
 			case "end_session":
 				// TODO Deregister all associated listeners
 				// TODO Call whatever code NETDEX has for this
-				this.database.removeSession(
-						data.get("session_id", UUID.class).toString());
+				returnData.put("status", this.database.removeSession(
+						data.get("session_id", UUID.class).toString()));
 				break;
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
