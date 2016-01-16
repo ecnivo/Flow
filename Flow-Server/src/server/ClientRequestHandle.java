@@ -498,9 +498,9 @@ public class ClientRequestHandle implements Runnable {
 						}
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.INSERT,
-								latestVersionUUID, null, line, idx, str, -1);
+								fileUUID, null, line, idx, str, -1);
 						PersistentHandleManager.getInstance()
-								.doCallbackEvent(latestVersionUUID, event);
+								.doCallbackEvent(fileUUID, event);
 					}
 						break;
 					case "DELETE": {
@@ -509,9 +509,9 @@ public class ClientRequestHandle implements Runnable {
 							td.delete(line, idx);
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.DELETE,
-								latestVersionUUID, null, line, idx, null, len);
+								fileUUID, null, line, idx, null, len);
 						PersistentHandleManager.getInstance()
-								.doCallbackEvent(latestVersionUUID, event);
+								.doCallbackEvent(fileUUID, event);
 					}
 						break;
 					}
