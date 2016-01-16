@@ -85,8 +85,8 @@ public class EditTabs extends JTabbedPane {
 
 	    @Override
 	    public void stateChanged(ChangeEvent e) {
-		if (getParent() instanceof EditPane) {
-		    EditPane editPane = (EditPane) getParent();
+		if (getParent().getParent().getParent() instanceof EditPane) {
+		    EditPane editPane = (EditPane) getParent().getParent().getParent();
 		    editPane.getCollabsList().refreshUserList();
 		}
 	    }
@@ -112,7 +112,6 @@ public class EditTabs extends JTabbedPane {
 	    JOptionPane.showConfirmDialog(null, "The limit on currently open tabs is 25.\nThe reason for doing so is to save processing power and reduce strain on your system.\nIf you need more than 25 tabs at a time, consider reorganizing your workflow.", "Too many tabs!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 	}
 	if (getParent().getParent().getParent() instanceof EditPane) {
-	    System.out.println("refreshing users list");
 	    EditPane editPane = (EditPane) getParent().getParent().getParent();
 	    editPane.getCollabsList().refreshUserList();
 	}

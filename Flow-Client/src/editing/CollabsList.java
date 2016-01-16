@@ -57,8 +57,6 @@ public class CollabsList extends JPanel {
     private DefaultListModel<UserInfo> userListModel;
     private static final String SEARCHBOX_TEXT = "Search...";
     // private static final int USER_ICON_SIZE = 55;
-    private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
-    private static final Border TEXT_ENTRY_BORDER = BorderFactory.createLineBorder(new Color(0xB1ADFF), 2);
     // private static final Border ICON_ENTRY_BORDER =
     // BorderFactory.createLineBorder(new Color(255, 128, 128), 2);
     private FlowPermission myPermission;
@@ -146,6 +144,9 @@ public class CollabsList extends JPanel {
 	userListModel = new DefaultListModel<UserInfo>();
 	userList = new JList<UserInfo>(userListModel);
 	userList.setCellRenderer(new UserListRenderer());
+	for (MouseListener listener : userList.getMouseListeners()) {
+	    userList.removeMouseListener(listener);
+	}
 	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth()), Integer.MAX_VALUE));
 	JScrollPane userListScroll = new JScrollPane(userList);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
@@ -215,6 +216,10 @@ public class CollabsList extends JPanel {
 	private JLabel permissionLabel;
 	private ButtonGroup permissionGroup;
 
+	private final Border TILE_BORDER = BorderFactory.createEmptyBorder(2, 5, 2, 5);
+	private final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
+	private final Border TEXT_ENTRY_BORDER = BorderFactory.createLineBorder(new Color(0xB1ADFF), 2);
+
 	private JRadioButton[] permissionSelectors = new JRadioButton[4];
 
 	public UserInfo(String userName, FlowPermission permission) {
@@ -225,7 +230,7 @@ public class CollabsList extends JPanel {
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setLayout(new BorderLayout(2, 0));
-	    setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+	    setBorder(TILE_BORDER);
 	    // JLabel icon = new JLabel(user.getAvatar());
 	    // icon.setPreferredSize(new Dimension(USER_ICON_SIZE,
 	    // USER_ICON_SIZE));
@@ -304,12 +309,14 @@ public class CollabsList extends JPanel {
 		    ((CardLayout) switcher.getLayout()).show(switcher, "simple");
 		    updateFields();
 		    CollabsList.this.refreshUserList();
+		    userList.revalidate();
+		    userList.repaint();
 		}
 	    });
 	    saveButton.addMouseListener(new ButtonHighlightListener());
 	    permissionPanel.add(saveButton);
 
-	    switcher.addMouseListener(new MouseListener() {
+	    addMouseListener(new MouseListener() {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -323,7 +330,7 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-		    setBorder(FlowClient.EMPTY_BORDER);
+		    setBorder(TILE_BORDER);
 		}
 
 		@Override
@@ -333,9 +340,12 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+		    System.out.println("clicked!");
 		    if (myPermission.canChangeCollabs())
 			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
 		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
+		    userList.revalidate();
+		    userList.repaint();
 		}
 	    });
 	}
