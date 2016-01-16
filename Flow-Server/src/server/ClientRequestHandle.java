@@ -178,7 +178,7 @@ public class ClientRequestHandle implements Runnable {
 						UUID directoryUUID = data.get("directory_uuid",
 								UUID.class), fileUUID = UUID.randomUUID(),
 								versionUUID = UUID.randomUUID();
-						String documentName = data.get("document_name",
+						String documentName = data.get("file_name",
 								String.class);
 						// TODO add the version to the database
 						this.database.newFile(fileUUID.toString(), documentName,
@@ -281,7 +281,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "file_modify": {
+			case "file_metadata_modify": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				String modType = data.get("mod_type", String.class);
 				try {
@@ -432,7 +432,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "document_request":
+			case "file_request":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
 					UUID versionUUID = UUID.fromString(this.database
@@ -458,7 +458,7 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			// TODO Implement sending messages to active sessions on changes
 			// ^-- NETDEX
-			case "text_document_modify": {
+			case "file_text_modify": {
 				UUID fileUUID = data.get("file_uuid", UUID.class);
 				int line = data.get("line", Integer.class);
 				int idx = data.get("idx", Integer.class);
@@ -487,7 +487,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
-			case "document_async":
+			case "file_async":
 				String rtype = data.get("rtype", String.class);
 				if (rtype.equals("register")) {
 
