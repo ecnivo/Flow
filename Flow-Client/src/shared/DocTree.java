@@ -145,7 +145,6 @@ public abstract class DocTree extends JTree {
     private void createProjectNode(UUID projectUUID) {
 	if (FlowClient.NETWORK) {
 	    Data fileListRequest = new Data("project_info");
-	    System.out.println("create project node");
 	    fileListRequest.put("project_uuid", projectUUID);
 	    fileListRequest.put("session_id", Communicator.getSessionID());
 	    Data project = Communicator.communicate(fileListRequest);

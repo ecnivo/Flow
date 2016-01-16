@@ -97,6 +97,10 @@ public class PanelManager extends JPanel {
     public EditPane getEditPane() {
 	return editPane;
     }
+    
+    public HistoryPane getHistoryPane(){
+	return historyPane;
+    }
 
     public LoginPane getLoginPane() {
 	return loginPane;

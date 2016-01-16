@@ -25,8 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import message.Data;
 import shared.Communicator;
@@ -174,6 +172,8 @@ public class LoginPane extends JPanel {
 			Communicator.setSessionID(reply.get("session_id", UUID.class));
 			LoginPane.this.panMan.getEditPane().getDocTree().refreshProjectList();
 			LoginPane.this.panMan.getEditPane().getDocTree().expandRow(0);
+			LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();
+			LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
 			return;
 		    default:
 			return;
