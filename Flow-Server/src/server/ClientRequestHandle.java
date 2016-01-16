@@ -560,9 +560,7 @@ public class ClientRequestHandle implements Runnable {
 				int idx = data.get("idx", Integer.class);
 
 				try {
-					String username =
-							this.database.getUsername(data.get("session_id",
-									String.class));
+					String username = this.database.getUsername(data.get("session_id", UUID.class).toString());
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
 					VersionText td = VersionManager.getInstance()
