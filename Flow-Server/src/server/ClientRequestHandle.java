@@ -612,10 +612,17 @@ public class ClientRequestHandle implements Runnable {
 		} catch (ClassNotFoundException e) {
 			L.warning("ClassNotFoundException error: " + e.getMessage());
 			e.printStackTrace();
-		} // catch (Exception e) {
-			// // TODO REMOVE THIS and catch individual exceptions
-			// L.severe("Internal Server Error: " + e.getMessage());
-			// }
+		} catch (Exception e) {
+			L.severe("Internal Server Error: " + e.getMessage());
+			e.printStackTrace();
+			Data data = new Data();
+			data.put("status", FlowServer.ERROR);
+			try {
+				psocket.send(data);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 
 		try {
 			socket.close();

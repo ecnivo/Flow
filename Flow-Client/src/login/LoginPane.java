@@ -138,17 +138,17 @@ public class LoginPane extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
-		    if (usernameEntry.getText().length() >= 16) {
+		    if (usernameEntry.getText().trim().length() >= 16) {
 			JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
-		    } else if (usernameEntry.getText().equals("Username")) {
+		    } else if (usernameEntry.getText().trim().equals("Username")) {
 			JOptionPane.showConfirmDialog(null, "Please enter a username.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 
 		    }
 
 		    Data usernamePass = new Data("login");
-		    usernamePass.put("username", usernameEntry.getText());
+		    usernamePass.put("username", usernameEntry.getText().trim());
 		    usernamePass.put("password", String.copyValueOf(passwordEntry.getPassword()));
 
 		    Data reply = Communicator.communicate(usernamePass);
@@ -174,6 +174,7 @@ public class LoginPane extends JPanel {
 			LoginPane.this.panMan.getEditPane().getDocTree().expandRow(0);
 			LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();
 			LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
+			Communicator.setUsername(usernameEntry.getText().trim());
 			return;
 		    default:
 			return;

@@ -67,6 +67,7 @@ public class EditArea extends JTextPane {
 
 	Data editorListRequest = new Data("project_info");
 	editorListRequest.put("project_uuid", projectUUID);
+	editorListRequest.put("session_id", Communicator.getSessionID());
 	Data editorListData = Communicator.communicate(editorListRequest);
 	if (!editorListData.get("status", String.class).equals("OK")) {
 	    return;
@@ -129,20 +130,21 @@ public class EditArea extends JTextPane {
 	    public void insertUpdate(DocumentEvent e) {
 		String insertedString = "";
 		int strLen = e.getLength();
-		int startPos = getCaretPosition();
-		System.out.println("styledoc pos at " + startPos + " length " + strLen);
+		int caretPos = getCaretPosition();
+		System.out.println("styledoc pos at " + caretPos + " length " + strLen);
 		try {
-		    insertedString = doc.getText(startPos, strLen);
+		    insertedString = doc.getText(caretPos, strLen);
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		}
 		Data fileModify = new Data("file_text_modify");
 		fileModify.put("file_uuid", fileUUID);
+		fileModify.put("session_id", Communicator.getSessionID());
 		fileModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
 		try {
-		    lastNewLine = doc.getText(0, startPos).lastIndexOf('\n');
+		    lastNewLine = doc.getText(0, caretPos).lastIndexOf('\n');
 		} catch (BadLocationException e1) {
 		    e1.printStackTrace();
 		    return;
@@ -155,10 +157,11 @@ public class EditArea extends JTextPane {
 		}
 		fileModify.put("line", lines);
 		int idx;
-		if (lastNewLine != -1)
+		if (lastNewLine > -1) {
 		    idx = getCaretPosition() - lastNewLine;
-		else
-		    idx = startPos;
+		    caretPos--;
+		} else
+		    idx = caretPos;
 		fileModify.put("idx", idx);
 		fileModify.put("str", insertedString);
 
@@ -196,6 +199,11 @@ public class EditArea extends JTextPane {
 		    if (text.charAt(i) == '\n')
 			lines++;
 		}
+		if (lastNewLine < 0) {
+		    lastNewLine = 0;
+		} else {
+		    caretPos--;
+		}
 		metadataModify.put("line", lines);
 		metadataModify.put("idx", caretPos - lastNewLine);
 		metadataModify.put("len", removedLen);
@@ -220,34 +228,35 @@ public class EditArea extends JTextPane {
 	TextModificationListener fileChangeListener = new TextModificationListener() {
 
 	    @Override
-	    public void onDocumentUpdate(DocumentCallbackEvent event) {
-		int line = event.LINE;
-		int idx = event.INDEX;
-
+	    public void onDocumentUpdate(DocumentCallbackEvent e) {
+		if (e.USERNAME.equals(Communicator.getUsername())) {
+		    return;
+		}
 		String text = getText();
 		int ln = 0;
 		int posOfChange = 0;
-		while (ln < line) {
+		System.out.println(e.LINE + " " + e.INDEX);
+		while (ln < e.LINE) {
 		    if (text.charAt(posOfChange) == '\n') {
 			ln++;
 		    }
 		    posOfChange++;
 		}
-		posOfChange += idx;
+		posOfChange += e.INDEX;
 
-		if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
-		    String addition = event.ADDITION;
+		if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
+		    String addition = e.ADDITION;
 		    try {
 			doc.insertString(posOfChange, addition, null);
-		    } catch (BadLocationException e) {
-			e.printStackTrace();
+		    } catch (BadLocationException e1) {
+			e1.printStackTrace();
 		    }
-		} else if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
-		    int length = event.REMOVAL_LENGTH;
+		} else if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
+		    int length = e.REMOVAL_LENGTH;
 		    try {
 			doc.remove(posOfChange, length);
-		    } catch (BadLocationException e) {
-			e.printStackTrace();
+		    } catch (BadLocationException e1) {
+			e1.printStackTrace();
 		    }
 		}
 	    }
