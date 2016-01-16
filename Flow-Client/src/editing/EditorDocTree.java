@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.swing.JMenuItem;
@@ -253,6 +254,21 @@ public class EditorDocTree extends DocTree {
 	fileContentsRequest.put("file_uuid", fileToOpen);
 	Data fileContents = Communicator.communicate(fileContentsRequest);
 
+	Data permissionRequest = new Data("project_info");
+	permissionRequest.put("session_id", Communicator.getSessionID());
+	permissionRequest.put("project_uuid", projectUUID);
+	Data permissions = Communicator.communicate(permissionRequest);
+
+	String[] editors = permissions.get("editors", String[].class);
+	String owner = permissions.get("owner", String.class);
+
+	boolean canEdit = false;
+	if (Communicator.getUsername().equals(owner)) {
+	    canEdit = true;
+	} else if (Arrays.asList(editors).contains(Communicator.getUsername())) {
+	    canEdit = true;
+	}
+
 	String status = fileContents.get("status", String.class);
 	switch (status) {
 	case "OK":
@@ -271,7 +287,7 @@ public class EditorDocTree extends DocTree {
 		    byte[] bytes = fileContents.get("file_data", byte[].class);
 		    String fileContentsString = new String(bytes);
 		    UUID versionUUID = fileContents.get("version_uuid", UUID.class);
-		    tabs.openTab(fileName, fileContentsString, projectUUID, fileToOpen, versionUUID, true);
+		    tabs.openTab(fileName, fileContentsString, projectUUID, fileToOpen, versionUUID, canEdit);
 		}
 	    }
 	    break;
@@ -346,6 +362,7 @@ public class EditorDocTree extends DocTree {
 
 		    DefaultTreeModel model = (DefaultTreeModel) EditorDocTree.this.getModel();
 		    model.nodeChanged(selectedDir);
+		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });
 
@@ -396,6 +413,7 @@ public class EditorDocTree extends DocTree {
 			break;
 		    }
 		    ((DefaultTreeModel) EditorDocTree.this.getModel()).nodeChanged(selectedDir);
+		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });
 
