@@ -21,7 +21,7 @@ public class VersionText implements Serializable {
      * @return whether or not line count was affected by this operation
      */
     public boolean insert(char c, int idx) {
-        if (idx < 0 || idx >= text.length())
+        if (idx < 0 || idx > text.length())
             throw new ArrayIndexOutOfBoundsException("index out of range");
         text = text.substring(0, idx) + c + text.substring(idx);
         if (c == '\n')
