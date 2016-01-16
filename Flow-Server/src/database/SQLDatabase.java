@@ -628,6 +628,11 @@ public class SQLDatabase {
 					directoryUUID)).next()) {
 				return "INVALID_DIRECTORY_UUID";
 			}
+			if (this.query(String.format(
+					"SELECT * FROM Directories WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Directories WHERE DirectoryID = '%s') AND DirectoryName = '%s';",
+					directoryUUID, newName)).next()) {
+				return "DIRECTORY_NAME_INVALID";
+			}
 			this.update(String.format(
 					"UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
 					newName, directoryUUID));
