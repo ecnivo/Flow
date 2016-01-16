@@ -1,26 +1,26 @@
 package shared;
 
-import callback.TextModificationListener;
-import message.Data;
-import network.FMLNetworker;
-
 import java.io.IOException;
 import java.util.UUID;
+
+import message.Data;
+import network.FMLNetworker;
+import callback.TextModificationListener;
 
 public class Communicator {
 
     private static UUID sessionID;
 
-    private static FMLNetworker packageSender;
+    private static FMLNetworker networker;
 
     public static void initComms(String host, int port) {
-        packageSender = new FMLNetworker(host, port, 10225);// TODO hardcoded
+        networker = new FMLNetworker(host, port, 10225);// TODO hardcoded
     }
 
     @SuppressWarnings("unchecked")
     public static Data communicate(Data data) {
 	try {
-	    return packageSender.send(data);
+	    return networker.send(data);
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
@@ -34,12 +34,20 @@ public class Communicator {
     public static void setSessionID(UUID sessionID) {
 	Communicator.sessionID = sessionID;
     }
+    
+    public static void initAsync(){
+	try {
+	    networker.initAsync();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+    }
 
     public static void addFileChangeListener(TextModificationListener listener, UUID fileUUID) {
-        packageSender.registerCallbackListener(listener, fileUUID);
+        networker.registerCallbackListener(listener, fileUUID);
     }
 
     public static void removeFileChangeListener(UUID fileUUID) {
-        packageSender.unregisterCallbackListener(fileUUID);
+        networker.unregisterCallbackListener(fileUUID);
     }
 }

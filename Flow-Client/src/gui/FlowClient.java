@@ -31,6 +31,7 @@ public class FlowClient extends JFrame {
         }
 
         Communicator.initComms(HOST, PORT);
+        Communicator.initAsync();
 
         manager = new PanelManager(this);
         this.add(manager);

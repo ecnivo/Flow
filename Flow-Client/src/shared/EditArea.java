@@ -1,22 +1,31 @@
 package shared;
 
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
 import editing.UserCaret;
 import gui.FlowClient;
-import message.Data;
 
-import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.UUID;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import message.Data;
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
 
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
@@ -208,12 +217,12 @@ public class EditArea extends JTextPane {
 		// TODO send position to server
 	    }
 	});
-		TextModificationListener fileChangeListener = new TextModificationListener() {
+	TextModificationListener fileChangeListener = new TextModificationListener() {
 
 	    @Override
-		public void onDocumentUpdate(DocumentCallbackEvent event) {
-			int line = event.LINE;
-			int idx = event.INDEX;
+	    public void onDocumentUpdate(DocumentCallbackEvent event) {
+		int line = event.LINE;
+		int idx = event.INDEX;
 
 		String text = getText();
 		int ln = 0;
@@ -226,16 +235,16 @@ public class EditArea extends JTextPane {
 		}
 		posOfChange += idx;
 
-			if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
-				String addition = event.ADDITION;
-				try {
+		if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
+		    String addition = event.ADDITION;
+		    try {
 			doc.insertString(posOfChange, addition, null);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
 		    }
-			} else if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
-				int length = event.REMOVAL_LENGTH;
-				try {
+		} else if (event.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
+		    int length = event.REMOVAL_LENGTH;
+		    try {
 			doc.remove(posOfChange, length);
 		    } catch (BadLocationException e) {
 			e.printStackTrace();
