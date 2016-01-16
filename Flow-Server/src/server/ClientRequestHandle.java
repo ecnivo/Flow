@@ -18,6 +18,7 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
+import util.Validator;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -77,17 +78,20 @@ public class ClientRequestHandle implements Runnable {
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
-				case "REGISTER":
-					returnData.put("status",
-							this.database.addUser(
-									data.get("username", String.class),
-									data.get("password", String.class)));
-					DataManagement.getInstance().addUser(new User(
-							data.get("username"), data.get("password")));
-					/*
-					 * TODO we need to know if the username/password have
-					 * invalid characters
-					 */
+				case "REGISTER": {
+					String username = data.get("username", String.class),
+							password = data.get("password", String.class);
+					if (!Validator.validUserName(username))
+						returnData.put("status", "USERNAME_INVALID");
+					else if (!Validator.validUserName(username))
+						returnData.put("status", "PASSWORD_INVALID");
+					else {
+						returnData.put("status",
+								this.database.addUser(username, password));
+						DataManagement.getInstance().addUser(new User(
+								data.get("username"), data.get("password")));
+					}
+				}
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
