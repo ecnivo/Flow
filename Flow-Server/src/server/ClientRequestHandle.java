@@ -408,6 +408,7 @@ public class ClientRequestHandle implements Runnable {
                                     td.delete(line, idx);
                                 break;
                         }
+                        returnData.put("status", "OK");
                     } catch (DatabaseException e) {
                         e.printStackTrace();
                         returnData.put("status", e.getMessage());
