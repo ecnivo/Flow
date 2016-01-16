@@ -70,26 +70,39 @@ public class FMLNetworker {
     }
 
     public boolean registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
+        if (asyncSocket == null) {
+            L.severe("attempted to register callback when async is not initiated!");
+            return false;
+        }
         try {
             Data asyncCallbackRequest = new Data("async");
             asyncCallbackRequest.put("rtype", "REGISTER");
             asyncCallbackRequest.put("uuid", assocUUID);
             asyncSocket.send(asyncCallbackRequest);
             pusher.registerListener(assocUUID, chngListener);
+            L.info("registered callback!");
             return true;
         } catch (IOException e) {
+            L.severe("ioexception when registering callback!");
             return false;
         }
     }
 
     public boolean unregisterCallbackListener(UUID assocUUID) {
+        if (asyncSocket == null) {
+            L.severe("attempted to deregister callback when async is not initiated!");
+            return false;
+        }
         try {
             Data cancelAsync = new Data("async");
             cancelAsync.put("rtype", "UNREGISTER");
+            cancelAsync.put("uuid", assocUUID);
             asyncSocket.send(cancelAsync);
             pusher.unregisterListener(assocUUID);
+            L.info("unregistered callback!");
             return true;
         } catch (IOException e) {
+            L.severe("io exception when deregistering callback!");
             return false;
         }
     }

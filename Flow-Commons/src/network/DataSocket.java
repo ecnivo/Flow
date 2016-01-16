@@ -66,5 +66,9 @@ public class DataSocket {
         ois.close();
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
 
 }

@@ -24,8 +24,8 @@ public class EventPusher implements Runnable {
 
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (arcSocket.getSocket().isConnected()) {
+            try {
                 Data data = arcSocket.receive(Data.class);
                 CallbackEvent event = data.get("event", CallbackEvent.class);
                 UUID assocUUID = event.getAssociatedUUID();
@@ -34,10 +34,10 @@ public class EventPusher implements Runnable {
                     listener.onCallbackEvent(event);
                 else
                     L.warning("warning: server tried to send event that is unregistered!");
+            } catch (Exception e) {
+                L.severe("error in event pusher");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            L.severe("error in event pusher");
-            e.printStackTrace();
         }
     }
 
