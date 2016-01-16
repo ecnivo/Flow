@@ -58,13 +58,13 @@ public class RunStopBar extends JToolBar {
 	Data dirInfo = Communicator.communicate(dirInfoRequest);
 
 	for (UUID childFileUUID : dirInfo.get("child_files", UUID[].class)) {
-	    Data documentRequest = new Data("document_request");
-	    documentRequest.put("file_uuid", childFileUUID);
-	    documentRequest.put("session_id", Communicator.getSessionID());
-	    Data document = Communicator.communicate(documentRequest);
+	    Data fileRequest = new Data("file_request");
+	    fileRequest.put("file_uuid", childFileUUID);
+	    fileRequest.put("session_id", Communicator.getSessionID());
+	    Data file = Communicator.communicate(fileRequest);
 
 	    TextFile textFile = new TextFile();
-	    textFile.setDocumentText(new String(document.get("file_data", byte[].class)));
+	    textFile.setDocumentText(new String(file.get("file_data", byte[].class)));
 	    out.add(textFile);
 	}
 	for (UUID childDir : dirInfo.get("child_directories", UUID[].class)) {

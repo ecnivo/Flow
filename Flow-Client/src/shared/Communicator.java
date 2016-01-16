@@ -35,8 +35,8 @@ public class Communicator {
 	Communicator.sessionID = sessionID;
     }
 
-    public static void addFileChangeListener(FileChangeListener listener, UUID docUUID) {
-	packageSender.registerFileChangeListener(listener, docUUID);
+    public static void addFileChangeListener(FileChangeListener listener, UUID fileUUID) {
+	packageSender.registerFileChangeListener(listener, fileUUID);
     }
 
     public static void removeFileChangeListener(FileChangeListener listener) {

@@ -86,22 +86,21 @@ public class EditTabs extends JTabbedPane {
 	});
     }
 
-    public void openTab(String tabName, String document, UUID projectUUID, UUID documentUUID, boolean editable) {
+    public void openTab(String tabName, String text, UUID projectUUID, UUID textFileUUID, boolean editable) {
 	int tabs = getTabCount();
 	// Checks if the tab is already open, and if it is, will automatically
 	// switch to it
 	for (int i = 0; i < tabs; i++) {
-	    if (((EditArea) getComponentAt(i)).getTextDocumentUUID().equals(documentUUID)) {
+	    if (((EditArea) getComponentAt(i)).getTextDocumentUUID().equals(textFileUUID)) {
 		setSelectedIndex(i);
 		return;
 	    }
 	}
 	if (getTabCount() <= TAB_LIMIT) {
-	    addTab(tabName, new EditArea(document, projectUUID, editable, this).getScrollPane());
+	    addTab(tabName, new EditArea(text, projectUUID, editable, this).getScrollPane());
 	    int idx = getTabCount() - 1;
 	    setTabComponentAt(idx, new CustomTabHeader(tabName));
-	    // setToolTipTextAt(idx, doc.getParentFile().getVersions().);
-	    // TODO should be the save date
+	    // TODO tool tip should be the save date
 	} else {
 	    JOptionPane.showConfirmDialog(null, "The limit on currently open tabs is 25.\nThe reason for doing so is to save processing power and reduce strain on your system.\nIf you need more than 25 tabs at a time, consider reorganizing your workflow.", "Too many tabs!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 	}

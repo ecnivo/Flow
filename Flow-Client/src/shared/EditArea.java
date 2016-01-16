@@ -31,7 +31,7 @@ import network.FileChangeListener;
 public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
-    private UUID documentUUID;
+    private UUID textFileUUID;
     private UUID projectUUID;
 
     private Style keywordStyle;
@@ -129,7 +129,7 @@ public class EditArea extends JTextPane {
 		    e1.printStackTrace();
 		}
 		Data fileModify = new Data("file_text_modify");
-		fileModify.put("file_uuid", documentUUID);
+		fileModify.put("file_uuid", textFileUUID);
 		fileModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
@@ -162,10 +162,10 @@ public class EditArea extends JTextPane {
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
 
-		Data documentModify = new Data("file_metadata_modify");
-		documentModify.put("file_uuid", documentUUID);
-		documentModify.put("session_id", Communicator.getSessionID());
-		documentModify.put("mod_type", "DELETE");
+		Data metadataModify = new Data("file_metadata_modify");
+		metadataModify.put("file_uuid", textFileUUID);
+		metadataModify.put("session_id", Communicator.getSessionID());
+		metadataModify.put("mod_type", "DELETE");
 
 		int lastNewLine;
 		try {
@@ -180,11 +180,11 @@ public class EditArea extends JTextPane {
 		    if (Character.isWhitespace(text.charAt(i)))
 			lines++;
 		}
-		documentModify.put("line", lines);
-		documentModify.put("idx", EditArea.this.getCaretPosition() - lastNewLine);
-		documentModify.put("len", removedLen);
+		metadataModify.put("line", lines);
+		metadataModify.put("idx", EditArea.this.getCaretPosition() - lastNewLine);
+		metadataModify.put("len", removedLen);
 
-		Data response = Communicator.communicate(documentModify);
+		Data response = Communicator.communicate(metadataModify);
 		String status = response.get("status", String.class);
 		if (!status.equals("OK")) {
 		    return;
@@ -237,12 +237,12 @@ public class EditArea extends JTextPane {
 	    }
 
 	};
-	Communicator.addFileChangeListener(fileChangeListener, documentUUID);
+	Communicator.addFileChangeListener(fileChangeListener, textFileUUID);
 	highlightSyntax();
     }
 
     public UUID getTextDocumentUUID() {
-	return documentUUID;
+	return textFileUUID;
     }
 
     public JScrollPane getScrollPane() {

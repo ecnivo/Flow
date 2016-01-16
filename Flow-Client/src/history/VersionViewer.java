@@ -108,7 +108,7 @@ public class VersionViewer extends JPanel {
 
     class VersionItem extends JPanel {
 
-	public VersionItem(byte[] data, Date date, UUID documentUUID, boolean isText) {
+	public VersionItem(byte[] data, Date date, UUID versionUUID, boolean isText) {
 	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
 	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
 	    setMinimumSize(new Dimension(5, 5));
@@ -150,10 +150,10 @@ public class VersionViewer extends JPanel {
 			if (isText) {
 			    EditTabs tabs = historyPane.getEditTabs();
 			    if (tabs != null)
-				tabs.openTab(date.toString(), new String(data), projectUUID, documentUUID, false);
+				tabs.openTab(date.toString(), new String(data), projectUUID, versionUUID, false);
 			} else
 			    throw new UnsupportedOperationException();
-			// TODO find a way to open past documents in desktop
+			// TODO find a way to open past arbit files in desktop
 		    }
 		}
 	    });

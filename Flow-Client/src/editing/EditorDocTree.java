@@ -247,12 +247,12 @@ public class EditorDocTree extends DocTree {
 	fileRequest.put("session_id", Communicator.getSessionID());
 	Data fileData = Communicator.communicate(fileRequest);
 
-	Data documentRequest = new Data("document_request");
-	documentRequest.put("session_id", Communicator.getSessionID());
-	documentRequest.put("file_uuid", fileToOpen);
-	Data documentData = Communicator.communicate(documentRequest);
+	Data fileContentsRequest = new Data("file_request");
+	fileContentsRequest.put("session_id", Communicator.getSessionID());
+	fileContentsRequest.put("file_uuid", fileToOpen);
+	Data fileContents = Communicator.communicate(fileContentsRequest);
 
-	String status = documentData.get("status", String.class);
+	String status = fileContents.get("status", String.class);
 	switch (status) {
 	case "OK":
 	    String type = fileData.get("file_type", String.class);
@@ -267,11 +267,10 @@ public class EditorDocTree extends DocTree {
 		EditTabs tabs = editPane.getEditTabs();
 		if (tabs != null) {
 		    String fileName = fileData.get("file_name", String.class);
-		    byte[] bytes = documentData.get("file_data", byte[].class);
-		    System.out.println(bytes);
-		    String docContents = new String(bytes);
-		    UUID docUUID = documentData.get("version_uuid", UUID.class);
-		    tabs.openTab(fileName, docContents, projectUUID, docUUID, true);
+		    byte[] bytes = fileContents.get("file_data", byte[].class);
+		    String fileContentsString = new String(bytes);
+		    UUID fileUUID = fileContents.get("version_uuid", UUID.class);
+		    tabs.openTab(fileName, fileContentsString, projectUUID, fileUUID, true);
 		}
 	    }
 	    break;
@@ -369,8 +368,8 @@ public class EditorDocTree extends DocTree {
 		    String status = reply.get("status", String.class);
 		    switch (status) {
 		    case "OK":
-			UUID docUUID = reply.get("file_uuid", UUID.class);
-			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new FileNode(docUUID), selectedDir, selectedDir.getChildCount());
+			UUID fileUUID = reply.get("file_uuid", UUID.class);
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new FileNode(fileUUID), selectedDir, selectedDir.getChildCount());
 			break;
 
 		    case "DIRECTORY_DOES_NOT_EXIST":
@@ -378,7 +377,7 @@ public class EditorDocTree extends DocTree {
 			break;
 
 		    case "DOCUMENT_NAME_INVALID":
-			JOptionPane.showConfirmDialog(null, "The document name is invalid.\nThis is typically due to a conflict with another document name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showConfirmDialog(null, "The file name is invalid.\nThis is typically due to a conflict with another file name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			break;
 
 		    default:
