@@ -1101,8 +1101,21 @@ public class SQLDatabase {
 		}
 	}
 
-	public UUID getProjectUUID(String UUID, ObjectType type) {
+	public String getProjectUUIDFromDirectory(String directoryUUID)
+			throws DatabaseException {
 		// TODO Auto-generated method stub
-		return null;
+		try {
+			ResultSet response = this.query(String.format(
+					"SELECT ProjectID FROM Directories WHERE DirectoryID = '%s';",
+					directoryUUID));
+			if (response.next()) {
+				return response.getString("ProjectID");
+			}
+			throw new DatabaseException("INVALID_DIRECTORY_UUID");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
 	}
 }

@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -10,14 +18,6 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -275,14 +275,16 @@ public class ClientRequestHandle implements Runnable {
 			}
 				break;
 			case "directory_modify": {
-				UUID directoryUUID = data.get("directory_uuid", UUID.class),
-						sessionID = data.get("session_id", UUID.class),
-						projectUUID = this.database.getProjectUUID(
-								directoryUUID.toString(),
-								SQLDatabase.ObjectType.DIRECTORY);
 				try {
-					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+					UUID directoryUUID = data.get("directory_uuid", UUID.class);
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromDirectory(
+											directoryUUID.toString());
+
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						String type = data.get("mod_type", String.class);
 						switch (type) {
 						case "RENAME":
@@ -296,6 +298,8 @@ public class ClientRequestHandle implements Runnable {
 									.deleteDirectory(directoryUUID.toString()));
 							break;
 						}
+					} else {
+						returnData.put("status", "INVALID_SESSION_ID");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -485,7 +489,9 @@ public class ClientRequestHandle implements Runnable {
 				int idx = data.get("idx", Integer.class);
 
 				try {
-					//String username = this.database.getUsername(data.get("session_id", String.class));
+					// String username =
+					// this.database.getUsername(data.get("session_id",
+					// String.class));
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
 					VersionText td = VersionManager.getInstance()
