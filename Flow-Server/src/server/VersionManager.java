@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
+ * Manages versions of files
+ *
  * Created by Netdex on 1/16/2016.
  */
 public class VersionManager {
@@ -28,6 +30,12 @@ public class VersionManager {
         this.parentFile = new HashMap<>();
     }
 
+    /**
+     * Loads all versions into memory
+     *
+     * @param fileDir Location of files
+     * @return success or not
+     */
     public boolean loadAllDocuments(File fileDir) {
         try {
             for (File fileStateDirectory : fileDir.listFiles()) {
@@ -55,6 +63,11 @@ public class VersionManager {
         return true;
     }
 
+    /**
+     * Flushes all versions to disk
+     * @param fileDir Directory to store
+     * @return success or not
+     */
     public boolean flushToDisk(File fileDir) {
         // TODO doesn't remove versions that were deleted!
         for (UUID versionUUID : loadedDocuments.keySet()) {
@@ -65,6 +78,13 @@ public class VersionManager {
         return true;
     }
 
+    /**
+     * Flushes a single version to disk
+     * @param fileDir File directory
+     * @param fileUUID File UUID
+     * @param versionUUID Version UUID
+     * @return success or not
+     */
     public boolean flushToDisk(File fileDir, UUID fileUUID, UUID versionUUID) {
         File versionPath = new File(new File(fileDir, fileUUID.toString())
                 , versionUUID.toString() + "." + DataManagement.TEXT_FILE_EXT);
@@ -79,6 +99,13 @@ public class VersionManager {
         }
     }
 
+    /**
+     * Add a text version
+     * @param fileUUID File UUID
+     * @param versionUUID Version UUID
+     * @param versionText Text data
+     * @return success or not
+     */
     public boolean addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {
         if (!loadedDocuments.containsKey(versionUUID)) {
             L.info("added text version " + versionUUID + " to memory map");
@@ -90,6 +117,11 @@ public class VersionManager {
         return false;
     }
 
+    /**
+     * Removes a text version
+     * @param versionUUID Version UUID
+     * @return success or not
+     */
     public boolean removeTextVersion(UUID versionUUID) {
         if (loadedDocuments.containsKey(versionUUID)) {
             L.info("removed text version " + versionUUID + " into memory map");
@@ -101,6 +133,11 @@ public class VersionManager {
         return false;
     }
 
+    /**
+     * Gets text version by UUID
+     * @param versionUUID Version UUID
+     * @return success or not
+     */
     public VersionText getTextByVersionUUID(UUID versionUUID) {
         return loadedDocuments.get(versionUUID);
     }

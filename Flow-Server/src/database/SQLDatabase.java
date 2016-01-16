@@ -229,8 +229,11 @@ public class SQLDatabase {
 	public String newProject(String projectId, String projectName,
 			String ownerId) {
 		try {
-			// TODO Add check to make sure user doesn't have two projects with
-			// same name
+			if (this.query(String.format(
+					"SELECT * FROM Projects WHERE ProjectName = '%s';",
+					projectName)).next()) {
+				return "PROJECT_NAME_INVALID";
+			}
 			this.update(String.format(
 					"INSERT INTO projects VALUES('%s', '%s', '%s');", projectId,
 					projectName, ownerId));
