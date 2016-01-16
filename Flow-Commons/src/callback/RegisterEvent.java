@@ -11,8 +11,8 @@ public class RegisterEvent {
         UNREGISTER
     }
 
-    public UUID UUID;
-    public RegisterType TYPE;
+    public final UUID UUID;
+    public final RegisterType TYPE;
 
     public RegisterEvent(UUID UUID, RegisterType TYPE) {
         this.UUID = UUID;

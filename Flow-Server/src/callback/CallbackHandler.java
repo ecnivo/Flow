@@ -28,10 +28,20 @@ public class CallbackHandler {
 
     }
 
+    /**
+     * Called when this callback handler is registered
+     *
+     * @param event The event argument passed on
+     */
     public void onRegister(RegisterEvent event) {
 
     }
 
+    /**
+     * Called when this callback handler is unregistered
+     *
+     * @param event The event argument passed on
+     */
     public void onUnregister(RegisterEvent event) {
 
     }
