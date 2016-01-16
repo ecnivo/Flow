@@ -95,7 +95,7 @@ public class VersionViewer extends JPanel {
 	    versionInfoRequest.put("version_uuid", versionUUID);
 	    versionInfoRequest.put("file_uuid", fileUUID);
 	    versionInfoRequest.put("session_id", Communicator.getSessionID());
-	    Date saveDate = Communicator.communicate(versionInfoRequest).get("date", Date.class);
+	    Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", long.class));
 
 	    VersionItem item = new VersionItem(versionData, saveDate, versionUUID, isText);
 
