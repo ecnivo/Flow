@@ -131,7 +131,6 @@ public class EditArea extends JTextPane {
 		String insertedString = "";
 		int strLen = e.getLength();
 		int caretPos = getCaretPosition();
-		System.out.println("styledoc pos at " + caretPos + " length " + strLen);
 		try {
 		    insertedString = doc.getText(caretPos, strLen);
 		} catch (BadLocationException e1) {
@@ -141,31 +140,8 @@ public class EditArea extends JTextPane {
 		fileModify.put("file_uuid", fileUUID);
 		fileModify.put("session_id", Communicator.getSessionID());
 		fileModify.put("mod_type", "INSERT");
-
-		int lastNewLine;
-		try {
-		    lastNewLine = doc.getText(0, caretPos).lastIndexOf('\n');
-		} catch (BadLocationException e1) {
-		    e1.printStackTrace();
-		    return;
-		}
-		String text = getText();
-		int lines = 0;
-		for (int i = 0; i <= lastNewLine; i++) {
-		    if (text.charAt(i) == '\n')
-			lines++;
-		}
-		fileModify.put("line", lines);
-		int idx;
-		if (lastNewLine > -1) {
-		    idx = getCaretPosition() - lastNewLine;
-		    caretPos--;
-		} else
-		    idx = caretPos;
-		fileModify.put("idx", idx);
+		fileModify.put("idx", caretPos);
 		fileModify.put("str", insertedString);
-
-		System.out.println("inserted string " + insertedString + " at line " + lines + " at index " + idx);
 
 		Data response = Communicator.communicate(fileModify);
 		String status = response.get("status", String.class);
@@ -185,27 +161,7 @@ public class EditArea extends JTextPane {
 		metadataModify.put("file_uuid", fileUUID);
 		metadataModify.put("session_id", Communicator.getSessionID());
 		metadataModify.put("mod_type", "DELETE");
-
-		int lastNewLine;
-		try {
-		    lastNewLine = doc.getText(0, caretPos).lastIndexOf('\n');
-		} catch (BadLocationException e1) {
-		    e1.printStackTrace();
-		    return;
-		}
-		String text = getText();
-		int lines = 0;
-		for (int i = 0; i < lastNewLine; i++) {
-		    if (text.charAt(i) == '\n')
-			lines++;
-		}
-		if (lastNewLine < 0) {
-		    lastNewLine = 0;
-		} else {
-		    caretPos--;
-		}
-		metadataModify.put("line", lines);
-		metadataModify.put("idx", caretPos - lastNewLine);
+		metadataModify.put("idx", caretPos);
 		metadataModify.put("len", removedLen);
 
 		Data response = Communicator.communicate(metadataModify);
@@ -232,29 +188,18 @@ public class EditArea extends JTextPane {
 		if (e.USERNAME.equals(Communicator.getUsername())) {
 		    return;
 		}
-		String text = getText();
-		int ln = 0;
-		int posOfChange = 0;
-		System.out.println(e.LINE + " " + e.INDEX);
-		while (ln < e.LINE) {
-		    if (text.charAt(posOfChange) == '\n') {
-			ln++;
-		    }
-		    posOfChange++;
-		}
-		posOfChange += e.INDEX;
 
 		if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
 		    String addition = e.ADDITION;
 		    try {
-			doc.insertString(posOfChange, addition, null);
+			doc.insertString(e.INDEX, addition, null);
 		    } catch (BadLocationException e1) {
 			e1.printStackTrace();
 		    }
 		} else if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
 		    int length = e.REMOVAL_LENGTH;
 		    try {
-			doc.remove(posOfChange, length);
+			doc.remove(e.INDEX, length);
 		    } catch (BadLocationException e1) {
 			e1.printStackTrace();
 		    }
