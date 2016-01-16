@@ -14,8 +14,8 @@ import java.util.logging.Logger;
  */
 public class DataManagement {
 
-	private static final String USER_FILE_EXT = "fusr";
-	private static final String TEXT_FILE_EXT = "ftd";
+	public static final String USER_FILE_EXT = "fusr";
+	public static final String TEXT_FILE_EXT = "ftd";
 
 	private static DataManagement instance;
 	private static Logger L = Logger.getLogger("DataManagement");
@@ -123,7 +123,7 @@ public class DataManagement {
 		} catch (Exception e) {
 			return false;
 		}
-		VersionManager.getInstance().addTextVersion(versionUUID, textDoc);
+		VersionManager.getInstance().addTextVersion(fileUUID, versionUUID, textDoc);
 		return true;
 	}
 

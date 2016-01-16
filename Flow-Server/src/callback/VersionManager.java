@@ -1,11 +1,9 @@
 package callback;
 
+import server.DataManagement;
 import struct.VersionText;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -24,9 +22,11 @@ public class VersionManager {
     }
 
     private HashMap<UUID, VersionText> loadedDocuments;
+    private HashMap<UUID, UUID> parentFile;
 
     private VersionManager() {
         this.loadedDocuments = new HashMap<>();
+        this.parentFile = new HashMap<>();
     }
 
     public boolean loadAllDocuments(File fileDir) {
@@ -42,10 +42,11 @@ public class VersionManager {
                         }
                         VersionText loadedVersion = new VersionText();
                         loadedVersion.setDocumentText(txt);
-                        String fileName = versionFile.getName();
-                        L.info("loaded version file " + fileName + " into memory");
-                        fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-                        this.addTextVersion(UUID.fromString(fileName), loadedVersion);
+                        String versionName = versionFile.getName();
+                        L.info("loaded version file " + versionName + " into memory");
+                        versionName = versionName.substring(0, versionName.lastIndexOf('.'));
+                        String fileName = fileStateDirectory.getName();
+                        this.addTextVersion(UUID.fromString(fileName), UUID.fromString(versionName), loadedVersion);
                     }
                 }
             }
@@ -55,10 +56,28 @@ public class VersionManager {
         return true;
     }
 
-    public boolean addTextVersion(UUID versionUUID, VersionText versionText) {
+    public boolean flushToDisk(File fileDir) {
+        for (UUID versionUUID : loadedDocuments.keySet()) {
+            UUID parentFileUUID = parentFile.get(versionUUID);
+            File versionPath = new File(new File(fileDir, parentFileUUID.toString())
+                    , versionUUID.toString() + "." + DataManagement.TEXT_FILE_EXT);
+            versionPath.getParentFile().mkdirs();
+            VersionText versionText = loadedDocuments.get(versionUUID);
+            try {
+                PrintStream ps = new PrintStream(versionPath);
+                ps.print(versionText.getDocumentText());
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {
         if (!loadedDocuments.containsKey(versionUUID)) {
             L.info("added text version " + versionUUID + " to memory map");
             loadedDocuments.put(versionUUID, versionText);
+            parentFile.put(versionUUID, fileUUID);
             return true;
         }
         L.warning("text version " + versionUUID + " was added but it already exists!");
@@ -69,6 +88,7 @@ public class VersionManager {
         if (loadedDocuments.containsKey(versionUUID)) {
             L.info("removed text version " + versionUUID + " into memory map");
             loadedDocuments.put(versionUUID, null);
+            parentFile.put(versionUUID, null);
             return true;
         }
         L.warning("text version " + versionUUID + " was removed but it doesn't exist!");
