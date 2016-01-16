@@ -10,7 +10,7 @@ public class VersionText implements Serializable {
     private String text;
 
     public VersionText() {
-
+        this.text = "";
     }
 
     /**
