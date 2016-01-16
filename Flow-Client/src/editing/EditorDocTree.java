@@ -100,6 +100,7 @@ public class EditorDocTree extends DocTree {
 			JOptionPane.showConfirmDialog(null, "Deletion failed.\nTry refreshing by Alt + clicking on the documents tree, or try again at another time.", "Failed to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			break;
 		    }
+		    ((DefaultTreeModel) getModel()).nodeChanged(selectedDir.getParent());
 		}
 		reloadProjectFiles((ProjectNode) getSelectionPath().getPath()[1]);
 	    }
@@ -210,7 +211,7 @@ public class EditorDocTree extends DocTree {
 			openFile(((FileNode) selected).getFileUUID(), ((ProjectNode) ((FileNode) selected).getPath()[1]).getProjectUUID());
 		    } else if (e.getButton() == MouseEvent.BUTTON3) {
 			// TODO re-enable when it's done
-//			filePopup.show(EditorDocTree.this, x, y);
+			// filePopup.show(EditorDocTree.this, x, y);
 		    }
 		} else if (selected instanceof DefaultMutableTreeNode) {
 		    if (e.getButton() == MouseEvent.BUTTON3)
