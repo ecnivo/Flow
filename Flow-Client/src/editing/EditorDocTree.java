@@ -12,6 +12,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
@@ -314,29 +315,23 @@ public class EditorDocTree extends DocTree {
 		    }
 
 		    Data createDirReq = new Data("new_directory");
-		    // createDirReq.put("project_uuid", ((FlowProject)
-		    // parentDir.getRootDirectory()).getProjectUUID());
 		    createDirReq.put("session_id", Communicator.getSessionID());
-		    // if (parentDir instanceof FlowProject)
-		    // createDirReq.put("parent_directory_uuid", ((FlowProject)
-		    // parentDir).getProjectUUID());
-		    // else
-		    // createDirReq.put("parent_directory_uuid",
-		    // parentDir.getDirectoryUUID());
-		    UUID parentDirUUID = ((DirectoryNode) selectedDir).getDirectoryUUID();
+		    UUID parentDirUUID = selectedDir.getDirectoryUUID();
 		    createDirReq.put("parent_directory_uuid", parentDirUUID);
-		    UUID projectUUID = ((ProjectNode) ((DirectoryNode) selectedDir).getPath()[1]).getProjectUUID();
+		    UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 		    createDirReq.put("project_uuid", projectUUID);
 		    createDirReq.put("directory_name", name);
 
 		    Data response = Communicator.communicate(createDirReq);
 		    if (response.get("status", String.class).equals("OK")) {
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new DirectoryNode(response.get("directory_uuid", UUID.class)), selectedDir, selectedDir.getChildCount());
 		    } else if (response.get("status", String.class).equals("DIRECTORY_NAME_INVALID")) {
 			JOptionPane.showConfirmDialog(null, "The directory name is invalid. Try another name.\nThe most likely issue is that the name is conflicting with another name.", "Directory name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		    } else
 			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 
-		    reloadProjectFiles(((ProjectNode) selectedDir.getPath()[1]));
+		    DefaultTreeModel model = (DefaultTreeModel) EditorDocTree.this.getModel();
+		    model.nodeChanged(selectedDir);
 		}
 	    });
 
@@ -368,7 +363,7 @@ public class EditorDocTree extends DocTree {
 		    switch (status) {
 		    case "OK":
 			UUID docUUID = reply.get("file_uuid", UUID.class);
-			selectedDir.add(new FileNode(docUUID));
+			((DefaultTreeModel) EditorDocTree.this.getModel()).insertNodeInto(new FileNode(docUUID), selectedDir, selectedDir.getChildCount());
 			break;
 
 		    case "DIRECTORY_DOES_NOT_EXIST":
@@ -382,8 +377,7 @@ public class EditorDocTree extends DocTree {
 		    default:
 			break;
 		    }
-
-		    EditorDocTree.this.reloadProjectFiles((ProjectNode) selectedDir.getPath()[1]);
+		    ((DefaultTreeModel) EditorDocTree.this.getModel()).nodeChanged(selectedDir);
 		}
 	    });
 

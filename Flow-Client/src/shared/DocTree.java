@@ -19,10 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -33,7 +36,6 @@ import message.Data;
 @SuppressWarnings("serial")
 public abstract class DocTree extends JTree {
 
-    private DefaultTreeModel model;
     private JScrollPane scrollView;
 
     private final static int TREE_ICON_SIZE = 16;
@@ -49,8 +51,7 @@ public abstract class DocTree extends JTree {
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setBorder(FlowClient.EMPTY_BORDER);
 	scrollView = new JScrollPane(this);
-	model = new DefaultTreeModel(new DefaultMutableTreeNode("Workspace"));
-	setModel(model);
+	setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Workspace")));
 	getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 	addMouseListener(new MouseAdapter() {
@@ -77,6 +78,20 @@ public abstract class DocTree extends JTree {
 	    }
 	});
 	setCellRenderer(new FlowNodeRenderer());
+	addTreeWillExpandListener(new TreeWillExpandListener() {
+
+	    @Override
+	    public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+		// nothing
+	    }
+
+	    @Override
+	    public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+		if (event.getPath().getPathCount() == 1) {
+		    throw new ExpandVetoException(event);
+		}
+	    }
+	});
     }
 
     public JScrollPane getScrollable() {
@@ -87,7 +102,7 @@ public abstract class DocTree extends JTree {
 	if (!FlowClient.NETWORK) {
 	    return;
 	} else {
-	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
 	    Data projectList = new Data("list_projects");
 	    projectList.put("session_id", Communicator.getSessionID());
 	    Data reply = Communicator.communicate(projectList);
@@ -118,10 +133,10 @@ public abstract class DocTree extends JTree {
 		    }
 		}
 		if (!projectExistsRemotely) {
-		    model.removeNodeFromParent((MutableTreeNode) root.getChildAt(i));
+		    ((DefaultTreeModel) getModel()).removeNodeFromParent((MutableTreeNode) root.getChildAt(i));
 		}
 	    }
-	    model.reload(root);
+	    ((DefaultTreeModel) getModel()).nodeChanged(root);
 	    revalidate();
 	    repaint();
 	}
@@ -135,7 +150,8 @@ public abstract class DocTree extends JTree {
 	    Data project = Communicator.communicate(fileListRequest);
 
 	    ProjectNode newProjectNode = new ProjectNode(projectUUID, project.get("project_name", String.class));
-	    ((DefaultMutableTreeNode) model.getRoot()).add(newProjectNode);
+	    ((DefaultTreeModel) getModel()).insertNodeInto(newProjectNode, (DefaultMutableTreeNode) getModel().getRoot(), ((DefaultMutableTreeNode) getModel().getRoot()).getChildCount());
+
 	    createProjectFileNodes(projectUUID, newProjectNode);
 	}
     }
@@ -156,7 +172,7 @@ public abstract class DocTree extends JTree {
 		String childDirName = Communicator.communicate(childDirNameRequest).get("directory_name", String.class);
 
 		DirectoryNode subDirNode = new DirectoryNode(childDirUUID, childDirName);
-		localDir.add(subDirNode);
+		((DefaultTreeModel) getModel()).insertNodeInto(subDirNode, localDir, localDir.getChildCount());
 		createProjectFileNodes(childDirUUID, subDirNode);
 	    }
 	}
@@ -165,7 +181,7 @@ public abstract class DocTree extends JTree {
 	UUID[] childFiles = remoteDir.get("child_files", UUID[].class);
 	if (childFiles.length > 0) {
 	    for (UUID childFileUUID : childFiles) {
-		localDir.add(new FileNode(childFileUUID));
+		((DefaultTreeModel) getModel()).insertNodeInto(new FileNode(childFileUUID), localDir, localDir.getChildCount());
 	    }
 	}
     }
@@ -179,9 +195,8 @@ public abstract class DocTree extends JTree {
 	    children[i] = (DefaultMutableTreeNode) projectNode.getChildAt(i);
 	}
 	for (DefaultMutableTreeNode child : children) {
-	    model.removeNodeFromParent(child);
+	    ((DefaultTreeModel) getModel()).removeNodeFromParent(child);
 	}
-	model.reload(projectNode);
 
 	// Gets the project from the server
 	Data projectReload = new Data("directory_info");
@@ -193,7 +208,7 @@ public abstract class DocTree extends JTree {
 	}
 
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
-	model.reload();
+	((DefaultTreeModel) getModel()).nodeChanged(projectNode);
     }
 
     private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {
@@ -214,7 +229,7 @@ public abstract class DocTree extends JTree {
 	for (FileNode localFileNode : localFiles) {
 	    int idx = indexOfArray(remoteChildFiles, localFileNode.getFileUUID());
 	    if (idx == -1) {
-		model.removeNodeFromParent(localFileNode);
+		((DefaultTreeModel) getModel()).removeNodeFromParent(localFileNode);
 		localFiles.remove(localFileNode);
 	    }
 	}
@@ -223,7 +238,7 @@ public abstract class DocTree extends JTree {
 	for (DirectoryNode localDirNode : localDirs) {
 	    int idx = indexOfArray(remoteChildDirs, localDirNode.getDirectoryUUID());
 	    if (idx == -1) {
-		model.removeNodeFromParent(localDirNode);
+		((DefaultTreeModel) getModel()).removeNodeFromParent(localDirNode);
 		localDirs.remove(localDirNode);
 	    }
 	}
@@ -239,7 +254,7 @@ public abstract class DocTree extends JTree {
 	    }
 	    if (!existsLocally) {
 		FileNode newFileNode = new FileNode(remoteFile);
-		localNode.add(newFileNode);
+		((DefaultTreeModel) getModel()).insertNodeInto(newFileNode, localNode, localNode.getChildCount());
 	    }
 	}
 
@@ -254,7 +269,7 @@ public abstract class DocTree extends JTree {
 	    }
 	    if (!existsLocally || childDirNode == null) {
 		DirectoryNode newDirNode = new DirectoryNode(remoteDir);
-		localNode.add(newDirNode);
+		((DefaultTreeModel) getModel()).insertNodeInto(newDirNode, localNode, localNode.getChildCount());
 		childDirNode = newDirNode;
 	    }
 
@@ -407,11 +422,10 @@ public abstract class DocTree extends JTree {
 		label.setText(node.toString());
 		label.setIcon(workspaceIcon);
 	    }
-	    if (selected){
-		label.setBackground(new Color(118,118,118,120));
+	    if (selected) {
+		label.setBackground(new Color(118, 118, 118, 120));
 		label.setOpaque(true);
-	    }
-	    else{
+	    } else {
 		label.setBackground(Color.WHITE);
 		label.setOpaque(false);
 	    }
