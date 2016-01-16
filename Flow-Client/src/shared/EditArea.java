@@ -139,6 +139,7 @@ public class EditArea extends JTextPane {
 		}
 		Data fileModify = new Data("file_text_modify");
 		fileModify.put("file_uuid", fileUUID);
+		fileModify.put("session_id", Communicator.getSessionID());
 		fileModify.put("mod_type", "INSERT");
 
 		int lastNewLine;
