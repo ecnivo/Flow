@@ -20,8 +20,9 @@ public class DataSocket {
 
     public DataSocket(Socket socket) throws IOException {
         this.socket = socket;
-        this.ois = new ObjectInputStream(socket.getInputStream());
         this.oos = new ObjectOutputStream(socket.getOutputStream());
+        oos.flush();
+        this.ois = new ObjectInputStream(socket.getInputStream());
     }
 
     /**
@@ -31,10 +32,8 @@ public class DataSocket {
      * @throws IOException When something nasty happens
      */
     public void send(Serializable serializable) throws IOException {
-        synchronized (serializable) {
-            oos.writeObject(serializable);
-            oos.flush();
-        }
+        oos.writeObject(serializable);
+        oos.flush();
     }
 
     /**
