@@ -31,7 +31,7 @@ public class ServerTest {
         variable_name=VALUE
          */
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        FMLNetworker fmlNetworker = new FMLNetworker("localhost", FlowServer.PORT);
+        FMLNetworker fmlNetworker = new FMLNetworker("localhost", FlowServer.PORT, FlowServer.ARC_PORT);
         HashMap<String, String> variables = new HashMap<>();
         while (true) {
             String cmd = br.readLine();

@@ -22,7 +22,7 @@ public class FlowServer implements Runnable {
 
 	public static final int PORT = 10244;
 
-	private static final int ARC_PORT = 10225;
+	public static final int ARC_PORT = 10225;
 
 	private SQLDatabase database;
 
