@@ -560,9 +560,9 @@ public class ClientRequestHandle implements Runnable {
 				int idx = data.get("idx", Integer.class);
 
 				try {
-					// String username =
-					// this.database.getUsername(data.get("session_id",
-					// String.class));
+					String username =
+							this.database.getUsername(data.get("session_id",
+									String.class));
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
 					VersionText td = VersionManager.getInstance()
@@ -575,7 +575,7 @@ public class ClientRequestHandle implements Runnable {
 						}
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.INSERT,
-								fileUUID, null, line, idx, str, -1);
+								fileUUID, username, line, idx, str, -1);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 					}
@@ -586,7 +586,7 @@ public class ClientRequestHandle implements Runnable {
 							td.delete(line, idx);
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.DELETE,
-								fileUUID, null, line, idx, null, len);
+								fileUUID, username, line, idx, null, len);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 					}
