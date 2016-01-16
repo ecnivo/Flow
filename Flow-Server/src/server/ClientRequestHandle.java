@@ -450,7 +450,8 @@ public class ClientRequestHandle implements Runnable {
 								.getArbitraryFileBytes(fileUUID, versionUUID);
 					}
 					returnData.put("status", "OK");
-					returnData.put("file_data", bytes);
+					returnData.put("file_data",
+							bytes == null ? new byte[] {} : bytes);
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
