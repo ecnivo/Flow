@@ -1,5 +1,7 @@
 package server;
 
+import callback.DocumentCallbackEvent;
+import callback.PersistentHandleManager;
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -383,8 +385,6 @@ public class ClientRequestHandle implements Runnable {
                         returnData.put("status", e.getMessage());
                     }
                     break;
-                // TODO Implement sending messages to active sessions on changes
-                // ^-- NETDEX
                 case "file_text_modify": {
                     UUID fileUUID = data.get("file_uuid", UUID.class);
                     int line = data.get("line", Integer.class);
@@ -395,16 +395,34 @@ public class ClientRequestHandle implements Runnable {
                                 .getLatestVersionUUID(fileUUID.toString()));
                         VersionText td = VersionManager.getInstance().getTextByVersionUUID(latestVersionUUID);
                         switch (data.get("mod_type", String.class)) {
-                            case "INSERT":
+                            case "INSERT": {
                                 String str = data.get("str", String.class);
                                 for (char c : str.toCharArray()) {
                                     td.insert(c, line, idx--);
                                 }
+                                DocumentCallbackEvent event = new DocumentCallbackEvent(
+                                        DocumentCallbackEvent.DocumentCallbackType.INSERT,
+                                        latestVersionUUID,
+                                        line,
+                                        idx,
+                                        str,
+                                        -1);
+                                PersistentHandleManager.getInstance().doCallbackEvent(latestVersionUUID, event);
+                            }
                                 break;
-                            case "DELETE":
+                            case "DELETE": {
                                 int len = data.get("len", Integer.class);
                                 while (len-- > 0)
                                     td.delete(line, idx);
+                                DocumentCallbackEvent event = new DocumentCallbackEvent(
+                                        DocumentCallbackEvent.DocumentCallbackType.DELETE,
+                                        latestVersionUUID,
+                                        line,
+                                        idx,
+                                        null,
+                                        len);
+                                PersistentHandleManager.getInstance().doCallbackEvent(latestVersionUUID, event);
+                            }
                                 break;
                         }
                         returnData.put("status", "OK");
