@@ -424,11 +424,11 @@ public class ClientRequestHandle implements Runnable {
 						bytes = DataManagement.getInstance()
 								.getArbitraryFileBytes(fileUUID, versionUUID);
 					}
-					data.put("file_data", bytes);
-					data.put("status", "OK");
+					returnData.put("file_data", bytes);
+					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
-					data.put("status", e.getMessage());
+					returnData.put("status", e.getMessage());
 				}
 			}
 				break;
