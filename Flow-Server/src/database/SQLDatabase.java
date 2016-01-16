@@ -288,7 +288,11 @@ public class SQLDatabase {
 	public String newDirectory(String directoryName, String directoryId,
 			String projectId, String parentDirectoryId) {
 		try {
-			// TODO Add checks
+			if (this.query(String.format(
+					"SELECT * FROM Directories WHERE ParentDirectoryID = '%s' AND DirectoryName = '%s';",
+					parentDirectoryId, directoryName)).next()) {
+				return "DIRECTORY_NAME_INVALID";
+			}
 			// TODO Change this to not require parentDirectoryId
 			this.update(String
 					.format("INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
