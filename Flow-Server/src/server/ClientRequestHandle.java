@@ -67,6 +67,7 @@ public class ClientRequestHandle implements Runnable {
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
+					returnData.put("status", e.getMessage());
 				}
 				break;
 			case "end_session":
@@ -202,7 +203,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("file_uuid", fileUUID);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -228,7 +229,7 @@ public class ClientRequestHandle implements Runnable {
 						}
 						returnData.put("status", status);
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -272,7 +273,7 @@ public class ClientRequestHandle implements Runnable {
 							break;
 						}
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -308,7 +309,7 @@ public class ClientRequestHandle implements Runnable {
 							break;
 						}
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -341,7 +342,7 @@ public class ClientRequestHandle implements Runnable {
 							break;
 						}
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -372,7 +373,7 @@ public class ClientRequestHandle implements Runnable {
 												SQLDatabase.OWNER)[0]);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -427,7 +428,7 @@ public class ClientRequestHandle implements Runnable {
 						// occurred in the data retrieval.
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -463,7 +464,7 @@ public class ClientRequestHandle implements Runnable {
 										.getFileVersions(fileUUID)));
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -490,7 +491,7 @@ public class ClientRequestHandle implements Runnable {
 								this.database.getVersionDate(versionUUID));
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -522,7 +523,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("file_data", bytes);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
