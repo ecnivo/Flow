@@ -12,6 +12,8 @@ import java.util.UUID;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -239,6 +241,16 @@ public class EditorDocTree extends DocTree {
 	    @Override
 	    public void keyPressed(KeyEvent e) {
 		// nothing
+	    }
+	});
+	addTreeSelectionListener(new TreeSelectionListener() {
+
+	    @Override
+	    public void valueChanged(TreeSelectionEvent selected) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) (selected.getPath().getLastPathComponent());
+		if (node.getPath().length >= 1) {
+		    editPane.getCollabsList().refreshUserList();
+		}
 	    }
 	});
     }

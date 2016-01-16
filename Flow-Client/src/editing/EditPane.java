@@ -22,7 +22,6 @@ public class EditPane extends JPanel {
     private EditorDocTree tree;
     private JSplitPane leftSide;
     private EditorToolbar editToolbar;
-    private EditTabs tempTabs;
     private RunStopBar runStopBar;
 
     private static final int RIGHT_SIDE_WIDTH = 300;
