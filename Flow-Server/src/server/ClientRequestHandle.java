@@ -41,14 +41,14 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			this.socket.setSoTimeout(500);
-			Data data = psocket.receive();
+			final Data data = psocket.receive();
 
 			L.info("receive: " + data.toString());
-			Data returnData = new Data();
+			final Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
 				try {
-					String username = data.get("username", String.class),
+					final String username = data.get("username", String.class),
 							password = data.get("password", String.class);
 					if (this.database.userExists(username)) {
 						if (this.server.getDatabase().authenticate(username,
@@ -57,8 +57,8 @@ public class ClientRequestHandle implements Runnable {
 							// will
 							// save session to database)
 							UUID sessionID = this.server.newSession(username);
-							returnData.put("status", "OK");
 							returnData.put("session_id", sessionID);
+							returnData.put("status", "OK");
 						} else {
 							returnData.put("status", "PASSWORD_INCORRECT");
 						}
@@ -292,8 +292,8 @@ public class ClientRequestHandle implements Runnable {
 									.getProjectUUIDFromDirectory(
 											directoryUUID.toString());
 
-					if (this.database.verifyPermissions(sessionID,
-							projectUUID, SQLDatabase.EDIT)) {
+					if (this.database.verifyPermissions(sessionID, projectUUID,
+							SQLDatabase.EDIT)) {
 						String type = data.get("mod_type", String.class);
 						switch (type) {
 						case "RENAME":
@@ -324,8 +324,8 @@ public class ClientRequestHandle implements Runnable {
 							.toString(),
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
-					if (this.database.verifyPermissions(sessionID,
-							projectUUID, SQLDatabase.EDIT)) {
+					if (this.database.verifyPermissions(sessionID, projectUUID,
+							SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
 						switch (modType) {
 						case "RENAME":
