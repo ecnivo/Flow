@@ -42,7 +42,7 @@ public abstract class FileTree extends JTree {
 
 	private JScrollPane			scrollView;
 
-	private final static int	TREE_ICON_SIZE	= 20;
+	private final static int	TREE_ICON_SIZE	= 16;
 
 	private UUID[]				usersProjectsUUIDs;
 
