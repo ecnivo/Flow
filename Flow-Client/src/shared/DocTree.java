@@ -1,37 +1,22 @@
 package shared;
 
 import gui.FlowClient;
+import message.Data;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
-import message.Data;
 
 @SuppressWarnings("serial")
 public abstract class DocTree extends JTree {
@@ -70,8 +55,8 @@ public abstract class DocTree extends JTree {
 
 		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 
-		if (((DefaultMutableTreeNode) selected).getChildCount() == 0 && !(selected instanceof ProjectNode) && !(selected instanceof DirectoryNode) && !(selected instanceof FileNode)) {
-		    refreshProjectList();
+			if (selected.getChildCount() == 0 && !(selected instanceof ProjectNode) && !(selected instanceof DirectoryNode) && !(selected instanceof FileNode)) {
+				refreshProjectList();
 
 		}
 	    }
@@ -101,8 +86,8 @@ public abstract class DocTree extends JTree {
 	if (!FlowClient.NETWORK) {
 	    return;
 	} else {
-	    DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
-	    Data projectList = new Data("list_projects");
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+		Data projectList = new Data("list_projects");
 	    projectList.put("session_id", Communicator.getSessionID());
 	    Data reply = Communicator.communicate(projectList);
 	    usersProjectsUUIDs = reply.get("projects", UUID[].class);
@@ -403,8 +388,8 @@ public abstract class DocTree extends JTree {
 
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-	    Object node = (DefaultMutableTreeNode) value;
-	    if (node instanceof ProjectNode) {
+		Object node = value;
+		if (node instanceof ProjectNode) {
 		ProjectNode projectNode = (ProjectNode) node;
 		label.setText(projectNode.getName());
 		label.setIcon(projectIcon);
