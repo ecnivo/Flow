@@ -93,7 +93,6 @@ public class EditorDocTree extends DocTree {
 		    String status = Communicator.communicate(ddr).get("status", String.class);
 		    switch (status) {
 		    case "OK":
-			JOptionPane.showConfirmDialog(null, "Deletion success", "Deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 			break;
 
 		    default:

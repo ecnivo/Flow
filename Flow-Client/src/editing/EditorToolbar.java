@@ -51,7 +51,6 @@ public class EditorToolbar extends JToolBar {
 		createProjectRequest.put("session_id", Communicator.getSessionID());
 		switch (Communicator.communicate(createProjectRequest).get("status", String.class)) {
 		case "OK":
-		    JOptionPane.showConfirmDialog(null, "Your project " + projectName + " has been succesfully created.", "Project creation success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		    break;
 
 		case "PROJECT_NAME_INVALID":

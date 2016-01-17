@@ -157,15 +157,23 @@ public class CollabsList extends JPanel {
 
 	userList.removeAll();
 
-	userList.add(new UserInfo(activeProject.get("owner", String.class), new FlowPermission(FlowPermission.OWNER)));
+	String ownerName = activeProject.get("owner", String.class);
+	if (ownerName.equals(Communicator.getUsername())) {
+	    myPermission = new FlowPermission(FlowPermission.OWNER);
+	}
+	userList.add(new UserInfo(ownerName, new FlowPermission(FlowPermission.OWNER)));
 
 	String[] editors = activeProject.get("editors", String[].class);
 	for (String editor : editors) {
+	    if (editor.equals(Communicator.getUsername()))
+		myPermission = new FlowPermission(FlowPermission.EDIT);
 	    userList.add(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
 	}
 
 	String[] viewers = activeProject.get("viewers", String[].class);
 	for (String viewer : viewers) {
+	    if (viewer.equals(Communicator.getUsername()))
+		myPermission = new FlowPermission(FlowPermission.VIEW);
 	    userList.add(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
 	}
 
@@ -257,7 +265,11 @@ public class CollabsList extends JPanel {
 
 	    setBackground(userPermission.getPermissionColor());
 
-	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
+	    byte limit = FlowPermission.EDIT;
+	    if (userPermission.getPermissionLevel() >= FlowPermission.OWNER) {
+		limit = FlowPermission.OWNER;
+	    }
+	    for (byte permLevel = 0; permLevel <= limit; permLevel++) {
 		permissionSelectors[permLevel] = new JRadioButton(new FlowPermission(permLevel).toString());
 		permissionSelectors[permLevel].addActionListener(new PermissionRadioButtonListener(permLevel));
 		permissionSelectors[permLevel].setOpaque(false);
@@ -318,9 +330,10 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		    if (myPermission.canChangeCollabs())
+		    if (myPermission.getPermissionLevel() >= FlowPermission.EDIT && permission.getPermissionLevel() < FlowPermission.OWNER) {
 			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
-		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
+			permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
+		    }
 		}
 	    });
 	}

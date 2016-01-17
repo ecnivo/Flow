@@ -47,20 +47,6 @@ public class FlowPermission {
 	}
     }
 
-    public boolean canChangeCollabs() {
-	if (permissionLevel >= EDIT) {
-	    return true;
-	} else
-	    return false;
-    }
-
-    public boolean canChangeOwner() {
-	if (permissionLevel == OWNER)
-	    return true;
-	else
-	    return false;
-    }
-
     @Override
     public String toString() {
 	switch (permissionLevel) {
