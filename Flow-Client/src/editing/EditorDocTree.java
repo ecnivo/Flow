@@ -370,8 +370,6 @@ public class EditorDocTree extends DocTree {
 		    } else
 			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 
-		    DefaultTreeModel model = (DefaultTreeModel) EditorDocTree.this.getModel();
-		    // model.nodeChanged(selectedDir);
 		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });
@@ -420,8 +418,6 @@ public class EditorDocTree extends DocTree {
 		    default:
 			break;
 		    }
-		    // ((DefaultTreeModel)
-		    // EditorDocTree.this.getModel()).nodeChanged(selectedDir);
 		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });
