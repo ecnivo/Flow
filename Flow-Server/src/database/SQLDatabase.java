@@ -453,8 +453,13 @@ public class SQLDatabase {
 	 * @return whether or not the session was successfully associated with the
 	 *         user and serial number.
 	 */
-	public boolean newSession(String username, String sessionId) {
+	public boolean newSession(String username, String sessionId)
+			throws DatabaseException {
 		try {
+			if (this.query(String.format(
+					"SELECT Username from Sessions WHERE Username = '%s';",
+					username)).next())
+				throw new DatabaseException("USER_ALREADY_LOGGED_IN");
 			this.update(
 					String.format("INSERT INTO sessions VALUES ('%s', '%s');",
 							username, sessionId));

@@ -1,7 +1,5 @@
 package server;
 
-import database.SQLDatabase;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,6 +9,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import database.SQLDatabase;
+import util.DatabaseException;
+
 public class FlowServer implements Runnable {
 
 	public static FlowServer instance;
@@ -18,6 +19,7 @@ public class FlowServer implements Runnable {
 	public static FlowServer getInstance() {
 		return instance;
 	}
+
 	private static Logger L = Logger.getLogger("FlowServer");
 
 	/**
@@ -70,7 +72,7 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	protected UUID newSession(String username) {
+	protected UUID newSession(String username) throws DatabaseException {
 		UUID sessionId = UUID.randomUUID();
 		this.database.newSession(username, sessionId.toString());
 		return sessionId;

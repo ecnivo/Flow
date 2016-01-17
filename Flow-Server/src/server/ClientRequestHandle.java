@@ -43,212 +43,266 @@ public class ClientRequestHandle implements Runnable {
 			this.socket.setSoTimeout(500);
 			final Data data = psocket.receive();
 
-            L.info("receive: " + data.toString());
-            final Data returnData = new Data();
-            switch (data.getType()) {
-                case "login":
-                    try {
-                        final String username = data.get("username", String.class),
-                                password = data.get("password", String.class);
-                        if (this.database.userExists(username)) {
-                            if (this.server.getDatabase().authenticate(username, password)) {
-                                // Inform server new session was created (server
-                                // will
-                                // save session to database)
-                                UUID sessionID = this.server.newSession(username);
-                                returnData.put("session_id", sessionID);
-                                returnData.put("status", "OK");
-                            } else {
-                                returnData.put("status", "PASSWORD_INCORRECT");
-                            }
-                        } else {
-                            returnData.put("status", "USERNAME_DOES_NOT_EXIST");
-                        }
-                    } catch (DatabaseException e) {
-                        e.printStackTrace();
-                        returnData.put("status", e.getMessage());
-                    }
-                    break;
-                case "end_session":
-                    // TODO Deregister all associated listeners
-                    // TODO Call whatever code NETDEX has for this
-                    returnData.put("status", this.database.removeSession(data.get("session_id", UUID.class).toString()));
-                    break;
-                case "user":
-                    String userCmdType = data.get("user_type", String.class);
-                    switch (userCmdType) {
-                        case "REGISTER": {
-                            String username = data.get("username", String.class),
-                                    password = data.get("password", String.class);
-                            if (!Validator.validUserName(username))
-                                returnData.put("status", "USERNAME_INVALID");
-                            else if (!Validator.validUserName(username))
-                                returnData.put("status", "PASSWORD_INVALID");
-                            else {
-                                returnData.put("status", this.database.addUser(username, password));
-                                DataManagement.getInstance().addUser(new User(data.get("username"), data.get("password")));
-                            }
-                        }
-                        break;
-                        case "CLOSE_ACCOUNT":
-                            try {
-                                String username = this.database.getUsername(data.get("session_id", UUID.class).toString());
-                                if (!DataManagement.getInstance().removeUser(username)) {
-                                    returnData.put("status", FlowServer.ERROR);
-                                } else {
-                                    returnData.put("status", this.database.closeAccount(username));
-                                }
-                            } catch (DatabaseException e) {
-                                e.printStackTrace();
-                                returnData.put("status", e.getMessage());
-                            }
-                            break;
-                        case "CHANGE_PASSWORD":
-                            try {
-                                returnData.put("status", this.database.changePassword(this.database.getUsername(data.get("session_id", UUID.class).toString()), data.get("new_password", String.class)));
-                            } catch (DatabaseException e) {
-                                e.printStackTrace();
-                                returnData.put("status", e.getMessage());
-                            }
-                            break;
-                    }
-                    break;
-                case "list_projects":
-                    // Initialized as null to prevent errors
-                    try {
-                        ResultSet temp = this.database.getSessionInfo(data.get("session_id", UUID.class).toString());
-                        String username = temp.getString("Username");
-                        if (DataManagement.getInstance().getUserByUsername(username) == null)
-                            throw new RuntimeException("User does not exist");
-                        ResultSet projects = this.database.getProjects(username);
-                        String[][] response = Results.toStringArray(new String[]{"ProjectID"}, projects);
-                        UUID[] projectUUIDs = new UUID[response.length];
-                        System.out.println(Arrays.toString(response));
-                        if (response == null || response[0] == null) {
-                            returnData.put("projects", new UUID[0]);
-                        } else {
-                            for (int i = 0; i < response.length; i++) {
-                                projectUUIDs[i] = UUID.fromString(response[i][0]);
-                            }
-                            returnData.put("projects", projectUUIDs);
-                        }
-                        returnData.put("status", "OK");
-                    } catch (DatabaseException e) {
-                        e.printStackTrace();
-                        returnData.put("status", e.getMessage());
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        returnData.put("status", FlowServer.ERROR);
-                    }
-                    break;
-                case "new_project":
-                    try {
-                        String projectName = data.get("project_name", String.class);
-                        String username = this.database.getUsername(data.get("session_id", UUID.class).toString());
-                        UUID uuid = UUID.randomUUID();
-                        String status = this.database.newProject(uuid.toString(), projectName, username);
-                        if (status != null && status.equals("OK")) {
-                            returnData.put("status", this.database.updateAccess(SQLDatabase.OWNER, uuid.toString(), username));
-                            returnData.put("project_uuid", uuid);
-                        } else {
-                            returnData.put("status", status);
-                        }
-                    } catch (DatabaseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        returnData.put("status", e.getMessage());
-                    }
-                    break;
-                case "new_text_file":
-                    try {
-                        UUID projectUUID = data.get("project_uuid", UUID.class),
-                                sessionID = data.get("session_id", UUID.class);
-                        if (this.database.verifyPermissions(sessionID.toString(), projectUUID.toString(), SQLDatabase.EDIT)) {
-                            UUID directoryUUID = data.get("directory_uuid", UUID.class), fileUUID = UUID.randomUUID(),
-                                    versionUUID = UUID.randomUUID();
-                            String documentName = data.get("file_name", String.class);
-                            if (Validator.validFileName(documentName)) {
-                                // TODO add the version to the database
-                                this.database.newFile(fileUUID.toString(), documentName, projectUUID.toString(), directoryUUID.toString(), "TEXT_DOCUMENT");
-                                this.database.newVersion(fileUUID.toString(), versionUUID.toString());
-                                VersionText newTextDocument = new VersionText();
-                                VersionManager.getInstance().addTextVersion(fileUUID, versionUUID, newTextDocument);
-                                DataManagement.getInstance().flushTextToDisk(fileUUID, versionUUID, newTextDocument);
-                                returnData.put("file_uuid", fileUUID);
-                                returnData.put("status", "OK");
-                            } else {
-                                returnData.put("status", "ACCESS_DENIED");
-                            }
-                        } else {
-                            returnData.put("status", "INVALID_FILE_NAME");
-                        }
-                    } catch (DatabaseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        returnData.put("status", FlowServer.ERROR);
-                    }
-                    break;
-                case "new_directory":
-                    try {
-                        UUID projectUUID = data.get("project_uuid", UUID.class);
-                        UUID parentDirectoryUUID = data.get("parent_directory_uuid", UUID.class);
-                        UUID sessionID = data.get("session_id", UUID.class);
-                        if (this.database.verifyPermissions(sessionID.toString(), projectUUID.toString(), SQLDatabase.EDIT)) {
-                            UUID random = UUID.randomUUID();
-                            String status = this.database.newDirectory(data.get("directory_name", String.class), random.toString(), projectUUID.toString(), parentDirectoryUUID.toString());
-                            if (status.equals("OK")) {
-                                returnData.put("directory_uuid", random);
-                            }
-                            returnData.put("status", status);
-                        } else {
-                            returnData.put("status", "ACCESS_DENIED");
-                        }
-                    } catch (DatabaseException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        returnData.put("status", FlowServer.ERROR);
-                    }
-                    break;
-                case "project_modify": {
-                    UUID projectUUID = data.get("project_uuid", UUID.class),
-                            sessionID = data.get("session_id", UUID.class);
-                    try {
-                        switch (data.get("project_modify_type", String.class)) {
-                            case "MODIFY_COLLABORATOR":
-                                String username = data.get("username", String.class);
-                                int accessLevel = (int) data.get("access_level", Byte.class);
-                                if (this.database.verifyPermissions(sessionID.toString(), projectUUID.toString(), SQLDatabase.OWNER)) {
-                                    returnData.put("status", this.database.updateAccess(accessLevel, projectUUID.toString(), username));
-                                } else if (this.database.verifyPermissions(sessionID.toString(), projectUUID.toString(), SQLDatabase.EDIT)) {
-                                    returnData.put("status", this.database.restrictedUpdateAccess(accessLevel, projectUUID.toString(), username));
-                                } else {
-                                    returnData.put("status", "ACCESS_DENIED");
-                                }
-                                break;
-                            case "RENAME_PROJECT": {
-                                String newName = data.get("new_name", String.class);
-                                returnData.put("status", this.database.renameProject(projectUUID.toString(), newName));
-                            }
-                            break;
-                            case "DELETE_PROJECT":
-                                if (this.database.verifyPermissions(sessionID.toString(), projectUUID.toString(), SQLDatabase.OWNER)) {
-                                    returnData.put("status", this.database.deleteProject(projectUUID.toString()));
-                                } else {
-                                    returnData.put("status", "ACCESS_DENIED");
-                                }
-                                break;
-                        }
-                    } catch (DatabaseException e) {
-                        e.printStackTrace();
-                        returnData.put("status", e.getMessage());
-                    }
-                }
-                break;
-                case "directory_modify": {
-                    try {
-                        UUID directoryUUID = data.get("directory_uuid", UUID.class);
-                        String sessionID = data.get("session_id", UUID.class).toString(),
-                                projectUUID = this.database.getProjectUUIDFromDirectory(directoryUUID.toString());
+			L.info("receive: " + data.toString());
+			final Data returnData = new Data();
+			switch (data.getType()) {
+			case "login":
+				try {
+					final String username = data.get("username", String.class),
+							password = data.get("password", String.class);
+					if (this.database.userExists(username)) {
+						if (this.server.getDatabase().authenticate(username,
+								password)) {
+							try {
+								UUID sessionID = this.server
+										.newSession(username);
+								returnData.put("session_id", sessionID);
+								returnData.put("status", "OK");
+							} catch (DatabaseException e) {
+								e.printStackTrace();
+								returnData.put("status", e.getMessage());
+							}
+						} else {
+							returnData.put("status", "PASSWORD_INCORRECT");
+						}
+					} else {
+						returnData.put("status", "USERNAME_DOES_NOT_EXIST");
+					}
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
+				break;
+			case "end_session":
+				// TODO Deregister all associated listeners
+				// TODO Call whatever code NETDEX has for this
+				returnData.put("status", this.database.removeSession(
+						data.get("session_id", UUID.class).toString()));
+				break;
+			case "user":
+				String userCmdType = data.get("user_type", String.class);
+				switch (userCmdType) {
+				case "REGISTER": {
+					String username = data.get("username", String.class),
+							password = data.get("password", String.class);
+					if (!Validator.validUserName(username))
+						returnData.put("status", "USERNAME_INVALID");
+					else if (!Validator.validUserName(username))
+						returnData.put("status", "PASSWORD_INVALID");
+					else {
+						returnData.put("status",
+								this.database.addUser(username, password));
+						DataManagement.getInstance().addUser(new User(
+								data.get("username"), data.get("password")));
+					}
+				}
+					break;
+				case "CLOSE_ACCOUNT":
+					try {
+						String username = this.database.getUsername(
+								data.get("session_id", UUID.class).toString());
+						if (!DataManagement.getInstance()
+								.removeUser(username)) {
+							returnData.put("status", FlowServer.ERROR);
+						} else {
+							returnData.put("status",
+									this.database.closeAccount(username));
+						}
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						returnData.put("status", e.getMessage());
+					}
+					break;
+				case "CHANGE_PASSWORD":
+					try {
+						returnData
+								.put("status",
+										this.database.changePassword(
+												this.database.getUsername(data
+														.get("session_id",
+																UUID.class)
+														.toString()),
+										data.get("new_password",
+												String.class)));
+					} catch (DatabaseException e) {
+						e.printStackTrace();
+						returnData.put("status", e.getMessage());
+					}
+					break;
+				}
+				break;
+			case "list_projects":
+				// Initialized as null to prevent errors
+				try {
+					ResultSet temp = this.database.getSessionInfo(
+							data.get("session_id", UUID.class).toString());
+					String username = temp.getString("Username");
+					if (DataManagement.getInstance()
+							.getUserByUsername(username) == null)
+						throw new RuntimeException("User does not exist");
+					ResultSet projects = this.database.getProjects(username);
+					String[][] response = Results.toStringArray(
+							new String[] { "ProjectID" }, projects);
+					UUID[] projectUUIDs = new UUID[response.length];
+					System.out.println(Arrays.toString(response));
+					if (response == null || response[0] == null) {
+						returnData.put("projects", new UUID[0]);
+					} else {
+						for (int i = 0; i < response.length; i++) {
+							projectUUIDs[i] = UUID.fromString(response[i][0]);
+						}
+						returnData.put("projects", projectUUIDs);
+					}
+					returnData.put("status", "OK");
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				} catch (SQLException e) {
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
+				break;
+			case "new_project":
+				try {
+					String projectName = data.get("project_name", String.class);
+					String username = this.database.getUsername(
+							data.get("session_id", UUID.class).toString());
+					UUID uuid = UUID.randomUUID();
+					String status = this.database.newProject(uuid.toString(),
+							projectName, username);
+					if (status != null && status.equals("OK")) {
+						returnData.put("status", this.database.updateAccess(
+								SQLDatabase.OWNER, uuid.toString(), username));
+						returnData.put("project_uuid", uuid);
+					} else {
+						returnData.put("status", status);
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
+				break;
+			case "new_text_file":
+				try {
+					UUID projectUUID = data.get("project_uuid", UUID.class),
+							sessionID = data.get("session_id", UUID.class);
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString(), SQLDatabase.EDIT)) {
+						UUID directoryUUID = data.get("directory_uuid",
+								UUID.class), fileUUID = UUID.randomUUID(),
+								versionUUID = UUID.randomUUID();
+						String documentName = data.get("file_name",
+								String.class);
+						if (Validator.validFileName(documentName)) {
+							// TODO add the version to the database
+							this.database.newFile(fileUUID.toString(),
+									documentName, projectUUID.toString(),
+									directoryUUID.toString(), "TEXT_DOCUMENT");
+							this.database.newVersion(fileUUID.toString(),
+									versionUUID.toString());
+							VersionText newTextDocument = new VersionText();
+							VersionManager.getInstance().addTextVersion(
+									fileUUID, versionUUID, newTextDocument);
+							DataManagement.getInstance().flushTextToDisk(
+									fileUUID, versionUUID, newTextDocument);
+							returnData.put("file_uuid", fileUUID);
+							returnData.put("status", "OK");
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
+						}
+					} else {
+						returnData.put("status", "INVALID_FILE_NAME");
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
+				break;
+			case "new_directory":
+				try {
+					UUID projectUUID = data.get("project_uuid", UUID.class);
+					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+							UUID.class);
+					UUID sessionID = data.get("session_id", UUID.class);
+					if (this.database.verifyPermissions(sessionID.toString(),
+							projectUUID.toString(), SQLDatabase.EDIT)) {
+						UUID random = UUID.randomUUID();
+						String status = this.database.newDirectory(
+								data.get("directory_name", String.class),
+								random.toString(), projectUUID.toString(),
+								parentDirectoryUUID.toString());
+						if (status.equals("OK")) {
+							returnData.put("directory_uuid", random);
+						}
+						returnData.put("status", status);
+					} else {
+						returnData.put("status", "ACCESS_DENIED");
+					}
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					returnData.put("status", FlowServer.ERROR);
+				}
+				break;
+			case "project_modify": {
+				UUID projectUUID = data.get("project_uuid", UUID.class),
+						sessionID = data.get("session_id", UUID.class);
+				try {
+					switch (data.get("project_modify_type", String.class)) {
+					case "MODIFY_COLLABORATOR":
+						String username = data.get("username", String.class);
+						int accessLevel = (int) data.get("access_level",
+								Byte.class);
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
+							returnData.put("status",
+									this.database.updateAccess(accessLevel,
+											projectUUID.toString(), username));
+						} else if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.EDIT)) {
+							returnData.put("status",
+									this.database.restrictedUpdateAccess(
+											accessLevel, projectUUID.toString(),
+											username));
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
+						}
+						break;
+					case "RENAME_PROJECT": {
+						String newName = data.get("new_name", String.class);
+						returnData.put("status", this.database.renameProject(
+								projectUUID.toString(), newName));
+					}
+						break;
+					case "DELETE_PROJECT":
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
+							returnData.put("status", this.database
+									.deleteProject(projectUUID.toString()));
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
+						}
+						break;
+					}
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+					returnData.put("status", e.getMessage());
+				}
+			}
+				break;
+			case "directory_modify": {
+				try {
+					UUID directoryUUID = data.get("directory_uuid", UUID.class);
+					String sessionID = data.get("session_id", UUID.class)
+							.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromDirectory(
+											directoryUUID.toString());
 
 					if (this.database.verifyPermissions(sessionID, projectUUID,
 							SQLDatabase.EDIT)) {
