@@ -40,8 +40,13 @@ public abstract class DocTree extends JTree {
 	addMouseListener(new MouseAdapter() {
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
-		if (e.isAltDown())
+		if (e.isAltDown()){
 		    refreshProjectList();
+		    DefaultMutableTreeNode root = (DefaultMutableTreeNode)((DefaultTreeModel)getModel()).getRoot();
+		    for (int i = 0; i < root.getChildCount(); i++) {
+			reloadProjectFiles((ProjectNode) root.getChildAt(i));
+		    }
+		}
 	    }
 	});
 	setSelectionRow(0);
@@ -120,7 +125,6 @@ public abstract class DocTree extends JTree {
 		    ((DefaultTreeModel) getModel()).removeNodeFromParent((MutableTreeNode) root.getChildAt(i));
 		}
 	    }
-	    // ((DefaultTreeModel) getModel()).nodeChanged(root);
 	    revalidate();
 	    repaint();
 	}
@@ -195,7 +199,6 @@ public abstract class DocTree extends JTree {
 	}
 
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
-	// ((DefaultTreeModel) getModel()).nodeChanged(projectNode);
     }
 
     private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {
@@ -249,7 +252,7 @@ public abstract class DocTree extends JTree {
 	    boolean existsLocally = false;
 	    DirectoryNode childDirNode = null;
 	    for (DirectoryNode directoryNode : localDirs) {
-		if (directoryNode.getDirectoryUUID().equals(directoryNode)) {
+		if (directoryNode.getDirectoryUUID().equals(remoteDir)) {
 		    existsLocally = true;
 		    break;
 		}
