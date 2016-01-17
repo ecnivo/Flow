@@ -388,7 +388,9 @@ public class EditorToolbar extends JToolBar {
 					// Asks server to create new file
 					Data createFileRequest = new Data("new_text_file");
 					createFileRequest.put("session_id", Communicator.getSessionID());
-					createFileRequest.put("file_name", importFile);
+					createFileRequest.put("file_name", importFile.getName());
+					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
+					createFileRequest.put("project_uuid", projectUUID);
 					createFileRequest.put("directory_uuid", dirUUID);
 					Data response = Communicator.communicate(createFileRequest);
 					switch (response.get("status", String.class)) {
