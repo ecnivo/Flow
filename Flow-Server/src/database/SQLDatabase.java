@@ -154,7 +154,7 @@ public class SQLDatabase {
 			String username) throws DatabaseException {
 		try {
 			ResultSet data = this.query(String.format(
-					"SELECT ProjectID FROM Projects WHERE ProjectID = '%s';",
+					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
 					projectUUID));
 			if (data.next()) {
 				if (accessLevel == OWNER
