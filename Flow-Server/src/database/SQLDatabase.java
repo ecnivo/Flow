@@ -61,16 +61,22 @@ public class SQLDatabase {
 					.println("Error loading database driver: " + e.toString());
 			return;
 		}
-		// try {
-		// this.connection = DriverManager
-		// .getConnection("jdbc:sqlite:" + databaseName);
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// System.out.println(
-		// "Error connecting to database located at: " + databaseName);
-		// }
 		if (!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE))
-			this.recoverFileSystem(LIVE_DATABASE, BACKUP_DATABASE);
+			try {
+				this.recoverFileSystem(LIVE_FOLDER, BACKUP_FOLDER);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("FUCKCUFUFFUKCKCKCKC");
+			}
+		try {
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error connecting to database located at: "
+					+ LIVE_DATABASE);
+		}
 		instance = this;
 	}
 
@@ -1345,7 +1351,13 @@ public class SQLDatabase {
 	}
 
 	public void recoverFileSystem(String corruptFileSystem,
-			String backUpFileSystem) {
+			String backUpFileSystem) throws IOException {
+		try {
+			this.connection.close();
+		} catch (SQLException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		this.deleteFileSystemDirectory(new File(corruptFileSystem));
 		try {
 			this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
@@ -1364,33 +1376,38 @@ public class SQLDatabase {
 				e1.printStackTrace();
 				System.err.println();
 				System.err.println(
-						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator or visit https://github.com/ecnivo/Flow/releases for a clean file system.");
+						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
 				System.exit(0);
 			}
 		}
 	}
 
-	private void deleteFileSystemDirectory(File file) {
+	private void deleteFileSystemDirectory(File file) throws IOException {
 		File[] contents = file.listFiles();
 		if (contents != null) {
 			for (File tempFile : contents) {
 				deleteFileSystemDirectory(tempFile);
 			}
 		}
-		file.delete();
+		System.out.println(file.toString());
+		if (!file.delete()) {
+			throw new IOException();
+		}
 	}
 
 	private void copyFileSystem(File backup, File live) throws IOException {
-		if (!live.exists())
-			live.mkdirs();
 		if (backup.isDirectory()) {
+			if (!live.exists())
+				live.mkdirs();
 			String[] files = backup.list();
 			for (String file : files) {
+				System.out.println(file);
 				copyFileSystem(new File(backup, file), new File(live, file));
 			}
 		} else {
 			FileInputStream in = new FileInputStream(backup);
-			FileOutputStream out = new FileOutputStream(backup);
+			System.out.println(live);
+			FileOutputStream out = new FileOutputStream(live);
 			byte[] buffer = new byte[1024];
 			int length = in.read(buffer);
 			while (length > 0) {
