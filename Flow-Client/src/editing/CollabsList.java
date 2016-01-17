@@ -5,14 +5,12 @@ import gui.FlowClient;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,21 +23,15 @@ import java.io.IOException;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 import javax.swing.tree.TreePath;
 
 import message.Data;
@@ -54,10 +46,10 @@ public class CollabsList extends JPanel {
     private JTextField searchBox;
     private JButton searchButton;
     private EditPane editPane;
-    private UUID activeProject;
-    private JList<UserInfo> userList;
-    private DefaultListModel<UserInfo> userListModel;
+    private UUID activeProjectUUID;
+    private JPanel userList;
     private static final String SEARCHBOX_TEXT = "Search...";
+    private static final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
     // private static final int USER_ICON_SIZE = 55;
     // private static final Border ICON_ENTRY_BORDER =
     // BorderFactory.createLineBorder(new Color(255, 128, 128), 2);
@@ -108,7 +100,7 @@ public class CollabsList extends JPanel {
 			Data collabMod = new Data("project_modify");
 			collabMod.put("session_id", Communicator.getSessionID());
 			collabMod.put("project_modify_type", "MODIFY_COLLABORATOR");
-			collabMod.put("project_uuid", activeProject);
+			collabMod.put("project_uuid", activeProjectUUID);
 			collabMod.put("username", query);
 			collabMod.put("access_level", (byte) 1);
 
@@ -142,62 +134,7 @@ public class CollabsList extends JPanel {
 	searchPane.add(searchButton, BorderLayout.EAST);
 	add(searchPane, BorderLayout.NORTH);
 
-	// userListPanel = new JPanel(new GridLayout(0, 1, 2, 3));
-	userListModel = new DefaultListModel<UserInfo>();
-	userList = new JList<UserInfo>(userListModel);
-	userList.setCellRenderer(new UserListRenderer());
-	userList.addMouseListener(new MouseListener() {
-
-	    @Override
-	    public void mouseReleased(MouseEvent e) {
-
-	    }
-
-	    @Override
-	    public void mousePressed(MouseEvent e) {
-
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent e) {
-
-	    }
-
-	    @Override
-	    public void mouseEntered(MouseEvent e) {
-
-	    }
-
-	    @Override
-	    public void mouseClicked(MouseEvent e) {
-		Component target = userList.getModel().getElementAt(userList.locationToIndex(e.getPoint()));
-		if (target instanceof UserInfo) {
-		    UserInfo clicked = (UserInfo) target;
-		    if (myPermission.canChangeCollabs()) {
-			((CardLayout) clicked.getSwitcher().getLayout()).show(clicked.getSwitcher(), "permissions");
-			clicked.getPermissionSelectors()[clicked.getUserPermission().getPermissionLevel()].setSelected(true);
-		    }
-		    userList.revalidate();
-		    userList.repaint();
-		} else {
-		    int index = userList.locationToIndex(e.getPoint());
-		    UserInfo value = userList.getModel().getElementAt(index);
-		    Component component = userList.getCellRenderer().getListCellRendererComponent(userList, value, index, true, true);
-		    component.setBounds(userList.getCellBounds(index, index));
-		    Point contextPoint = SwingUtilities.convertPoint(userList, e.getPoint(), component);
-		    target = component.getComponentAt(contextPoint);
-
-		    if (target instanceof PermissionRadioButton) {
-			PermissionRadioButton clicked = (PermissionRadioButton) target;
-			clicked.setSelected(true);
-			((UserInfo) clicked.getParent().getParent().getParent().getParent()).userPermission.setPermission(clicked.getPermissionLevel());
-		    } else if (target instanceof JButton) {
-			JButton clicked = (JButton) target;
-			clicked.doClick();
-		    }
-		}
-	    }
-	});
+	userList = new JPanel(new GridLayout(0, 1, 2, 3));
 	userList.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth()), Integer.MAX_VALUE));
 	JScrollPane userListScroll = new JScrollPane(userList);
 	userListScroll.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
@@ -210,26 +147,26 @@ public class CollabsList extends JPanel {
 	Data getProject = new Data("project_info");
 	getProject.put("session_id", Communicator.getSessionID());
 	try {
-	    activeProject = getActiveUUID();
+	    activeProjectUUID = getActiveUUID();
 	} catch (NoActiveProjectException e) {
 	    e.printStackTrace();
 	}
-	getProject.put("project_uuid", activeProject);
+	getProject.put("project_uuid", activeProjectUUID);
 
 	Data activeProject = Communicator.communicate(getProject);
 
-	userListModel.clear();
+	userList.removeAll();
 
-	userListModel.addElement(new UserInfo(activeProject.get("owner", String.class), new FlowPermission(FlowPermission.OWNER)));
+	userList.add(new UserInfo(activeProject.get("owner", String.class), new FlowPermission(FlowPermission.OWNER)));
 
 	String[] editors = activeProject.get("editors", String[].class);
 	for (String editor : editors) {
-	    userListModel.addElement(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
+	    userList.add(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
 	}
 
 	String[] viewers = activeProject.get("viewers", String[].class);
 	for (String viewer : viewers) {
-	    userListModel.addElement(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
+	    userList.add(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
 	}
 
 	userList.revalidate();
@@ -261,24 +198,15 @@ public class CollabsList extends JPanel {
 
 	private FlowPermission userPermission;
 
-	public FlowPermission getUserPermission() {
-	    return userPermission;
-	}
-
 	private JPanel simpleView;
 	private JPanel permissionsView;
-	private JPanel switcher;
 
 	private JLabel permissionLabel;
 	private ButtonGroup permissionGroup;
 
-	private final Border TILE_BORDER = BorderFactory.createEmptyBorder(2, 5, 2, 5);
-	private final Font USERNAME_FONT = new Font("TW Cen MT", Font.BOLD, 20);
-	private final Border TEXT_ENTRY_BORDER = BorderFactory.createLineBorder(new Color(0xB1ADFF), 2);
-
 	private JRadioButton[] permissionSelectors = new JRadioButton[4];
 
-	public UserInfo(String userName, FlowPermission permission) {
+	public UserInfo(String user, FlowPermission permission) {
 	    userPermission = permission;
 
 	    setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth() * .9), 80));
@@ -286,22 +214,19 @@ public class CollabsList extends JPanel {
 	    setMinimumSize(new Dimension(5, 5));
 
 	    setLayout(new BorderLayout(2, 0));
-	    setBorder(TILE_BORDER);
-	    setEnabled(true);
-	    setFocusable(true);
 	    // JLabel icon = new JLabel(user.getAvatar());
 	    // icon.setPreferredSize(new Dimension(USER_ICON_SIZE,
 	    // USER_ICON_SIZE));
 	    // icon.setMinimumSize(new Dimension(USER_ICON_SIZE,
 	    // USER_ICON_SIZE));
 	    // add(icon, BorderLayout.WEST);
-	    switcher = new JPanel(new CardLayout(0, 0));
+	    JPanel switcher = new JPanel(new CardLayout(0, 0));
 	    switcher.setOpaque(false);
 	    add(switcher, BorderLayout.CENTER);
 
 	    simpleView = new JPanel(new BorderLayout(0, 1));
 	    simpleView.setMaximumSize(new Dimension((int) Math.floor(CollabsList.this.getSize().getWidth() * .9), 80));
-	    JLabel name = new JLabel(userName) {
+	    JLabel name = new JLabel(user) {
 		public void paintComponent(Graphics g) {
 		    Graphics2D g2 = (Graphics2D) g;
 		    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -319,7 +244,7 @@ public class CollabsList extends JPanel {
 	    switcher.add(simpleView, "simple");
 
 	    permissionsView = new JPanel(new BorderLayout(0, 0));
-	    JLabel name2 = new JLabel(userName);
+	    JLabel name2 = new JLabel(user);
 	    name2.setFont(USERNAME_FONT);
 	    permissionsView.add(name2, BorderLayout.NORTH);
 	    permissionGroup = new ButtonGroup();
@@ -333,11 +258,8 @@ public class CollabsList extends JPanel {
 	    setBackground(userPermission.getPermissionColor());
 
 	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
-		permissionSelectors[permLevel] = new PermissionRadioButton(new FlowPermission(permLevel));
-		// permissionSelectors[permLevel].addActionListener(new
-		// PermissionRadioButtonListener(permLevel));
-		// permissionSelectors[permLevel].addMouseListener(new
-		// ButtonHighlightListener());
+		permissionSelectors[permLevel] = new JRadioButton(new FlowPermission(permLevel).toString());
+		permissionSelectors[permLevel].addActionListener(new PermissionRadioButtonListener(permLevel));
 		permissionSelectors[permLevel].setOpaque(false);
 		permissionGroup.add(permissionSelectors[permLevel]);
 		permissionPanel.add(permissionSelectors[permLevel]);
@@ -358,10 +280,10 @@ public class CollabsList extends JPanel {
 
 		    Data changePerm = new Data("project_modify");
 		    changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
-		    UUID projectUUID = ((EditArea) editPane.getEditTabs().getSelectedComponent()).getProjectUUID();
+		    UUID projectUUID = activeProjectUUID;
 		    changePerm.put("project_uuid", projectUUID);
 		    changePerm.put("session_id", Communicator.getSessionID());
-		    changePerm.put("username", userName);
+		    changePerm.put("username", user);
 		    changePerm.put("access_level", changePermission);
 		    if (!Communicator.communicate(changePerm).get("status", String.class).equals("OK")) {
 			JOptionPane.showConfirmDialog(null, "Either this project does not exist,\n" + "the user does not exist,\n" + "the access level is invalid,\n" + "or you do not have the access to change permissions.\n\n" + "Try refreshing the list of projects by moving your mouse cursor to the documents tree\n" + "and back into this list of users and try again.", "Project out of sync", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -370,12 +292,37 @@ public class CollabsList extends JPanel {
 		    ((CardLayout) switcher.getLayout()).show(switcher, "simple");
 		    updateFields();
 		    CollabsList.this.refreshUserList();
-		    userList.revalidate();
-		    userList.repaint();
 		}
 	    });
-	    // saveButton.addMouseListener(new ButtonHighlightListener());
 	    permissionPanel.add(saveButton);
+
+	    switcher.addMouseListener(new MouseListener() {
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		    setBackground(userPermission.getPermissionColor());
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		    setBackground(new Color(0xB1ADFF));
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		    if (myPermission.canChangeCollabs())
+			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
+		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
+		}
+	    });
 	}
 
 	private void updateFields() {
@@ -383,43 +330,6 @@ public class CollabsList extends JPanel {
 	    permissionLabel.setText(userPermission.toString());
 	    revalidate();
 	}
-
-	private JPanel getSwitcher() {
-	    return switcher;
-	}
-
-	public JRadioButton[] getPermissionSelectors() {
-	    return permissionSelectors;
-	}
-
-	// class ButtonHighlightListener implements MouseListener {
-	//
-	// @Override
-	// public void mouseClicked(MouseEvent e) {
-	// // nothing
-	// }
-	//
-	// @Override
-	// public void mouseExited(MouseEvent e) {
-	// setBorder(FlowClient.EMPTY_BORDER);
-	// }
-	//
-	// @Override
-	// public void mouseEntered(MouseEvent e) {
-	// setBorder(TEXT_ENTRY_BORDER);
-	// }
-	//
-	// @Override
-	// public void mousePressed(MouseEvent e) {
-	// // nothing
-	// }
-	//
-	// @Override
-	// public void mouseReleased(MouseEvent e) {
-	// // nothing
-	// }
-	//
-	// }
 
 	class PermissionRadioButtonListener implements ActionListener {
 
@@ -433,27 +343,6 @@ public class CollabsList extends JPanel {
 	    public void actionPerformed(ActionEvent e) {
 		userPermission.setPermission(permLevel);
 	    }
-	}
-    }
-
-    private class PermissionRadioButton extends JRadioButton {
-	byte permissionLevel;
-
-	private PermissionRadioButton(FlowPermission level) {
-	    super(level.toString());
-	    permissionLevel = level.getPermissionLevel();
-	}
-
-	private byte getPermissionLevel() {
-	    return permissionLevel;
-	}
-    }
-
-    private class UserListRenderer implements ListCellRenderer<JPanel> {
-
-	@Override
-	public Component getListCellRendererComponent(JList<? extends JPanel> list, JPanel value, int index, boolean isSelected, boolean cellHasFocus) {
-	    return value;
 	}
     }
 }

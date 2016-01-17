@@ -31,10 +31,6 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public enum ObjectType {
-		PROJECT, DIRECTORY, FILE, VERSION;
-	}
-
 	/**
 	 * Connection to the database.
 	 */
@@ -114,31 +110,38 @@ public class SQLDatabase {
 	 */
 	public String updateAccess(int accessLevel, String projectId,
 			String username) {
-		// TODO Implement check for if username exists
 		try {
-			if (accessLevel == EDIT || accessLevel == VIEW) {
-				this.update(String.format(
-						"INSERT INTO access values('%s', '%s', '%s');",
-						projectId, username, accessLevel));
-			} else if (accessLevel == OWNER) {
-				// Changes the owner of the project in the projects table
-				this.update(String.format(
-						"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
-						username, projectId));
+			if (this.query(String.format(
+					"SELECT Username FROM Users WHERE Username = '%s';",
+					username)).next()) {
 
+				// Remove any old access status
 				this.update(String.format(
 						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
 						username, projectId));
 
-				// Changes the permissions of the user to be an owner
-				this.update("INSERT INTO access values('" + projectId + "', '"
-						+ username + "', '" + OWNER + "');");
-			} else if (accessLevel == NONE) {
-				this.update(String.format(
-						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-						username, projectId));
+				if (accessLevel == EDIT || accessLevel == VIEW) {
+					this.update(String.format(
+							"INSERT INTO access values('%s', '%s', '%s');",
+							projectId, username, accessLevel));
+				} else if (accessLevel == OWNER) {
+					// Changes the owner of the project in the projects table
+					this.update(String.format(
+							"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
+							username, projectId));
+
+					// Changes the permissions of the user to be an owner
+					this.update("INSERT INTO access values('" + projectId
+							+ "', '" + username + "', '" + OWNER + "');");
+				} else if (accessLevel == NONE) {
+					this.update(String.format(
+							"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+							username, projectId));
+				} else {
+					return "ACCESS_LEVEL_INVALID";
+				}
 			} else {
-				return "ACCESS_LEVEL_INVALID";
+				return "USERNAME_DOES_NOT_EXIST";
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -147,52 +150,87 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
+			String username) throws DatabaseException {
+		try {
+			ResultSet data = this.query(String.format(
+					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
+			if (data.next()) {
+				if (accessLevel == OWNER
+						|| username.equals(data.getString("OwnerUsername"))) {
+					return "ACCESS_DENIED";
+				}
+				return this.updateAccess(accessLevel, projectUUID, username);
+			}
+			return "INVALID_PROJECT_UUID";
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+	
+	public String ownerUpdateAccess(int accessLevel, String projectUUID,
+			String username) throws DatabaseException {
+		try {
+			ResultSet data = this.query(String.format(
+					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
+			if (data.next()) {
+				if (username.equals(data.getString("OwnerUsername"))) {
+					return "ACCESS_DENIED";
+				}
+				return this.updateAccess(accessLevel, projectUUID, username);
+			}
+			return "INVALID_PROJECT_UUID";
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+
 	/**
 	 * Getter for all files associated with the specified project.
 	 *
-	 * @param projectId
-	 *            the ID of the project.
+	 * @param projectUUID
+	 *            the string representation of the UUID of the project.
 	 * @return all associated files.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
-	public ResultSet getFilesInProject(String projectId)
+	public ResultSet getFilesInProject(String projectUUID)
 			throws DatabaseException {
-		synchronized (this) {
-			try {
-				// TODO Add check if for project is exists
-				return this.query(String.format(
-						"SELECT * FROM documents WHERE ProjectID = '%s';",
-						projectId));
-			} catch (SQLException e) {
-				e.printStackTrace();
-				// TODO: this won't be called for the above reason, move this
-				// exception to the check (Above)
-				throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
-			}
+		try {
+			return this.query(String.format(
+					"SELECT * FROM documents WHERE ProjectID = '%s';",
+					projectUUID));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
 		}
-		// return null;
 	}
 
 	/**
 	 * Getter for all files inside the specified directory.
 	 *
 	 * @param directoryUUID
-	 *            the UUID of the directory in String form.
+	 *            the string representation of the UUID of the directory.
 	 * @return all associated files.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
 	public ResultSet getFilesInDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
-			// TODO Add check if for project is exists
 			return this.query(String.format(
 					"SELECT * FROM documents WHERE ParentDirectoryID = '%s';",
 					directoryUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// TODO: this won't be called for the above reason, move this
-			// exception to the check (Above)
-			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+			throw new DatabaseException(FlowServer.ERROR);
 		}
-		// return null;
 	}
 
 	/**
@@ -343,7 +381,8 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Getter for all of the usernames in the database.
+	 * Getter for all of the usernames in the database who have access to the
+	 * specified project.
 	 *
 	 * @return all of the usernames in the database.
 	 * @throws DatabaseException
@@ -926,15 +965,21 @@ public class SQLDatabase {
 
 	/**
 	 * Verifies if the user associated with the specified session ID has at
-	 * least VIEW access to the specified project.
+	 * least VIEW access to the specified project.<br>
+	 * <br>
+	 * *NOTE: this method is more efficient than, but yields the equivalent
+	 * result of calling
+	 * {@link SQLDatabase#verifyPermissions(sessionID, projectUUID, accessLevel)}
+	 * and using {@link SQLDatabase#VIEW} for the accessLevel.
 	 *
 	 * @param sessionID
 	 *            the UUID of the session, in String form.
 	 * @param projectUUID
 	 *            the UUID of the project, in String form.
-	 * @return Whether or not the user has at least VIEW access to the specified
+	 * @return whether or not the user has at least VIEW access to the specified
 	 *         project.
 	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
@@ -942,6 +987,36 @@ public class SQLDatabase {
 			if (!this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
 					this.getUsername(sessionID), projectUUID)).next())
+				return false;
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	/**
+	 * Verifies if the user associated with the specified session ID has at
+	 * least VIEW access to the specified project.
+	 *
+	 * @param sessionID
+	 *            the UUID of the session, in String form.
+	 * @param projectUUID
+	 *            the UUID of the project, in String form.
+	 * @param accessLevel
+	 *            the minimum level of access required to perform the action.
+	 * @return whether or not the user has at least the specified access level
+	 *         to the specified project.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public boolean verifyPermissions(String sessionID, String projectUUID,
+			int accessLevel) throws DatabaseException {
+		try {
+			if (!this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
+					this.getUsername(sessionID), projectUUID, accessLevel - 1))
+					.next())
 				return false;
 			return true;
 		} catch (SQLException e) {

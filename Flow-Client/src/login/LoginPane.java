@@ -138,7 +138,7 @@ public class LoginPane extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		if (FlowClient.NETWORK) {
-		    if (usernameEntry.getText().trim().length() >= 16) {
+		    if (usernameEntry.getText().trim().length() > 16) {
 			JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		    } else if (usernameEntry.getText().trim().equals("Username")) {

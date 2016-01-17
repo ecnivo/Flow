@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -10,14 +18,7 @@ import struct.VersionText;
 import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
+import util.Validator;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -40,14 +41,14 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 			this.socket.setSoTimeout(500);
-			Data data = psocket.receive();
+			final Data data = psocket.receive();
 
 			L.info("receive: " + data.toString());
-			Data returnData = new Data();
+			final Data returnData = new Data();
 			switch (data.getType()) {
 			case "login":
 				try {
-					String username = data.get("username", String.class),
+					final String username = data.get("username", String.class),
 							password = data.get("password", String.class);
 					if (this.database.userExists(username)) {
 						if (this.server.getDatabase().authenticate(username,
@@ -56,8 +57,8 @@ public class ClientRequestHandle implements Runnable {
 							// will
 							// save session to database)
 							UUID sessionID = this.server.newSession(username);
-							returnData.put("status", "OK");
 							returnData.put("session_id", sessionID);
+							returnData.put("status", "OK");
 						} else {
 							returnData.put("status", "PASSWORD_INCORRECT");
 						}
@@ -66,6 +67,7 @@ public class ClientRequestHandle implements Runnable {
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
+					returnData.put("status", e.getMessage());
 				}
 				break;
 			case "end_session":
@@ -77,17 +79,20 @@ public class ClientRequestHandle implements Runnable {
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
-				case "REGISTER":
-					returnData.put("status",
-							this.database.addUser(
-									data.get("username", String.class),
-									data.get("password", String.class)));
-					DataManagement.getInstance().addUser(new User(
-							data.get("username"), data.get("password")));
-					/*
-					 * TODO we need to know if the username/password have
-					 * invalid characters
-					 */
+				case "REGISTER": {
+					String username = data.get("username", String.class),
+							password = data.get("password", String.class);
+					if (!Validator.validUserName(username))
+						returnData.put("status", "USERNAME_INVALID");
+					else if (!Validator.validUserName(username))
+						returnData.put("status", "PASSWORD_INVALID");
+					else {
+						returnData.put("status",
+								this.database.addUser(username, password));
+						DataManagement.getInstance().addUser(new User(
+								data.get("username"), data.get("password")));
+					}
+				}
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
@@ -95,10 +100,10 @@ public class ClientRequestHandle implements Runnable {
 								data.get("session_id", UUID.class).toString());
 						if (!DataManagement.getInstance()
 								.removeUser(username)) {
-							returnData.put("status", "INTERNAL_SERVER_ERROR");
+							returnData.put("status", FlowServer.ERROR);
 						} else {
-							this.database.closeAccount(username);
-							returnData.put("status", "OK");
+							returnData.put("status",
+									this.database.closeAccount(username));
 						}
 					} catch (DatabaseException e) {
 						e.printStackTrace();
@@ -107,10 +112,15 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CHANGE_PASSWORD":
 					try {
-						this.database.changePassword(this.database.getUsername(
-								data.get("session_id", UUID.class).toString()),
-								data.get("new_password", String.class));
-						returnData.put("status", "OK");
+						returnData
+								.put("status",
+										this.database.changePassword(
+												this.database.getUsername(data
+														.get("session_id",
+																UUID.class)
+														.toString()),
+										data.get("new_password",
+												String.class)));
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						returnData.put("status", e.getMessage());
@@ -175,7 +185,7 @@ public class ClientRequestHandle implements Runnable {
 					UUID projectUUID = data.get("project_uuid", UUID.class),
 							sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID directoryUUID = data.get("directory_uuid",
 								UUID.class), fileUUID = UUID.randomUUID(),
 								versionUUID = UUID.randomUUID();
@@ -193,7 +203,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("file_uuid", fileUUID);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -208,7 +218,7 @@ public class ClientRequestHandle implements Runnable {
 							UUID.class);
 					UUID sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
+							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID random = UUID.randomUUID();
 						String status = this.database.newDirectory(
 								data.get("directory_name", String.class),
@@ -219,7 +229,7 @@ public class ClientRequestHandle implements Runnable {
 						}
 						returnData.put("status", status);
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -231,46 +241,48 @@ public class ClientRequestHandle implements Runnable {
 				UUID projectUUID = data.get("project_uuid", UUID.class),
 						sessionID = data.get("session_id", UUID.class);
 				try {
-					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString())) {
-						switch (data.get("project_modify_type", String.class)) {
-						case "MODIFY_COLLABORATOR":
-							ResultSet sessionInfo = null;
-							sessionInfo = this.database.getSessionInfo(
-									data.get("session_id").toString());
-							sessionInfo.next();
-							// TODO something is not right with this session
-							// check
-							String username = data.get("username",
-									String.class);
+					switch (data.get("project_modify_type", String.class)) {
+					case "MODIFY_COLLABORATOR":
+						String username = data.get("username", String.class);
+						int accessLevel = (int) data.get("access_level",
+								Byte.class);
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
 							returnData.put("status",
-									this.database.updateAccess(
-											(int) data.get("access_level",
-													Byte.class),
-									projectUUID.toString(), username));
-
-							break;
-						case "RENAME_PROJECT": {
-							String newName = data.get("new_name", String.class);
+									this.database.ownerUpdateAccess(accessLevel,
+											projectUUID.toString(), username));
+						} else if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.EDIT)) {
 							returnData.put("status",
-									this.database.renameProject(
-											projectUUID.toString(), newName));
+									this.database.restrictedUpdateAccess(
+											accessLevel, projectUUID.toString(),
+											username));
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
 						}
-							break;
-						case "DELETE_PROJECT":
+						break;
+					case "RENAME_PROJECT": {
+						String newName = data.get("new_name", String.class);
+						returnData.put("status", this.database.renameProject(
+								projectUUID.toString(), newName));
+					}
+						break;
+					case "DELETE_PROJECT":
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
 							returnData.put("status", this.database
 									.deleteProject(projectUUID.toString()));
-							break;
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
 						}
-					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						break;
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
-				} catch (SQLException e) {
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
 				}
 			}
 				break;
@@ -283,8 +295,8 @@ public class ClientRequestHandle implements Runnable {
 									.getProjectUUIDFromDirectory(
 											directoryUUID.toString());
 
-					if (this.database.verifyPermissions(sessionID,
-							projectUUID)) {
+					if (this.database.verifyPermissions(sessionID, projectUUID,
+							SQLDatabase.EDIT)) {
 						String type = data.get("mod_type", String.class);
 						switch (type) {
 						case "RENAME":
@@ -299,7 +311,7 @@ public class ClientRequestHandle implements Runnable {
 							break;
 						}
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -315,8 +327,8 @@ public class ClientRequestHandle implements Runnable {
 							.toString(),
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
-					if (this.database.verifyPermissions(sessionID,
-							projectUUID)) {
+					if (this.database.verifyPermissions(sessionID, projectUUID,
+							SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
 						switch (modType) {
 						case "RENAME":
@@ -332,7 +344,7 @@ public class ClientRequestHandle implements Runnable {
 							break;
 						}
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -363,7 +375,7 @@ public class ClientRequestHandle implements Runnable {
 												SQLDatabase.OWNER)[0]);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -418,7 +430,7 @@ public class ClientRequestHandle implements Runnable {
 						// occurred in the data retrieval.
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -454,7 +466,7 @@ public class ClientRequestHandle implements Runnable {
 										.getFileVersions(fileUUID)));
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -481,7 +493,7 @@ public class ClientRequestHandle implements Runnable {
 								this.database.getVersionDate(versionUUID));
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
@@ -513,7 +525,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("file_data", bytes);
 						returnData.put("status", "OK");
 					} else {
-						returnData.put("status", "INVALID_SESSION_ID");
+						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
