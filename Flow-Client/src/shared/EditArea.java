@@ -486,6 +486,9 @@ public class EditArea extends JTextPane {
 			// First tries to find words
 			if (Character.isLetter(sourceCode.charAt(pos)) || pos == 0) {
 				int end = nextNonLetter(sourceCode, pos);
+//				if (end == -1) {
+//					end = sourceCode.length();
+//				}
 				if (end >= 0 || (pos == 0 && end == -1)) {
 					String candidate = sourceCode.substring(pos, end);
 					// If the word is in the array, then it's placed in a new StyleBlock
@@ -505,7 +508,6 @@ public class EditArea extends JTextPane {
 
 		// Finds the strings
 		String sourceString = sourceCode.replace("\n", "");
-		System.out.println(sourceString);
 		for (int startQuote = 0; startQuote < sourceString.length(); startQuote++) {
 			if (sourceString.charAt(startQuote) == '"') {
 				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\') {
@@ -513,6 +515,7 @@ public class EditArea extends JTextPane {
 				}
 
 				int endQuote = startQuote + 1;
+				// Searching for the next non-escaped, non-ending, matching quote
 				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '"' && sourceString.charAt(endQuote - 1) != '\\') {
 					endQuote++;
 				}
@@ -522,10 +525,13 @@ public class EditArea extends JTextPane {
 				stringBlocks.add(new StyleBlock(endQuote - startQuote, startQuote));
 				startQuote = endQuote;
 			} else if (sourceString.charAt(startQuote) == '\'') {
-				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\')
+				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\') {
+					// Means that the quote is escaped
 					continue;
+				}
 
 				int endQuote = startQuote + 1;
+				// Searching for the next non-escaped, non-ending, matching quote
 				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '\'' && sourceString.charAt(endQuote - 1) != '\\') {
 					endQuote++;
 				}
@@ -537,31 +543,26 @@ public class EditArea extends JTextPane {
 			}
 		}
 
-		// Finds the comments
-		lines = 0;
-		for (int pos = 0; pos < sourceLength - 1; pos++) {
+		// Finds the asterisk-slash type comment
+		for (int pos = 0; pos < sourceString.length() - 2; pos++) {
 			// Tries to look for double-slash comments
-			if (sourceCode.substring(pos, pos + 1).equals("////")) {
-				int nextLine = sourceCode.indexOf('\n', pos);
-				if (nextLine == -1)
-					nextLine = sourceLength - 1;
-				commentBlocks.add(new StyleBlock(nextLine - pos, pos - lines));
-				pos = nextLine;
-			}
-			// Then tries to look for block comments
-			else if (sourceCode.substring(pos, pos + 1).equals("//*")) {
-				int end = sourceCode.indexOf("*//", pos);
+			String candidate = sourceString.substring(pos, pos + 2);
+			if (candidate.equals("/*")) {
+				int end = sourceString.indexOf("*/", pos);
 				if (end < 0) {
 					continue;
 				}
-				commentBlocks.add(new StyleBlock(end + 2 - pos, pos - lines));
+				commentBlocks.add(new StyleBlock(end + 2 - pos, pos));
 				pos = end + 2;
 			}
-			// Line counting
-			else if (sourceCode.charAt(pos) == '\n') {
-				lines++;
-			}
 		}
+		
+//		for (int pos = 0; pos < sourceCode.length()-1; pos++) {
+//			String candidate = sourceCode.substring(pos, pos + 2);
+//			if (candidate.equals("//")) {
+//				int endIdx = sourceCode.indexOf('\n')
+//			}
+//		}
 
 		// First paints everything "plain", then does key words, strings, then comments
 		SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
