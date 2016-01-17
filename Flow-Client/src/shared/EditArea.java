@@ -40,7 +40,6 @@ public class EditArea extends JTextPane {
     private Style commentsStyle;
 
     private ArrayList<StyleToken> keywordBlocks;
-    private ArrayList<StyleToken> plainBlocks;
     private ArrayList<StyleToken> stringBlocks;
     private ArrayList<StyleToken> commentBlocks;
 
@@ -204,7 +203,7 @@ public class EditArea extends JTextPane {
 			e1.printStackTrace();
 		    }
 		}
-		
+
 	    }
 
 	};
@@ -226,61 +225,49 @@ public class EditArea extends JTextPane {
 
     private class StyleToken {
 	private int length;
-	private int pos;
+	private int premiereIdx;
 
-	private StyleToken(int length, int pos) {
+	private StyleToken(int length, int firstIdx) {
 	    this.length = length;
-	    this.pos = pos;
+	    this.premiereIdx = firstIdx;
 	}
 
 	private int getLength() {
 	    return length;
 	}
 
-	private int getPos() {
-	    return pos;
+	private int getFirstIdx() {
+	    return premiereIdx;
 	}
     }
 
     private void highlightSyntax() {
 	keywordBlocks = new ArrayList<StyleToken>();
-	plainBlocks = new ArrayList<StyleToken>();
 	stringBlocks = new ArrayList<StyleToken>();
 	commentBlocks = new ArrayList<StyleToken>();
 
 	String sourceCode = getText();
 	int sourceLength = sourceCode.length();
-	int line;
-	for (String target : JAVA_KEYWORDS) {
-	    int targetLength = target.length();
-	    line = 0;
-	    for (int pos = 0; pos + targetLength < sourceLength; pos++) {
-		if (pos > 0 && pos + targetLength + 1 < sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1)) && !Character.isAlphabetic(sourceCode.charAt(pos + targetLength))) {
-			markWordBlocks(sourceCode, pos, target, line);
-			pos += targetLength;
+	int lines = 0;
+	for (int pos = 0; pos < sourceLength; pos++) {
+	    if (!Character.isAlphabetic(sourceCode.charAt(pos)) || pos == 0) {
+		int end = nextNonAlphabetic(sourceCode, pos);
+		if (end >= 0 || (pos == 0 && end == -1)) {
+		    String candidate = sourceCode.substring(pos, end);
+		    if (arrayContains(JAVA_KEYWORDS, candidate.trim())) {
+			keywordBlocks.add(new StyleToken(end - pos, pos - lines));
+			pos = end - 1;
 		    }
-		} else if (pos == 0 && pos + targetLength + 1 < sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos + targetLength))) {
-			markWordBlocks(sourceCode, pos, target, line);
-			pos += targetLength;
-		    }
-		} else if (pos > 0 && pos + targetLength + 1 == sourceLength) {
-		    if (!Character.isAlphabetic(sourceCode.charAt(pos - 1))) {
-			markWordBlocks(sourceCode, pos, target, line);
-			pos += targetLength;
-		    }
-		} else if (pos == 0 && pos + targetLength + 1 == sourceLength) {
-		    markWordBlocks(sourceCode, pos, target, line);
-		    pos += targetLength;
+		} else {
+		    break;
 		}
-		if (sourceCode.charAt(pos) == '\n') {
-		    line++;
-		}
+	    }
+	    if (sourceCode.charAt(pos) == '\n') {
+		lines++;
 	    }
 	}
 
-	line = 0;
+	lines = 0;
 	for (int pos = 0; pos < sourceLength; pos++) {
 	    if (sourceCode.charAt(pos) == '"') {
 		boolean escaped;
@@ -288,6 +275,7 @@ public class EditArea extends JTextPane {
 		    escaped = false;
 		} else {
 		    escaped = true;
+		    continue;
 		}
 		if (!escaped) {
 		    int closeQuote = sourceCode.indexOf('"', pos + 1);
@@ -295,10 +283,11 @@ public class EditArea extends JTextPane {
 		    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
 			closeQuote = sourceCode.indexOf('"', closeQuote + 1);
 		    }
-		    if (closeQuote > -1) {
-			stringBlocks.add(new StyleToken(closeQuote - pos, pos - line));
-			pos = closeQuote;
+		    if (closeQuote < 0) {
+			continue;
 		    }
+		    stringBlocks.add(new StyleToken(closeQuote + 1 - pos + lines, pos - lines));
+		    pos = closeQuote;
 		}
 	    } else if (sourceCode.charAt(pos) == '\'') {
 		boolean escaped;
@@ -306,57 +295,54 @@ public class EditArea extends JTextPane {
 		    escaped = false;
 		} else {
 		    escaped = true;
+		    continue;
 		}
 		if (!escaped) {
 		    int closeQuote = sourceCode.indexOf('\'', pos + 1);
 		    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
 			closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
 		    }
-		    if (closeQuote > -1) {
-			stringBlocks.add(new StyleToken(closeQuote - pos, pos - line));
-			pos = closeQuote;
+		    if (closeQuote < 0) {
+			continue;
 		    }
+		    stringBlocks.add(new StyleToken(closeQuote + 1 - pos + lines, pos - lines));
+		    pos = closeQuote;
 		}
-	    }
-
-	    if (sourceCode.charAt(pos) == '\n') {
-		line++;
+	    } else if (sourceCode.charAt(pos) == '\n') {
+		lines++;
 	    }
 	}
 
-	for (int pos = 0; pos < sourceLength; pos++) {
+	lines = 0;
+	for (int pos = 0; pos < sourceLength - 1; pos++) {
 	    if (sourceCode.substring(pos, pos + 1).equals("////")) {
 		int nextLine = sourceCode.indexOf('\n', pos);
-		StyleToken commentToken = new StyleToken((nextLine - pos), pos);
-		commentBlocks.add(commentToken);
+		if (nextLine == -1)
+		    nextLine = sourceLength - 1;
+		commentBlocks.add(new StyleToken(nextLine - pos, pos - lines));
 		pos = nextLine;
 	    } else if (sourceCode.substring(pos, pos + 1).equals("//*")) {
 		int end = sourceCode.indexOf("*//", pos);
-		StyleToken commentToken = new StyleToken((end - pos), pos);
-		commentBlocks.add(commentToken);
-		pos = end;
+		if (end < 0) {
+		    continue;
+		}
+		commentBlocks.add(new StyleToken(end + 2 - pos, pos - lines));
+		pos = end + 2;
+	    } else if (sourceCode.charAt(pos) == '\n') {
+		lines++;
 	    }
 	}
 
-	for (StyleToken styleToken : plainBlocks) {
-	    // doc.setCharacterAttributes(styleToken.getPos(),
-	    // styleToken.getLength(), keywordStyle, false);
-	    SwingUtilities.invokeLater(new FormatPlainLater(styleToken.getPos(), styleToken.getLength()));
-	}
+	SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
+
 	for (StyleToken styleToken : keywordBlocks) {
-	    // doc.setCharacterAttributes(styleToken.getPos(),
-	    // styleToken.getLength(), keywordStyle, false);
-	    SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken.getPos(), styleToken.getLength()));
+	    SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken.getFirstIdx(), styleToken.getLength()));
 	}
 	for (StyleToken styleToken : stringBlocks) {
-	    // doc.setCharacterAttributes(styleToken.getPos(),
-	    // styleToken.getLength() + 1, stringStyle, false);
-	    SwingUtilities.invokeLater(new FormatStringsLater(styleToken.getPos(), styleToken.getLength() + 1));
+	    SwingUtilities.invokeLater(new FormatStringsLater(styleToken.getFirstIdx(), styleToken.getLength() + 1));
 	}
-	for (StyleToken token : commentBlocks) {
-	    // doc.setCharacterAttributes(token.getPos(), token.getLength() + 1,
-	    // stringStyle, false);
-	    SwingUtilities.invokeLater(new FormatCommentsLater(token.getPos(), token.getLength()));
+	for (StyleToken styleToken : commentBlocks) {
+	    SwingUtilities.invokeLater(new FormatCommentsLater(styleToken.getFirstIdx(), styleToken.getLength()));
 	}
     }
 
@@ -368,12 +354,12 @@ public class EditArea extends JTextPane {
 	return false;
     }
 
-    private void markWordBlocks(String sourceCode, int pos, String target, int line) {
-	String candidate = sourceCode.substring(pos, pos + target.length());
-	if (arrayContains(JAVA_KEYWORDS, candidate))
-	    keywordBlocks.add(new StyleToken(candidate.length(), pos - line));
-	else
-	    plainBlocks.add(new StyleToken(candidate.length(), pos - line));
+    private int nextNonAlphabetic(String sourceCode, int idx) {
+	int sourceCodeLength = sourceCode.length();
+	do {
+	    idx++;
+	} while (idx < sourceCodeLength - 1 && Character.isAlphabetic(sourceCode.charAt(idx)));
+	return idx;
     }
 
     private class FormatKeywordsLater implements Runnable {
@@ -388,7 +374,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, false);
+	    doc.setCharacterAttributes(pos, nextToken, keywordStyle, true);
 	}
 
     }
@@ -405,7 +391,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, plainStyle, false);
+	    doc.setCharacterAttributes(pos, nextToken, plainStyle, true);
 	}
 
     }
@@ -421,7 +407,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, stringStyle, false);
+	    doc.setCharacterAttributes(pos, nextToken, stringStyle, true);
 	}
     }
 
@@ -436,7 +422,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void run() {
-	    doc.setCharacterAttributes(pos, nextToken, commentsStyle, false);
+	    doc.setCharacterAttributes(pos, nextToken, commentsStyle, true);
 	}
     }
 }
