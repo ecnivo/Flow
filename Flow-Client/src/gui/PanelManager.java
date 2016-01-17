@@ -39,6 +39,8 @@ public class PanelManager extends JPanel {
 	private HistoryPane			historyPane;
 
 	private EditTabs			editTabs;
+	
+	private FlowClient			frame;
 
 	/**
 	 * Creates a new PanelManager
@@ -46,9 +48,10 @@ public class PanelManager extends JPanel {
 	 * @param frame
 	 *        the JFrame
 	 */
-	public PanelManager(JFrame frame) {
+	public PanelManager(FlowClient frame) {
 		// Swing necessities
 		layout = new CardLayout();
+		this.frame = frame;
 		this.setLayout(layout);
 		setBorder(FlowClient.EMPTY_BORDER);
 
@@ -121,6 +124,7 @@ public class PanelManager extends JPanel {
 		revalidate();
 		repaint();
 	}
+
 	/**
 	 * Switches to the history view
 	 */
@@ -133,6 +137,7 @@ public class PanelManager extends JPanel {
 
 	/**
 	 * Gets the editPane
+	 * 
 	 * @return the EditPane
 	 */
 	public EditPane getEditPane() {
@@ -141,6 +146,7 @@ public class PanelManager extends JPanel {
 
 	/**
 	 * Gets the version history pane
+	 * 
 	 * @return the version history pane
 	 */
 	public HistoryPane getHistoryPane() {
@@ -148,7 +154,8 @@ public class PanelManager extends JPanel {
 	}
 
 	/**
-	 * Gets the login pane 
+	 * Gets the login pane
+	 * 
 	 * @return the login pane
 	 */
 	public LoginPane getLoginPane() {
@@ -159,10 +166,6 @@ public class PanelManager extends JPanel {
 	 * Resets the UI on logout and close account
 	 */
 	public void resetUI() {
-		((DefaultMutableTreeNode) editPane.getFileTree().getModel().getRoot()).removeAllChildren();
-		((DefaultTreeModel) editPane.getFileTree().getModel()).reload();
-		((DefaultMutableTreeNode) historyPane.getTree().getModel().getRoot()).removeAllChildren();
-		editTabs.removeAll();
-		editTabs.revalidate();
+		frame.resetUI();
 	}
 }

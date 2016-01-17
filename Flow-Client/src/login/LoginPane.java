@@ -204,7 +204,6 @@ public class LoginPane extends JPanel {
 							// Success case
 						case "OK":
 							// Switching, clearing, and resetting UI
-							LoginPane.this.panMan.resetUI();
 							LoginPane.this.panMan.switchToEditor();
 							Communicator.setSessionID(reply.get("session_id", UUID.class));
 							LoginPane.this.panMan.getEditPane().getFileTree().refreshProjectList();

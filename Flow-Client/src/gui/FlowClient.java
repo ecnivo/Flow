@@ -94,4 +94,12 @@ public class FlowClient extends JFrame {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		new FlowClient();
 	}
+	
+	public void resetUI() {
+		this.remove(manager);
+		manager = new PanelManager(this);
+		this.add(manager);
+		revalidate();
+		repaint();
+	}
 }
