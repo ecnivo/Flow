@@ -141,6 +141,9 @@ public class EditArea extends JTextPane {
 		fileModify.put("file_uuid", fileUUID);
 		fileModify.put("session_id", Communicator.getSessionID());
 		fileModify.put("mod_type", "INSERT");
+		
+		System.out.println("inserting " + insertedString + " at " + caretPos);
+		
 		fileModify.put("idx", caretPos);
 		fileModify.put("str", insertedString);
 
@@ -156,12 +159,15 @@ public class EditArea extends JTextPane {
 	    @Override
 	    public void removeUpdate(DocumentEvent e) {
 		int removedLen = e.getLength();
-		int caretPos = getCaretPosition() - removedLen;
+		int caretPos = getCaretPosition();
 
 		Data metadataModify = new Data("file_text_modify");
 		metadataModify.put("file_uuid", fileUUID);
 		metadataModify.put("session_id", Communicator.getSessionID());
 		metadataModify.put("mod_type", "DELETE");
+		
+		System.out.println("removing length " + removedLen + " from position " + caretPos);
+
 		metadataModify.put("idx", caretPos);
 		metadataModify.put("len", removedLen);
 
@@ -224,8 +230,8 @@ public class EditArea extends JTextPane {
     public UUID getProjectUUID() {
 	return projectUUID;
     }
-    
-    public UUID getFileUUID(){
+
+    public UUID getFileUUID() {
 	return fileUUID;
     }
 
