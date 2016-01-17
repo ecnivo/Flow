@@ -202,6 +202,9 @@ public class LoginPane extends JPanel {
 					case "USER_ALREADY_LOGGED_IN":
 						JOptionPane.showConfirmDialog(null, "You are logged into your Flow account from another computer.\nPlease log out of that account before you try to log in here.", "Simultaneous logins are not supported", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
 						// Success case
 					case "OK":
 						// Switching, clearing, and resetting UI

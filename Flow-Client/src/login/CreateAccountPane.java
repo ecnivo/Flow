@@ -199,6 +199,10 @@ public class CreateAccountPane extends JPanel {
 					case "PASSWORD_INVALID":
 						JOptionPane.showConfirmDialog(null, "This password is invalid.\nThe most likely cause is the presence of special characters.\nPlease select another one.", "Password invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
+						
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
 						// Success case: clears boxes and switches back to the login pane
 					case "OK":
 						JOptionPane.showConfirmDialog(null, "Congratulations, you have successfully registered a Flow account!\nEnter your username and password on the next page to login.", "Registration successful", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);

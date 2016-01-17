@@ -9,7 +9,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,6 +112,12 @@ public abstract class FileTree extends JTree {
 		Data projectList = new Data("list_projects");
 		projectList.put("session_id", Communicator.getSessionID());
 		Data reply = Communicator.communicate(projectList);
+		if (reply == null) {
+			return;
+		} else if (reply.get("status", String.class).equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 		usersProjectsUUIDs = reply.get("projects", UUID[].class);
 		if (usersProjectsUUIDs == null) {
 			return;
@@ -132,6 +137,12 @@ public abstract class FileTree extends JTree {
 				fileListRequest.put("project_uuid", remoteProjectUUID);
 				fileListRequest.put("session_id", Communicator.getSessionID());
 				Data project = Communicator.communicate(fileListRequest);
+				if (project == null) {
+					return;
+				} else if (project.get("status", String.class).equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 
 				// Creates new node and adds it
 				ProjectNode newProjectNode = new ProjectNode(remoteProjectUUID, project.get("project_name", String.class));
@@ -174,6 +185,10 @@ public abstract class FileTree extends JTree {
 		dirInfoRequest.put("session_id", Communicator.getSessionID());
 		dirInfoRequest.put("directory_uuid", remoteDirUUID);
 		Data remoteDir = Communicator.communicate(dirInfoRequest);
+		if (remoteDir.get("status", String.class).equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 
 		// adds folders
 		UUID[] childDirs = remoteDir.get("child_directories", UUID[].class);
@@ -232,7 +247,8 @@ public abstract class FileTree extends JTree {
 		if (reloadedProject == null) {
 			JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
-		}
+		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED"))
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 
 		// Does the recursion one on the children
 		reloadProjectFilesRecursively(reloadedProject, projectNode);
@@ -306,6 +322,10 @@ public abstract class FileTree extends JTree {
 			remoteChildDirRequest.put("directory_uuid", remoteChildDirUUID);
 			remoteChildDirRequest.put("session_id", Communicator.getSessionID());
 			Data remoteChildDir = Communicator.communicate(remoteChildDirRequest);
+			if (remoteChildDir.get("status", String.class).equals("ACCESS_DENIED")) {
+				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 
 			reloadProjectFilesRecursively(remoteChildDir, newChildNode);
 		}

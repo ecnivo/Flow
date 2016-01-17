@@ -84,6 +84,10 @@ public class EditorToolbar extends JToolBar {
 					case "OK":
 						break;
 
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
+
 					// Other cases
 					default:
 						JOptionPane.showConfirmDialog(null, "Your project name is invalid. Please choose another one.\nThe most likely case is that your project name conflicts with another project name.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -146,6 +150,9 @@ public class EditorToolbar extends JToolBar {
 					case "PROJECT_NAME_INVALID":
 						JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						break;
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
 					case "PROJECT_DOES_NOT_EXIST":
 						JOptionPane.showConfirmDialog(null, "The project you are trying to rename does not exist.\n" + "Try refreshing the list of projects by moving your mouse cursor into,\n" + "then out of the project list.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						break;
@@ -183,6 +190,9 @@ public class EditorToolbar extends JToolBar {
 				projectRequest.put("session_id", Communicator.getSessionID());
 				projectRequest.put("project_uuid", projectUUID);
 				Data project = Communicator.communicate(projectRequest);
+				if (project.get("status", String.class).equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+				}
 				// Confirms that they match
 				if (confirm.equals(project.get("project_name", String.class))) {
 					// Secondary confirmation
@@ -202,6 +212,10 @@ public class EditorToolbar extends JToolBar {
 							case "OK":
 								project = null;
 								pane.getFileTree().refreshProjectList();
+								break;
+
+							case "ACCESS_DENIED":
+								JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 								break;
 
 							// Failure cases

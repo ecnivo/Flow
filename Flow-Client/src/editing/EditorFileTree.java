@@ -22,8 +22,8 @@ import javax.swing.tree.TreePath;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
-import shared.FileTree;
 import shared.EditTabs;
+import shared.FileTree;
 
 /**
  * Special documents tree for the editing view
@@ -47,7 +47,7 @@ public class EditorFileTree extends FileTree {
 	 * Creates a new EditorDocTree
 	 * 
 	 * @param editPane
-	 *            the parent pane (MUST be an EditPane, however)
+	 *        the parent pane (MUST be an EditPane, however)
 	 */
 	public EditorFileTree(EditPane editPane) {
 		super();
@@ -123,6 +123,10 @@ public class EditorFileTree extends FileTree {
 							((DefaultTreeModel) getModel()).removeNodeFromParent(selectedDir);
 							break;
 
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							break;
+
 						// Failure case
 						default:
 							JOptionPane.showConfirmDialog(null, "Deletion failed.\nTry refreshing by Alt + clicking on the documents tree, or try again at another time.", "Failed to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -186,7 +190,11 @@ public class EditorFileTree extends FileTree {
 					switch (status) {
 					// Success case
 						case "OK":
-							((DefaultTreeModel)getModel()).removeNodeFromParent(selectedNode);
+							((DefaultTreeModel) getModel()).removeNodeFromParent(selectedNode);
+							break;
+
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 							break;
 
 						// Failure case
@@ -197,7 +205,7 @@ public class EditorFileTree extends FileTree {
 				} else {
 					JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
-//				reloadProjectFiles((ProjectNode) selectedNode.getPath()[1]);
+				// reloadProjectFiles((ProjectNode) selectedNode.getPath()[1]);
 			}
 		});
 		filePopup.add(deleteFileButton);
@@ -323,11 +331,17 @@ public class EditorFileTree extends FileTree {
 		fileRequest.put("session_id", Communicator.getSessionID());
 		Data fileData = Communicator.communicate(fileRequest);
 
+		if (fileData.get("status", String.class).equals("ACCESS_DENIED"))
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+
 		// Asks the server for the file's data
 		Data fileContentsRequest = new Data("file_request");
 		fileContentsRequest.put("session_id", Communicator.getSessionID());
 		fileContentsRequest.put("file_uuid", fileToOpen);
 		Data fileContents = Communicator.communicate(fileContentsRequest);
+
+		if (fileContents.get("status", String.class).equals("ACCESS_DENIED"))
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 
 		// Asks the server for the project's info
 		Data permissionRequest = new Data("project_info");
@@ -338,6 +352,7 @@ public class EditorFileTree extends FileTree {
 		// Checks tha this user has access to this project
 		String permissionsStatus = permissions.get("status", String.class);
 		if (permissionsStatus.equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
@@ -452,7 +467,7 @@ public class EditorFileTree extends FileTree {
 						JOptionPane.showConfirmDialog(null, "Please select a directory to put your new directory in first", "No selected directory", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					// Asks the user for their new directory's name 
+					// Asks the user for their new directory's name
 					String name = JOptionPane.showInputDialog(null, "What is the name of your new directory?", "Name", JOptionPane.QUESTION_MESSAGE);
 					if (name == null) {
 						return;
@@ -489,7 +504,9 @@ public class EditorFileTree extends FileTree {
 					// Failure cases
 					else if (response.get("status", String.class).equals("DIRECTORY_NAME_INVALID")) {
 						JOptionPane.showConfirmDialog(null, "The directory name is invalid. Try another name.\nThe most likely issue is that the name is conflicting with another name.", "Directory name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-					} else
+					} else if (response.get("status", String.class).equals("ACCESS_DENIED"))
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+					else
 						JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 
 					// Expands the created directory
@@ -565,6 +582,10 @@ public class EditorFileTree extends FileTree {
 
 						case "FILE_NAME_INVALID":
 							JOptionPane.showConfirmDialog(null, "The file name is invalid.\nThis is typically due to a conflict with another file name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							break;
+							
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 							break;
 
 						default:

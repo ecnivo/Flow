@@ -10,7 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -98,6 +98,8 @@ public class VersionViewer extends JPanel {
 		fileInfoRequest.put("file_uuid", fileUUID);
 		fileInfoRequest.put("session_id", Communicator.getSessionID());
 		Data fileInfo = Communicator.communicate(fileInfoRequest);
+		if (fileInfo.get("status", String.class).equals("ACCESS_DENIED"))
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 		UUID[] versions = fileInfo.get("file_versions", UUID[].class);
 		boolean isFileText = false;
 		// Does different things based on text/arbitrary type files
@@ -119,7 +121,10 @@ public class VersionViewer extends JPanel {
 			versionDataRequest.put("file_uuid", fileUUID);
 			versionDataRequest.put("version_uuid", versionUUID);
 			versionDataRequest.put("session_id", Communicator.getSessionID());
-			byte[] versionData = Communicator.communicate(versionDataRequest).get("version_data", byte[].class);
+			Data versionRequestResponse = Communicator.communicate(versionDataRequest);
+			if (versionRequestResponse.get("status", String.class).equals("ACCESS_DENIED"))
+				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			byte[] versionData = versionRequestResponse.get("version_data", byte[].class);
 
 			// More version information is requested
 			Data versionInfoRequest = new Data("version_info");
@@ -127,7 +132,10 @@ public class VersionViewer extends JPanel {
 			versionInfoRequest.put("file_uuid", fileUUID);
 			versionInfoRequest.put("session_id", Communicator.getSessionID());
 			// Gets the date from a millis value
-			Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", Long.class).longValue());
+			Data versionInfo = Communicator.communicate(versionInfoRequest);
+			if (versionInfo.get("status", String.class).equals("ACCESS_DENIED"))
+				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			Date saveDate = new Date(versionInfo.get("date", Long.class).longValue());
 
 			// Creates a new VersionItem and adds it
 			VersionItem item = new VersionItem(versionData, saveDate, versionUUID);

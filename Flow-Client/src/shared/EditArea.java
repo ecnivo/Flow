@@ -114,7 +114,10 @@ public class EditArea extends JTextPane {
 		editorListRequest.put("project_uuid", projectUUID);
 		editorListRequest.put("session_id", Communicator.getSessionID());
 		Data editorListData = Communicator.communicate(editorListRequest);
-		if (!editorListData.get("status", String.class).equals("OK")) {
+		if (editorListData.get("status", String.class).equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			return;
+		} else if (!editorListData.get("status", String.class).equals("OK")) {
 			return;
 		}
 		carets = new ArrayList<UserCaret>();
@@ -277,7 +280,11 @@ public class EditArea extends JTextPane {
 				caretPosChange.put("file_uuid", fileUUID);
 				caretPosChange.put("mod_type", "MOVE");
 				caretPosChange.put("idx", caretPos);
-				Communicator.communicate(caretPosChange);
+				Data response = Communicator.communicate(caretPosChange);
+				if (response.get("status", String.class).equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 			}
 		});
 		// Listener to get changes from the server

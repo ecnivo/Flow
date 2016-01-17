@@ -186,6 +186,10 @@ public class CollabsList extends JPanel {
 							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions to add this user as a viewer.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 							break;
 
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							break;
+
 						default:
 							break;
 					}
@@ -238,6 +242,7 @@ public class CollabsList extends JPanel {
 		Data activeProject = Communicator.communicate(getProject);
 
 		if (activeProject.get("status", String.class).equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 

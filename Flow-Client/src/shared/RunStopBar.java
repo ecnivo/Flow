@@ -15,6 +15,7 @@ import java.util.UUID;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
 import message.Data;
@@ -75,6 +76,12 @@ public class RunStopBar extends JToolBar {
 			fileRequest.put("file_uuid", childFileUUID);
 			fileRequest.put("session_id", Communicator.getSessionID());
 			Data file = Communicator.communicate(fileRequest);
+			if (file == null) {
+				return null;
+			} else if (file.get("status", String.class).equals("ACCESS_DENIED")) {
+				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+				return null;
+			}
 
 			VersionText versionText = new VersionText();
 			versionText.setDocumentText(new String(file.get("file_data", byte[].class)));
