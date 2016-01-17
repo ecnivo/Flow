@@ -31,6 +31,8 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
+	public static final String backupDatabase = "";
+
 	/**
 	 * Connection to the database.
 	 */
@@ -59,6 +61,7 @@ public class SQLDatabase {
 			System.out.println(
 					"Error connecting to database located at: " + databaseName);
 		}
+		// this.verifyDirectoryCorruption();
 		instance = this;
 	}
 
@@ -462,16 +465,16 @@ public class SQLDatabase {
 	 *            the string representation of the UUID of the session
 	 * @return whether or not the session was successfully removed
 	 */
-	public boolean removeSession(String sessionId) {
+	public String removeSession(String sessionId) {
 		try {
 			// TODO Verify if the session actually exists prior to removal
 			this.update(String.format(
 					"DELETE FROM sessions WHERE SessionID = '%s';", sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return FlowServer.ERROR;
 		}
-		return true;
+		return "OK";
 	}
 
 	/**
@@ -1246,4 +1249,8 @@ public class SQLDatabase {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
+
+	// public boolean verifyDirectoryCorruption() {
+	//
+	// }
 }
