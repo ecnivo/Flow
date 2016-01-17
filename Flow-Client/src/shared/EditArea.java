@@ -254,10 +254,13 @@ public class EditArea extends JTextPane {
 		addCaretListener(new CaretListener() {
 
 			@Override
-			public void caretUpdate(CaretEvent arg0) {
-				// Gets the caret position
-				int caretPos = getCaret().getDot();
-				// TODO send position to server
+			public void caretUpdate(CaretEvent e) {
+				// Gets the caret position and sends to server
+				int caretPos = e.getDot();
+				Data caretPosChange = new Data("file_text_modify");
+				caretPosChange.put("session_id", Communicator.getSessionID());
+				caretPosChange.put("idx", caretPos);
+				Communicator.communicate(caretPosChange);
 			}
 		});
 		// Listener to get changes from the server
