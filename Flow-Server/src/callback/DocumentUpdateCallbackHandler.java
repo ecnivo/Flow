@@ -30,18 +30,14 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
     }
 
     @Override
-    public void onCallbackEvent(CallbackEvent arg0) {
+    public void onCallbackEvent(CallbackEvent arg0) throws IOException {
         if (!(arg0 instanceof DocumentCallbackEvent))
             throw new IllegalArgumentException("event must be document callback event!");
         DocumentCallbackEvent event = (DocumentCallbackEvent) arg0;
         DataSocket dataSocket = this.getHandle().getDataSocket();
         Data data = new Data("async_callback");
         data.put("event", event);
-        try {
-            dataSocket.send(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        dataSocket.send(data);
     }
 
     @Override

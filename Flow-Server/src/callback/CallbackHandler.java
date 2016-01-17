@@ -1,5 +1,7 @@
 package callback;
 
+import java.io.IOException;
+
 /**
  * Represents a handler that handles a callback event
  * <p>
@@ -24,7 +26,7 @@ public class CallbackHandler {
      *
      * @param event The event argument passed on
      */
-    public void onCallbackEvent(CallbackEvent event) {
+    public void onCallbackEvent(CallbackEvent event) throws IOException {
 
     }
 
