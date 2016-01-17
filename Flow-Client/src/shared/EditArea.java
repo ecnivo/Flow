@@ -1,441 +1,629 @@
+
 package shared;
 
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
 import editing.UserCaret;
 import gui.FlowClient;
-import message.Data;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
+
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.UUID;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
+import message.Data;
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
+
+/**
+ * The area for the user to edit their documents
+ * 
+ * @author Vince Ou
+ *
+ */
 @SuppressWarnings("serial")
 public class EditArea extends JTextPane {
-    private JScrollPane scrolling;
-    private StyledDocument doc;
-    private UUID versionTextUUID;
-    private UUID fileUUID;
-    private UUID projectUUID;
-
-    private Style keywordStyle;
-    private Style plainStyle;
-    private Style stringStyle;
-    private Style commentsStyle;
-
-    private ArrayList<StyleToken> keywordBlocks;
-    private ArrayList<StyleToken> stringBlocks;
-    private ArrayList<StyleToken> commentBlocks;
-
-    public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
-    public static final Color PLAIN_COLOUR = Color.BLACK;
-    public static final Color KEYWORD_COLOUR = new Color(0x38761D);
-    public static final Color STRING_COLOUR = new Color(0xA30BCF);
-    public static final Color COMMENTS_COLOUR = new Color(0xD13313);
-
-    private static final String[] JAVA_KEYWORDS = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "try", "void", "volatile", "while"};
-
-    private boolean ignoreEvents = false;
-
-    public EditArea(String textDoc, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable, EditTabs tabs) {
-        setLayout(null);
-        this.projectUUID = projectUUID;
-        this.versionTextUUID = versionTextUUID;
-        this.fileUUID = fileUUID;
-        scrolling = new JScrollPane(this);
-        setBorder(FlowClient.EMPTY_BORDER);
-        setFont(PLAIN);
-        setForeground(PLAIN_COLOUR);
-        doc = getStyledDocument();
-        setText(textDoc);
-        doc.putProperty(PlainDocument.tabSizeAttribute, 4);
-        setEditable(editable);
-
-        Data editorListRequest = new Data("project_info");
-        editorListRequest.put("project_uuid", projectUUID);
-        editorListRequest.put("session_id", Communicator.getSessionID());
-        Data editorListData = Communicator.communicate(editorListRequest);
-        if (!editorListData.get("status", String.class).equals("OK")) {
-            return;
-        }
-        String[] editors = editorListData.get("editors", String[].class);
-        for (String editor : editors) {
-            add(new UserCaret(editor, this));
-        }
-
-        keywordStyle = addStyle("keywords", null);
-        StyleConstants.setForeground(keywordStyle, KEYWORD_COLOUR);
-        StyleConstants.setItalic(keywordStyle, true);
-
-        plainStyle = addStyle("plain", null);
-        StyleConstants.setForeground(plainStyle, PLAIN_COLOUR);
-        StyleConstants.setBold(plainStyle, false);
-
-        stringStyle = addStyle("strings", null);
-        StyleConstants.setBold(stringStyle, false);
-        StyleConstants.setForeground(stringStyle, STRING_COLOUR);
-
-        commentsStyle = addStyle("comments", null);
-        StyleConstants.setBold(commentsStyle, false);
-        StyleConstants.setForeground(commentsStyle, COMMENTS_COLOUR);
-
-        addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                // nothing
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_W) {
-                    tabs.removeTabAt(tabs.getSelectedIndex());
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_TAB && editable) {
-                    try {
-                        doc.insertString(getCaretPosition(), "    ", null);
-                    } catch (BadLocationException e1) {
-                        e1.printStackTrace();
-                    }
-                    e.consume();
-                }
-            }
-        });
-        doc.addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                // useless for plaintext areas
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                if (ignoreEvents)
-                    return;
-                String insertedString = "";
-                int strLen = e.getLength();
-                int vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince = e.getOffset();
-                try {
-                    insertedString = doc.getText(vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince, strLen);
-                } catch (BadLocationException e1) {
-                    e1.printStackTrace();
-                }
-                Data fileModify = new Data("file_text_modify");
-                fileModify.put("file_uuid", fileUUID);
-                fileModify.put("session_id", Communicator.getSessionID());
-                fileModify.put("mod_type", "INSERT");
-
-                System.out.println("inserting " + insertedString + " at " + vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince);
-
-                fileModify.put("idx", vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince);
-                fileModify.put("str", insertedString);
-
-                Data response = Communicator.communicate(fileModify);
-                String status = response.get("status", String.class);
-                if (!status.equals("OK")) {
-                    return;
-                }
-
-                highlightSyntax();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (ignoreEvents)
-                    return;
-                int removedLen = e.getLength();
-                int vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince = e.getOffset();
-
-                Data metadataModify = new Data("file_text_modify");
-                metadataModify.put("file_uuid", fileUUID);
-                metadataModify.put("session_id", Communicator.getSessionID());
-                metadataModify.put("mod_type", "DELETE");
-
-                System.out.println("removing length " + removedLen + " from position " + vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince);
-
-                metadataModify.put("idx", vinceYoureRetardedYouShouldHaveUsedThisInsteadOmgVince);
-                metadataModify.put("len", removedLen);
-
-                Data response = Communicator.communicate(metadataModify);
-                String status = response.get("status", String.class);
-                if (!status.equals("OK")) {
-                    return;
-                }
-
-                highlightSyntax();
-            }
-        });
-        addCaretListener(new CaretListener() {
-
-            @Override
-            public void caretUpdate(CaretEvent arg0) {
-                int caretPos = getCaret().getDot();
-                // TODO send position to server
-            }
-        });
-        TextModificationListener fileChangeListener = new TextModificationListener() {
-
-            @Override
-            public void onDocumentUpdate(DocumentCallbackEvent e) {
-                if (e.USERNAME.equals(Communicator.getUsername())) {
-                    return;
-                }
-
-                if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
-                    String addition = e.ADDITION;
-                    try {
-                        ignoreEvents = true;
-                        doc.insertString(e.INDEX, addition, null);
-                        ignoreEvents = false;
-                    } catch (BadLocationException e1) {
-                        e1.printStackTrace();
-                    }
-                } else if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
-                    int length = e.REMOVAL_LENGTH;
-                    try {
-                        ignoreEvents = true;
-                        doc.remove(e.INDEX, length);
-                        ignoreEvents = false;
-                    } catch (BadLocationException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-            }
-
-        };
-        Communicator.addFileChangeListener(fileChangeListener, fileUUID);
-        highlightSyntax();
-    }
-
-    public UUID getVersionTextUUID() {
-        return versionTextUUID;
-    }
-
-    public JScrollPane getScrollPane() {
-        return scrolling;
-    }
-
-    public UUID getProjectUUID() {
-        return projectUUID;
-    }
-
-    public UUID getFileUUID() {
-        return fileUUID;
-    }
-
-    private class StyleToken {
-        private int length;
-        private int premiereIdx;
-
-        private StyleToken(int length, int firstIdx) {
-            this.length = length;
-            this.premiereIdx = firstIdx;
-        }
-
-        private int getLength() {
-            return length;
-        }
-
-        private int getFirstIdx() {
-            return premiereIdx;
-        }
-    }
-
-    private void highlightSyntax() {
-        keywordBlocks = new ArrayList<StyleToken>();
-        stringBlocks = new ArrayList<StyleToken>();
-        commentBlocks = new ArrayList<StyleToken>();
-
-        String sourceCode = getText();
-        int sourceLength = sourceCode.length();
-        int lines = 0;
-        for (int pos = 0; pos < sourceLength; pos++) {
-            if (!Character.isAlphabetic(sourceCode.charAt(pos)) || pos == 0) {
-                int end = nextNonAlphabetic(sourceCode, pos);
-                if (end >= 0 || (pos == 0 && end == -1)) {
-                    String candidate = sourceCode.substring(pos, end);
-                    if (arrayContains(JAVA_KEYWORDS, candidate.trim())) {
-                        keywordBlocks.add(new StyleToken(end - pos, pos - lines));
-                        pos = end - 1;
-                    }
-                } else {
-                    break;
-                }
-            }
-            if (sourceCode.charAt(pos) == '\n') {
-                lines++;
-            }
-        }
-
-        lines = 0;
-        for (int pos = 0; pos < sourceLength; pos++) {
-            if (sourceCode.charAt(pos) == '"') {
-                boolean escaped;
-                if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
-                    escaped = false;
-                } else {
-                    escaped = true;
-                    continue;
-                }
-                if (!escaped) {
-                    int closeQuote = sourceCode.indexOf('"', pos + 1);
-
-                    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
-                        closeQuote = sourceCode.indexOf('"', closeQuote + 1);
-                    }
-                    if (closeQuote < 0) {
-                        continue;
-                    }
-                    stringBlocks.add(new StyleToken(closeQuote + 1 - pos + lines, pos - lines));
-                    pos = closeQuote;
-                }
-            } else if (sourceCode.charAt(pos) == '\'') {
-                boolean escaped;
-                if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
-                    escaped = false;
-                } else {
-                    escaped = true;
-                    continue;
-                }
-                if (!escaped) {
-                    int closeQuote = sourceCode.indexOf('\'', pos + 1);
-                    while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
-                        closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
-                    }
-                    if (closeQuote < 0) {
-                        continue;
-                    }
-                    stringBlocks.add(new StyleToken(closeQuote + 1 - pos + lines, pos - lines));
-                    pos = closeQuote;
-                }
-            } else if (sourceCode.charAt(pos) == '\n') {
-                lines++;
-            }
-        }
-
-        lines = 0;
-        for (int pos = 0; pos < sourceLength - 1; pos++) {
-            if (sourceCode.substring(pos, pos + 1).equals("////")) {
-                int nextLine = sourceCode.indexOf('\n', pos);
-                if (nextLine == -1)
-                    nextLine = sourceLength - 1;
-                commentBlocks.add(new StyleToken(nextLine - pos, pos - lines));
-                pos = nextLine;
-            } else if (sourceCode.substring(pos, pos + 1).equals("//*")) {
-                int end = sourceCode.indexOf("*//", pos);
-                if (end < 0) {
-                    continue;
-                }
-                commentBlocks.add(new StyleToken(end + 2 - pos, pos - lines));
-                pos = end + 2;
-            } else if (sourceCode.charAt(pos) == '\n') {
-                lines++;
-            }
-        }
-
-        SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
-
-        for (StyleToken styleToken : keywordBlocks) {
-            SwingUtilities.invokeLater(new FormatKeywordsLater(styleToken.getFirstIdx(), styleToken.getLength()));
-        }
-        for (StyleToken styleToken : stringBlocks) {
-            SwingUtilities.invokeLater(new FormatStringsLater(styleToken.getFirstIdx(), styleToken.getLength() + 1));
-        }
-        for (StyleToken styleToken : commentBlocks) {
-            SwingUtilities.invokeLater(new FormatCommentsLater(styleToken.getFirstIdx(), styleToken.getLength()));
-        }
-    }
-
-    private boolean arrayContains(String[] array, String target) {
-        for (String string : array) {
-            if (string.equals(target))
-                return true;
-        }
-        return false;
-    }
-
-    private int nextNonAlphabetic(String sourceCode, int idx) {
-        int sourceCodeLength = sourceCode.length();
-        do {
-            idx++;
-        } while (idx < sourceCodeLength - 1 && Character.isAlphabetic(sourceCode.charAt(idx)));
-        return idx;
-    }
-
-    private class FormatKeywordsLater implements Runnable {
-
-        private int pos;
-        private int nextToken;
-
-        private FormatKeywordsLater(int pos, int nextToken) {
-            this.pos = pos;
-            this.nextToken = nextToken;
-        }
-
-        @Override
-        public void run() {
-            doc.setCharacterAttributes(pos, nextToken, keywordStyle, true);
-        }
-
-    }
-
-    private class FormatPlainLater implements Runnable {
-
-        private int pos;
-        private int nextToken;
-
-        private FormatPlainLater(int pos, int nextToken) {
-            this.pos = pos;
-            this.nextToken = nextToken;
-        }
-
-        @Override
-        public void run() {
-            doc.setCharacterAttributes(pos, nextToken, plainStyle, true);
-        }
-
-    }
-
-    private class FormatStringsLater implements Runnable {
-        private int pos;
-        private int nextToken;
-
-        private FormatStringsLater(int pos, int nextToken) {
-            this.pos = pos;
-            this.nextToken = nextToken;
-        }
-
-        @Override
-        public void run() {
-            doc.setCharacterAttributes(pos, nextToken, stringStyle, true);
-        }
-    }
-
-    private class FormatCommentsLater implements Runnable {
-        private int pos;
-        private int nextToken;
-
-        private FormatCommentsLater(int pos, int nextToken) {
-            this.pos = pos;
-            this.nextToken = nextToken;
-        }
-
-        @Override
-        public void run() {
-            doc.setCharacterAttributes(pos, nextToken, commentsStyle, true);
-        }
-    }
+
+	// Swing components
+	private JScrollPane				scrolling;
+	private StyledDocument			doc;
+
+	// UUID trackers
+	private UUID					versionTextUUID;
+	private UUID					fileUUID;
+	private UUID					projectUUID;
+
+	// Styles
+	private Style					keywordStyle;
+	private Style					plainStyle;
+	private Style					stringStyle;
+	private Style					commentsStyle;
+
+	// "Blocks" of text to highlight
+	private ArrayList<StyleBlock>	keywordBlocks;
+	private ArrayList<StyleBlock>	stringBlocks;
+	private ArrayList<StyleBlock>	commentBlocks;
+
+	// Different style constants
+	public static final Font		PLAIN			= new Font("Consolas", Font.PLAIN, 13);
+	public static final Color		PLAIN_COLOUR	= Color.BLACK;
+	public static final Color		KEYWORD_COLOUR	= new Color(0x38761D);
+	public static final Color		STRING_COLOUR	= new Color(0xA30BCF);
+	public static final Color		COMMENTS_COLOUR	= new Color(0xD13313);
+
+	// Java's keywords
+	private static final String[]	JAVA_KEYWORDS	= { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
+			"new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
+
+	private boolean					ignoreEvents	= false;
+
+	/**
+	 * Creates a new EditArea
+	 * 
+	 * @param textDoc
+	 *        the text of the document to load on start
+	 * @param projectUUID
+	 *        the UUID of its parent project
+	 * @param fileUUID
+	 *        the UUID of the specific file
+	 * @param versionTextUUID
+	 *        the UUID of the version
+	 * @param editable
+	 *        if this should be editable
+	 * @param tabs
+	 *        the parent EditTabs
+	 */
+	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable, EditTabs tabs) {
+		// Swing stuff
+		setLayout(null);
+		scrolling = new JScrollPane(this);
+		setBorder(FlowClient.EMPTY_BORDER);
+		setFont(PLAIN);
+		setForeground(PLAIN_COLOUR);
+		// Setup
+		this.projectUUID = projectUUID;
+		this.versionTextUUID = versionTextUUID;
+		this.fileUUID = fileUUID;
+		// Sets up the StyledDocument
+		doc = getStyledDocument();
+		setText(textDoc);
+		doc.putProperty(PlainDocument.tabSizeAttribute, 4);
+		setEditable(editable);
+
+		// Asks the server for a list of editors to create their respective carets
+		Data editorListRequest = new Data("project_info");
+		editorListRequest.put("project_uuid", projectUUID);
+		editorListRequest.put("session_id", Communicator.getSessionID());
+		Data editorListData = Communicator.communicate(editorListRequest);
+		if (!editorListData.get("status", String.class).equals("OK")) {
+			return;
+		}
+		String[] editors = editorListData.get("editors", String[].class);
+		for (String editor : editors) {
+			add(new UserCaret(editor, this));
+		}
+
+		// Creates styles for each of the syntax highlighting items
+		keywordStyle = addStyle("keywords", null);
+		StyleConstants.setForeground(keywordStyle, KEYWORD_COLOUR);
+		StyleConstants.setItalic(keywordStyle, true);
+
+		plainStyle = addStyle("plain", null);
+		StyleConstants.setForeground(plainStyle, PLAIN_COLOUR);
+		StyleConstants.setBold(plainStyle, false);
+
+		stringStyle = addStyle("strings", null);
+		StyleConstants.setBold(stringStyle, false);
+		StyleConstants.setForeground(stringStyle, STRING_COLOUR);
+
+		commentsStyle = addStyle("comments", null);
+		StyleConstants.setBold(commentsStyle, false);
+		StyleConstants.setForeground(commentsStyle, COMMENTS_COLOUR);
+
+		addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// nothing
+			}
+
+			/**
+			 * Close tab shortcut
+			 */
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (!e.isControlDown()) {
+					return;
+				}
+				if (e.getKeyCode() == KeyEvent.VK_W) {
+					tabs.removeTabAt(tabs.getSelectedIndex());
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP && tabs.getSelectedIndex() > 0) {
+					System.out.println("switch left");
+					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() - 1));
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && tabs.getSelectedIndex() < tabs.getTabCount() - 1) {
+					System.out.println("switch right");
+					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() + 1));
+				}
+			}
+
+			/**
+			 * Turns [TAB] into four spaces
+			 */
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_TAB && editable) {
+					try {
+						doc.insertString(getCaretPosition(), "    ", null);
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+					e.consume();
+				}
+			}
+		});
+		doc.addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// useless for plaintext areas
+			}
+
+			/**
+			 * For when stuff is inserted
+			 */
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if (ignoreEvents)
+					return;
+				// Sets up some data that was inserted
+				String insertedString = "";
+				int strLen = e.getLength();
+				int caretPos = e.getOffset();
+				// Get the string
+				try {
+					insertedString = doc.getText(caretPos, strLen);
+				} catch (BadLocationException e1) {
+					e1.printStackTrace();
+				}
+				// Prepare message for server to send text off
+				Data fileModify = new Data("file_text_modify");
+				fileModify.put("file_uuid", fileUUID);
+				fileModify.put("session_id", Communicator.getSessionID());
+				fileModify.put("mod_type", "INSERT");
+				fileModify.put("idx", caretPos);
+				fileModify.put("str", insertedString);
+
+				// Send message to server about what was inserted
+				Data response = Communicator.communicate(fileModify);
+				String status = response.get("status", String.class);
+				// Makes sure that things work
+				if (status == null || !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				// Updates syntax highlighting
+				highlightSyntax();
+			}
+
+			/**
+			 * For when stuff is deleted
+			 */
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				if (ignoreEvents)
+					return;
+				// Gets info on the change
+				int removedLen = e.getLength();
+				int caretPos = e.getOffset();
+
+				// Creates message for server
+				Data metadataModify = new Data("file_text_modify");
+				metadataModify.put("file_uuid", fileUUID);
+				metadataModify.put("session_id", Communicator.getSessionID());
+				metadataModify.put("mod_type", "DELETE");
+				metadataModify.put("idx", caretPos);
+				metadataModify.put("len", removedLen);
+
+				// Sends message to server
+				Data response = Communicator.communicate(metadataModify);
+				String status = response.get("status", String.class);
+				if (status == null || !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				// Highlights syntax
+				highlightSyntax();
+			}
+		});
+		// For when the user changes their caret position
+		addCaretListener(new CaretListener() {
+
+			@Override
+			public void caretUpdate(CaretEvent arg0) {
+				// Gets the caret position
+				int caretPos = getCaret().getDot();
+				// TODO send position to server
+			}
+		});
+		// Listener to get changes from the server
+		Communicator.addFileChangeListener(new TextModificationListener() {
+
+			@Override
+			public void onDocumentUpdate(DocumentCallbackEvent e) {
+				// Prevents adding your own changes again
+				if (e.USERNAME.equals(Communicator.getUsername())) {
+					return;
+				}
+
+				if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
+					String addition = e.ADDITION;
+					try {
+						// Uses boolean flags when inserting or deleting so that the
+						// insertions/deletions don't interpret the other users' inputs as the
+						// current user's actions
+						ignoreEvents = true;
+						// Tries to insert the contents
+						doc.insertString(e.INDEX, addition, null);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+				} else if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
+					int length = e.REMOVAL_LENGTH;
+					try {
+						ignoreEvents = true;
+						// Tries to remove the contents
+						doc.remove(e.INDEX, length);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+				}
+
+			}
+
+		}, fileUUID);
+		// Update
+		highlightSyntax();
+	}
+
+	/**
+	 * Gets the VersionText's UUID
+	 * 
+	 * @return the versiontext's UUID
+	 */
+	public UUID getVersionTextUUID() {
+		return versionTextUUID;
+	}
+
+	/**
+	 * Gets the scrolling pane
+	 * 
+	 * @return the JScrollPane
+	 */
+	public JScrollPane getScrollPane() {
+		return scrolling;
+	}
+
+	/**
+	 * gets the project's UUID
+	 * 
+	 * @return the project's UUID
+	 */
+	public UUID getProjectUUID() {
+		return projectUUID;
+	}
+
+	/**
+	 * gets the file's UUID
+	 * 
+	 * @return the file's UUID
+	 */
+	public UUID getFileUUID() {
+		return fileUUID;
+	}
+
+	/**
+	 * A particular block of text that should be styled a certain way
+	 * 
+	 * @author Vince Ou
+	 *
+	 */
+	private class StyleBlock {
+
+		private int	length;
+		private int	premiereIdx;
+
+		/**
+		 * Creates a new StyleBlock
+		 * 
+		 * @param length
+		 *        the length of the block
+		 * @param firstIdx
+		 *        the index of the block
+		 */
+		private StyleBlock(int length, int firstIdx) {
+			// Saves them
+			this.length = length;
+			this.premiereIdx = firstIdx;
+		}
+
+		/**
+		 * Gets the length of the block
+		 * 
+		 * @return the length of the block
+		 */
+		private int getLength() {
+			return length;
+		}
+
+		/**
+		 * Gets the first index
+		 * 
+		 * @return the first index
+		 */
+		private int getFirstIdx() {
+			return premiereIdx;
+		}
+	}
+
+	/**
+	 * Highlights syntax, Java style.
+	 */
+	private void highlightSyntax() {
+		// Creates new blocks
+		keywordBlocks = new ArrayList<StyleBlock>();
+		stringBlocks = new ArrayList<StyleBlock>();
+		commentBlocks = new ArrayList<StyleBlock>();
+
+		// Goes through and does the key words first
+		String sourceCode = getText();
+		int sourceLength = sourceCode.length();
+		int lines = 0;
+		for (int pos = 0; pos < sourceLength; pos++) {
+			// First tries to find words
+			if (!Character.isAlphabetic(sourceCode.charAt(pos)) || pos == 0) {
+				int end = nextNonAlphabetic(sourceCode, pos);
+				if (end >= 0 || (pos == 0 && end == -1)) {
+					String candidate = sourceCode.substring(pos, end);
+					// If the word is in the array, then it's placed in a new StyleBlock
+					if (Arrays.asList(JAVA_KEYWORDS).contains(candidate.trim())) {
+						keywordBlocks.add(new StyleBlock(end - pos, pos - lines));
+						pos = end - 1;
+					}
+				} else {
+					break;
+				}
+			}
+			// Line counting, because the StyledDocumet counts \n differently compared to the string
+			if (sourceCode.charAt(pos) == '\n') {
+				lines++;
+			}
+		}
+
+		// Then finds quotes (With escaped quote support!)
+		lines = 0;
+		for (int pos = 0; pos < sourceLength; pos++) {
+			// Tries to find double quotes
+			if (sourceCode.charAt(pos) == '"') {
+				boolean escaped;
+				if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
+					escaped = false;
+				} else {
+					escaped = true;
+					continue;
+				}
+				if (!escaped) {
+					int closeQuote = sourceCode.indexOf('"', pos + 1);
+
+					while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
+						closeQuote = sourceCode.indexOf('"', closeQuote + 1);
+					}
+					if (closeQuote < 0) {
+						continue;
+					}
+					// Adds the block when it's found
+					stringBlocks.add(new StyleBlock(closeQuote + 1 - pos + lines, pos - lines));
+					pos = closeQuote;
+				}
+			}
+			// ... or single quotes
+			else if (sourceCode.charAt(pos) == '\'') {
+				boolean escaped;
+				if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
+					escaped = false;
+				} else {
+					escaped = true;
+					continue;
+				}
+				if (!escaped) {
+					int closeQuote = sourceCode.indexOf('\'', pos + 1);
+					while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
+						closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
+					}
+					if (closeQuote < 0) {
+						continue;
+					}
+					// Adds the block when found
+					stringBlocks.add(new StyleBlock(closeQuote + 1 - pos + lines, pos - lines));
+					pos = closeQuote;
+				}
+			}
+			// Same deal with line counting
+			else if (sourceCode.charAt(pos) == '\n') {
+				lines++;
+			}
+		}
+
+		// Finds the comments
+		lines = 0;
+		for (int pos = 0; pos < sourceLength - 1; pos++) {
+			// Tries to look for double-slash comments
+			if (sourceCode.substring(pos, pos + 1).equals("////")) {
+				int nextLine = sourceCode.indexOf('\n', pos);
+				if (nextLine == -1)
+					nextLine = sourceLength - 1;
+				commentBlocks.add(new StyleBlock(nextLine - pos, pos - lines));
+				pos = nextLine;
+			}
+			// Then tries to look for block comments
+			else if (sourceCode.substring(pos, pos + 1).equals("//*")) {
+				int end = sourceCode.indexOf("*//", pos);
+				if (end < 0) {
+					continue;
+				}
+				commentBlocks.add(new StyleBlock(end + 2 - pos, pos - lines));
+				pos = end + 2;
+			}
+			// Line counting
+			else if (sourceCode.charAt(pos) == '\n') {
+				lines++;
+			}
+		}
+
+		// First paints everything "plain", then does key words, strings, then comments
+		SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
+
+		for (StyleBlock styleBlock : keywordBlocks) {
+			SwingUtilities.invokeLater(new FormatKeywordsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+		}
+		for (StyleBlock styleBlock : stringBlocks) {
+			SwingUtilities.invokeLater(new FormatStringsLater(styleBlock.getFirstIdx(), styleBlock.getLength() + 1));
+		}
+		for (StyleBlock styleBlock : commentBlocks) {
+			SwingUtilities.invokeLater(new FormatCommentsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+		}
+	}
+
+	/**
+	 * Finds the next non-alphabetic letter in a string
+	 * 
+	 * @param sourceCode
+	 *        the string to search
+	 * @param idx
+	 *        the index to start from
+	 * @return the index (-1 if none)
+	 */
+	private int nextNonAlphabetic(String sourceCode, int idx) {
+		int sourceCodeLength = sourceCode.length();
+		do {
+			idx++;
+		} while (idx < sourceCodeLength - 1 && Character.isAlphabetic(sourceCode.charAt(idx)));
+		return idx;
+	}
+
+	/**
+	 * A runnable with data
+	 * 
+	 * @author Vince Ou
+	 *
+	 */
+	private class FormatKeywordsLater implements Runnable {
+
+		private int	pos;
+		private int	nextToken;
+
+		/**
+		 * Creates a new FormatKeywordsLater
+		 * 
+		 * @param pos
+		 *        the position
+		 * @param nextToken
+		 *        the length
+		 */
+		private FormatKeywordsLater(int pos, int nextToken) {
+
+			this.pos = pos;
+			this.nextToken = nextToken;
+		}
+
+		@Override
+		public void run() {
+			// Sets the attributes when it's run
+			doc.setCharacterAttributes(pos, nextToken, keywordStyle, true);
+		}
+
+	}
+
+	/**
+	 * A runnable with data (copy of FormatKeywordsLater)
+	 * 
+	 * @author Vince
+	 *
+	 */
+	private class FormatPlainLater implements Runnable {
+
+		private int	pos;
+		private int	nextToken;
+
+		private FormatPlainLater(int pos, int nextToken) {
+			this.pos = pos;
+			this.nextToken = nextToken;
+		}
+
+		@Override
+		public void run() {
+			doc.setCharacterAttributes(pos, nextToken, plainStyle, true);
+		}
+
+	}
+
+	/**
+	 * A runnable with data (copy of FormatKeywordsLater)
+	 * 
+	 * @author Vince
+	 *
+	 */
+	private class FormatStringsLater implements Runnable {
+
+		private int	pos;
+		private int	nextToken;
+
+		private FormatStringsLater(int pos, int nextToken) {
+			this.pos = pos;
+			this.nextToken = nextToken;
+		}
+
+		@Override
+		public void run() {
+			doc.setCharacterAttributes(pos, nextToken, stringStyle, true);
+		}
+	}
+
+	/**
+	 * A runnable with data (copy of FormatKeywordsLater)
+	 * 
+	 * @author Vince
+	 *
+	 */
+	private class FormatCommentsLater implements Runnable {
+
+		private int	pos;
+		private int	nextToken;
+
+		private FormatCommentsLater(int pos, int nextToken) {
+			this.pos = pos;
+			this.nextToken = nextToken;
+		}
+
+		@Override
+		public void run() {
+			doc.setCharacterAttributes(pos, nextToken, commentsStyle, true);
+		}
+	}
 }

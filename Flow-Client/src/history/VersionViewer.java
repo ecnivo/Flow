@@ -1,3 +1,4 @@
+
 package history;
 
 import gui.FlowClient;
@@ -25,145 +26,206 @@ import message.Data;
 import shared.Communicator;
 import shared.EditTabs;
 
+/**
+ * A viewer for the many versions of one file
+ * 
+ * @author Vince
+ *
+ */
 @SuppressWarnings("serial")
 public class VersionViewer extends JPanel {
-    private ImageIcon middle;
 
-    private UUID fileUUID;
-    private UUID projectUUID;
+	private ImageIcon			middle;
 
-    private static final int ICON_SIZE = 42;
+	private UUID				fileUUID;
+	private UUID				projectUUID;
 
-    // private FlowFile file;
-    private HistoryPane historyPane;
-    private JScrollPane scrolling;
+	private static final int	ICON_SIZE	= 42;
 
-    public VersionViewer(HistoryPane hp) {
-	historyPane = hp;
-	setBackground(Color.WHITE);
-	setMinimumSize(new Dimension(25, 0));
-	// setBorder(FlowClient.EMPTY_BORDER);
-	setLayout(new GridLayout(0, 1, 0, 0));
-	scrolling = new JScrollPane(this);
-	scrolling.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-	scrolling.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
-	try {
-	    middle = new ImageIcon(ImageIO.read(new File("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-    }
+	// private FlowFile file;
+	private HistoryPane			historyPane;
+	private JScrollPane			scrolling;
 
-    /**
-     * @param flowFileUUID
-     */
-    public void setFile(UUID flowFileUUID, UUID projectUUID) {
-	fileUUID = flowFileUUID;
-	this.projectUUID = projectUUID;
-	updateVersions();
-    }
+	private boolean				isText;
 
-    /**
-     */
-    private void updateVersions() {
-	removeAll();
-
-	Data fileInfoRequest = new Data("file_info");
-	fileInfoRequest.put("file_uuid", fileUUID);
-	fileInfoRequest.put("session_id", Communicator.getSessionID());
-	Data fileInfo = Communicator.communicate(fileInfoRequest);
-	UUID[] versions = fileInfo.get("file_versions", UUID[].class);
-	boolean isText = false;
-	switch (fileInfo.get("file_type", String.class)) {
-	case "TEXT_DOCUMENT":
-	    isText = true;
-	    break;
-
-	case "ARBITRARY_DOCUMENT":
-	    isText = false;
-	    break;
+	/**
+	 * Creates a new VersionViewer
+	 * 
+	 * @param hp
+	 *        the historyPane that this is associated with
+	 */
+	public VersionViewer(HistoryPane hp) {
+		// init
+		historyPane = hp;
+		setBackground(Color.WHITE);
+		setMinimumSize(new Dimension(25, 0));
+		// setBorder(FlowClient.EMPTY_BORDER);
+		setLayout(new GridLayout(0, 1, 0, 0));
+		// Enables scrolling
+		scrolling = new JScrollPane(this);
+		scrolling.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrolling.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
+		// Sets icon
+		try {
+			middle = new ImageIcon(ImageIO.read(new File("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	for (UUID versionUUID : versions) {
-	    Data versionDataRequest = new Data("version_request");
-	    versionDataRequest.put("file_uuid", fileUUID);
-	    versionDataRequest.put("version_uuid", versionUUID);
-	    versionDataRequest.put("session_id", Communicator.getSessionID());
-	    byte[] versionData = Communicator.communicate(versionDataRequest).get("version_data", byte[].class);
-
-	    Data versionInfoRequest = new Data("version_info");
-	    versionInfoRequest.put("version_uuid", versionUUID);
-	    versionInfoRequest.put("file_uuid", fileUUID);
-	    versionInfoRequest.put("session_id", Communicator.getSessionID());
-	    Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", Long.class).longValue());
-
-	    VersionItem item = new VersionItem(versionData, saveDate, versionUUID, isText);
-
-	    add(item);
+	/**
+	 * Sets a file based on its UUID
+	 * 
+	 * @param flowFileUUID
+	 *        the flowFile's UUID
+	 * @param projectUUID
+	 *        the project's UUID
+	 */
+	public void setFile(UUID flowFileUUID, UUID projectUUID) {
+		fileUUID = flowFileUUID;
+		this.projectUUID = projectUUID;
+		updateVersions();
 	}
 
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Forces an update of the versions
+	 */
+	private void updateVersions() {
+		removeAll();
 
-    class VersionItem extends JPanel {
+		// Asks the server for the versions to update
+		Data fileInfoRequest = new Data("file_info");
+		fileInfoRequest.put("file_uuid", fileUUID);
+		fileInfoRequest.put("session_id", Communicator.getSessionID());
+		Data fileInfo = Communicator.communicate(fileInfoRequest);
+		UUID[] versions = fileInfo.get("file_versions", UUID[].class);
+		boolean isFileText = false;
+		// Does different things based on text/arbitrary type files
+		switch (fileInfo.get("file_type", String.class)) {
+			case "TEXT_DOCUMENT":
+				isFileText = true;
+				break;
 
-	public VersionItem(byte[] data, Date date, UUID versionUUID, boolean isText) {
-	    setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
-	    setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
-	    setMinimumSize(new Dimension(5, 5));
-
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    setLayout(new BorderLayout(3, 0));
-	    JLabel icon = new JLabel(middle);
-	    add(icon, BorderLayout.WEST);
-
-	    JLabel changeTime = new JLabel(date.toString());
-	    add(changeTime, BorderLayout.CENTER);
-
-	    addMouseListener(new MouseListener() {
-
-		@Override
-		public void mouseReleased(MouseEvent arg0) {
-		    // nothing
+			case "ARBITRARY_DOCUMENT":
+				isFileText = false;
+				break;
 		}
+		isText = isFileText;
 
-		@Override
-		public void mousePressed(MouseEvent arg0) {
-		    // nothing
-		}
+		// Creates a new "tile" for each version
+		for (UUID versionUUID : versions) {
+			// Ask the server for the version's information
+			Data versionDataRequest = new Data("version_request");
+			versionDataRequest.put("file_uuid", fileUUID);
+			versionDataRequest.put("version_uuid", versionUUID);
+			versionDataRequest.put("session_id", Communicator.getSessionID());
+			byte[] versionData = Communicator.communicate(versionDataRequest).get("version_data", byte[].class);
 
-		@Override
-		public void mouseExited(MouseEvent arg0) {
-		    VersionViewer.this.setBorder(FlowClient.EMPTY_BORDER);
-		}
+			// More version information is requested
+			Data versionInfoRequest = new Data("version_info");
+			versionInfoRequest.put("version_uuid", versionUUID);
+			versionInfoRequest.put("file_uuid", fileUUID);
+			versionInfoRequest.put("session_id", Communicator.getSessionID());
+			// Gets the date from a millis value
+			Date saveDate = new Date(Communicator.communicate(versionInfoRequest).get("date", Long.class).longValue());
 
-		@Override
-		public void mouseEntered(MouseEvent arg0) {
-		    VersionViewer.this.setBorder(BorderFactory.createLineBorder(new Color(0x5C9EB4), 2));
-		    // updateVersions();
-		}
+			// Creates a new VersionItem and adds it
+			VersionItem item = new VersionItem(versionData, saveDate, versionUUID);
 
-		@Override
-		public void mouseClicked(MouseEvent e) {
-		    if (e.getButton() == MouseEvent.BUTTON1) {
-			if (isText) {
-			    EditTabs tabs = historyPane.getEditTabs();
-			    if (tabs == null)
-				return;
-			    String stringDate = date.toString();
-			    String stringData = new String(data);
-			    tabs.openTab(stringDate, stringData, projectUUID, fileUUID, versionUUID, false);
-			} else
-			    throw new UnsupportedOperationException();
-			// TODO find a way to open past arbit files in desktop
-		    }
+			add(item);
 		}
-	    });
+		// Refresh
+		revalidate();
+		repaint();
 	}
-    }
 
-    public JScrollPane getScrolling() {
-	return scrolling;
-    }
+	/**
+	 * Reperesents one version of a file
+	 * 
+	 * @author Vince Ou
+	 *
+	 */
+	class VersionItem extends JPanel {
+
+		/**
+		 * Creates a new VersionItem
+		 * 
+		 * @param data
+		 *        the contents of the version
+		 * @param date
+		 *        the date it was saved on
+		 * @param versionUUID
+		 *        the UUID of the version
+		 * @param isText
+		 *        if this file is text or not
+		 */
+		public VersionItem(byte[] data, Date date, UUID versionUUID) {
+			// Swing setup
+			setMaximumSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
+			setPreferredSize(new Dimension((int) Math.floor(VersionViewer.this.getSize().getWidth() * .9), 80));
+			setMinimumSize(new Dimension(5, 5));
+			// Adds an icon
+			setBorder(FlowClient.EMPTY_BORDER);
+			setLayout(new BorderLayout(3, 0));
+			JLabel icon = new JLabel(middle);
+			add(icon, BorderLayout.WEST);
+			// Adds the time of change
+			JLabel changeTime = new JLabel(date.toString());
+			add(changeTime, BorderLayout.CENTER);
+
+			addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// nothing
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// nothing
+				}
+
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					VersionViewer.this.setBorder(FlowClient.EMPTY_BORDER);
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					VersionViewer.this.setBorder(BorderFactory.createLineBorder(new Color(0x5C9EB4), 2));
+					// updateVersions();
+				}
+
+				/**
+				 * When clicked, it will open the file up in a new tab
+				 */
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (isText) {
+							EditTabs tabs = historyPane.getEditTabs();
+							if (tabs == null)
+								return;
+							String stringDate = date.toString();
+							String stringData = new String(data);
+							// Opens the file
+							tabs.openTab(stringDate, stringData, projectUUID, fileUUID, versionUUID, false);
+						} else {
+							throw new UnsupportedOperationException();
+							// TODO find a way to open past arbit files in desktop
+						}
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Gets the scrolling pane
+	 * 
+	 * @return the JScrollPane
+	 */
+	public JScrollPane getScrolling() {
+		return scrolling;
+	}
 }

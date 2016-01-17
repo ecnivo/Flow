@@ -1,3 +1,4 @@
+
 package shared;
 
 import gui.FlowClient;
@@ -26,115 +27,169 @@ import struct.VersionText;
 
 import compiler.FlowCompiler;
 
+/**
+ * A toolbar with run and stop buttons
+ * 
+ * @author Vince
+ *
+ */
 @SuppressWarnings("serial")
 public class RunStopBar extends JToolBar {
 
-    private EditTabs editTabs;
+	private EditTabs	editTabs;
 
-    public RunStopBar(GenericConsole console) {
-	setBorder(FlowClient.EMPTY_BORDER);
-	setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	/**
+	 * Creates a new RunStopBar
+	 * 
+	 * @param console
+	 *        the GenericConsole to run in
+	 */
+	public RunStopBar(GenericConsole console) {
+		// Swing stuff
+		setBorder(FlowClient.EMPTY_BORDER);
+		setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-	add(new RunButton(console));
-	add(new StopButton(console));
+		// Adds the buttons
+		add(new RunButton(console));
+		add(new StopButton(console));
 
-	setFloatable(false);
-	setRollover(true);
-    }
-
-    /**
-     * Used to recursively iterate through the entire tree for a project getting
-     * all text files so that they can be compiled
-     * 
-     * @param directory
-     *            the directory to search for the files
-     */
-    private VersionText[] getFiles(UUID directory) {
-	ArrayList<VersionText> out = new ArrayList<VersionText>();
-
-	Data dirInfoRequest = new Data("directory_info");
-	dirInfoRequest.put("session_id", Communicator.getSessionID());
-	dirInfoRequest.put("directory_uuid", directory);
-	Data dirInfo = Communicator.communicate(dirInfoRequest);
-
-	for (UUID childFileUUID : dirInfo.get("child_files", UUID[].class)) {
-	    Data fileRequest = new Data("file_request");
-	    fileRequest.put("file_uuid", childFileUUID);
-	    fileRequest.put("session_id", Communicator.getSessionID());
-	    Data file = Communicator.communicate(fileRequest);
-
-	    VersionText versionText = new VersionText();
-	    versionText.setDocumentText(new String(file.get("file_data", byte[].class)));
-	    out.add(versionText);
-	}
-	for (UUID childDir : dirInfo.get("child_directories", UUID[].class)) {
-	    out.addAll(Arrays.asList(getFiles(childDir)));
+		// More swing stuff
+		setFloatable(false);
+		setRollover(true);
 	}
 
-	VersionText[] outArray = new VersionText[out.size()];
-	for (int i = 0; i < out.size(); i++) {
-	    outArray[i] = out.get(i);
-	}
-	return outArray;
-    }
+	/**
+	 * Used to recursively iterate through the entire tree for a project getting
+	 * all text files so that they can be compiled
+	 * 
+	 * @param projectUUID
+	 *        the project to search for the files
+	 */
+	private VersionText[] getFiles(UUID projectUUID) {
+		// Gets the list of files at this level in the directory
+		ArrayList<VersionText> out = new ArrayList<VersionText>();
 
-    public void setEditTabs(EditTabs tabs) {
-	editTabs = tabs;
-    }
+		// Asks the server for information
+		Data dirInfoRequest = new Data("directory_info");
+		dirInfoRequest.put("session_id", Communicator.getSessionID());
+		dirInfoRequest.put("directory_uuid", projectUUID);
+		Data dirInfo = Communicator.communicate(dirInfoRequest);
 
-    private class RunButton extends JButton {
-	public RunButton(GenericConsole console) {
-	    setToolTipText("Compiles, then runs the file currently open in the editor");
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    try {
-		setIcon(new ImageIcon(ImageIO.read(new File("images/run.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
-	    setFocusable(false);
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    addActionListener(new ActionListener() {
+		// Goes through all the children files and adds them
+		for (UUID childFileUUID : dirInfo.get("child_files", UUID[].class)) {
+			// Gets information about these files
+			Data fileRequest = new Data("file_request");
+			fileRequest.put("file_uuid", childFileUUID);
+			fileRequest.put("session_id", Communicator.getSessionID());
+			Data file = Communicator.communicate(fileRequest);
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    if (editTabs == null) {
-			return;
-		    }
-		    FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
-		    try {
-			List<Diagnostic<? extends JavaFileObject>> errors = flowCompiler.build();
-			flowCompiler.execute();
-		    } catch (IOException e1) {
-			e1.printStackTrace();
-			JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-			return;
-		    }
-		    System.out.println("Run button pressed");
+			VersionText versionText = new VersionText();
+			versionText.setDocumentText(new String(file.get("file_data", byte[].class)));
+
+			// Gets the file data and adds it
+			out.add(versionText);
 		}
-	    });
-	}
-    }
-
-    private class StopButton extends JButton {
-
-	public StopButton(GenericConsole console) {
-	    setToolTipText("Stops the currently running program");
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    try {
-		setIcon(new ImageIcon(ImageIO.read(new File("images/stop.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
-	    setFocusable(false);
-	    setBorder(FlowClient.EMPTY_BORDER);
-	    addActionListener(new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		    // TODO make it stop
-		    System.out.println("Stop button pressed");
+		// Recursively does this in its child directories
+		for (UUID childDir : dirInfo.get("child_directories", UUID[].class)) {
+			out.addAll(Arrays.asList(getFiles(childDir)));
 		}
-	    });
+
+		// Converts it to an array
+		VersionText[] outArray = new VersionText[out.size()];
+		return out.toArray(outArray);
 	}
-    }
+
+	/**
+	 * Sets edit tabs as necessary
+	 * @param tabs the new edit tabs
+	 */
+	public void setEditTabs(EditTabs tabs) {
+		editTabs = tabs;
+	}
+
+	/**
+	 * Runs a file
+	 * @author Vince Ou
+	 *
+	 */
+	private class RunButton extends JButton {
+
+		/**
+		 * Creates a new RunButton
+		 * @param console the affiliated console
+		 */
+		public RunButton(GenericConsole console){
+			// swing stuff
+			setToolTipText("Compiles, then runs the file currently open in the editor");
+			setBorder(FlowClient.EMPTY_BORDER);
+			// Sets icon
+			try {
+				setIcon(new ImageIcon(ImageIO.read(new File("images/run.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			// More swing
+			setFocusable(false);
+			setBorder(FlowClient.EMPTY_BORDER);
+			addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// When the button is pressed
+					if (editTabs == null) {
+						return;
+					}
+					// Create a compiler
+					FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
+					// Try to build and execute it
+					// TODO make this work
+					try {
+						List<Diagnostic<? extends JavaFileObject>> errors = flowCompiler.build();
+						flowCompiler.execute();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					System.out.println("Run button pressed");
+				}
+			});
+		}
+	}
+
+	/**
+	 * Button to stop code execution
+	 * @author Vince
+	 *
+	 */
+	private class StopButton extends JButton {
+
+		/**
+		 * Creates a new StopButton
+		 * @param console the console to stop
+		 */
+		public StopButton(GenericConsole console) {
+			// Swing stuff (incl. setting icon)
+			setToolTipText("Stops the currently running program");
+			setBorder(FlowClient.EMPTY_BORDER);
+			try {
+				setIcon(new ImageIcon(ImageIO.read(new File("images/stop.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			setFocusable(false);
+			setBorder(FlowClient.EMPTY_BORDER);
+			addActionListener(new ActionListener() {
+
+				/**
+				 * Stops code execution
+				 */
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO make it stop
+					System.out.println("Stop button pressed");
+				}
+			});
+		}
+	}
 }

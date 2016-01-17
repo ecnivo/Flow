@@ -1,113 +1,168 @@
+
 package gui;
 
-import debug.DebugPane;
-import editing.EditPane;
 import history.HistoryPane;
+
+import java.awt.CardLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
 import shared.EditTabs;
+import debug.DebugPane;
+import editing.EditPane;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
-
+/**
+ * A panel with a CardLayout that manages the many different views of Flow
+ * 
+ * @author Vince Ou
+ *
+ */
+/**
+ * @author Vince
+ *
+ */
 @SuppressWarnings("serial")
 public class PanelManager extends JPanel {
-    private CardLayout layout;
-    private EditPane editPane;
-    private SettingsPane settingsTabs;
-    private LoginPane loginPane;
-    private DebugPane debugPane;
-    private CreateAccountPane createAccountPane;
-    private HistoryPane historyPane;
 
-    private EditTabs editTabs;
+	private CardLayout			layout;
+	private EditPane			editPane;
+	private SettingsPane		settingsTabs;
+	private LoginPane			loginPane;
+	private DebugPane			debugPane;
+	private CreateAccountPane	createAccountPane;
+	private HistoryPane			historyPane;
 
-    public PanelManager(JFrame frame) {
-	layout = new CardLayout();
-	this.setLayout(layout);
-	setBorder(FlowClient.EMPTY_BORDER);
+	private EditTabs			editTabs;
 
-	editTabs = new EditTabs();
+	/**
+	 * Creates a new PanelManager
+	 * 
+	 * @param frame
+	 *        the JFrame
+	 */
+	public PanelManager(JFrame frame) {
+		// Swing necessities
+		layout = new CardLayout();
+		this.setLayout(layout);
+		setBorder(FlowClient.EMPTY_BORDER);
 
-	loginPane = new LoginPane(this);
-	add(loginPane, "loginPane");
+		// Creates new panels and adds them to the cardlayout stack
+		editTabs = new EditTabs();
 
-	createAccountPane = new CreateAccountPane(this);
-	add(createAccountPane, "createPane");
+		loginPane = new LoginPane(this);
+		add(loginPane, "loginPane");
 
-	editPane = new EditPane(this);
-	add(editPane, "editPane");
+		createAccountPane = new CreateAccountPane(this);
+		add(createAccountPane, "createPane");
 
-	debugPane = new DebugPane(this);
-	add(debugPane, "debugPane");
+		editPane = new EditPane(this);
+		add(editPane, "editPane");
 
-	settingsTabs = new SettingsPane(this);
-	add(settingsTabs, "settingsPane");
+		debugPane = new DebugPane(this);
+		add(debugPane, "debugPane");
 
-	historyPane = new HistoryPane(this);
-	add(historyPane, "historyPane");
-    }
+		settingsTabs = new SettingsPane(this);
+		add(settingsTabs, "settingsPane");
 
-    public void switchToEditor() {
-	editPane.addEditTabs(editTabs);
-	layout.show(this, "editPane");
-	revalidate();
-	repaint();
-    }
+		historyPane = new HistoryPane(this);
+		add(historyPane, "historyPane");
+	}
 
-    public void switchToLogin() {
-	layout.show(this, "loginPane");
-	loginPane.resetPassFields();
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Switches to the editor
+	 */
+	public void switchToEditor() {
+		editPane.addEditTabs(editTabs);
+		layout.show(this, "editPane");
+		revalidate();
+		repaint();
+	}
 
-    public void switchToCreateAccount() {
-	layout.show(this, "createPane");
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Switches to the login view
+	 */
+	public void switchToLogin() {
+		layout.show(this, "loginPane");
+		loginPane.resetPassFields();
+		revalidate();
+		repaint();
+	}
 
-    public void switchToDebug() {
-	debugPane.addEditTabs(editTabs);
-	layout.show(this, "debugPane");
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Switches to the "Create account" view
+	 */
+	public void switchToCreateAccount() {
+		layout.show(this, "createPane");
+		revalidate();
+		repaint();
+	}
 
-    public void switchToSettings() {
-	layout.show(this, "settingsPane");
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Switches to the debug view
+	 */
+	public void switchToDebug() {
+		debugPane.addEditTabs(editTabs);
+		layout.show(this, "debugPane");
+		revalidate();
+		repaint();
+	}
 
-    public void switchToHistory() {
-	historyPane.addEditTabs(editTabs);
-	layout.show(this, "historyPane");
-	revalidate();
-	repaint();
-    }
+	/**
+	 * Switches to the settings view
+	 */
+	public void switchToSettings() {
+		layout.show(this, "settingsPane");
+		revalidate();
+		repaint();
+	}
+	/**
+	 * Switches to the history view
+	 */
+	public void switchToHistory() {
+		historyPane.addEditTabs(editTabs);
+		layout.show(this, "historyPane");
+		revalidate();
+		repaint();
+	}
 
-    public EditPane getEditPane() {
-	return editPane;
-    }
-    
-    public HistoryPane getHistoryPane(){
-	return historyPane;
-    }
+	/**
+	 * Gets the editPane
+	 * @return the EditPane
+	 */
+	public EditPane getEditPane() {
+		return editPane;
+	}
 
-    public LoginPane getLoginPane() {
-	return loginPane;
-    }
+	/**
+	 * Gets the version history pane
+	 * @return the version history pane
+	 */
+	public HistoryPane getHistoryPane() {
+		return historyPane;
+	}
 
-    public void resetUI() {
-		((DefaultMutableTreeNode) editPane.getDocTree().getModel().getRoot()).removeAllChildren();
-	((DefaultTreeModel) editPane.getDocTree().getModel()).reload();
+	/**
+	 * Gets the login pane 
+	 * @return the login pane
+	 */
+	public LoginPane getLoginPane() {
+		return loginPane;
+	}
+
+	/**
+	 * Resets the UI on logout and close account
+	 */
+	public void resetUI() {
+		((DefaultMutableTreeNode) editPane.getFileTree().getModel().getRoot()).removeAllChildren();
+		((DefaultTreeModel) editPane.getFileTree().getModel()).reload();
 		((DefaultMutableTreeNode) historyPane.getTree().getModel().getRoot()).removeAllChildren();
-	editTabs.removeAll();
-	editTabs.revalidate();
-    }
+		editTabs.removeAll();
+		editTabs.revalidate();
+	}
 }

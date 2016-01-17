@@ -1,3 +1,4 @@
+
 package debug;
 
 import gui.FlowClient;
@@ -15,57 +16,84 @@ import shared.GenericConsole;
 import shared.NavBar;
 import shared.RunStopBar;
 
+/**
+ * A panel that holds various debugging elements
+ * 
+ * @author Vince Ou
+ *
+ */
 @SuppressWarnings("serial")
 public class DebugPane extends JPanel {
-    
-    private RunStopBar runStopBar;
-    
-    //TODO if it looks so simple, things still need to be added, such as selecting break points, highlighting the line...
 
-    private JSplitPane mainSplit;
+	private RunStopBar	runStopBar;
 
-    public DebugPane(PanelManager manager) {
-	setLayout(new BorderLayout());
-	setBorder(FlowClient.EMPTY_BORDER);
+	// TODO if it looks so simple, things still need to be added, such as selecting break points,
+	// highlighting the line...
 
-	mainSplit = new JSplitPane();
-	add(mainSplit, BorderLayout.CENTER);
-	mainSplit.setResizeWeight(0);
-	mainSplit.setContinuousLayout(true);
-	mainSplit.setBorder(FlowClient.EMPTY_BORDER);
+	private JSplitPane	mainSplit;
 
-	JSplitPane leftHalf = new JSplitPane();
-	leftHalf.setPreferredSize(new Dimension(310, 574));
-	leftHalf.setBorder(FlowClient.EMPTY_BORDER);
-	leftHalf.setMinimumSize(new Dimension(310, 0));
-	leftHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
-	leftHalf.setContinuousLayout(true);
-	mainSplit.setLeftComponent(leftHalf);
+	/**
+	 * Creates a new DebugPane
+	 * 
+	 * @param manager
+	 *        the associated PanelManager
+	 */
+	public DebugPane(PanelManager manager) {
+		// Swing setup
+		setLayout(new BorderLayout());
+		setBorder(FlowClient.EMPTY_BORDER);
 
-	GenericConsole debugConsole = new GenericConsole();
-	debugConsole.getScroll().setPreferredSize(new Dimension(400, 255));
-	leftHalf.setRightComponent(debugConsole.getScroll());
+		// Creates a centrel jsplitpane
+		mainSplit = new JSplitPane();
+		add(mainSplit, BorderLayout.CENTER);
+		mainSplit.setResizeWeight(0);
+		mainSplit.setContinuousLayout(true);
+		mainSplit.setBorder(FlowClient.EMPTY_BORDER);
 
-	JPanel rightTop = new JPanel(new BorderLayout());
-	leftHalf.setLeftComponent(rightTop);
+		// Sets the left half of the main to another jsplitpane
+		JSplitPane leftHalf = new JSplitPane();
+		leftHalf.setPreferredSize(new Dimension(310, 574));
+		leftHalf.setBorder(FlowClient.EMPTY_BORDER);
+		leftHalf.setMinimumSize(new Dimension(310, 0));
+		leftHalf.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		leftHalf.setContinuousLayout(true);
+		mainSplit.setLeftComponent(leftHalf);
 
-	JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-	buttonPanel.setMinimumSize(new Dimension(310, 0));
-	buttonPanel.setBorder(FlowClient.EMPTY_BORDER);
-	buttonPanel.setPreferredSize(new Dimension(310, 32));
-	rightTop.add(buttonPanel, BorderLayout.NORTH);
-	rightTop.setBorder(FlowClient.EMPTY_BORDER);
-	NavBar navBar = new NavBar(manager);
-	navBar.disableButton(NavBar.DEBUG);
-	buttonPanel.add(navBar);
-	runStopBar = new RunStopBar(debugConsole);
-	buttonPanel.add(runStopBar);
-	buttonPanel.add(new DebugToolbar());
-	rightTop.add(new VariablesList(), BorderLayout.CENTER);
-    }
+		// Puts the debug console on the bottom of the left half
+		GenericConsole debugConsole = new GenericConsole();
+		debugConsole.getScroll().setPreferredSize(new Dimension(400, 255));
+		leftHalf.setRightComponent(debugConsole.getScroll());
 
-    public void addEditTabs(EditTabs editTabs) {
-	runStopBar.setEditTabs(editTabs);
-	mainSplit.setRightComponent(editTabs);
-    }
+		// The left side top contains the buttons bar and the variables list
+		JPanel leftTop = new JPanel(new BorderLayout());
+		leftHalf.setLeftComponent(leftTop);
+
+		// Creates a panel for the buttons, with various buttons (navigation, run/stop, debugging)
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		buttonPanel.setMinimumSize(new Dimension(310, 0));
+		buttonPanel.setBorder(FlowClient.EMPTY_BORDER);
+		buttonPanel.setPreferredSize(new Dimension(310, 32));
+		leftTop.add(buttonPanel, BorderLayout.NORTH);
+		leftTop.setBorder(FlowClient.EMPTY_BORDER);
+		NavBar navBar = new NavBar(manager);
+		navBar.disableButton(NavBar.DEBUG);
+		buttonPanel.add(navBar);
+		runStopBar = new RunStopBar(debugConsole);
+		buttonPanel.add(runStopBar);
+		buttonPanel.add(new DebugToolbar());
+
+		// Adds a variables list on the bottom half of the left sides' top half
+		leftTop.add(new VariablesList(), BorderLayout.CENTER);
+	}
+
+	/**
+	 * Adds the editTabs to the panel
+	 * 
+	 * @param editTabs
+	 *        the edit tabs in use
+	 */
+	public void addEditTabs(EditTabs editTabs) {
+		runStopBar.setEditTabs(editTabs);
+		mainSplit.setRightComponent(editTabs);
+	}
 }
