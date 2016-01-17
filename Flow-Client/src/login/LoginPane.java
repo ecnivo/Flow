@@ -1,34 +1,16 @@
 
 package login;
 
-import gui.FlowClient;
 import gui.PanelManager;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-
 import message.Data;
 import shared.Communicator;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * The pane for the user to enter their credentials to log in with
@@ -206,7 +188,9 @@ public class LoginPane extends JPanel {
 							// Switching, clearing, and resetting UI
 							LoginPane.this.panMan.resetUI();
 							LoginPane.this.panMan.switchToEditor();
-							Communicator.setSessionID(reply.get("session_id", UUID.class));
+							UUID sessionID = reply.get("session_id", UUID.class);
+							Communicator.setSessionID(sessionID);
+							Communicator.initAsync(sessionID);
 							LoginPane.this.panMan.getEditPane().getFileTree().refreshProjectList();
 							LoginPane.this.panMan.getEditPane().getFileTree().expandRow(0);
 							LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();

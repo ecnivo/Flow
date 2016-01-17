@@ -3,31 +3,18 @@ package settings;
 
 import gui.FlowClient;
 import gui.PanelManager;
+import message.Data;
+import shared.Communicator;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
-
-import message.Data;
-import shared.Communicator;
 
 /**
  * Some tabs to manage the many many settings we have
@@ -167,6 +154,7 @@ public class SettingsTabs extends JTabbedPane {
 				endSession.put("session_id", Communicator.getSessionID());
 				Communicator.communicate(endSession);
 				Communicator.setSessionID(null);
+				Communicator.killAsync();
 				// Resets everything and everything
 				panMan.switchToLogin();
 				panMan.resetUI();

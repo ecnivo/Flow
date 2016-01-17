@@ -19,6 +19,7 @@ public class PersistentClientHandle implements Runnable {
 
     private DataSocket dataSocket;
     private HashMap<UUID, CallbackHandler> handlers;
+    private UUID sessionUUID;
 
     public PersistentClientHandle(Socket socket) throws IOException {
         this.socket = socket;
@@ -41,6 +42,7 @@ public class PersistentClientHandle implements Runnable {
     @Override
     public void run() {
         try {
+            sessionUUID = dataSocket.receive(UUID.class);
             while (socket.isConnected()) {
                 Data data = dataSocket.receive(Data.class);
                 L.info("accepted async data " + data);
@@ -71,7 +73,11 @@ public class PersistentClientHandle implements Runnable {
                 }
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
+    }
+
+    public UUID getSessionUUID() {
+        return sessionUUID;
     }
 }

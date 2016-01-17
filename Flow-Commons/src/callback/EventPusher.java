@@ -17,6 +17,8 @@ public class EventPusher implements Runnable {
 
     private HashMap<UUID, CallbackListener> registeredEvents;
 
+    private boolean running = true;
+
     public EventPusher(DataSocket arcSocket) {
         this.arcSocket = arcSocket;
         this.registeredEvents = new HashMap<>();
@@ -25,23 +27,29 @@ public class EventPusher implements Runnable {
     @Override
     public void run() {
         try {
-            while (arcSocket.getSocket().isConnected()) {
+            while (arcSocket.getSocket().isConnected() && running) {
                 Data data = arcSocket.receive(Data.class);
-                CallbackEvent event = data.get("event", CallbackEvent.class);
-                L.info("received event " + event);
-                UUID assocUUID = event.getAssociatedUUID();
-                CallbackListener listener = registeredEvents.get(assocUUID);
-                if (listener != null)
-                    listener.onCallbackEvent(event);
-                else
-                    L.warning("server tried to send event that is unregistered! this means something is wrong!");
+                if (running) {
+                    CallbackEvent event = data.get("event", CallbackEvent.class);
+                    L.info("received event " + event);
+                    UUID assocUUID = event.getAssociatedUUID();
+                    CallbackListener listener = registeredEvents.get(assocUUID);
+                    if (listener != null)
+                        listener.onCallbackEvent(event);
+                    else
+                        L.warning("server tried to send event that is unregistered! this means something is wrong!");
+                }
             }
         } catch (Exception e) {
             L.severe("error in event pusher, this means something is very wrong!");
             e.printStackTrace();
         }
+        L.info("event pusher dead");
     }
 
+    public void kill() {
+        running = false;
+    }
     public void registerListener(UUID uuid, CallbackListener event) {
         registeredEvents.put(uuid, event);
     }

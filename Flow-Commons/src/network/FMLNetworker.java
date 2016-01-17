@@ -59,11 +59,18 @@ public class FMLNetworker {
         }
     }
 
-    public void initAsync() throws IOException {
+    public void initAsync(UUID sessionUUID) throws IOException {
         Socket socket = new Socket(ip, arcport);
         this.asyncSocket = new DataSocket(socket);
+        asyncSocket.send(sessionUUID);
         this.pusher = new EventPusher(asyncSocket);
         new Thread(pusher).start();
+    }
+
+    public void killAsync() throws IOException {
+        pusher.kill();
+        asyncSocket.getSocket().close();
+        asyncSocket.close();
     }
 
     public boolean registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
