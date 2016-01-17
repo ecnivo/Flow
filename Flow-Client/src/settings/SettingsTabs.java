@@ -150,13 +150,11 @@ public class SettingsTabs extends JTabbedPane {
 			public void actionPerformed(ActionEvent e) {
 				// Creates an "end session" message to send to the server
 				Data endSession = new Data("end_session");
-				System.out.println(Communicator.getSessionID());
 				endSession.put("session_id", Communicator.getSessionID());
 				Communicator.communicate(endSession);
 				Communicator.setSessionID(null);
 				Communicator.killAsync();
 				// Resets everything and everything
-				panMan.switchToLogin();
 				panMan.resetUI();
 				return;
 			}
@@ -185,7 +183,6 @@ public class SettingsTabs extends JTabbedPane {
 						JOptionPane.showConfirmDialog(null, "Your Flow account has been successfully deleted.", "Account deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 						// Clears things, and switches back to the login window
 						Communicator.setSessionID(null);
-						panMan.switchToLogin();
 						panMan.resetUI();
 						return;
 					} else {

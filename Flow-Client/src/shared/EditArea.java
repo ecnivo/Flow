@@ -203,7 +203,7 @@ public class EditArea extends JTextPane {
 			 */
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				if (ignoreEvents)
+				if (ignoreEvents || !editable)
 					return;
 				// Sets up some data that was inserted
 				String insertedString = "";
@@ -240,7 +240,7 @@ public class EditArea extends JTextPane {
 			 */
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				if (ignoreEvents)
+				if (ignoreEvents || !editable)
 					return;
 				// Gets info on the change
 				int removedLen = e.getLength();
