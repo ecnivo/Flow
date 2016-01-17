@@ -52,10 +52,8 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
     @Override
     public void onUnregister(RegisterEvent event) {
         try {
-            VersionManager.getInstance().flushToDisk(
-                    DataManagement.getInstance().fileDir,
-                    event.UUID,
-                    UUID.fromString(FlowServer.getInstance().getDatabase().getLatestVersionUUID(event.UUID.toString())));
+            UUID latestVersionUUID = UUID.fromString(FlowServer.getInstance().getDatabase().getLatestVersionUUID(event.UUID.toString()));
+            DataManagement.getInstance().flushTextToDisk(event.UUID, latestVersionUUID, VersionManager.getInstance().getTextByVersionUUID(latestVersionUUID));
         } catch (DatabaseException e) {
             e.printStackTrace();
         }

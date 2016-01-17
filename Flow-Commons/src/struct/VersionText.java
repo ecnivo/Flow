@@ -36,7 +36,7 @@ public class VersionText implements Serializable {
     public boolean delete(int idx) {
         if (idx < 0 || idx >= text.length())
             throw new ArrayIndexOutOfBoundsException("index out of range");
-        text = text.substring(0, Math.max(0, idx - 1)) + text.substring(idx);
+        text = text.substring(0, idx) + text.substring(idx + 1);
         return false;
     }
 

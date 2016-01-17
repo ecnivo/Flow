@@ -109,8 +109,7 @@ public class DataManagement {
 	 *            The text document
 	 * @return whether or not the addition was successful
 	 */
-	public boolean addTextVersion(UUID fileUUID, UUID versionUUID,
-								  VersionText textDoc) {
+	public boolean flushTextToDisk(UUID fileUUID, UUID versionUUID, VersionText textDoc) {
 		L.info("adding text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -122,7 +121,7 @@ public class DataManagement {
 		} catch (Exception e) {
 			return false;
 		}
-		VersionManager.getInstance().addTextVersion(fileUUID, versionUUID, textDoc);
+
 		return true;
 	}
 
@@ -135,7 +134,7 @@ public class DataManagement {
 	 *            The UUID of the version of the file
 	 * @return whether or not the removal was successful
 	 */
-	public boolean removeTextVersion(UUID fileUUID, UUID versionUUID) {
+	public boolean deleteTextFromDisk(UUID fileUUID, UUID versionUUID) {
 		L.info("removing document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -155,8 +154,7 @@ public class DataManagement {
 	 *            The bytes of the file
 	 * @return whether or not the addition was successful
 	 */
-	public boolean addArbitraryDocumentVersion(UUID fileUUID, UUID versionUUID,
-			byte[] bytes) {
+	public boolean flushArbitraryDocumentToDisk(UUID fileUUID, UUID versionUUID, byte[] bytes) {
 		L.info("adding arbitrary document of uuid " + fileUUID + " of length "
 				+ bytes.length);
 		File file = new File(new File(fileDir, fileUUID.toString()),
@@ -216,7 +214,7 @@ public class DataManagement {
 		return td;
 	}
 
-	public byte[] getArbitraryFileBytes(UUID fileUUID, UUID versionUUID) {
+	public byte[] getArbitraryFileFromFile(UUID fileUUID, UUID versionUUID) {
 		L.info("getting arbitrary document of uuid " + versionUUID + " of file"
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),

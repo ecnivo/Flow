@@ -171,7 +171,7 @@ public class ClientRequestHandle implements Runnable {
                                 this.database.newFile(fileUUID.toString(), documentName, projectUUID.toString(), directoryUUID.toString(), "TEXT_DOCUMENT");
                                 this.database.newVersion(fileUUID.toString(), versionUUID.toString());
                                 VersionText newTextDocument = new VersionText();
-                                DataManagement.getInstance().addTextVersion(fileUUID, versionUUID, newTextDocument);
+                                VersionManager.getInstance().addTextVersion(fileUUID, versionUUID, newTextDocument);
                                 returnData.put("file_uuid", fileUUID);
                                 returnData.put("status", "OK");
                             } else {
@@ -418,7 +418,7 @@ public class ClientRequestHandle implements Runnable {
                                 VersionText doc = VersionManager.getInstance().getTextByVersionUUID(versionUUID);
                                 bytes = doc.getDocumentText().getBytes();
                             } else {
-                                bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
+                                bytes = DataManagement.getInstance().getArbitraryFileFromFile(fileUUID, versionUUID);
                             }
                             returnData.put("file_data", bytes);
                             returnData.put("status", "OK");
@@ -445,7 +445,7 @@ public class ClientRequestHandle implements Runnable {
                                 VersionText doc = VersionManager.getInstance().getTextByVersionUUID(versionUUID);
                                 bytes = doc.getDocumentText().getBytes();
                             } else {
-                                bytes = DataManagement.getInstance().getArbitraryFileBytes(fileUUID, versionUUID);
+                                bytes = DataManagement.getInstance().getArbitraryFileFromFile(fileUUID, versionUUID);
                             }
                             returnData.put("status", "OK");
                             returnData.put("file_data", bytes);

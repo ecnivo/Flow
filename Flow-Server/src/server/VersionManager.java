@@ -2,14 +2,17 @@ package server;
 
 import struct.VersionText;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
  * Manages versions of files
- *
+ * <p>
  * Created by Netdex on 1/16/2016.
  */
 public class VersionManager {
@@ -65,43 +68,23 @@ public class VersionManager {
 
     /**
      * Flushes all versions to disk
-     * @param fileDir Directory to store
+     *
      * @return success or not
      */
-    public boolean flushToDisk(File fileDir) {
+    public boolean flushToDisk() {
         // TODO doesn't remove versions that were deleted!
         for (UUID versionUUID : loadedDocuments.keySet()) {
             UUID parentFileUUID = parentFile.get(versionUUID);
-            if (!flushToDisk(fileDir, parentFileUUID, versionUUID))
+            if (!DataManagement.getInstance().flushTextToDisk(parentFileUUID, versionUUID, loadedDocuments.get(versionUUID)))
                 return false;
         }
         return true;
     }
 
     /**
-     * Flushes a single version to disk
-     * @param fileDir File directory
-     * @param fileUUID File UUID
-     * @param versionUUID Version UUID
-     * @return success or not
-     */
-    public boolean flushToDisk(File fileDir, UUID fileUUID, UUID versionUUID) {
-        File versionPath = new File(new File(fileDir, fileUUID.toString())
-                , versionUUID.toString() + "." + DataManagement.TEXT_FILE_EXT);
-        versionPath.getParentFile().mkdirs();
-        VersionText versionText = loadedDocuments.get(versionUUID);
-        try {
-            PrintStream ps = new PrintStream(versionPath);
-            ps.print(versionText.getDocumentText());
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
      * Add a text version
-     * @param fileUUID File UUID
+     *
+     * @param fileUUID    File UUID
      * @param versionUUID Version UUID
      * @param versionText Text data
      * @return success or not
@@ -118,6 +101,7 @@ public class VersionManager {
 
     /**
      * Removes a text version
+     *
      * @param versionUUID Version UUID
      * @return success or not
      */
@@ -134,6 +118,7 @@ public class VersionManager {
 
     /**
      * Gets text version by UUID
+     *
      * @param versionUUID Version UUID
      * @return success or not
      */
