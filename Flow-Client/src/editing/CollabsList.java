@@ -257,11 +257,7 @@ public class CollabsList extends JPanel {
 
 	    setBackground(userPermission.getPermissionColor());
 
-	    byte limit = FlowPermission.EDIT;
-	    if (myPermission.getPermissionLevel() == FlowPermission.OWNER) {
-		limit = FlowPermission.OWNER;
-	    }
-	    for (byte permLevel = 0; permLevel <= limit; permLevel++) {
+	    for (byte permLevel = 0; permLevel < permissionSelectors.length; permLevel++) {
 		permissionSelectors[permLevel] = new JRadioButton(new FlowPermission(permLevel).toString());
 		permissionSelectors[permLevel].addActionListener(new PermissionRadioButtonListener(permLevel));
 		permissionSelectors[permLevel].setOpaque(false);
@@ -322,7 +318,7 @@ public class CollabsList extends JPanel {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		    if (myPermission.canChangeCollabs() && permission.getPermissionLevel() != FlowPermission.OWNER)
+		    if (myPermission.canChangeCollabs())
 			((CardLayout) switcher.getLayout()).show(switcher, "permissions");
 		    permissionSelectors[userPermission.getPermissionLevel()].setSelected(true);
 		}
