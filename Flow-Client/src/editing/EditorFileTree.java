@@ -161,7 +161,7 @@ public class EditorFileTree extends FileTree {
 		// });
 
 		// Same case as "delete directory" in which it won't be used again, so
-		// it can be decleared right here
+		// it can be declared right here
 		JMenuItem deleteFileButton = new JMenuItem();
 		deleteFileButton.setText("Delete");
 		deleteFileButton.addActionListener(new ActionListener() {
@@ -186,6 +186,7 @@ public class EditorFileTree extends FileTree {
 					switch (status) {
 					// Success case
 						case "OK":
+							((DefaultTreeModel)getModel()).removeNodeFromParent(selectedNode);
 							break;
 
 						// Failure case
@@ -196,11 +197,10 @@ public class EditorFileTree extends FileTree {
 				} else {
 					JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
-				// EditorDocTree.this.reloadProjectFiles((ProjectNode)
-				// getActiveDirectoryNode().getPath()[1]);
-				reloadProjectFiles((ProjectNode) selectedNode.getPath()[1]);
+//				reloadProjectFiles((ProjectNode) selectedNode.getPath()[1]);
 			}
 		});
+		filePopup.add(deleteFileButton);
 
 		// Adds functionality when clicking
 		addMouseListener(new MouseListener() {
@@ -249,11 +249,6 @@ public class EditorFileTree extends FileTree {
 					// Directory menu for selected directory
 					if (e.getButton() == MouseEvent.BUTTON3) {
 						dirPopup.show(EditorFileTree.this, x, y);
-					}
-					if (e.isAltDown()) {
-						// Will reload the project files for that particular
-						// directory if ALT pressed
-						reloadProjectFiles((ProjectNode) ((DirectoryNode) selected).getPath()[1]);
 					}
 				} else if (selected instanceof FileNode) {
 					// If double click, opens the file
