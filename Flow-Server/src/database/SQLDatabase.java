@@ -170,7 +170,7 @@ public class SQLDatabase {
 			throw new DatabaseException(e.getMessage());
 		}
 	}
-	
+
 	public String ownerUpdateAccess(int accessLevel, String projectUUID,
 			String username) throws DatabaseException {
 		try {
