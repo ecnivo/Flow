@@ -1,28 +1,20 @@
 package editing;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Arrays;
-import java.util.UUID;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
 import shared.DocTree;
 import shared.EditTabs;
+
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.event.*;
+import java.util.Arrays;
+import java.util.UUID;
 
 @SuppressWarnings("serial")
 public class EditorDocTree extends DocTree {
@@ -227,7 +219,7 @@ public class EditorDocTree extends DocTree {
 	    public void keyTyped(KeyEvent e) {
 		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
 		if (selected instanceof FileNode && e.getKeyChar() == KeyEvent.VK_ENTER) {
-		    openFile(((FileNode) selected).getFileUUID(), ((ProjectNode) ((FileNode) selected).getPath()[1]).getProjectUUID());
+		    openFile(((FileNode) selected).getFileUUID(), ((ProjectNode) selected.getPath()[1]).getProjectUUID());
 		}
 	    }
 

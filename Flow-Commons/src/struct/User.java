@@ -3,20 +3,18 @@ package struct;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Created by Netdex on 12/24/2015.
  */
 public class User implements Serializable {
 
-    private String username;
-    private transient String password;
-    private transient ImageIcon avatar; // TODO this breaks stuff right now
-
     private static final transient ImageIcon DEFAULT_AVATAR = new ImageIcon(
             new ImageIcon("images/icon.png").getImage().getScaledInstance(32,
                     32, Image.SCALE_SMOOTH));
+    private String username;
+    private transient String password;
+    private transient ImageIcon avatar; // TODO this breaks stuff right now
 
     public User(String username, String password, ImageIcon avatar) {
         this.username = username;
@@ -45,9 +43,9 @@ public class User implements Serializable {
         return avatar;
     }
 
-//    public void setAvatar(ImageIcon icon) {
-//	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
-//		Image.SCALE_SMOOTH));
-//
-//    }
+    //    public void setAvatar(ImageIcon icon) {
+    //	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
+    //		Image.SCALE_SMOOTH));
+    //
+    //    }
 }

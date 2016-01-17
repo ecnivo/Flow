@@ -1,17 +1,12 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.UUID;
-
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
+
+import java.sql.*;
+import java.util.Date;
+import java.util.UUID;
 
 public class SQLDatabase {
 
@@ -30,6 +25,8 @@ public class SQLDatabase {
 
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
+
+	public static final String backupDatabase = "";
 
 	/**
 	 * Connection to the database.
@@ -59,6 +56,7 @@ public class SQLDatabase {
 			System.out.println(
 					"Error connecting to database located at: " + databaseName);
 		}
+		// this.verifyDirectoryCorruption();
 		instance = this;
 	}
 
@@ -462,16 +460,16 @@ public class SQLDatabase {
 	 *            the string representation of the UUID of the session
 	 * @return whether or not the session was successfully removed
 	 */
-	public boolean removeSession(String sessionId) {
+	public String removeSession(String sessionId) {
 		try {
 			// TODO Verify if the session actually exists prior to removal
 			this.update(String.format(
 					"DELETE FROM sessions WHERE SessionID = '%s';", sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			return FlowServer.ERROR;
 		}
-		return true;
+		return "OK";
 	}
 
 	/**
@@ -984,11 +982,9 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
 		try {
-			if (!this.query(String.format(
+			return this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-					this.getUsername(sessionID), projectUUID)).next())
-				return false;
-			return true;
+					this.getUsername(sessionID), projectUUID)).next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1013,12 +1009,10 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID,
 			int accessLevel) throws DatabaseException {
 		try {
-			if (!this.query(String.format(
+			return this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
 					this.getUsername(sessionID), projectUUID, accessLevel - 1))
-					.next())
-				return false;
-			return true;
+					.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1246,4 +1240,8 @@ public class SQLDatabase {
 			throw new DatabaseException(FlowServer.ERROR);
 		}
 	}
+
+	// public boolean verifyDirectoryCorruption() {
+	//
+	// }
 }

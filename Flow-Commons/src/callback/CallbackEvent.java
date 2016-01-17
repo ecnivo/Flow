@@ -10,11 +10,6 @@ import java.util.UUID;
  */
 public abstract class CallbackEvent implements Serializable {
     private UUID assocUUID;
-
-    public enum CallbackEventType {
-        DOCUMENT_CALLBACK
-    }
-
     private CallbackEventType type;
 
     protected CallbackEvent(CallbackEventType type, UUID assocUUID) {
@@ -28,5 +23,9 @@ public abstract class CallbackEvent implements Serializable {
 
     public UUID getAssociatedUUID() {
         return assocUUID;
+    }
+
+    public enum CallbackEventType {
+        DOCUMENT_CALLBACK
     }
 }

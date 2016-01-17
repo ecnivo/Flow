@@ -76,34 +76,34 @@ public class DiffMatchPatch {
      * The number of bits in an int.
      */
     private short Match_MaxBits = 32;
-
-    /**
-     * Internal class for returning results from diff_linesToChars(). Other less
-     * paranoid languages just use a three-element array.
-     */
-    protected static class LinesToCharsResult {
-        protected String chars1;
-        protected String chars2;
-        protected List<String> lineArray;
-
-        protected LinesToCharsResult(String chars1, String chars2,
-                                     List<String> lineArray) {
-            this.chars1 = chars1;
-            this.chars2 = chars2;
-            this.lineArray = lineArray;
-        }
-    }
+    // Define some regex patterns for matching boundaries.
+    private Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z",
+            Pattern.DOTALL);
 
     // DIFF FUNCTIONS
+    private Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n",
+            Pattern.DOTALL);
 
     /**
-     * The data structure representing a diff is a Linked list of Diff objects:
-     * {Diff(Operation.DELETE, "Hello"), Diff(Operation.INSERT, "Goodbye"),
-     * Diff(Operation.EQUAL, " world.")} which means: delete "Hello", add
-     * "Goodbye" and keep " world."
+     * Unescape selected chars for compatability with JavaScript's encodeURI. In
+     * speed critical applications this could be dropped since the receiving
+     * application will certainly decode these fine. Note that this function is
+     * case-sensitive. Thus "%3f" would not be unescaped. But this is ok because
+     * it is only called with the output of URLEncoder.encode which returns
+     * uppercase hex.
+     * <p>
+     * Example: "%3F" -> "?", "%24" -> "$", etc.
+     *
+     * @param str The string to escape.
+     * @return The escaped string.
      */
-    public enum Operation {
-        DELETE, INSERT, EQUAL
+    private static String unescapeForEncodeUriCompatability(String str) {
+        return str.replace("%21", "!").replace("%7E", "~").replace("%27", "'")
+                .replace("%28", "(").replace("%29", ")").replace("%3B", ";")
+                .replace("%2F", "/").replace("%3F", "?").replace("%3A", ":")
+                .replace("%40", "@").replace("%26", "&").replace("%3D", "=")
+                .replace("%2B", "+").replace("%24", "$").replace("%2C", ",")
+                .replace("%23", "#");
     }
 
     /**
@@ -233,7 +233,7 @@ public class DiffMatchPatch {
         if (i != -1) {
             // Shorter text is inside the longer text (speedup).
             Operation op = (text1.length() > text2.length()) ? Operation.DELETE
-                    : Operation.INSERT;
+                                                             : Operation.INSERT;
             diffs.add(new Diff(op, longtext.substring(0, i)));
             diffs.add(new Diff(Operation.EQUAL, shorttext));
             diffs.add(new Diff(op, longtext.substring(i + shorttext.length())));
@@ -752,8 +752,10 @@ public class DiffMatchPatch {
             }
         }
         if (best_common.length() * 2 >= longtext.length()) {
-            return new String[]{best_longtext_a, best_longtext_b,
-                    best_shorttext_a, best_shorttext_b, best_common};
+            return new String[]{
+                    best_longtext_a, best_longtext_b,
+                    best_shorttext_a, best_shorttext_b, best_common
+            };
         } else {
             return null;
         }
@@ -1064,12 +1066,6 @@ public class DiffMatchPatch {
         return 0;
     }
 
-    // Define some regex patterns for matching boundaries.
-    private Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z",
-            Pattern.DOTALL);
-    private Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n",
-            Pattern.DOTALL);
-
     /**
      * Reduce the number of edits by eliminating operationally trivial
      * equalities.
@@ -1293,7 +1289,7 @@ public class DiffMatchPatch {
         }
 
 		/*
-		 * Second pass: look for single edits surrounded on both sides by
+         * Second pass: look for single edits surrounded on both sides by
 		 * equalities which can be shifted sideways to eliminate an equality.
 		 * e.g: A<ins>BA</ins>C -> <ins>AB</ins>AC
 		 */
@@ -1596,8 +1592,6 @@ public class DiffMatchPatch {
         return diffs;
     }
 
-    // MATCH FUNCTIONS
-
     /**
      * Locate the best instance of 'pattern' in 'text' near 'loc'. Returns -1 if
      * no match found.
@@ -1630,6 +1624,8 @@ public class DiffMatchPatch {
             return match_bitap(text, pattern, loc);
         }
     }
+
+    // MATCH FUNCTIONS
 
     /**
      * Locate the best instance of 'pattern' in 'text' near 'loc' using the
@@ -1783,8 +1779,6 @@ public class DiffMatchPatch {
         return s;
     }
 
-    // PATCH FUNCTIONS
-
     /**
      * Increase the context until it is unique, but don't let the pattern expand
      * beyond Match_MaxBits.
@@ -1833,6 +1827,8 @@ public class DiffMatchPatch {
         patch.length1 += prefix.length() + suffix.length();
         patch.length2 += prefix.length() + suffix.length();
     }
+
+    // PATCH FUNCTIONS
 
     /**
      * Compute a list of patches to turn text1 into text2. A set of diffs will
@@ -2411,6 +2407,33 @@ public class DiffMatchPatch {
     }
 
     /**
+     * The data structure representing a diff is a Linked list of Diff objects:
+     * {Diff(Operation.DELETE, "Hello"), Diff(Operation.INSERT, "Goodbye"),
+     * Diff(Operation.EQUAL, " world.")} which means: delete "Hello", add
+     * "Goodbye" and keep " world."
+     */
+    public enum Operation {
+        DELETE, INSERT, EQUAL
+    }
+
+    /**
+     * Internal class for returning results from diff_linesToChars(). Other less
+     * paranoid languages just use a three-element array.
+     */
+    protected static class LinesToCharsResult {
+        protected String chars1;
+        protected String chars2;
+        protected List<String> lineArray;
+
+        protected LinesToCharsResult(String chars1, String chars2,
+                                     List<String> lineArray) {
+            this.chars1 = chars1;
+            this.chars2 = chars2;
+            this.lineArray = lineArray;
+        }
+    }
+
+    /**
      * Class representing one diff operation.
      */
     public static class Diff {
@@ -2556,27 +2579,5 @@ public class DiffMatchPatch {
             }
             return unescapeForEncodeUriCompatability(text.toString());
         }
-    }
-
-    /**
-     * Unescape selected chars for compatability with JavaScript's encodeURI. In
-     * speed critical applications this could be dropped since the receiving
-     * application will certainly decode these fine. Note that this function is
-     * case-sensitive. Thus "%3f" would not be unescaped. But this is ok because
-     * it is only called with the output of URLEncoder.encode which returns
-     * uppercase hex.
-     * <p>
-     * Example: "%3F" -> "?", "%24" -> "$", etc.
-     *
-     * @param str The string to escape.
-     * @return The escaped string.
-     */
-    private static String unescapeForEncodeUriCompatability(String str) {
-        return str.replace("%21", "!").replace("%7E", "~").replace("%27", "'")
-                .replace("%28", "(").replace("%29", ")").replace("%3B", ";")
-                .replace("%2F", "/").replace("%3F", "?").replace("%3A", ":")
-                .replace("%40", "@").replace("%26", "&").replace("%3D", "=")
-                .replace("%2B", "+").replace("%24", "$").replace("%2C", ",")
-                .replace("%23", "#");
     }
 }
