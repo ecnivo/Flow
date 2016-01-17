@@ -10,21 +10,15 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 
 import message.Data;
 import struct.VersionText;
-
-import compiler.FlowCompiler;
 
 /**
  * A toolbar with run and stop buttons
@@ -135,29 +129,34 @@ public class RunStopBar extends JToolBar {
 			// More swing
 			setFocusable(false);
 			setBorder(FlowClient.EMPTY_BORDER);
-			addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// When the button is pressed
-					if (editTabs == null) {
-						return;
-					}/*
-					// Create a compiler
-					FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
-					// Try to build and execute it
-					// TODO make this work
-					try {
-						List<Diagnostic<? extends JavaFileObject>> errors = flowCompiler.build();
-						flowCompiler.execute();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-						JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					System.out.println("Run button pressed");*/
-				}
-			});
+			// addActionListener(new ActionListener() {
+			//
+			// @Override
+			// public void actionPerformed(ActionEvent e) {
+			// // When the button is pressed
+			// if (editTabs == null) {
+			// return;
+			// }
+			// /*
+			// // Create a compiler
+			// FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea)
+			// editTabs.getSelectedComponent()).getProjectUUID()));
+			// // Try to build and execute it
+			// // TODO make this work
+			// try {
+			// List<Diagnostic<? extends JavaFileObject>> errors = flowCompiler.build();
+			// flowCompiler.execute();
+			// } catch (IOException e1) {
+			// e1.printStackTrace();
+			// JOptionPane.showConfirmDialog(null,
+			// "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed",
+			// "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+			// return;
+			// }*/
+			// // System.out.println("Run button pressed");
+			// }
+			// }
+			// });
 		}
 	}
 
