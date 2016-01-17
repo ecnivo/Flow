@@ -111,84 +111,61 @@ public class SQLDatabase {
 	public String updateAccess(int accessLevel, String projectId,
 			String username) {
 		try {
-			if (this.query(String.format(
-					"SELECT Username FROM Users WHERE Username = '%s';",
-					username)).next()) {
-
-				// Remove any old access status
-				this.update(String.format(
-						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-						username, projectId));
-
-				if (accessLevel == EDIT || accessLevel == VIEW) {
-					this.update(String.format(
-							"INSERT INTO access values('%s', '%s', '%s');",
-							projectId, username, accessLevel));
-				} else if (accessLevel == OWNER) {
-					// Changes the owner of the project in the projects table
-					this.update(String.format(
-							"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
-							username, projectId));
-
-					// Changes the permissions of the user to be an owner
-					this.update("INSERT INTO access values('" + projectId
-							+ "', '" + username + "', '" + OWNER + "');");
-				} else if (accessLevel == NONE) {
-					this.update(String.format(
-							"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-							username, projectId));
-				} else {
-					return "ACCESS_LEVEL_INVALID";
-				}
-			} else {
-				return "USERNAME_DOES_NOT_EXIST";
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return FlowServer.ERROR;
-		}
-		return "OK";
-	}
-
-	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
-			String username) throws DatabaseException {
-		try {
 			ResultSet data = this.query(String.format(
 					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
-					projectUUID));
-			if (data.next()) {
-				if (accessLevel == OWNER
-						|| username.equals(data.getString("OwnerUsername"))) {
-					return "ACCESS_DENIED";
-				}
-				return this.updateAccess(accessLevel, projectUUID, username);
-			}
-			return "INVALID_PROJECT_UUID";
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new DatabaseException(e.getMessage());
-		}
-	}
-	
-	public String ownerUpdateAccess(int accessLevel, String projectUUID,
-			String username) throws DatabaseException {
-		try {
-			ResultSet data = this.query(String.format(
-					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
-					projectUUID));
+					projectId));
 			if (data.next()) {
 				if (username.equals(data.getString("OwnerUsername"))) {
 					return "ACCESS_DENIED";
 				}
-				return this.updateAccess(accessLevel, projectUUID, username);
+				if (this.query(String.format(
+						"SELECT Username FROM Users WHERE Username = '%s';",
+						username)).next()) {
+
+					// Remove any old access status
+					this.update(String.format(
+							"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+							username, projectId));
+
+					if (accessLevel == EDIT || accessLevel == VIEW) {
+						this.update(String.format(
+								"INSERT INTO access values('%s', '%s', '%s');",
+								projectId, username, accessLevel));
+					} else if (accessLevel == OWNER) {
+						// Changes the owner of the project in the projects
+						// table
+						this.update(String.format(
+								"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
+								username, projectId));
+
+						// Changes the permissions of the user to be an owner
+						this.update("INSERT INTO access values('" + projectId
+								+ "', '" + username + "', '" + OWNER + "');");
+					} else if (accessLevel == NONE) {
+						this.update(String.format(
+								"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+								username, projectId));
+					} else {
+						return "ACCESS_LEVEL_INVALID";
+					}
+					return "OK";
+				} else {
+					return "USERNAME_DOES_NOT_EXIST";
+				}
 			}
 			return "INVALID_PROJECT_UUID";
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new DatabaseException(e.getMessage());
+			return FlowServer.ERROR;
 		}
+	}
+
+	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
+			String username) throws DatabaseException {
+			if (accessLevel == OWNER) {
+				return "ACCESS_DENIED";
+			}
+			return this.updateAccess(accessLevel, projectUUID, username);
 	}
 
 	/**
