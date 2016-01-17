@@ -30,13 +30,13 @@ public class VersionText implements Serializable {
     /**
      * Remove a character at line number at index
      *
-     * @param idx The index of the character to delete, -1 to remove the line
+     * @param idx The index of the character to delete
      * @return whether or not line count was affected by this operation
      */
     public boolean delete(int idx) {
         if (idx < 0 || idx >= text.length())
             throw new ArrayIndexOutOfBoundsException("index out of range");
-        text = text.substring(0, idx) + text.substring(idx + 1);
+        text = text.substring(0, Math.max(0, idx - 1)) + text.substring(idx);
         return false;
     }
 

@@ -1,5 +1,6 @@
 package callback;
 
+import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -7,7 +8,7 @@ import java.util.logging.Logger;
 
 /**
  * Manages all persistent handles to the server
- *
+ * <p>
  * Created by Netdex on 1/15/2016.
  */
 public class PersistentHandleManager {
@@ -41,7 +42,10 @@ public class PersistentHandleManager {
                 try {
                     handler.onCallbackEvent(event);
                 } catch (Exception e) {
-                    unregisterCallbackHandler(callbackUUID, handler);
+                    if (!(e instanceof BadLocationException)) { // FIXME
+                        e.printStackTrace();
+                        unregisterCallbackHandler(callbackUUID, handler);
+                    }
                 }
             }
         }
