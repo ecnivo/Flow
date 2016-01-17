@@ -1,12 +1,17 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
+import java.util.UUID;
+
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
-
-import java.sql.*;
-import java.util.Date;
-import java.util.UUID;
 
 public class SQLDatabase {
 
@@ -56,7 +61,8 @@ public class SQLDatabase {
 			System.out.println(
 					"Error connecting to database located at: " + databaseName);
 		}
-		// this.verifyDirectoryCorruption();
+		if (this.checkDatabaseCorruption())
+			this.refreshDatabase();
 		instance = this;
 	}
 
@@ -1241,7 +1247,11 @@ public class SQLDatabase {
 		}
 	}
 
-	// public boolean verifyDirectoryCorruption() {
-	//
-	// }
+	public boolean checkDatabaseCorruption() {
+		return false;
+	}
+
+	public void refreshDatabase() {
+		System.err.println("DATABASE WIPED AND RELOADED");
+	}
 }
