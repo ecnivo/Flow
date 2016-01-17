@@ -1,5 +1,6 @@
 package database;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
@@ -33,7 +34,8 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public static final String BACKUP_DATABASE = "FlowDatabseBackUp.db";
+	public static final String BACKUP_DATABASE = "data" + File.separator
+			+ "FlowDatabseBackUp.db";
 
 	/**
 	 * Connection to the database.
@@ -46,6 +48,7 @@ public class SQLDatabase {
 	public static SQLDatabase instance;
 
 	public SQLDatabase(String databaseName) {
+		System.out.println("data" + File.separator + "FlowDatabseBackUp.db");
 		try {
 			DriverManager.registerDriver(
 					(Driver) Class.forName(DRIVER).newInstance());
@@ -1310,13 +1313,22 @@ public class SQLDatabase {
 			return false;
 		}
 
+		System.out.println("hi");
+
 		try {
 			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
 			for (int i = 0; i < tableNames.size(); i++) {
+				// Test query for table corruption check
+				// SQLException will be thrown is corrupted
+				this.query(String.format("SELECT * FROM '%s';",
+						tableNames.get(i)));
+
+				// Check if column names in each table match with back up
 				ResultSet tableInfo = databaseMetaData.getColumns(null, null,
 						tableNames.get(i), null);
 				ArrayList<String> columnInfo = tableColumns.get(i);
 				for (int j = 0; j < columnInfo.size(); j++) {
+					tableInfo.next();
 					if (!columnInfo.get(j).equals(
 							printAndReturn(tableInfo.getString("COLUMN_NAME"))))
 						return false;
