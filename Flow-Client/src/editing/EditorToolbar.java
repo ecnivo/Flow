@@ -428,7 +428,7 @@ public class EditorToolbar extends JToolBar {
 					modify.put("file_uuid", response.get("file_uuid", UUID.class));
 					modify.put("session_id", Communicator.getSessionID());
 					modify.put("mod_type", "INSERT");
-					modify.put("idx", fileContents.length());
+					modify.put("idx", 0);
 					modify.put("str", fileContents);
 					Data modifyResponse = Communicator.communicate(modify);
 					switch (modifyResponse.get("status", String.class)) {
