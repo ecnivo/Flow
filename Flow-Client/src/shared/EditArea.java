@@ -32,6 +32,7 @@ public class EditArea extends JTextPane {
     private JScrollPane scrolling;
     private StyledDocument doc;
     private UUID versionTextUUID;
+    private UUID fileUUID;
     private UUID projectUUID;
 
     private Style keywordStyle;
@@ -55,6 +56,7 @@ public class EditArea extends JTextPane {
 	setLayout(null);
 	this.projectUUID = projectUUID;
 	this.versionTextUUID = versionTextUUID;
+	this.fileUUID = fileUUID;
 	scrolling = new JScrollPane(this);
 	setBorder(FlowClient.EMPTY_BORDER);
 	setFont(PLAIN);
@@ -221,6 +223,10 @@ public class EditArea extends JTextPane {
 
     public UUID getProjectUUID() {
 	return projectUUID;
+    }
+    
+    public UUID getFileUUID(){
+	return fileUUID;
     }
 
     private class StyleToken {
