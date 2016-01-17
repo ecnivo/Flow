@@ -563,7 +563,7 @@ public class EditorFileTree extends FileTree {
 							JOptionPane.showConfirmDialog(null, "The directory you are trying to create this file in does not exist.\nTry refreshing the list of projects by Alt + clicking the projects list.", "Project cannot be found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 							break;
 
-						case "DOCUMENT_NAME_INVALID":
+						case "FILE_NAME_INVALID":
 							JOptionPane.showConfirmDialog(null, "The file name is invalid.\nThis is typically due to a conflict with another file name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 							break;
 

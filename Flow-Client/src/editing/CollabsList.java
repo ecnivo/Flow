@@ -21,8 +21,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -237,6 +237,10 @@ public class CollabsList extends JPanel {
 		// Asks server
 		Data activeProject = Communicator.communicate(getProject);
 
+		if (activeProject.get("status", String.class).equals("ACCESS_DENIED")) {
+			return;
+		}
+
 		// Clears the list
 		userList.removeAll();
 
@@ -247,21 +251,24 @@ public class CollabsList extends JPanel {
 		if (ownerName.equals(Communicator.getUsername())) {
 			myPermission = new FlowPermission(FlowPermission.OWNER);
 		}
-		userList.add(new UserInfo(ownerName, new FlowPermission(FlowPermission.OWNER)));
 
 		// Lists the editors
 		String[] editors = activeProject.get("editors", String[].class);
-		for (String editor : editors) {
-			if (editor.equals(Communicator.getUsername()))
-				myPermission = new FlowPermission(FlowPermission.EDIT);
-			userList.add(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
+		if (Arrays.asList(editors).contains(Communicator.getUsername())) {
+			myPermission = new FlowPermission(FlowPermission.EDIT);
 		}
 
 		// Lists the viewers
 		String[] viewers = activeProject.get("viewers", String[].class);
+		if (Arrays.asList(viewers).contains(Communicator.getUsername())) {
+			myPermission = new FlowPermission(FlowPermission.VIEW);
+		}
+
+		userList.add(new UserInfo(ownerName, new FlowPermission(FlowPermission.OWNER)));
+		for (String editor : editors) {
+			userList.add(new UserInfo(editor, new FlowPermission(FlowPermission.EDIT)));
+		}
 		for (String viewer : viewers) {
-			if (viewer.equals(Communicator.getUsername()))
-				myPermission = new FlowPermission(FlowPermission.VIEW);
 			userList.add(new UserInfo(viewer, new FlowPermission(FlowPermission.VIEW)));
 		}
 
@@ -289,7 +296,7 @@ public class CollabsList extends JPanel {
 		if (selectedScrollPane == null) {
 			// If there is no tab open, tries the doc-tree
 			TreePath treePath = editPane.getFileTree().getSelectionPath();
-			if (treePath == null || treePath.getPath().length < 2)
+			if (treePath == null || treePath.getPath().length <= 1)
 				// If neither of those apply, then throws a
 				// NoActiveProjectException
 				throw new NoActiveProjectException();
@@ -414,7 +421,7 @@ public class CollabsList extends JPanel {
 			// Creates the radio buttons. Will not create any "OWNER" buttons
 			// for non-owners of the project
 			byte limit = FlowPermission.EDIT;
-			if (userPermission.getPermissionLevel() >= FlowPermission.OWNER) {
+			if (myPermission.getPermissionLevel() >= FlowPermission.OWNER) {
 				limit = FlowPermission.OWNER;
 			}
 			for (byte permLevel = 0; permLevel <= limit; permLevel++) {

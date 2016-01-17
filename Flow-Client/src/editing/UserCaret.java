@@ -3,8 +3,6 @@ package editing;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -27,6 +25,7 @@ public class UserCaret extends JComponent {
 	private Color				userColor;
 	private JLabel				infoLabel;
 	private EditArea			editArea;
+	private String				name;
 
 	private static final int	SHOW_INFO_DISTANCE	= 25;
 
@@ -42,6 +41,7 @@ public class UserCaret extends JComponent {
 		// TODO whenever usercarets are created, they need to be initialized
 		// with a listener for the caret movements of other users
 		this.editArea = editArea;
+		name = user;
 		setLayout(null);
 		location = new Point(0, 0);
 
@@ -95,18 +95,6 @@ public class UserCaret extends JComponent {
 	}
 
 	/**
-	 * Paints the cursor
-	 */
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(userColor);
-		g2d.fillRect((int) (location.getX()), (int) location.getY(), 2, 17);
-	}
-
-	/**
 	 * Sets a new location for the caret
 	 * 
 	 * @param line
@@ -114,11 +102,12 @@ public class UserCaret extends JComponent {
 	 * @param charPos
 	 *        the n'th character in said line
 	 */
-	public void caretMoved(int line, int charPos) {
+	public void moveTo(Point location) {
 		// TODO since we're not using lines, do something about line wrapping?
-		location = new Point(charPos * 8, line * 17);
+		this.location = location;
 		// Changes its location
 		infoLabel.setBounds(editArea.getInsets().left, (int) (editArea.getInsets().top + location.getY()), (int) infoLabel.getSize().getWidth(), (int) infoLabel.getSize().getHeight());
+		repaint();
 	}
 
 	/**
@@ -128,5 +117,17 @@ public class UserCaret extends JComponent {
 	 */
 	public Point getLocation() {
 		return location;
+	}
+
+	public String toString() {
+		return name;
+	}
+
+	/**
+	 * Gets the colour of the cursor
+	 * @return the colour
+	 */
+	public Color getColor() {
+		return userColor;
 	}
 }

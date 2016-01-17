@@ -1,11 +1,11 @@
 
 package shared;
 
-import editing.UserCaret;
-import gui.FlowClient;
-
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -29,6 +29,8 @@ import javax.swing.text.StyledDocument;
 import message.Data;
 import callback.DocumentCallbackEvent;
 import callback.TextModificationListener;
+import editing.UserCaret;
+import gui.FlowClient;
 
 /**
  * The area for the user to edit their documents
@@ -71,6 +73,7 @@ public class EditArea extends JTextPane {
 			"new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
 
 	private boolean					ignoreEvents	= false;
+	private ArrayList<UserCaret>	carets;
 
 	/**
 	 * Creates a new EditArea
@@ -113,9 +116,12 @@ public class EditArea extends JTextPane {
 		if (!editorListData.get("status", String.class).equals("OK")) {
 			return;
 		}
+		carets = new ArrayList<UserCaret>();
 		String[] editors = editorListData.get("editors", String[].class);
-		for (String editor : editors) {
-			add(new UserCaret(editor, this));
+		for (String userName : editors) {
+			UserCaret caret = new UserCaret(userName, this);
+			add(caret);
+			carets.add(caret);
 		}
 
 		// Creates styles for each of the syntax highlighting items
@@ -212,7 +218,7 @@ public class EditArea extends JTextPane {
 				Data response = Communicator.communicate(fileModify);
 				String status = response.get("status", String.class);
 				// Makes sure that things work
-				if (status == null || !status.equals("OK")) {
+				if (response == null || status == null || !status.equals("OK")) {
 					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -242,7 +248,7 @@ public class EditArea extends JTextPane {
 				// Sends message to server
 				Data response = Communicator.communicate(metadataModify);
 				String status = response.get("status", String.class);
-				if (status == null || !status.equals("OK")) {
+				if (response == null || status == null || !status.equals("OK")) {
 					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -275,29 +281,66 @@ public class EditArea extends JTextPane {
 					return;
 				}
 
-				if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.INSERT) {
-					String addition = e.ADDITION;
-					try {
-						// Uses boolean flags when inserting or deleting so that the
-						// insertions/deletions don't interpret the other users' inputs as the
-						// current user's actions
-						ignoreEvents = true;
-						// Tries to insert the contents
-						doc.insertString(e.INDEX, addition, null);
-						ignoreEvents = false;
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
-					}
-				} else if (e.TYPE == DocumentCallbackEvent.DocumentCallbackType.DELETE) {
-					int length = e.REMOVAL_LENGTH;
-					try {
-						ignoreEvents = true;
-						// Tries to remove the contents
-						doc.remove(e.INDEX, length);
-						ignoreEvents = false;
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
-					}
+				switch (e.TYPE) {
+					case INSERT:
+						String addition = e.ADDITION;
+						try {
+							// Uses boolean flags when inserting or deleting so that the
+							// insertions/deletions don't interpret the other users' inputs as the
+							// current user's actions
+							ignoreEvents = true;
+							// Tries to insert the contents
+							doc.insertString(e.INDEX, addition, null);
+							ignoreEvents = false;
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						}
+						break;
+
+					case DELETE:
+						int length = e.REMOVAL_LENGTH;
+						try {
+							ignoreEvents = true;
+							// Tries to remove the contents
+							doc.remove(e.INDEX, length);
+							ignoreEvents = false;
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						}
+
+						fireCaretUpdate(new CaretEvent(EditArea.this) {
+
+							@Override
+							public int getMark() {
+								return EditArea.this.getCaret().getMark();
+							}
+
+							@Override
+							public int getDot() {
+								return EditArea.this.getCaret().getDot();
+							}
+						});
+						break;
+
+					case MOVE:
+						UserCaret caret = getCaretByUserName(e.USERNAME);
+						if (caret == null) {
+							return;
+						}
+						Rectangle rectangle = null;
+						try {
+							rectangle = modelToView(e.INDEX);
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+							return;
+						}
+						caret.moveTo(rectangle.getLocation());
+						repaint();
+
+						break;
+
+					default:
+						break;
 				}
 				highlightSyntax();
 			}
@@ -341,6 +384,33 @@ public class EditArea extends JTextPane {
 	 */
 	public UUID getFileUUID() {
 		return fileUUID;
+	}
+
+	/**
+	 * Gets a caret by its username
+	 * 
+	 * @param name
+	 *        name of user
+	 * @return the caret that corresponds with the name. Returns null if not found.
+	 */
+	private UserCaret getCaretByUserName(String name) {
+		name = name.trim();
+		for (UserCaret userCaret : carets) {
+			if (userCaret.toString().equals(name)) {
+				return userCaret;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		for (UserCaret userCaret : carets) {
+			g2d.setColor(userCaret.getColor());
+			g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret.getLocation().getY(), 3, 17);
+		}
 	}
 
 	/**

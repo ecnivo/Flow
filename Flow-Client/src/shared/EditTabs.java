@@ -121,6 +121,8 @@ public class EditTabs extends JTabbedPane {
 		// EditPane editPane = (EditPane) getParent().getParent().getParent();
 		// editPane.getCollabsList().refreshUserList();
 		// }
+		revalidate();
+		repaint();
 	}
 
 	/**
