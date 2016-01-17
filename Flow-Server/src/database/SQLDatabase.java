@@ -61,12 +61,15 @@ public class SQLDatabase {
 					.println("Error loading database driver: " + e.toString());
 			return;
 		}
-		if (!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE))
+		if ((!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE))
+				|| (!this.checkAndRepairFileSystemCorruption(LIVE_DATABASE,
+						LIVE_FOLDER))) {
 			try {
 				this.recoverFileSystem(LIVE_FOLDER, BACKUP_FOLDER);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
 		try {
 			this.connection = DriverManager
 					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
@@ -1421,6 +1424,12 @@ public class SQLDatabase {
 			in.close();
 			out.close();
 		}
+	}
+
+	public boolean checkAndRepairFileSystemCorruption(String databaseName,
+			String dataFolder) {
+		
+		return true;
 	}
 
 	public static String printAndReturn(String word) {
