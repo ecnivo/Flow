@@ -476,6 +476,7 @@ public class EditorToolbar extends JToolBar {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					// Gets the source for export
 					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
 					if (selected == null || !(selected instanceof FileNode)) {
 						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -483,6 +484,7 @@ public class EditorToolbar extends JToolBar {
 					}
 					FileNode node = (FileNode) selected;
 
+					// Gets the export contents
 					Data getFileContents = new Data("file_request");
 					getFileContents.put("session_id", Communicator.getSessionID());
 					getFileContents.put("file_uuid", node.getFileUUID());
@@ -500,11 +502,13 @@ public class EditorToolbar extends JToolBar {
 					}
 					String fileConts = new String(reply.get("file_data", byte[].class));
 
+					// Gets the name of the export file
 					Data getFileName = new Data("file_info");
 					getFileName.put("session_id", Communicator.getSessionID());
 					getFileName.put("file_uuid", node.getFileUUID());
 					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
 					
+					// Checks. Makes it a txt by default.
 					boolean valid = true;
 					int dotIdx = fileName.lastIndexOf('.');
 					if (dotIdx == -1)
@@ -513,6 +517,7 @@ public class EditorToolbar extends JToolBar {
 						fileName += ".txt";
 					}
 
+					// Gets the user to choose the destination
 					JFileChooser destChooser = new JFileChooser();
 					destChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					destChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -525,6 +530,7 @@ public class EditorToolbar extends JToolBar {
 					}
 					File outFile = new File(dest);
 
+					// Writes it into the destination TODO (this may be the cause of the errors)
 					try {
 						if (!outFile.createNewFile()) {
 							JOptionPane.showConfirmDialog(null, "Could not export. Are you sure you have permissions to the destination folder?", "Could not export", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -532,6 +538,8 @@ public class EditorToolbar extends JToolBar {
 						}
 
 						FileWriter fw = new FileWriter(outFile);
+						
+						// Cleans up
 						fw.write(fileConts);
 						fw.close();
 
@@ -539,6 +547,7 @@ public class EditorToolbar extends JToolBar {
 						e1.printStackTrace();
 					}
 
+					// Shows confirmation
 					JOptionPane.showConfirmDialog(null, "Finished exporting file " + fileName + " to " + dest, "Done!", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
