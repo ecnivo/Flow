@@ -31,10 +31,6 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public enum ObjectType {
-		PROJECT, DIRECTORY, FILE, VERSION;
-	}
-
 	/**
 	 * Connection to the database.
 	 */
@@ -118,7 +114,7 @@ public class SQLDatabase {
 			if (this.query(String.format(
 					"SELECT Username FROM Users WHERE Username = '%s';",
 					username)).next()) {
-				
+
 				// Remove any old access status
 				this.update(String.format(
 						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
@@ -152,6 +148,27 @@ public class SQLDatabase {
 			return FlowServer.ERROR;
 		}
 		return "OK";
+	}
+
+	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
+			String username) throws DatabaseException {
+		try {
+			ResultSet data = this.query(String.format(
+					"SELECT ProjectID FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
+			if (data.next()) {
+				if (accessLevel == OWNER
+						|| username.equals(data.getString("OwnerUsername"))) {
+					return "ACCESS_DENIED";
+				}
+				return this.updateAccess(accessLevel, projectUUID, username);
+			}
+			return "INVALID_PROJECT_UUID";
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(e.getMessage());
+		}
 	}
 
 	/**
@@ -928,15 +945,21 @@ public class SQLDatabase {
 
 	/**
 	 * Verifies if the user associated with the specified session ID has at
-	 * least VIEW access to the specified project.
+	 * least VIEW access to the specified project.<br>
+	 * <br>
+	 * *NOTE: this method is more efficient than, but yields the equivalent
+	 * result of calling
+	 * {@link SQLDatabase#verifyPermissions(sessionID, projectUUID, accessLevel)}
+	 * and using {@link SQLDatabase#VIEW} for the accessLevel.
 	 *
 	 * @param sessionID
 	 *            the UUID of the session, in String form.
 	 * @param projectUUID
 	 *            the UUID of the project, in String form.
-	 * @return Whether or not the user has at least VIEW access to the specified
+	 * @return whether or not the user has at least VIEW access to the specified
 	 *         project.
 	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
 	 */
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
@@ -944,6 +967,36 @@ public class SQLDatabase {
 			if (!this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
 					this.getUsername(sessionID), projectUUID)).next())
+				return false;
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseException(FlowServer.ERROR);
+		}
+	}
+
+	/**
+	 * Verifies if the user associated with the specified session ID has at
+	 * least VIEW access to the specified project.
+	 *
+	 * @param sessionID
+	 *            the UUID of the session, in String form.
+	 * @param projectUUID
+	 *            the UUID of the project, in String form.
+	 * @param accessLevel
+	 *            the minimum level of access required to perform the action.
+	 * @return whether or not the user has at least the specified access level
+	 *         to the specified project.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
+	public boolean verifyPermissions(String sessionID, String projectUUID,
+			int accessLevel) throws DatabaseException {
+		try {
+			if (!this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
+					this.getUsername(sessionID), projectUUID, accessLevel - 1))
+					.next())
 				return false;
 			return true;
 		} catch (SQLException e) {
