@@ -22,7 +22,7 @@ public class VersionText implements Serializable {
      */
     public boolean insert(char c, int idx) {
         if (idx < 0 || idx > text.length())
-            throw new ArrayIndexOutOfBoundsException("index out of range");
+	    throw new ArrayIndexOutOfBoundsException("index out of range");
         text = text.substring(0, idx) + c + text.substring(idx);
         if (c == '\n')
             return true;
