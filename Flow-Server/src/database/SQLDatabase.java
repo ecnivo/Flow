@@ -65,9 +65,7 @@ public class SQLDatabase {
 			try {
 				this.recoverFileSystem(LIVE_FOLDER, BACKUP_FOLDER);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("FUCKCUFUFFUKCKCKCKC");
 			}
 		try {
 			this.connection = DriverManager
@@ -1347,6 +1345,12 @@ public class SQLDatabase {
 					"Error loading database meta data: " + databaseName);
 			return false;
 		}
+		try {
+			this.connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 
@@ -1354,9 +1358,9 @@ public class SQLDatabase {
 			String backUpFileSystem) throws IOException {
 		try {
 			this.connection.close();
-		} catch (SQLException e2) {
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			e.printStackTrace();
 		}
 		this.deleteFileSystemDirectory(new File(corruptFileSystem));
 		try {
