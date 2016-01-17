@@ -211,7 +211,8 @@ public class EditArea extends JTextPane {
 				// Sets up some data that was inserted
 				String insertedString = "";
 				int strLen = e.getLength();
-				int caretPos = e.getOffset();
+				int caretPos = e.getOffset() + e.getLength() - 1;
+				
 				// Get the string
 				try {
 					insertedString = doc.getText(caretPos, strLen);
