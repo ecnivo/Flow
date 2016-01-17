@@ -3,29 +3,14 @@ package shared;
 
 import gui.FlowClient;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
-
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
+import java.io.OutputStream;
 
 /**
  * A console to run code in.
@@ -40,6 +25,7 @@ public class GenericConsole extends JTextArea {
 	private String		history	= "FLOW - CONSOLE\n";
 	private JPopupMenu	popUp;
 	private JScrollPane	scrolling;
+	private OutputStream activeOutputStream;
 
 	/**
 	 * Creates a new GenericConsole
@@ -230,10 +216,19 @@ public class GenericConsole extends JTextArea {
 	 * @param command the command
 	 */
 	private void sendCommand(String command) {
-		// TODO send command to the standard in
-		// I have no idea what's supposed to happen
+		try {
+			if (activeOutputStream != null) {
+				System.out.println("writing " + command);
+				activeOutputStream.write((command + "\n").getBytes());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
+	public void setActiveOutputStream(OutputStream activeOutputStream) {
+		this.activeOutputStream = activeOutputStream;
+	}
 	/**
 	 * Updates the console window
 	 */
