@@ -1,14 +1,13 @@
 
 package shared;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.swing.JOptionPane;
-
+import callback.TextModificationListener;
 import message.Data;
 import network.FMLNetworker;
-import callback.TextModificationListener;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Central communications handler
@@ -89,9 +88,17 @@ public class Communicator {
 	/**
 	 * Initialize the File Synchronizer
 	 */
-	public static void initAsync() {
+	public static void initAsync(UUID sessionID) {
 		try {
-			networker.initAsync();
+			networker.initAsync(sessionID);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void killAsync() {
+		try {
+			networker.killAsync();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
