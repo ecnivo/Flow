@@ -9,6 +9,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeListenerProxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -366,6 +370,15 @@ public class EditArea extends JTextPane {
 		}, fileUUID);
 		// Update
 		highlightSyntax();
+	}
+	
+	private class VetoableDocumentChangeListener implements VetoableChangeListener{
+
+		@Override
+		public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+// TODO 			
+		}
+		
 	}
 
 	/**
