@@ -34,8 +34,8 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public static final String BACKUP_DATABASE = "data" + File.separator
-			+ "FlowDatabseBackUp.db";
+	public static final String BACKUP_DATABASE = "backup" + File.separator
+			+ "FlowDatabse.db";
 
 	/**
 	 * Connection to the database.
@@ -48,7 +48,6 @@ public class SQLDatabase {
 	public static SQLDatabase instance;
 
 	public SQLDatabase(String databaseName) {
-		System.out.println("data" + File.separator + "FlowDatabseBackUp.db");
 		try {
 			DriverManager.registerDriver(
 					(Driver) Class.forName(DRIVER).newInstance());
