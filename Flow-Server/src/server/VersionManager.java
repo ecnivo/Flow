@@ -37,6 +37,7 @@ public class VersionManager {
      * @return success or not
      */
     public boolean loadAllDocuments(File fileDir) {
+        L.info("loading all document versions");
         try {
             for (File fileStateDirectory : fileDir.listFiles()) {
                 if (fileStateDirectory.isDirectory()) {
@@ -50,7 +51,6 @@ public class VersionManager {
                         VersionText loadedVersion = new VersionText();
                         loadedVersion.setDocumentText(txt);
                         String versionName = versionFile.getName();
-                        L.info("loaded version file " + versionName + " into memory");
                         versionName = versionName.substring(0, versionName.lastIndexOf('.'));
                         String fileName = fileStateDirectory.getName();
                         this.addTextVersion(UUID.fromString(fileName), UUID.fromString(versionName), loadedVersion);
@@ -108,7 +108,6 @@ public class VersionManager {
      */
     public boolean addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {
         if (!loadedDocuments.containsKey(versionUUID)) {
-            L.info("added text version " + versionUUID + " to memory map");
             loadedDocuments.put(versionUUID, versionText);
             parentFile.put(versionUUID, fileUUID);
             return true;
