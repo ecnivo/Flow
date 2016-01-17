@@ -2,30 +2,18 @@
 package shared;
 
 import gui.FlowClient;
-
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-
 import message.Data;
 import struct.VersionText;
 
-import compiler.FlowCompiler;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * A toolbar with run and stop buttons
@@ -139,6 +127,7 @@ public class RunStopBar extends JToolBar {
 					if (editTabs == null) {
 						return;
 					}
+					/*
 					// Create a compiler
 					FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
 					// Try to build and execute it
@@ -150,7 +139,7 @@ public class RunStopBar extends JToolBar {
 						e1.printStackTrace();
 						JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
-					}
+					}*/
 					System.out.println("Run button pressed");
 				}
 			});
