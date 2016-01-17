@@ -486,9 +486,9 @@ public class EditArea extends JTextPane {
 			// First tries to find words
 			if (Character.isLetter(sourceCode.charAt(pos)) || pos == 0) {
 				int end = nextNonLetter(sourceCode, pos);
-//				if (end == -1) {
-//					end = sourceCode.length();
-//				}
+				// if (end == -1) {
+				// end = sourceCode.length();
+				// }
 				if (end >= 0 || (pos == 0 && end == -1)) {
 					String candidate = sourceCode.substring(pos, end);
 					// If the word is in the array, then it's placed in a new StyleBlock
@@ -556,13 +556,18 @@ public class EditArea extends JTextPane {
 				pos = end + 2;
 			}
 		}
-		
-//		for (int pos = 0; pos < sourceCode.length()-1; pos++) {
-//			String candidate = sourceCode.substring(pos, pos + 2);
-//			if (candidate.equals("//")) {
-//				int endIdx = sourceCode.indexOf('\n')
-//			}
-//		}
+
+		for (int pos = 0; pos < sourceCode.length() - 1; pos++) {
+			String candidate = sourceCode.substring(pos, pos + 2);
+			if (candidate.equals("//")) {
+				int endIdx = sourceCode.indexOf('\n', pos);
+				if (endIdx == -1)
+					endIdx = sourceString.length();
+				int charsBefore = sourceCode.substring(0, pos).replace("\n", "").length();
+				commentBlocks.add(new StyleBlock(endIdx - pos, charsBefore));
+				pos = endIdx;
+			}
+		}
 
 		// First paints everything "plain", then does key words, strings, then comments
 		SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
