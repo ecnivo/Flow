@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import message.Data;
 import shared.Communicator;
 import shared.FileTree;
 import shared.FileTree.DirectoryNode;
+import shared.FileTree.FileNode;
 import shared.FileTree.ProjectNode;
 
 /**
@@ -426,7 +428,7 @@ public class EditorToolbar extends JToolBar {
 					modify.put("file_uuid", response.get("file_uuid", UUID.class));
 					modify.put("session_id", Communicator.getSessionID());
 					modify.put("mod_type", "INSERT");
-					modify.put("idx", 0);
+					modify.put("idx", fileContents.length());
 					modify.put("str", fileContents);
 					Data modifyResponse = Communicator.communicate(modify);
 					switch (modifyResponse.get("status", String.class)) {
@@ -474,9 +476,70 @@ public class EditorToolbar extends JToolBar {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO pop open a window asking where the user would like
-					// the file exported, then export file to that location.
-					System.out.println("Export button pressed");
+					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					if (selected == null || !(selected instanceof FileNode)) {
+						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					FileNode node = (FileNode) selected;
+
+					Data getFileContents = new Data("file_request");
+					getFileContents.put("session_id", Communicator.getSessionID());
+					getFileContents.put("file_uuid", node.getFileUUID());
+					Data reply = Communicator.communicate(getFileContents);
+					switch (reply.get("status", String.class)) {
+						case "OK":
+							break;
+
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
+
+						default:
+							return;
+					}
+					String fileConts = new String(reply.get("file_data", byte[].class));
+
+					Data getFileName = new Data("file_info");
+					getFileName.put("session_id", Communicator.getSessionID());
+					getFileName.put("file_uuid", node.getFileUUID());
+					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
+					
+					boolean valid = true;
+					int dotIdx = fileName.lastIndexOf('.');
+					if (dotIdx == -1)
+						valid = false;
+					if (!valid) {
+						fileName += ".txt";
+					}
+
+					JFileChooser destChooser = new JFileChooser();
+					destChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					destChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+					destChooser.setDialogTitle("Choose export destination");
+					String dest;
+					if (destChooser.showSaveDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
+						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
+					} else {
+						return;
+					}
+					File outFile = new File(dest);
+
+					try {
+						if (!outFile.createNewFile()) {
+							JOptionPane.showConfirmDialog(null, "Could not export. Are you sure you have permissions to the destination folder?", "Could not export", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+
+						FileWriter fw = new FileWriter(outFile);
+						fw.write(fileConts);
+						fw.close();
+
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					JOptionPane.showConfirmDialog(null, "Finished exporting file " + fileName + " to " + dest, "Done!", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
