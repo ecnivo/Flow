@@ -261,6 +261,11 @@ public class EditorDocTree extends DocTree {
 	permissionRequest.put("project_uuid", projectUUID);
 	Data permissions = Communicator.communicate(permissionRequest);
 
+	String permissionsStatus = permissions.get("status", String.class);
+	if (permissionsStatus.equals("ACCESS_DENIED")) {
+	    return;
+	}
+
 	String[] editors = permissions.get("editors", String[].class);
 	String owner = permissions.get("owner", String.class);
 

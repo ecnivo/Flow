@@ -11,10 +11,17 @@ public class Validator {
 
 	public static boolean validFileName(String str) {
 		// TODO update the regex
-		return str == null ? false : str.matches("[A-Za-z]{1,16}");
+		return str == null ? false : str.matches("[A-Za-z0-9_\\-\\.]{1,16}");
 	}
 
-	public boolean remove(String message) {
+	/**
+	 * Verifies if the message is safe to be put into an SQL statement.
+	 * 
+	 * @param message
+	 *            the string to check.
+	 * @return whether or not the string is SQL safe.
+	 */
+	public boolean verifySQLSafety(String message) {
 		int length = message.length();
 		for (int i = 0; i < length; i++) {
 			char c = message.charAt(i);
