@@ -19,14 +19,19 @@ public class EventPusher implements Runnable {
 
     private boolean running = true;
 
-    public EventPusher(DataSocket arcSocket) {
+    private UUID sessionID;
+
+    public EventPusher(DataSocket arcSocket, UUID sessionID) {
         this.arcSocket = arcSocket;
+        this.sessionID = sessionID;
         this.registeredEvents = new HashMap<>();
     }
 
     @Override
     public void run() {
+        L.info("event pusher started under session " + sessionID);
         try {
+            arcSocket.send(sessionID);
             while (arcSocket.getSocket().isConnected() && running) {
                 Data data = arcSocket.receive(Data.class);
                 if (running) {
@@ -41,8 +46,7 @@ public class EventPusher implements Runnable {
                 }
             }
         } catch (Exception e) {
-            L.severe("error in event pusher, this means something is very wrong!");
-            e.printStackTrace();
+            L.severe("error in event pusher");
         }
         L.info("event pusher dead");
     }

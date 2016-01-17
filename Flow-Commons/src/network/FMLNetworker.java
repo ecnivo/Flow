@@ -62,8 +62,7 @@ public class FMLNetworker {
     public void initAsync(UUID sessionUUID) throws IOException {
         Socket socket = new Socket(ip, arcport);
         this.asyncSocket = new DataSocket(socket);
-        asyncSocket.send(sessionUUID);
-        this.pusher = new EventPusher(asyncSocket);
+        this.pusher = new EventPusher(asyncSocket, sessionUUID);
         new Thread(pusher).start();
     }
 
