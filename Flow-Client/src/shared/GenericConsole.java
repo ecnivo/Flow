@@ -220,6 +220,7 @@ public class GenericConsole extends JTextArea {
 			if (activeOutputStream != null) {
 				System.out.println("writing " + command);
 				activeOutputStream.write((command + "\n").getBytes());
+				activeOutputStream.flush();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
