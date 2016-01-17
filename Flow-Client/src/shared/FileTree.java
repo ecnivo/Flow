@@ -500,6 +500,10 @@ public abstract class FileTree extends JTree {
 		}
 	}
 
+	public FileNode generateFileNode(UUID childUUID) {
+		return new FileNode(childUUID);
+	}
+
 	/**
 	 * Renderer for the nodes in the tree
 	 * 

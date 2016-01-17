@@ -7,21 +7,31 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
+import shared.FileTree;
+import shared.FileTree.DirectoryNode;
+import shared.FileTree.FileNode;
 import shared.FileTree.ProjectNode;
 
 /**
@@ -37,6 +47,7 @@ public class EditorToolbar extends JToolBar {
 	private JPopupMenu	popup;
 	private JMenuItem	createProjectButton;
 	private JMenuItem	renameProjectButton;
+	private EditPane	editPane;
 
 	/**
 	 * Creates a new EditorToolbar
@@ -48,6 +59,7 @@ public class EditorToolbar extends JToolBar {
 		// Swing setup
 		setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		setBorder(FlowClient.EMPTY_BORDER);
+		this.editPane = pane;
 
 		// Creates the project options dialog
 		popup = new JPopupMenu("Project Management");
@@ -344,9 +356,96 @@ public class EditorToolbar extends JToolBar {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO pop open a window for the user to first select a
-					// file, then to choose the project to insert it in
-					System.out.println("Import button pressed");
+					// Gets the node to put the file under
+					DefaultMutableTreeNode selectedDir = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					if (selectedDir == null || !(selectedDir instanceof DirectoryNode)) {
+						JOptionPane.showConfirmDialog(null, "Please select a directory to place your imported file under", "Select a directory first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					UUID dirUUID = ((DirectoryNode) selectedDir).getDirectoryUUID();
+
+					// Opens a file chooser to get new file
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+
+						@Override
+						public String getDescription() {
+							return "Only .JAVA or .TXT files (for now)";
+						}
+
+						@Override
+						public boolean accept(File f) {
+							String name = f.getName();
+							return name.endsWith(".java") || name.endsWith(".txt");
+						}
+					});
+					fileChooser.setDialogTitle("Select file to import...");
+					File importFile;
+					if (fileChooser.showOpenDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
+						importFile = fileChooser.getSelectedFile();
+					} else {
+						return;
+					}
+
+					// Asks server to create new file
+					Data createFileRequest = new Data("new_text_file");
+					createFileRequest.put("session_id", Communicator.getSessionID());
+					createFileRequest.put("file_name", importFile.getName());
+					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
+					createFileRequest.put("project_uuid", projectUUID);
+					createFileRequest.put("directory_uuid", dirUUID);
+					Data response = Communicator.communicate(createFileRequest);
+					switch (response.get("status", String.class)) {
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
+
+						case "OK":
+							break;
+
+						default:
+							JOptionPane.showConfirmDialog(null, "There was an error importing your file.\nTry a force refresh on the documents tree by Alt + clicking it.", "Import error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
+					}
+
+					// Gets the file contents into a String
+					String fileContents = "";
+					BufferedReader br;
+					try {
+						br = new BufferedReader(new FileReader(importFile));
+						String line;
+						while ((line = br.readLine()) != null) {
+							fileContents += line;
+						}
+						br.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						return;
+					}
+
+					// Writes file contents to server
+					Data modify = new Data("file_text_modify");
+					modify.put("file_uuid", response.get("file_uuid", UUID.class));
+					modify.put("session_id", Communicator.getSessionID());
+					modify.put("mod_type", "INSERT");
+					modify.put("idx", fileContents.length());
+					modify.put("str", fileContents);
+					Data modifyResponse = Communicator.communicate(modify);
+					switch (modifyResponse.get("status", String.class)) {
+						case "OK":
+							break;
+
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
+
+						default:
+							return;
+					}
+
+					// Inserts a new child node
+					FileTree.FileNode child = editPane.getFileTree().generateFileNode(response.get("file_uuid", UUID.class));
+					((DefaultTreeModel) editPane.getFileTree().getModel()).insertNodeInto(child, selectedDir, selectedDir.getChildCount());
 				}
 			});
 		}
@@ -377,9 +476,79 @@ public class EditorToolbar extends JToolBar {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO pop open a window asking where the user would like
-					// the file exported, then export file to that location.
-					System.out.println("Export button pressed");
+					// Gets the source for export
+					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					if (selected == null || !(selected instanceof FileNode)) {
+						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					FileNode node = (FileNode) selected;
+
+					// Gets the export contents
+					Data getFileContents = new Data("file_request");
+					getFileContents.put("session_id", Communicator.getSessionID());
+					getFileContents.put("file_uuid", node.getFileUUID());
+					Data reply = Communicator.communicate(getFileContents);
+					switch (reply.get("status", String.class)) {
+						case "OK":
+							break;
+
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
+
+						default:
+							return;
+					}
+					String fileConts = new String(reply.get("file_data", byte[].class));
+
+					// Gets the name of the export file
+					Data getFileName = new Data("file_info");
+					getFileName.put("session_id", Communicator.getSessionID());
+					getFileName.put("file_uuid", node.getFileUUID());
+					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
+					
+					// Checks. Makes it a txt by default.
+					boolean valid = true;
+					int dotIdx = fileName.lastIndexOf('.');
+					if (dotIdx == -1)
+						valid = false;
+					if (!valid) {
+						fileName += ".txt";
+					}
+
+					// Gets the user to choose the destination
+					JFileChooser destChooser = new JFileChooser();
+					destChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					destChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+					destChooser.setDialogTitle("Choose export destination");
+					String dest;
+					if (destChooser.showSaveDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
+						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
+					} else {
+						return;
+					}
+					File outFile = new File(dest);
+
+					// Writes it into the destination TODO (this may be the cause of the errors)
+					try {
+						if (!outFile.createNewFile()) {
+							JOptionPane.showConfirmDialog(null, "Could not export. Are you sure you have permissions to the destination folder?", "Could not export", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+
+						FileWriter fw = new FileWriter(outFile);
+						
+						// Cleans up
+						fw.write(fileConts);
+						fw.close();
+
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					// Shows confirmation
+					JOptionPane.showConfirmDialog(null, "Finished exporting file " + fileName + " to " + dest, "Done!", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
