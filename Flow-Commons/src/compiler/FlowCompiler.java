@@ -2,13 +2,11 @@ package compiler;
 
 import struct.VersionText;
 
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.tools.*;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -23,7 +21,7 @@ import java.util.logging.Logger;
 public class FlowCompiler {
 
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
-    private VersionText[] versionTexts;
+    private CompilableText[] versionTexts;
     private UUID dirUUID;
     private File workingDirectory;
 
@@ -32,13 +30,11 @@ public class FlowCompiler {
      *
      * @param doc The textDocuments to compile
      */
-    public FlowCompiler(VersionText... doc) {
+    public FlowCompiler(CompilableText... doc) {
         this.versionTexts = doc;
         this.dirUUID = UUID.randomUUID();
         this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
-
-        throw new UnsupportedOperationException();
     }
 
     protected static String removeExtension(String s) {
@@ -63,42 +59,38 @@ public class FlowCompiler {
      * @throws IOException when files cannot be written
      */
     public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
-        /*
-        L.info("Found working directory of " + workingDirectory.getAbsolutePath());
+        L.info("found working directory of " + workingDirectory.getAbsolutePath());
         ArrayList<File> paths = new ArrayList<>();
         if (!workingDirectory.exists()) {
             workingDirectory.mkdir();
-            L.info("Working directory did not exist, created it");
+            L.info("working directory did not exist, created it");
         }
-        L.info(textDocuments.length + " textDocuments queued for compilation");
-        for (TextDocument doc : textDocuments) {
-            if (doc.getParentFile() == null)
-                throw new IllegalArgumentException("Compiler contains a text document without link to file reference!");
-
-            File tempPath = new File(workingDirectory.getAbsolutePath() + File.separator + doc.getParentFile().getParentDirectory().getFullyQualifiedPath() + File.separator + doc.getParentFile().getFileName());
+        L.info(versionTexts.length + " textdocuments queued for compilation");
+        for (CompilableText doc : versionTexts) {
+            File tempPath = new File(workingDirectory.getAbsolutePath(), doc.getFullPath());
             if (tempPath.getParentFile().mkdirs()) {
-                L.info("Directory " + tempPath.getParent() + " did not exist, created!");
+                L.info("directory " + tempPath.getParent() + " did not exist, created!");
             }
             paths.add(tempPath);
             PrintStream ps = new PrintStream(tempPath);
             ps.println(doc.getDocumentText());
             ps.close();
-            L.info("Wrote " + doc.getParentFile().getFileName() + " to temporary path of " + tempPath.getAbsolutePath());
+            L.info("wrote " + doc.getName() + " to temporary path of " + tempPath.getAbsolutePath());
         }
-
+        System.out.println(paths);
         try {
-            L.info("Setting up compilation diagnostics and compiler");
+            L.info("setting up compilation diagnostics and compiler");
             DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 
-            L.info("Setting up cmd arguments for compiler");
+            L.info("setting up cmd arguments for compiler");
             List<String> optionList = new ArrayList<>();
             optionList.add("-g"); // FOR THE DEBUGGER
             optionList.add("-classpath");
             optionList.add(workingDirectory.getAbsolutePath());
 
-            L.info("Setting up compilation task");
+            L.info("setting up compilation task");
             Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(paths);
             JavaCompiler.CompilationTask task = compiler.getTask(
                     null,
@@ -108,38 +100,36 @@ public class FlowCompiler {
                     null,
                     compilationUnit);
 
-            L.info("Calling compilation task");
+            L.info("calling compilation task");
             if (task.call()) {
-                L.info("Compilation success!");
+                L.info("compilation success!");
             } else {
-                L.severe("Failed to compile!");
+                L.severe("failed to compile!");
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    L.severe(String.format("Error on line %d in %s: %s", diagnostic.getLineNumber(), diagnostic.getSource().toUri(), diagnostic.getMessage(Locale.getDefault())));
+                    L.severe(String.format("error on line %d in %s: %s", diagnostic.getLineNumber(), diagnostic.getSource().toUri(), diagnostic.getMessage(Locale.getDefault())));
                 }
                 return diagnostics.getDiagnostics();
             }
             fileManager.close();
         } catch (Exception e) {
-            L.severe("Exception occurred while compiling!");
+            L.severe("exception occurred while compiling!");
             L.severe(e.getMessage());
-        }*/
+        }
         return null;
     }
 
     public Process execute() throws IOException {
-        /* TODO actually fix this, instead of commenting it out to remove the error
-        String remotePath = (textDocuments[0].getParentFile().getRemotePath() == "" ? "" : textDocuments[0].getParentFile().getRemotePath() + "/") // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
-                + removeExtension(textDocuments[0].getParentFile().getRemoteName());
-        L.info("Assuming main class is " + remotePath);
-        ProcessBuilder pb = new ProcessBuilder("java", "-cp", workingDirectory.getAbsolutePath(), remotePath);
-        L.info("Execution arguments are: " + pb.command().toString());
+        String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/") // YOU MUST USE A FORWARD SLASH HERE OR ELSE IT WON'T WORK
+                + removeExtension(versionTexts[0].getFullPath());
+        L.info("assuming main class is " + remotePath);
+        ProcessBuilder pb = new ProcessBuilder("java", "-cp", "\"" + workingDirectory.getAbsolutePath() + "\"", remotePath);
+        L.info("execution arguments are: " + pb.command().toString());
         Process p = pb.start();
-        return p;*/
-        return null;
+        return p;
     }
 
     public String readAllOutput() throws IOException {
-        L.info("Reading all output of execution");
+        L.info("reading all output of execution");
         String str = "";
         Process p = this.execute();
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));

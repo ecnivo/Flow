@@ -1,7 +1,5 @@
 package compiler;
 
-import struct.VersionText;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +17,7 @@ public class Debugger {
     private BufferedReader in;
     private PrintStream out;
 
-    public Debugger(VersionText... flowFiles) {
+    public Debugger(CompilableText... flowFiles) {
         this.flowCompiler = new FlowCompiler(flowFiles);
         this.workingDirectory = flowCompiler.getWorkingDirectory();
         throw new UnsupportedOperationException(); // FIXME: 12/30/2015

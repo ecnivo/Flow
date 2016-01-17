@@ -13,6 +13,9 @@ public class VersionText implements Serializable {
         this.text = "";
     }
 
+    public VersionText(String text) {
+        this.text = text;
+    }
     /**
      * Insert a character at line number at index
      *
