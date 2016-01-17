@@ -245,12 +245,6 @@ public class ClientRequestHandle implements Runnable {
 							projectUUID.toString(), SQLDatabase.OWNER)) {
 						switch (data.get("project_modify_type", String.class)) {
 						case "MODIFY_COLLABORATOR":
-							ResultSet sessionInfo = null;
-							sessionInfo = this.database.getSessionInfo(
-									data.get("session_id").toString());
-							sessionInfo.next();
-							// TODO something is not right with this session
-							// check
 							String username = data.get("username",
 									String.class);
 							returnData.put("status",
@@ -258,7 +252,6 @@ public class ClientRequestHandle implements Runnable {
 											(int) data.get("access_level",
 													Byte.class),
 									projectUUID.toString(), username));
-
 							break;
 						case "RENAME_PROJECT": {
 							String newName = data.get("new_name", String.class);
@@ -278,9 +271,6 @@ public class ClientRequestHandle implements Runnable {
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
-				} catch (SQLException e) {
-					e.printStackTrace();
-					returnData.put("status", FlowServer.ERROR);
 				}
 			}
 				break;
