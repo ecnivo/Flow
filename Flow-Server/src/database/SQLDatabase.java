@@ -153,7 +153,9 @@ public class SQLDatabase {
 	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
 			String username) throws DatabaseException {
 		try {
-			ResultSet data = this.getProjectInfo(projectUUID);
+			ResultSet data = this.query(String.format(
+					"SELECT ProjectID FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
 			if (data.next()) {
 				if (accessLevel == OWNER
 						|| username.equals(data.getString("OwnerUsername"))) {
