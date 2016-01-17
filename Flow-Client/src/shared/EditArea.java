@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -119,9 +120,17 @@ public class EditArea extends JTextPane {
 		carets = new ArrayList<UserCaret>();
 		String[] editors = editorListData.get("editors", String[].class);
 		for (String userName : editors) {
-			UserCaret caret = new UserCaret(userName, this);
-			add(caret);
-			carets.add(caret);
+			if (!userName.equals(Communicator.getUsername())) {
+				UserCaret caret = new UserCaret(userName, this);
+				add(caret);
+				carets.add(caret);
+			}
+		}
+		String ownerName = editorListData.get("owner", String.class);
+		if (!ownerName.equals(Communicator.getUsername())) {
+			UserCaret ownerCaret = new UserCaret(ownerName, this);
+			add(ownerCaret);
+			carets.add(ownerCaret);
 		}
 
 		// Creates styles for each of the syntax highlighting items
@@ -325,6 +334,7 @@ public class EditArea extends JTextPane {
 					case MOVE:
 						UserCaret caret = getCaretByUserName(e.USERNAME);
 						if (caret == null) {
+							System.out.println("caret not found");
 							return;
 						}
 						Rectangle rectangle = null;
@@ -334,6 +344,7 @@ public class EditArea extends JTextPane {
 							e1.printStackTrace();
 							return;
 						}
+						System.out.println(caret + " was moved to " + rectangle.getLocation());
 						caret.moveTo(rectangle.getLocation());
 						repaint();
 
@@ -394,6 +405,7 @@ public class EditArea extends JTextPane {
 	 * @return the caret that corresponds with the name. Returns null if not found.
 	 */
 	private UserCaret getCaretByUserName(String name) {
+		System.out.println(carets);
 		name = name.trim();
 		for (UserCaret userCaret : carets) {
 			if (userCaret.toString().equals(name)) {
@@ -407,6 +419,7 @@ public class EditArea extends JTextPane {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		Point mouse = getMousePosition();
 		for (UserCaret userCaret : carets) {
 			g2d.setColor(userCaret.getColor());
 			g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret.getLocation().getY(), 3, 17);

@@ -46,22 +46,22 @@ public class UserCaret extends JComponent {
 		location = new Point(0, 0);
 
 		// Sets a colour
-		int red = (int) (Math.random() * 150) + 30;
-		int green = (int) (Math.random() * 150) + 30;
-		int blue = (int) (Math.random() * 150) + 30;
+		int red = (int) (Math.random() * 150) + 35;
+		int green = (int) (Math.random() * 150) + 35;
+		int blue = (int) (Math.random() * 150) + 35;
 
 		// Makes the colour differential greater
 		switch ((int) (Math.random() * 3)) {
 			case 0:
-				red -= 15;
+				red -= 20;
 				break;
 
 			case 1:
-				green -= 15;
+				green -= 20;
 				break;
 
 			case 2:
-				blue -= 15;
+				blue -= 20;
 				break;
 		}
 		userColor = new Color(red, green, blue, 225);

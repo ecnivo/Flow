@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,7 +100,9 @@ public class RunStopBar extends JToolBar {
 
 	/**
 	 * Sets edit tabs as necessary
-	 * @param tabs the new edit tabs
+	 * 
+	 * @param tabs
+	 *        the new edit tabs
 	 */
 	public void setEditTabs(EditTabs tabs) {
 		editTabs = tabs;
@@ -109,6 +110,7 @@ public class RunStopBar extends JToolBar {
 
 	/**
 	 * Runs a file
+	 * 
 	 * @author Vince Ou
 	 *
 	 */
@@ -116,9 +118,11 @@ public class RunStopBar extends JToolBar {
 
 		/**
 		 * Creates a new RunButton
-		 * @param console the affiliated console
+		 * 
+		 * @param console
+		 *        the affiliated console
 		 */
-		public RunButton(GenericConsole console){
+		public RunButton(GenericConsole console) {
 			// swing stuff
 			setToolTipText("Compiles, then runs the file currently open in the editor");
 			setBorder(FlowClient.EMPTY_BORDER);
@@ -138,7 +142,7 @@ public class RunStopBar extends JToolBar {
 					// When the button is pressed
 					if (editTabs == null) {
 						return;
-					}
+					}/*
 					// Create a compiler
 					FlowCompiler flowCompiler = new FlowCompiler(getFiles(((EditArea) editTabs.getSelectedComponent()).getProjectUUID()));
 					// Try to build and execute it
@@ -151,7 +155,7 @@ public class RunStopBar extends JToolBar {
 						JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					System.out.println("Run button pressed");
+					System.out.println("Run button pressed");*/
 				}
 			});
 		}
@@ -159,6 +163,7 @@ public class RunStopBar extends JToolBar {
 
 	/**
 	 * Button to stop code execution
+	 * 
 	 * @author Vince
 	 *
 	 */
@@ -166,7 +171,9 @@ public class RunStopBar extends JToolBar {
 
 		/**
 		 * Creates a new StopButton
-		 * @param console the console to stop
+		 * 
+		 * @param console
+		 *        the console to stop
 		 */
 		public StopButton(GenericConsole console) {
 			// Swing stuff (incl. setting icon)
