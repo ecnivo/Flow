@@ -259,6 +259,8 @@ public class EditArea extends JTextPane {
 				int caretPos = e.getDot();
 				Data caretPosChange = new Data("file_text_modify");
 				caretPosChange.put("session_id", Communicator.getSessionID());
+				caretPosChange.put("file_uuid", fileUUID);
+				caretPosChange.put("mod_type", "MOVE");
 				caretPosChange.put("idx", caretPos);
 				Communicator.communicate(caretPosChange);
 			}
@@ -297,7 +299,7 @@ public class EditArea extends JTextPane {
 						e1.printStackTrace();
 					}
 				}
-
+				highlightSyntax();
 			}
 
 		}, fileUUID);
@@ -400,8 +402,8 @@ public class EditArea extends JTextPane {
 		int lines = 0;
 		for (int pos = 0; pos < sourceLength; pos++) {
 			// First tries to find words
-			if (!Character.isAlphabetic(sourceCode.charAt(pos)) || pos == 0) {
-				int end = nextNonAlphabetic(sourceCode, pos);
+			if (Character.isLetter(sourceCode.charAt(pos)) || pos == 0) {
+				int end = nextNonLetter(sourceCode, pos);
 				if (end >= 0 || (pos == 0 && end == -1)) {
 					String candidate = sourceCode.substring(pos, end);
 					// If the word is in the array, then it's placed in a new StyleBlock
@@ -522,11 +524,11 @@ public class EditArea extends JTextPane {
 	 *        the index to start from
 	 * @return the index (-1 if none)
 	 */
-	private int nextNonAlphabetic(String sourceCode, int idx) {
+	private int nextNonLetter(String sourceCode, int idx) {
 		int sourceCodeLength = sourceCode.length();
 		do {
 			idx++;
-		} while (idx < sourceCodeLength - 1 && Character.isAlphabetic(sourceCode.charAt(idx)));
+		} while (idx < sourceCodeLength - 1 && Character.isLetter(sourceCode.charAt(idx)));
 		return idx;
 	}
 
