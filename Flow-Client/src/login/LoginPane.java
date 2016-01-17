@@ -2,15 +2,31 @@
 package login;
 
 import gui.PanelManager;
-import message.Data;
-import shared.Communicator;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+
+import message.Data;
+import shared.Communicator;
 
 /**
  * The pane for the user to enter their credentials to log in with
@@ -150,55 +166,58 @@ public class LoginPane extends JPanel {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-					// Usernames are limited to 16 characters
-					if (usernameEntry.getText().trim().length() > 16) {
-						JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-						return;
-					} else if (usernameEntry.getText().trim().equals("Username")) {
-						JOptionPane.showConfirmDialog(null, "Please enter a username.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-						return;
-					}
+				// Usernames are limited to 16 characters
+				if (usernameEntry.getText().trim().length() > 16) {
+					JOptionPane.showConfirmDialog(null, "The username is too long.\nUsernames have a limit of 16 characters.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				} else if (usernameEntry.getText().trim().equals("Username")) {
+					JOptionPane.showConfirmDialog(null, "Please enter a username.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 
-					// Creates a message to the server
-					Data usernamePass = new Data("login");
-					usernamePass.put("username", usernameEntry.getText().trim());
-					usernamePass.put("password", String.copyValueOf(passwordEntry.getPassword()));
+				// Creates a message to the server
+				Data usernamePass = new Data("login");
+				usernamePass.put("username", usernameEntry.getText().trim());
+				usernamePass.put("password", String.copyValueOf(passwordEntry.getPassword()));
 
-					// Checks if server is online
-					Data reply = Communicator.communicate(usernamePass);
-					if (reply == null) {
-						JOptionPane.showConfirmDialog(null, "The server is currently offline. Please try again at another time.", "Server under maintenance", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+				// Checks if server is online
+				Data reply = Communicator.communicate(usernamePass);
+				if (reply == null) {
+					JOptionPane.showConfirmDialog(null, "The server is currently offline. Please try again at another time.", "Server under maintenance", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				// If the server can be contacted...
+				String status = reply.get("status", String.class);
+				switch (status) {
+				// Failure cases
+					case "USERNAME_DOES_NOT_EXIST":
+						JOptionPane.showConfirmDialog(null, "The username does not exist.\nPlease enter a username that is valid, or create a new account.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
-					}
-					// If the server can be contacted...
-					String status = reply.get("status", String.class);
-					switch (status) {
-					// Failure cases
-						case "USERNAME_DOES_NOT_EXIST":
-							JOptionPane.showConfirmDialog(null, "The username does not exist.\nPlease enter a username that is valid, or create a new account.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-							return;
-						case "PASSWORD_INCORRECT":
-							JOptionPane.showConfirmDialog(null, "Whoops! Your password does not match the one we don't have. Try again.", "Incorrect password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-							return;
-						case "INVALID_CREDENTIALS":
-							JOptionPane.showConfirmDialog(null, "Whoops! Your Your credentials are incorrect.\nTry again.", "Invalid credentials", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-							return;
-							// Success case
-						case "OK":
-							// Switching, clearing, and resetting UI
-							LoginPane.this.panMan.switchToEditor();
-							UUID sessionID = reply.get("session_id", UUID.class);
-							Communicator.setSessionID(sessionID);
-							Communicator.initAsync(sessionID);
-							LoginPane.this.panMan.getEditPane().getFileTree().refreshProjectList();
-							LoginPane.this.panMan.getEditPane().getFileTree().expandRow(0);
-							LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();
-							LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
-							Communicator.setUsername(usernameEntry.getText().trim());
-							return;
-						default:
-							return;
-					}
+					case "PASSWORD_INCORRECT":
+						JOptionPane.showConfirmDialog(null, "Whoops! Your password does not match the one we don't have. Try again.", "Incorrect password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					case "INVALID_CREDENTIALS":
+						JOptionPane.showConfirmDialog(null, "Whoops! Your Your credentials are incorrect.\nTry again.", "Invalid credentials", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+					case "USER_ALREADY_LOGGED_IN":
+						JOptionPane.showConfirmDialog(null, "You are logged into your Flow account from another computer.\nPlease log out of that account before you try to log in here.", "Simultaneous logins are not supported", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						return;
+						// Success case
+					case "OK":
+						// Switching, clearing, and resetting UI
+						LoginPane.this.panMan.switchToEditor();
+						UUID sessionID = reply.get("session_id", UUID.class);
+						Communicator.setSessionID(sessionID);
+						Communicator.initAsync(sessionID);
+						LoginPane.this.panMan.getEditPane().getFileTree().refreshProjectList();
+						LoginPane.this.panMan.getEditPane().getFileTree().expandRow(0);
+						LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();
+						LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
+						Communicator.setUsername(usernameEntry.getText().trim());
+						return;
+					default:
+						return;
+				}
 			}
 		});
 	}

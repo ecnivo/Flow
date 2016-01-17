@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -110,7 +109,11 @@ public class EditorToolbar extends JToolBar {
 				if (path == null) {
 					return;
 				}
-				ProjectNode selectedNode = (ProjectNode) path.getPath()[1];
+				Object[] pathArray = path.getPath();
+				if (pathArray == null) {
+					return;
+				}
+				ProjectNode selectedNode = (ProjectNode) pathArray[1];
 
 				// Asks user for new name
 				String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + selectedNode.getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE);

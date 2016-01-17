@@ -405,7 +405,6 @@ public class EditArea extends JTextPane {
 	 * @return the caret that corresponds with the name. Returns null if not found.
 	 */
 	private UserCaret getCaretByUserName(String name) {
-		System.out.println(carets);
 		name = name.trim();
 		for (UserCaret userCaret : carets) {
 			if (userCaret.toString().equals(name)) {
@@ -504,57 +503,37 @@ public class EditArea extends JTextPane {
 			}
 		}
 
-		// Then finds quotes (With escaped quote support!)
-		lines = 0;
-		for (int pos = 0; pos < sourceLength; pos++) {
-			// Tries to find double quotes
-			if (sourceCode.charAt(pos) == '"') {
-				boolean escaped;
-				if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
-					escaped = false;
-				} else {
-					escaped = true;
+		// Finds the strings
+		String sourceString = sourceCode.replace("\n", "");
+		System.out.println(sourceString);
+		for (int startQuote = 0; startQuote < sourceString.length(); startQuote++) {
+			if (sourceString.charAt(startQuote) == '"') {
+				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\') {
 					continue;
 				}
-				if (!escaped) {
-					int closeQuote = sourceCode.indexOf('"', pos + 1);
 
-					while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
-						closeQuote = sourceCode.indexOf('"', closeQuote + 1);
-					}
-					if (closeQuote < 0) {
-						continue;
-					}
-					// Adds the block when it's found
-					stringBlocks.add(new StyleBlock(closeQuote + 1 - pos + lines, pos - lines));
-					pos = closeQuote;
+				int endQuote = startQuote + 1;
+				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '"' && sourceString.charAt(endQuote - 1) != '\\') {
+					endQuote++;
 				}
-			}
-			// ... or single quotes
-			else if (sourceCode.charAt(pos) == '\'') {
-				boolean escaped;
-				if ((pos > 0 && sourceCode.charAt(pos - 1) != '\\') || pos == 0) {
-					escaped = false;
-				} else {
-					escaped = true;
+				if (endQuote == sourceString.length()) {
 					continue;
 				}
-				if (!escaped) {
-					int closeQuote = sourceCode.indexOf('\'', pos + 1);
-					while (closeQuote > 0 && sourceCode.charAt(closeQuote - 1) == '\\') {
-						closeQuote = sourceCode.indexOf('\'', closeQuote + 1);
-					}
-					if (closeQuote < 0) {
-						continue;
-					}
-					// Adds the block when found
-					stringBlocks.add(new StyleBlock(closeQuote + 1 - pos + lines, pos - lines));
-					pos = closeQuote;
+				stringBlocks.add(new StyleBlock(endQuote - startQuote, startQuote));
+				startQuote = endQuote;
+			} else if (sourceString.charAt(startQuote) == '\'') {
+				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\')
+					continue;
+
+				int endQuote = startQuote + 1;
+				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '\'' && sourceString.charAt(endQuote - 1) != '\\') {
+					endQuote++;
 				}
-			}
-			// Same deal with line counting
-			else if (sourceCode.charAt(pos) == '\n') {
-				lines++;
+				if (endQuote == sourceString.length()) {
+					continue;
+				}
+				stringBlocks.add(new StyleBlock(endQuote - startQuote, startQuote));
+				startQuote = endQuote;
 			}
 		}
 

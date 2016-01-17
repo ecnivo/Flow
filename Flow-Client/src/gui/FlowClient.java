@@ -1,15 +1,20 @@
 
 package gui;
 
-import message.Data;
-import shared.Communicator;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+
+import message.Data;
+import shared.Communicator;
 
 /**
  * The Main/Client program
@@ -47,7 +52,6 @@ public class FlowClient extends JFrame {
 		// Sets up communications with the server
 		Communicator.initComms(HOST, PORT);
 
-
 		// Creates a new PanelManager
 		manager = new PanelManager(this);
 		this.add(manager);
@@ -68,7 +72,6 @@ public class FlowClient extends JFrame {
 				Communicator.killAsync();
 				logOff.put("session_id", sessionID);
 				Communicator.communicate(logOff);
-
 			}
 		}));
 		this.setSize((int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() * 0.8), (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.8));
@@ -90,7 +93,7 @@ public class FlowClient extends JFrame {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		new FlowClient();
 	}
-	
+
 	public void resetUI() {
 		this.remove(manager);
 		manager = new PanelManager(this);
