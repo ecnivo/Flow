@@ -26,4 +26,10 @@ public class DocumentCallbackEvent extends CallbackEvent {
         INSERT,
         DELETE
     }
+
+    @Override
+    public String toString() {
+        return String.format("type=%s;username=%s;index=%d;addition=%s;removal_length=%d",
+                TYPE, USERNAME, INDEX, ADDITION, REMOVAL_LENGTH);
+    }
 }
