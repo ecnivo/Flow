@@ -197,7 +197,7 @@ public class CollabsList extends JPanel {
 		});
 		// Sets the search button icon
 		try {
-			searchButton.setIcon(new ImageIcon(ImageIO.read(new File("images/addCollab.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE - 3, FlowClient.BUTTON_ICON_SIZE - 3, Image.SCALE_SMOOTH)));
+			searchButton.setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/addCollab.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE - 3, FlowClient.BUTTON_ICON_SIZE - 3, Image.SCALE_SMOOTH)));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

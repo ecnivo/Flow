@@ -247,7 +247,7 @@ public class EditorToolbar extends JToolBar {
 		private SearchButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/search.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/search.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -281,7 +281,7 @@ public class EditorToolbar extends JToolBar {
 		private ProjectManageButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/projectManage.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/projectManage.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -314,7 +314,7 @@ public class EditorToolbar extends JToolBar {
 		private ImportButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/import.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/import.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -346,7 +346,7 @@ public class EditorToolbar extends JToolBar {
 		private ExportButton() {
 			// Sets the icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/export.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/export.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

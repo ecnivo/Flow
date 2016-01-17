@@ -124,7 +124,7 @@ public class RunStopBar extends JToolBar {
 			setBorder(FlowClient.EMPTY_BORDER);
 			// Sets icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/run.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/run.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -173,7 +173,7 @@ public class RunStopBar extends JToolBar {
 			setToolTipText("Stops the currently running program");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/stop.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/stop.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

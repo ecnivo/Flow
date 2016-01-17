@@ -147,7 +147,7 @@ public class EditTabs extends JTabbedPane {
 			// Sets an icon
 			ImageIcon icon = null;
 			try {
-				icon = new ImageIcon(ImageIO.read(new File("images/file.png")).getScaledInstance(TAB_ICON_SIZE, TAB_ICON_SIZE, Image.SCALE_SMOOTH));
+				icon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/file.png")).getScaledInstance(TAB_ICON_SIZE, TAB_ICON_SIZE, Image.SCALE_SMOOTH));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

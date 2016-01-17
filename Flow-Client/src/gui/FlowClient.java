@@ -45,7 +45,7 @@ public class FlowClient extends JFrame {
 
 		// sets the icon in the task bar
 		try {
-			this.setIconImage(ImageIO.read(new File("images/icon.png")));
+			this.setIconImage(ImageIO.read(ClassLoader.getSystemResource("images/icon.png")));
 		} catch (IOException e) {
 			JOptionPane.showConfirmDialog(this, "Window icon not found", "Missing Image", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		}

@@ -67,7 +67,7 @@ public class VersionViewer extends JPanel {
 		scrolling.getVerticalScrollBar().setUnitIncrement(FlowClient.SCROLL_SPEED);
 		// Sets icon
 		try {
-			middle = new ImageIcon(ImageIO.read(new File("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+			middle = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/middleVersion.png")).getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

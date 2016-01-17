@@ -504,11 +504,11 @@ public abstract class FileTree extends JTree {
 			this.label = new JLabel();
 			// Sets images
 			try {
-				workspaceIcon = new ImageIcon(ImageIO.read(new File("images/workspace.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
-				projectIcon = new ImageIcon(ImageIO.read(new File("images/icon.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
-				directoryIcon = new ImageIcon(ImageIO.read(new File("images/folder.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
-				textDocumentIcon = new ImageIcon(ImageIO.read(new File("images/textDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
-				arbitraryFileIcon = new ImageIcon(ImageIO.read(new File("images/arbitDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+				workspaceIcon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/workspace.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+				projectIcon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/icon.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+				directoryIcon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/folder.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+				textDocumentIcon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/textDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
+				arbitraryFileIcon = new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/arbitDoc.png")).getScaledInstance(TREE_ICON_SIZE, TREE_ICON_SIZE, Image.SCALE_SMOOTH));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

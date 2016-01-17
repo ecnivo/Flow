@@ -58,7 +58,7 @@ public class DebugToolbar extends JToolBar {
 			setToolTipText("Start debugging the currently open tab");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/debug.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/debug.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -90,7 +90,7 @@ public class DebugToolbar extends JToolBar {
 		private StepInButton() {
 			setToolTipText("Step into the current method");
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/stepIn.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/stepIn.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -123,7 +123,7 @@ public class DebugToolbar extends JToolBar {
 		private StepOverButton() {
 			setToolTipText("Step over the highlighted method");
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/stepOver.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/stepOver.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -153,7 +153,7 @@ public class DebugToolbar extends JToolBar {
 		private StepOutButton() {
 			setToolTipText("Step out of (return) the current method");
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/stepOut.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/stepOut.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

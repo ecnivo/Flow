@@ -65,7 +65,7 @@ public class LoginPane extends JPanel {
 		title.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 		add(title);
 		try {
-			title.setIcon(new ImageIcon(ImageIO.read(new File("images/flow.png")).getScaledInstance(414, 128, Image.SCALE_SMOOTH)));
+			title.setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/flow.png")).getScaledInstance(414, 128, Image.SCALE_SMOOTH)));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

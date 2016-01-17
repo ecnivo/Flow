@@ -105,7 +105,7 @@ public class NavBar extends JToolBar {
 			setBorder(FlowClient.EMPTY_BORDER);
 			// Loads icon
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/editWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/editWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -134,7 +134,7 @@ public class NavBar extends JToolBar {
 			setToolTipText("Switch to the debug view");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/debugWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/debugWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -162,7 +162,7 @@ public class NavBar extends JToolBar {
 			setToolTipText("Switch to the version history view");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/historyWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/historyWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -193,7 +193,7 @@ public class NavBar extends JToolBar {
 			setToolTipText("Switch to the settings view");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(new File("images/settingsWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/settingsWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
