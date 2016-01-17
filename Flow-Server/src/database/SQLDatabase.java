@@ -33,7 +33,7 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public static final String BACKUP_DATABASE = "FlowDatabaseBackUp";
+	public static final String BACKUP_DATABASE = "FlowDatabseBackUp.db";
 
 	/**
 	 * Connection to the database.
@@ -54,16 +54,16 @@ public class SQLDatabase {
 					.println("Error loading database driver: " + e.toString());
 			return;
 		}
-		try {
-			this.connection = DriverManager
-					.getConnection("jdbc:sqlite:" + databaseName);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println(
-					"Error connecting to database located at: " + databaseName);
-		}
-		// if (this.checkDatabaseCorruption(databaseName, BACKUP_DATABASE))
-		// this.refreshDatabase();
+		// try {
+		// this.connection = DriverManager
+		// .getConnection("jdbc:sqlite:" + databaseName);
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// System.out.println(
+		// "Error connecting to database located at: " + databaseName);
+		// }
+		if (!this.checkDatabaseCorruption(databaseName, BACKUP_DATABASE))
+			this.refreshDatabase();
 		instance = this;
 	}
 
@@ -134,6 +134,11 @@ public class SQLDatabase {
 					this.update(String.format(
 							"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
 							username, projectId));
+
+					// Change permissions of old owner
+					this.update(String.format(
+							"UPDATE Access SET AccessLevel = '2' WHERE ProjectID = '%s' AND AccessLevel = '%d';",
+							projectId, OWNER));
 
 					// Changes the permissions of the user to be an owner
 					this.update("INSERT INTO access values('" + projectId
@@ -1248,82 +1253,86 @@ public class SQLDatabase {
 		}
 	}
 
-	// /**
-	// *
-	// * @return
-	// */
-	// public boolean checkDatabaseCorruption(String databaseName,
-	// String backUpDatabase) {
-	// try {
-	// this.connection = DriverManager
-	// .getConnection("jdbc:sqlite:" + backUpDatabase);
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// System.out.println("Error connecting to database located at: "
-	// + backUpDatabase);
-	// }
-	// ArrayList<String> tableNames = new ArrayList<>();
-	// ArrayList<ArrayList<String>> tableColumns = new ArrayList<>();
-	// try {
-	// DatabaseMetaData databaseMetaData = this.connection.getMetaData();
-	// ResultSet tables = databaseMetaData.getTables(null, null, "%",
-	// null);
-	// while (tables.next()) {
-	// tableNames.add(printAndReturn(tables.getString("TABLE_NAME")));
-	// }
-	// System.out.println("hi");
-	// for (String table : tableNames) {
-	// ResultSet tableInfo = databaseMetaData.getColumns(null, null,
-	// table, null);
-	// ArrayList<String> columnInfo = new ArrayList<>();
-	// while (tableInfo.next()) {
-	// columnInfo.add(
-	// printAndReturn(tableInfo.getString("COLUMN_NAME")));
-	// }
-	// tableColumns.add(columnInfo);
-	// }
-	// } catch (SQLException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// System.out.println(
-	// "Error loading database back up meta data: " + databaseName);
-	// }
-	// try {
-	// this.connection = DriverManager
-	// .getConnection("jdbc:sqlite:" + databaseName);
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// System.out.println(
-	// "Error connecting to database located at: " + databaseName);
-	// }
-	//
-	// try {
-	// DatabaseMetaData databaseMetaData = this.connection.getMetaData();
-	// for (String table : tableNames) {
-	// ResultSet tableInfo = databaseMetaData.getColumns(null, null,
-	// table, null);
-	// ArrayList<String> columnInfo = new ArrayList<>();
-	// while (tableInfo.next()) {
-	// columnInfo.add(
-	// printAndReturn(tableInfo.getString("COLUMN_NAME")));
-	// }
-	// tableColumns.add(columnInfo);
-	// }
-	// } catch (SQLException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// System.out.println(
-	// "Error loading database back up meta data: " + databaseName);
-	// }
-	// return true;
-	// }
-	//
-	// public static String printAndReturn(String word) {
-	// System.out.println(word);
-	// return word;
-	// }
-	//
-	// public void refreshDatabase() {
-	// System.err.println("DATABASE WIPED AND RELOADED");
-	// }
+	/**
+	 *
+	 * @return
+	 */
+	public boolean checkDatabaseCorruption(String databaseName,
+			String backUpDatabase) {
+		try {
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + backUpDatabase);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error connecting to database located at: "
+					+ backUpDatabase);
+		}
+		ArrayList<String> tableNames = new ArrayList<>();
+		ArrayList<ArrayList<String>> tableColumns = new ArrayList<>();
+		try {
+			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
+			ResultSet tables = databaseMetaData.getTables(null, null, "%",
+					null);
+			while (tables.next()) {
+				System.out.println("hi");
+				tableNames.add(printAndReturn(tables.getString("TABLE_NAME")));
+			}
+			System.out.println("hi");
+			for (String table : tableNames) {
+				ResultSet tableInfo = databaseMetaData.getColumns(null, null,
+						table, null);
+				ArrayList<String> columnInfo = new ArrayList<>();
+				while (tableInfo.next()) {
+					columnInfo.add(
+							printAndReturn(tableInfo.getString("COLUMN_NAME")));
+				}
+				tableColumns.add(columnInfo);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Error loading database back up meta data: "
+					+ databaseName);
+			return false;
+		}
+		try {
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + databaseName);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println(
+					"Error connecting to database located at: " + databaseName);
+			return false;
+		}
+
+		try {
+			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
+			for (int i = 0; i < tableNames.size(); i++) {
+				ResultSet tableInfo = databaseMetaData.getColumns(null, null,
+						tableNames.get(i), null);
+				ArrayList<String> columnInfo = tableColumns.get(i);
+				for (int j = 0; j < columnInfo.size(); j++) {
+					if (!columnInfo.get(j).equals(
+							printAndReturn(tableInfo.getString("COLUMN_NAME"))))
+						return false;
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(
+					"Error loading database meta data: " + databaseName);
+			return false;
+		}
+		return true;
+	}
+
+	public static String printAndReturn(String word) {
+		System.out.println(word);
+		return word;
+	}
+
+	public void refreshDatabase() {
+		System.err.println("DATABASE WIPED AND RELOADED");
+	}
 }
