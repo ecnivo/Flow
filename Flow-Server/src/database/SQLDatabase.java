@@ -34,8 +34,10 @@ public class SQLDatabase {
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
-	public static final String BACKUP_DATABASE = "backup" + File.separator
-			+ "FlowDatabse.db";
+	public static final String BACKUP_FOLDER = "backup", LIVE_FOLDER = "data";
+	public static final String BACKUP_DATABASE = BACKUP_FOLDER + File.separator
+			+ "FlowDatabse.db",
+			LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
 
 	/**
 	 * Connection to the database.
@@ -47,7 +49,7 @@ public class SQLDatabase {
 	 */
 	public static SQLDatabase instance;
 
-	public SQLDatabase(String databaseName) {
+	public SQLDatabase() {
 		try {
 			DriverManager.registerDriver(
 					(Driver) Class.forName(DRIVER).newInstance());
@@ -64,8 +66,8 @@ public class SQLDatabase {
 		// System.out.println(
 		// "Error connecting to database located at: " + databaseName);
 		// }
-		if (!this.checkDatabaseCorruption(databaseName, BACKUP_DATABASE))
-			this.refreshDatabase();
+		if (!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE))
+			this.recoverFileSystem(LIVE_DATABASE, BACKUP_DATABASE);
 		instance = this;
 	}
 
@@ -280,8 +282,8 @@ public class SQLDatabase {
 			String ownerId) {
 		try {
 			if (this.query(String.format(
-					"SELECT * FROM Projects WHERE ProjectName = '%s';",
-					projectName)).next()) {
+					"SELECT * FROM Projects WHERE ProjectName = '%s' and OwnerUsername = '%s';",
+					projectName, ownerId)).next()) {
 				return "PROJECT_NAME_INVALID";
 			}
 			this.update(String.format(
@@ -1264,7 +1266,7 @@ public class SQLDatabase {
 	 *
 	 * @return
 	 */
-	public boolean checkDatabaseCorruption(String databaseName,
+	public boolean checkForDatabaseCorruption(String databaseName,
 			String backUpDatabase) {
 		try {
 			this.connection = DriverManager
@@ -1281,10 +1283,8 @@ public class SQLDatabase {
 			ResultSet tables = databaseMetaData.getTables(null, null, "%",
 					null);
 			while (tables.next()) {
-				System.out.println("hi");
 				tableNames.add(printAndReturn(tables.getString("TABLE_NAME")));
 			}
-			System.out.println("hi");
 			for (String table : tableNames) {
 				ResultSet tableInfo = databaseMetaData.getColumns(null, null,
 						table, null);
@@ -1311,8 +1311,6 @@ public class SQLDatabase {
 					"Error connecting to database located at: " + databaseName);
 			return false;
 		}
-
-		System.out.println("hi");
 
 		try {
 			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
@@ -1343,12 +1341,33 @@ public class SQLDatabase {
 		return true;
 	}
 
+	public void recoverFileSystem(String corruptFileSystem,
+			String backUpFileSystem) {
+		//this.deleteFileSystemDirectory(new File(corruptFileSystem));
+		//this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
+		System.err.println("DATABASE WIPED AND RELOADED");
+	}
+
+	private void deleteFileSystemDirectory(File file) {
+		File[] contents = file.listFiles();
+		if (contents != null) {
+			for (File tempFile : contents) {
+				deleteFileSystemDirectory(tempFile);
+			}
+		}
+		file.delete();
+	}
+
+	private void copyFileSystem(File backup, File live) {
+		if (!live.exists())
+			live.mkdirs();
+		if (backup.isDirectory()) {
+
+		}
+	}
+
 	public static String printAndReturn(String word) {
 		System.out.println(word);
 		return word;
-	}
-
-	public void refreshDatabase() {
-		System.err.println("DATABASE WIPED AND RELOADED");
 	}
 }

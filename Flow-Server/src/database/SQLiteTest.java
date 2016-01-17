@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class SQLiteTest {
 
 	public static void main(String[] args) throws SQLException, IOException {
-		SQLDatabase database = new SQLDatabase("data/flow-database");
+		SQLDatabase database = new SQLDatabase();
 
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(System.in));

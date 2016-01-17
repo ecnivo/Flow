@@ -38,7 +38,7 @@ public class FlowServer implements Runnable {
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
 	public FlowServer() {
-		this.database = new SQLDatabase("data/FlowDatabse.db");
+		this.database = new SQLDatabase();
 		instance = this;
 	}
 
