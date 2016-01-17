@@ -250,7 +250,7 @@ public class ClientRequestHandle implements Runnable {
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
 							returnData.put("status",
-									this.database.updateAccess(accessLevel,
+									this.database.ownerUpdateAccess(accessLevel,
 											projectUUID.toString(), username));
 						} else if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
