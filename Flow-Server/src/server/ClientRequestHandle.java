@@ -1,5 +1,13 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -11,14 +19,6 @@ import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 import util.Validator;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
