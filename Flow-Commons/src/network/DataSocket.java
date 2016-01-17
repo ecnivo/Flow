@@ -52,7 +52,7 @@ public class DataSocket {
     /**
      * Receives a serializable over the network, auto cast, type infer
      *
-     * @param <T>   The type of the class of the serializable
+     * @param <T> The type of the class of the serializable
      * @return The serializable from the network
      * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote

@@ -34,11 +34,11 @@ public class EventPusher implements Runnable {
                 if (listener != null)
                     listener.onCallbackEvent(event);
                 else
-                    L.warning("server tried to send event that is unregistered!");
+                    L.warning("server tried to send event that is unregistered! this means something is wrong!");
 
             }
         } catch (Exception e) {
-            L.severe("error in event pusher");
+            L.severe("error in event pusher, this means something is very wrong!");
             e.printStackTrace();
         }
     }

@@ -30,7 +30,7 @@ public class VersionText implements Serializable {
     /**
      * Remove a character at line number at index
      *
-     * @param idx        The index of the character to delete, -1 to remove the line
+     * @param idx The index of the character to delete, -1 to remove the line
      * @return whether or not line count was affected by this operation
      */
     public boolean delete(int idx) {
