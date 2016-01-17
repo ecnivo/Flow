@@ -47,6 +47,8 @@ public abstract class DocTree extends JTree {
 	setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	setBorder(FlowClient.EMPTY_BORDER);
 	scrollView = new JScrollPane(this);
+	scrollView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	scrollView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Workspace")));
 	getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -181,7 +183,7 @@ public abstract class DocTree extends JTree {
 		((DefaultTreeModel) getModel()).insertNodeInto(new FileNode(childFileUUID), localDir, localDir.getChildCount());
 	    }
 	}
-	
+
 	expandRow(0);
     }
 

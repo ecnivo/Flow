@@ -79,7 +79,7 @@ public class EditPane extends JPanel {
 	treeAndButtons.setLeftComponent(buttonPanel);
 
 	tree = new EditorDocTree(this);
-	treeAndButtons.setRightComponent(tree);
+	treeAndButtons.setRightComponent(tree.getScrollable());
 	leftSide.setLeftComponent(treeAndButtons);
     }
 
