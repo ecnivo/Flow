@@ -120,7 +120,7 @@ public abstract class DocTree extends JTree {
 		    ((DefaultTreeModel) getModel()).removeNodeFromParent((MutableTreeNode) root.getChildAt(i));
 		}
 	    }
-	    ((DefaultTreeModel) getModel()).nodeChanged(root);
+	    // ((DefaultTreeModel) getModel()).nodeChanged(root);
 	    revalidate();
 	    repaint();
 	}
@@ -195,7 +195,7 @@ public abstract class DocTree extends JTree {
 	}
 
 	reloadProjectFilesRecursively(reloadedProject, projectNode);
-	((DefaultTreeModel) getModel()).nodeChanged(projectNode);
+	// ((DefaultTreeModel) getModel()).nodeChanged(projectNode);
     }
 
     private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {

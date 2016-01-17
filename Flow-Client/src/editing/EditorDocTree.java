@@ -75,9 +75,11 @@ public class EditorDocTree extends DocTree {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + ((DirectoryNode) getSelectionPath().getLastPathComponent()).getName() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		ProjectNode projectNode = null;
 		if (confirm == JOptionPane.YES_OPTION) {
 		    Data ddr = new Data("directory_modify");
 		    DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
+		    projectNode = (ProjectNode) selectedDir.getPath()[1];
 		    ddr.put("directory_uuid", selectedDir.getDirectoryUUID());
 		    ddr.put("session_id", Communicator.getSessionID());
 		    ddr.put("mod_type", "DELETE");
@@ -85,15 +87,16 @@ public class EditorDocTree extends DocTree {
 		    String status = Communicator.communicate(ddr).get("status", String.class);
 		    switch (status) {
 		    case "OK":
+			((DefaultTreeModel) getModel()).removeNodeFromParent(selectedDir);
 			break;
 
 		    default:
 			JOptionPane.showConfirmDialog(null, "Deletion failed.\nTry refreshing by Alt + clicking on the documents tree, or try again at another time.", "Failed to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			break;
 		    }
-		    ((DefaultTreeModel) getModel()).nodeChanged(selectedDir.getParent());
 		}
-		reloadProjectFiles((ProjectNode) getSelectionPath().getPath()[1]);
+		if (projectNode == null)
+		    reloadProjectFiles(projectNode);
 	    }
 	});
 	dirPopup.add(deleteFolderButton);
@@ -360,7 +363,7 @@ public class EditorDocTree extends DocTree {
 			JOptionPane.showConfirmDialog(null, "The directory was not created because of an error.\nTry refreshing by Alt + clicking the project tree, or try again some other time.", "Directory creation failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 
 		    DefaultTreeModel model = (DefaultTreeModel) EditorDocTree.this.getModel();
-		    model.nodeChanged(selectedDir);
+		    // model.nodeChanged(selectedDir);
 		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });
@@ -409,7 +412,8 @@ public class EditorDocTree extends DocTree {
 		    default:
 			break;
 		    }
-		    ((DefaultTreeModel) EditorDocTree.this.getModel()).nodeChanged(selectedDir);
+		    // ((DefaultTreeModel)
+		    // EditorDocTree.this.getModel()).nodeChanged(selectedDir);
 		    expandRow(getRowForPath(new TreePath(selectedDir.getPath())));
 		}
 	    });

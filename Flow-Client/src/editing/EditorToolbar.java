@@ -108,6 +108,9 @@ public class EditorToolbar extends JToolBar {
 		    return;
 		}
 		String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion", JOptionPane.WARNING_MESSAGE);
+		if (confirm == null){
+		    return;
+		}
 		Data projectRequest = new Data("project_info");
 		projectRequest.put("session_id", Communicator.getSessionID());
 		projectRequest.put("project_uuid", projectUUID);
