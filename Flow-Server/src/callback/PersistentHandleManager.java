@@ -38,7 +38,11 @@ public class PersistentHandleManager {
             L.warning("no handles for callbackUUID " + callbackUUID + "!");
         } else {
             for (CallbackHandler handler : events.get(callbackUUID)) {
-                handler.onCallbackEvent(event);
+                try {
+                    handler.onCallbackEvent(event);
+                } catch (Exception e) {
+                    unregisterCallbackHandler(callbackUUID, handler);
+                }
             }
         }
     }
