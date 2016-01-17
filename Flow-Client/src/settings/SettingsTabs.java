@@ -2,31 +2,18 @@ package settings;
 
 import gui.FlowClient;
 import gui.PanelManager;
+import message.Data;
+import shared.Communicator;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
-
-import message.Data;
-import shared.Communicator;
 
 public class SettingsTabs extends JTabbedPane {
 
@@ -65,10 +52,8 @@ public class SettingsTabs extends JTabbedPane {
 		    @Override
 		    public boolean accept(File f) {
 			String name = f.getName();
-			if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".bmp"))
-			    return true;
-			return false;
-		    }
+				return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".bmp");
+			}
 		});
 		avatarChooser.setDialogTitle("Select Avatar Image");
 		if (avatarChooser.showOpenDialog(SettingsTabs.this) == JFileChooser.APPROVE_OPTION) {

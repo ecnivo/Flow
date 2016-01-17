@@ -95,7 +95,7 @@ public class EditTabs extends JTabbedPane {
 
     @Override
     public void removeTabAt(int idx) {
-	EditArea component = (EditArea) ((JScrollPane) getTabComponentAt(idx)).getViewport().getView();
+	EditArea component = (EditArea) ((JScrollPane) getComponentAt(idx)).getViewport().getView();
 	Communicator.removeFileChangeListener(component.getFileUUID());
 	super.removeTabAt(idx);
     }

@@ -15,14 +15,12 @@ import java.util.logging.Logger;
  */
 public class FMLNetworker {
 
+    private static Logger L = Logger.getLogger("FMLNetworker");
     private String ip;
     private int port;
     private int arcport;
-
     private DataSocket asyncSocket;
     private EventPusher pusher;
-
-    private static Logger L = Logger.getLogger("FMLNetworker");
 
     public FMLNetworker(String ip, int port, int arcport) {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
@@ -75,7 +73,7 @@ public class FMLNetworker {
         }
         try {
             Data asyncCallbackRequest = new Data("async");
-            if(chngListener instanceof TextModificationListener){
+            if (chngListener instanceof TextModificationListener) {
                 asyncCallbackRequest.put("ltype", CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK);
             }
             asyncCallbackRequest.put("rtype", RegisterEvent.RegisterType.REGISTER);

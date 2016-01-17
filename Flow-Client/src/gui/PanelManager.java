@@ -1,20 +1,17 @@
 package gui;
 
+import debug.DebugPane;
+import editing.EditPane;
 import history.HistoryPane;
-
-import java.awt.CardLayout;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
 import shared.EditTabs;
-import debug.DebugPane;
-import editing.EditPane;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
 
 @SuppressWarnings("serial")
 public class PanelManager extends JPanel {
@@ -107,9 +104,9 @@ public class PanelManager extends JPanel {
     }
 
     public void resetUI() {
-	((DefaultMutableTreeNode) ((DefaultTreeModel) editPane.getDocTree().getModel()).getRoot()).removeAllChildren();
+		((DefaultMutableTreeNode) editPane.getDocTree().getModel().getRoot()).removeAllChildren();
 	((DefaultTreeModel) editPane.getDocTree().getModel()).reload();
-	((DefaultMutableTreeNode) ((DefaultTreeModel) historyPane.getTree().getModel()).getRoot()).removeAllChildren();
+		((DefaultMutableTreeNode) historyPane.getTree().getModel().getRoot()).removeAllChildren();
 	editTabs.removeAll();
 	editTabs.revalidate();
     }

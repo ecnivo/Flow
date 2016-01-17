@@ -1,17 +1,12 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.UUID;
-
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
+
+import java.sql.*;
+import java.util.Date;
+import java.util.UUID;
 
 public class SQLDatabase {
 
@@ -987,11 +982,9 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
 		try {
-			if (!this.query(String.format(
+			return this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-					this.getUsername(sessionID), projectUUID)).next())
-				return false;
-			return true;
+					this.getUsername(sessionID), projectUUID)).next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1016,12 +1009,10 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID,
 			int accessLevel) throws DatabaseException {
 		try {
-			if (!this.query(String.format(
+			return this.query(String.format(
 					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
 					this.getUsername(sessionID), projectUUID, accessLevel - 1))
-					.next())
-				return false;
-			return true;
+					.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);

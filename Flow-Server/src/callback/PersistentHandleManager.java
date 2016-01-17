@@ -33,7 +33,7 @@ public class PersistentHandleManager {
      * @param event        The event to send to them all
      */
     public void doCallbackEvent(UUID callbackUUID, CallbackEvent event) {
-        L.info("running event to callbackUUID " + callbackUUID);
+        L.info("running event " + event + " to callbackUUID " + callbackUUID);
         if (events.get(callbackUUID) == null) {
             L.warning("no handles for callbackUUID " + callbackUUID + "!");
         } else {

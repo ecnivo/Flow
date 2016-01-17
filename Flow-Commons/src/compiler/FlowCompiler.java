@@ -1,24 +1,16 @@
 package compiler;
 
+import struct.VersionText;
+
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-
-import struct.VersionText;
 
 /**
  * Represents a wrapper around the javac compiler
@@ -30,10 +22,10 @@ import struct.VersionText;
  */
 public class FlowCompiler {
 
+    private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
     private VersionText[] versionTexts;
     private UUID dirUUID;
     private File workingDirectory;
-    private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
 
     /**
      * Instantiates a compiler from the given textDocuments
@@ -47,6 +39,21 @@ public class FlowCompiler {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
 
         throw new UnsupportedOperationException();
+    }
+
+    protected static String removeExtension(String s) {
+        String separator = System.getProperty("file.separator");
+        String filename;
+        int lastSeparatorIndex = s.lastIndexOf(separator);
+        if (lastSeparatorIndex == -1) {
+            filename = s;
+        } else {
+            filename = s.substring(lastSeparatorIndex + 1);
+        }
+        int extensionIndex = filename.lastIndexOf(".");
+        if (extensionIndex == -1)
+            return filename;
+        return filename.substring(0, extensionIndex);
     }
 
     /**
@@ -151,21 +158,6 @@ public class FlowCompiler {
 
     protected VersionText[] getFlowFiles() {
         return versionTexts;
-    }
-
-    protected static String removeExtension(String s) {
-        String separator = System.getProperty("file.separator");
-        String filename;
-        int lastSeparatorIndex = s.lastIndexOf(separator);
-        if (lastSeparatorIndex == -1) {
-            filename = s;
-        } else {
-            filename = s.substring(lastSeparatorIndex + 1);
-        }
-        int extensionIndex = filename.lastIndexOf(".");
-        if (extensionIndex == -1)
-            return filename;
-        return filename.substring(0, extensionIndex);
     }
 }
 
