@@ -150,6 +150,25 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
+			String username) throws DatabaseException {
+		try {
+			ResultSet data = this.getProjectInfo(projectUUID);
+			if (data.next()) {
+				if (accessLevel == OWNER
+						|| username.equals(data.getString("OwnerUsername"))) {
+					return "ACCESS_DENIED";
+				}
+				return this.updateAccess(accessLevel, projectUUID, username);
+			}
+			return "INVALID_PROJECT_UUID";
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+
 	/**
 	 * Getter for all files associated with the specified project.
 	 *

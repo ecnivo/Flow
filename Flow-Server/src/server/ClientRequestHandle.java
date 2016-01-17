@@ -241,32 +241,44 @@ public class ClientRequestHandle implements Runnable {
 				UUID projectUUID = data.get("project_uuid", UUID.class),
 						sessionID = data.get("session_id", UUID.class);
 				try {
-					if (this.database.verifyPermissions(sessionID.toString(),
-							projectUUID.toString(), SQLDatabase.OWNER)) {
-						switch (data.get("project_modify_type", String.class)) {
-						case "MODIFY_COLLABORATOR":
-							String username = data.get("username",
-									String.class);
+					switch (data.get("project_modify_type", String.class)) {
+					case "MODIFY_COLLABORATOR":
+						String username = data.get("username", String.class);
+						int accessLevel = (int) data.get("access_level",
+								Byte.class);
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
 							returnData.put("status",
-									this.database.updateAccess(
-											(int) data.get("access_level",
-													Byte.class),
-									projectUUID.toString(), username));
-							break;
-						case "RENAME_PROJECT": {
-							String newName = data.get("new_name", String.class);
+									this.database.updateAccess(accessLevel,
+											projectUUID.toString(), username));
+						} else if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.EDIT)) {
 							returnData.put("status",
-									this.database.renameProject(
-											projectUUID.toString(), newName));
+									this.database.restrictedUpdateAccess(
+											accessLevel, projectUUID.toString(),
+											username));
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
 						}
-							break;
-						case "DELETE_PROJECT":
+						break;
+					case "RENAME_PROJECT": {
+						String newName = data.get("new_name", String.class);
+						returnData.put("status", this.database.renameProject(
+								projectUUID.toString(), newName));
+					}
+						break;
+					case "DELETE_PROJECT":
+						if (this.database.verifyPermissions(
+								sessionID.toString(), projectUUID.toString(),
+								SQLDatabase.OWNER)) {
 							returnData.put("status", this.database
 									.deleteProject(projectUUID.toString()));
-							break;
+						} else {
+							returnData.put("status", "ACCESS_DENIED");
 						}
-					} else {
-						returnData.put("status", "ACCESS_DENIED");
+						break;
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
