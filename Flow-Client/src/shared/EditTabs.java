@@ -93,6 +93,13 @@ public class EditTabs extends JTabbedPane {
 	});
     }
 
+    @Override
+    public void removeTabAt(int idx) {
+	EditArea component = (EditArea) ((JScrollPane) getTabComponentAt(idx)).getViewport().getView();
+	Communicator.removeFileChangeListener(component.getFileUUID());
+	super.removeTabAt(idx);
+    }
+
     public void openTab(String tabName, String text, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable) {
 	int tabs = getTabCount();
 	// Checks if the tab is already open, and if it is, will automatically
@@ -266,7 +273,7 @@ public class EditTabs extends JTabbedPane {
 		    int i = EditTabs.this.indexOfTabComponent(CustomTabHeader.this);
 		    if (i != -1) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
-			    EditTabs.this.remove(i);
+			    EditTabs.this.removeTabAt(i);
 
 			} else if (e.getButton() == MouseEvent.BUTTON1) {
 			    EditTabs.this.setSelectedIndex(i);
@@ -301,7 +308,7 @@ public class EditTabs extends JTabbedPane {
 	    public void actionPerformed(ActionEvent e) {
 		int i = EditTabs.this.indexOfTabComponent(CustomTabHeader.this);
 		if (i != -1) {
-		    EditTabs.this.remove(i);
+		    EditTabs.this.removeTabAt(i);
 		}
 	    }
 
