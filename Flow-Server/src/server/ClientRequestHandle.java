@@ -596,7 +596,8 @@ public class ClientRequestHandle implements Runnable {
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 						for (char c : str.toCharArray()) {
-							td.insert(c, idx--);
+							// TODO GORDON STOP CHANGING THIS TO --
+							td.insert(c, idx++);
 						}
 
 					}
