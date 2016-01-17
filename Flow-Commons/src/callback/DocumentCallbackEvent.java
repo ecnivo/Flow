@@ -24,7 +24,8 @@ public class DocumentCallbackEvent extends CallbackEvent {
 
     public enum DocumentCallbackType {
         INSERT,
-        DELETE
+        DELETE,
+        MOVE
     }
 
     @Override
