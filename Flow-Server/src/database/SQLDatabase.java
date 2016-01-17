@@ -1,6 +1,9 @@
 package database;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
@@ -1343,9 +1346,28 @@ public class SQLDatabase {
 
 	public void recoverFileSystem(String corruptFileSystem,
 			String backUpFileSystem) {
-		//this.deleteFileSystemDirectory(new File(corruptFileSystem));
-		//this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
-		System.err.println("DATABASE WIPED AND RELOADED");
+		this.deleteFileSystemDirectory(new File(corruptFileSystem));
+		try {
+			this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
+			System.err.println("DATABASE WIPED AND RELOADED");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.err.println(
+					"Error recovering the database and file system from backup, restarting recovery proccess...");
+			try {
+				this.deleteFileSystemDirectory(new File(corruptFileSystem));
+				this.copyFileSystem(new File(BACKUP_FOLDER),
+						new File(LIVE_FOLDER));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				System.err.println();
+				System.err.println(
+						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator or visit https://github.com/ecnivo/Flow/releases for a clean file system.");
+				System.exit(0);
+			}
+		}
 	}
 
 	private void deleteFileSystemDirectory(File file) {
@@ -1358,11 +1380,25 @@ public class SQLDatabase {
 		file.delete();
 	}
 
-	private void copyFileSystem(File backup, File live) {
+	private void copyFileSystem(File backup, File live) throws IOException {
 		if (!live.exists())
 			live.mkdirs();
 		if (backup.isDirectory()) {
-
+			String[] files = backup.list();
+			for (String file : files) {
+				copyFileSystem(new File(backup, file), new File(live, file));
+			}
+		} else {
+			FileInputStream in = new FileInputStream(backup);
+			FileOutputStream out = new FileOutputStream(backup);
+			byte[] buffer = new byte[1024];
+			int length = in.read(buffer);
+			while (length > 0) {
+				out.write(buffer, 0, length);
+				length = in.read(buffer);
+			}
+			in.close();
+			out.close();
 		}
 	}
 

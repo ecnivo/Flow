@@ -196,18 +196,21 @@ public class ClientRequestHandle implements Runnable {
 								String.class);
 						if (Validator.validFileName(documentName)) {
 							// TODO add the version to the database
-							this.database.newFile(fileUUID.toString(),
-									documentName, projectUUID.toString(),
+							String status = this.database.newFile(
+									fileUUID.toString(), documentName,
+									projectUUID.toString(),
 									directoryUUID.toString(), "TEXT_DOCUMENT");
-							this.database.newVersion(fileUUID.toString(),
-									versionUUID.toString());
-							VersionText newTextDocument = new VersionText();
-							VersionManager.getInstance().addTextVersion(
-									fileUUID, versionUUID, newTextDocument);
-							DataManagement.getInstance().flushTextToDisk(
-									fileUUID, versionUUID, newTextDocument);
-							returnData.put("file_uuid", fileUUID);
-							returnData.put("status", "OK");
+							if (status.equals("OK")) {
+								this.database.newVersion(fileUUID.toString(),
+										versionUUID.toString());
+								VersionText newTextDocument = new VersionText();
+								VersionManager.getInstance().addTextVersion(
+										fileUUID, versionUUID, newTextDocument);
+								DataManagement.getInstance().flushTextToDisk(
+										fileUUID, versionUUID, newTextDocument);
+								returnData.put("file_uuid", fileUUID);
+							}
+							returnData.put("status", status);
 						} else {
 							returnData.put("status", "ACCESS_DENIED");
 						}
