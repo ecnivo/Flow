@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -379,19 +380,19 @@ public class EditorToolbar extends JToolBar {
 
 					// Opens a file chooser to get new file
 					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-
-						@Override
-						public String getDescription() {
-							return "Only .JAVA or .TXT files (for now)";
-						}
-
-						@Override
-						public boolean accept(File f) {
-							String name = f.getName();
-							return name.endsWith(".java") || name.endsWith(".txt") || f.isDirectory();
-						}
-					});
+//					fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+//
+//						@Override
+//						public String getDescription() {
+//							return "Only .JAVA or .TXT files (for now)";
+//						}
+//
+//						@Override
+//						public boolean accept(File f) {
+//							String name = f.getName();
+//							return f.isDirectory();
+//						}
+//					});
 					fileChooser.setDialogTitle("Select file to import...");
 					File importFile;
 					if (fileChooser.showOpenDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
@@ -493,7 +494,7 @@ public class EditorToolbar extends JToolBar {
 					// Gets the source for export
 					UUID fileUUID;
 					EditTabs tabs = editPane.getEditTabs();
-					if (tabs == null) {
+					if (tabs == null || tabs.getTabCount() < 1) {
 						TreePath path = editPane.getEditorFileTree().getSelectionPath();
 						if (path == null) {
 							JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -546,16 +547,32 @@ public class EditorToolbar extends JToolBar {
 
 					// Gets the user to choose the destination
 					JFileChooser destChooser = new JFileChooser();
+					destChooser.setFileFilter(new FileFilter() {
+						
+						@Override
+						public String getDescription() {
+							return "Only folders";
+						}
+						
+						@Override
+						public boolean accept(File f) {
+							return f.isDirectory();
+						}
+					});
 					destChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					destChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 					destChooser.setDialogTitle("Choose export destination");
 					String dest;
 					if (destChooser.showSaveDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
-						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
+//						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
+						dest = destChooser.getSelectedFile().getPath() + fileName;
 					} else {
 						return;
 					}
-					JOptionPane.showConfirmDialog(null, "Confirm export destination to be " + dest + "?", "Confirm export", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+					int confirm = JOptionPane.showConfirmDialog(null, "Confirm export destination to be " + dest + "?", "Confirm export", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if (confirm == JOptionPane.NO_OPTION) {
+						return;
+					}
 					File outFile = new File(dest);
 
 					// Writes it into the destination TODO (this may be the
