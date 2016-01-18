@@ -24,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
 import javax.swing.SpringLayout;
 
 import message.Data;
@@ -214,9 +213,13 @@ public class SettingsTabs extends JTabbedPane {
 		});
 		closeAccount.add(confirmButton);
 
-		SettingsTab hideMode = new SettingsTab("Hide mode");
-		hideMode.add(new JLabel("HIDE MODE"));
+		SettingsTab hideMode = new SettingsTab("Experimental mode");
+		hideMode.add(new JLabel("HIDE/BETA TESTER MODE"));
 		hideMode.add(new JLabel("Toggle hiding of unfinished elements. Flow will be restarted when toggled."));
+		if (FlowClient.HIDE)
+			hideMode.add(new JLabel("Unfinished elements are currently turned off."));
+		else
+			hideMode.add(new JLabel("Unfinished elements are currently turned on."));
 		JButton toggle = new JButton("SWITCH!");
 		toggle.setVisible(true);
 		toggle.addActionListener(new ActionListener() {
