@@ -561,7 +561,7 @@ public class EditArea extends JTextPane {
 	}
 
 	/**
-	 * WORKING syntax highlighting - <3 Bimesh
+	 * WORKING syntax highlighting - Bimesh
 	 */
 	private void highlightSyntax() {
 		// Creates new blocks
@@ -633,21 +633,26 @@ public class EditArea extends JTextPane {
 								new StyleBlock(i - start, start - spaceCount));
 						i--;
 					} else if (text.charAt(i + 1) == '*') {
-						int start = i;
+						int start = i, internalSpaceCount = 0;
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
 							if (c == 13)
-								spaceCount++;
+								internalSpaceCount++;
 							else if (c == '*') {
 								i++;
-								if (text.charAt(i) == '/') {
+								c = text.charAt(i);
+								if (c == 13)
+									internalSpaceCount++;
+								else if (c == '/') {
 									done = true;
 								}
 							}
 						}
 						commentBlocks.add(
-								new StyleBlock(i - start, start - spaceCount));
+								new StyleBlock(i - start - internalSpaceCount,
+										start - spaceCount));
+						spaceCount += internalSpaceCount;
 						i--;
 					}
 				}
