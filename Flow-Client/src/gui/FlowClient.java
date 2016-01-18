@@ -46,7 +46,7 @@ public class FlowClient extends JFrame {
 		}
 
 		// Sets up communications with the server
-		Communicator.initComms(HOST, PORT);
+		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP"), PORT);
 
 		// Creates a new PanelManager
 		manager = new PanelManager(this);
