@@ -72,7 +72,7 @@ public class FlowClient extends JFrame {
 				Communicator.killAsync();
 				logOff.put("session_id", sessionID);
 				Communicator.communicate(logOff);
-				
+
 			}
 		}));
 		this.setSize((int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() * 0.8), (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.8));
