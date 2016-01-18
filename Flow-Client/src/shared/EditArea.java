@@ -626,12 +626,17 @@ public class EditArea extends JTextPane {
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == 13)
-							spaceCount++;
-						else if (c == '\"' && text.charAt(i - 1) != '\\') {
-							stringBlocks.add(new StyleBlock(i - start, start
-									- spaceCount));
-							done = true;
+						if (c != '\\') {
+							if (c == 13)
+								spaceCount++;
+							else if (c == '\"') {
+								stringBlocks.add(new StyleBlock(i - start,
+										start - spaceCount));
+								done = true;
+							}
+						} else {
+							// Escapes a character
+							i++;
 						}
 					}
 					i--;
@@ -640,12 +645,17 @@ public class EditArea extends JTextPane {
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == 13)
-							spaceCount++;
-						else if (c == '\'' && text.charAt(i - 1) != '\\') {
-							stringBlocks.add(new StyleBlock(i - start, start
-									- spaceCount));
-							done = true;
+						if (c != '\\') {
+							if (c == 13)
+								spaceCount++;
+							else if (c == '\'') {
+								stringBlocks.add(new StyleBlock(i - start,
+										start - spaceCount));
+								done = true;
+							}
+						} else {
+							// Escapes a character
+							i++;
 						}
 					}
 					i--;
