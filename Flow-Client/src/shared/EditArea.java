@@ -357,68 +357,79 @@ public class EditArea extends JTextPane {
 				}
 
 				switch (e.TYPE) {
-				case INSERT:
-					String addition = e.ADDITION;
-					try {
-						// Uses boolean flags when inserting or deleting so that
-						// the
-						// insertions/deletions don't interpret the other users'
-						// inputs as the
-						// current user's actions
-						ignoreEvents = true;
-						// Tries to insert the contents
-						doc.insertString(e.INDEX, addition, null);
-						ignoreEvents = false;
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
-					}
-					break;
+					case INSERT:
+						String addition = e.ADDITION;
+						try {
+							// Uses boolean flags when inserting or deleting so that
+							// the
+							// insertions/deletions don't interpret the other users'
+							// inputs as the
+							// current user's actions
+							ignoreEvents = true;
+							// Tries to insert the contents
+							try {
+								doc.insertString(e.INDEX, addition, null);
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
+							}
+							ignoreEvents = false;
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						}
+						break;
 
-				case DELETE:
-					int length = e.REMOVAL_LENGTH;
-					try {
-						ignoreEvents = true;
-						// Tries to remove the contents
-						doc.remove(e.INDEX, length);
-						ignoreEvents = false;
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
-					}
-
-					fireCaretUpdate(new CaretEvent(EditArea.this) {
-
-						@Override
-						public int getMark() {
-							return EditArea.this.getCaret().getMark();
+					case DELETE:
+						int length = e.REMOVAL_LENGTH;
+						try {
+							ignoreEvents = true;
+							// Tries to remove the contents
+							try {
+								doc.remove(e.INDEX, length);
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
+							}
+							ignoreEvents = false;
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
 						}
 
-						@Override
-						public int getDot() {
-							return EditArea.this.getCaret().getDot();
+						fireCaretUpdate(new CaretEvent(EditArea.this) {
+
+							@Override
+							public int getMark() {
+								return EditArea.this.getCaret().getMark();
+							}
+
+							@Override
+							public int getDot() {
+								return EditArea.this.getCaret().getDot();
 						}
-					});
-					break;
+						});
+						break;
 
-				case MOVE:
-					UserCaret caret = getCaretByUserName(e.USERNAME);
-					if (caret == null) {
-						System.out.println("caret not found");
-						return;
-					}
-					Rectangle rectangle = null;
-					try {
-						rectangle = modelToView(e.INDEX);
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
-						return;
-					}
-					caret.moveTo(rectangle.getLocation());
-					repaint();
+					case MOVE:
+						//						UserCaret caret = getCaretByUserName(e.USERNAME);
+						//						if (caret == null) {
+						//							System.out.println("caret not found");
+						//							return;
+						//						}
+						//						Rectangle rectangle = null;
+						//						try {
+						//							rectangle = modelToView(e.INDEX);
+						//						} catch (BadLocationException e1) {
+						//							e1.printStackTrace();
+						//							return;
+						//						}catch(NullPointerException e1){
+						//							e1.printStackTrace();
+						//							return;
+						//						}
+						//						caret.moveTo(rectangle.getLocation());
+						//						repaint();
 
-					break;
+						break;
 
-				default:
-					break;
+					default:
+						break;
 				}
 				highlightSyntax();
 			}
@@ -506,13 +517,17 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		try {
+			super.paintComponent(g);
+			return;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 		Graphics2D g2d = (Graphics2D) g;
 		Point mouse = getMousePosition();
 		for (UserCaret userCaret : carets) {
 			g2d.setColor(userCaret.getColor());
-			g2d.fillRect((int) userCaret.getLocation().getX(),
-					(int) userCaret.getLocation().getY(), 3, 17);
+			g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret.getLocation().getY(), 3, 17);
 		}
 	}
 

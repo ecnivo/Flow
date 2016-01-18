@@ -47,6 +47,7 @@ public class EventPusher implements Runnable {
             }
         } catch (Exception e) {
             L.severe("error in event pusher");
+            e.printStackTrace();
         }
         L.info("event pusher dead");
     }

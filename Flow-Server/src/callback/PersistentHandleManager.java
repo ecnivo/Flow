@@ -2,6 +2,7 @@ package callback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -32,17 +33,20 @@ public class PersistentHandleManager {
      * @param callbackUUID The UUID of the callback handlers
      * @param event        The event to send to them all
      */
-    public void doCallbackEvent(UUID callbackUUID, CallbackEvent event) {
+    public synchronized void doCallbackEvent(UUID callbackUUID, CallbackEvent event) {
         L.info("running event " + event + " to callbackUUID " + callbackUUID);
         if (events.get(callbackUUID) == null) {
             L.warning("no handles for callbackUUID " + callbackUUID + "!");
         } else {
-            for (CallbackHandler handler : events.get(callbackUUID)) {
+            Iterator<CallbackHandler> iterator = events.get(callbackUUID).iterator();
+            while (iterator.hasNext()) {
+                CallbackHandler handler = iterator.next();
                 try {
                     handler.onCallbackEvent(event);
                 } catch (Exception e) {
                     L.severe("handler " + handler.getHandle().getSocket().getRemoteSocketAddress() + " has died! removing from callback!");
-                    unregisterCallbackHandler(callbackUUID, handler);
+                    e.printStackTrace();
+                    iterator.remove();
                 }
             }
         }
@@ -59,4 +63,5 @@ public class PersistentHandleManager {
         events.get(assocUUID).remove(handler);
         L.info("deregistered callback handler associated with handle " + assocUUID);
     }
+
 }
