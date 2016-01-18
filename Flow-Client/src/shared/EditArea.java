@@ -525,6 +525,9 @@ public class EditArea extends JTextPane {
 		}
 	}
 
+	/**
+	 * WORKING syntax highlighting - <3 Bimesh
+	 */
 	private void highlightSyntax() {
 		// Creates new blocks
 		keywordBlocks = new ArrayList<StyleBlock>();
@@ -533,7 +536,6 @@ public class EditArea extends JTextPane {
 
 		String text = this.getText(), word = "";
 		int textLength = text.length();
-		boolean newWord = true;
 		for (int i = 0; i < textLength; i++) {
 			char c = text.charAt(i);
 			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
@@ -729,23 +731,23 @@ public class EditArea extends JTextPane {
 	// }
 	// }
 
-	/**
-	 * Finds the next non-alphabetic letter in a string
-	 * 
-	 * @param sourceCode
-	 *            the string to search
-	 * @param idx
-	 *            the index to start from
-	 * @return the index (-1 if none)
-	 */
-	private int nextNonLetter(String sourceCode, int idx) {
-		int sourceCodeLength = sourceCode.length();
-		do {
-			idx++;
-		} while (idx < sourceCodeLength - 1
-				&& Character.isLetter(sourceCode.charAt(idx)));
-		return idx;
-	}
+	// /**
+	// * Finds the next non-alphabetic letter in a string
+	// *
+	// * @param sourceCode
+	// * the string to search
+	// * @param idx
+	// * the index to start from
+	// * @return the index (-1 if none)
+	// */
+	// private int nextNonLetter(String sourceCode, int idx) {
+	// int sourceCodeLength = sourceCode.length();
+	// do {
+	// idx++;
+	// } while (idx < sourceCodeLength - 1
+	// && Character.isLetter(sourceCode.charAt(idx)));
+	// return idx;
+	// }
 
 	/**
 	 * A runnable with data
