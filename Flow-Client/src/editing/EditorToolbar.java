@@ -156,7 +156,6 @@ public class EditorToolbar extends JToolBar {
 				// Success case
 					case "OK":
 						((ProjectNode) pane.getFileTree().getSelectionPath().getPath()[1]).setName(modifiedProjectName);
-						JOptionPane.showConfirmDialog(null, "Your project has been succesfully renamed to " + modifiedProjectName + ".", "Project renaming success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 						break;
 					// Failure cases
 					case "PROJECT_NAME_INVALID":
@@ -224,6 +223,7 @@ public class EditorToolbar extends JToolBar {
 							case "OK":
 								project = null;
 								pane.getFileTree().refreshProjectList();
+								pane.getFileTree().setSelectionRow(0);
 								break;
 
 							case "ACCESS_DENIED":

@@ -146,7 +146,6 @@ public class RunStopBar extends JToolBar {
 						try {
 							getFiles(((EditArea) ((JScrollPane) editTabs.getSelectedComponent()).getViewport().getView()).getProjectUUID(), textFiles, "", false);
 						} catch (NullPointerException e11) {
-							e11.printStackTrace();
 							return;
 						}
 						FlowCompiler flowCompiler = new FlowCompiler(textFiles.toArray(new CompilableText[0]));
