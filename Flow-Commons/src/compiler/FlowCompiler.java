@@ -33,7 +33,7 @@ public class FlowCompiler {
     public FlowCompiler(CompilableText... doc) {
         this.versionTexts = doc;
         this.dirUUID = UUID.randomUUID();
-        this.workingDirectory = new File(System.getenv("APPDATA") + File.separator + "flow" + File.separator + dirUUID.toString());
+        this.workingDirectory = new File("flow" + File.separator + dirUUID.toString());
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
     }
 
