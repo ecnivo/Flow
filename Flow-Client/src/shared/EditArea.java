@@ -106,7 +106,8 @@ public class EditArea extends JTextPane {
 			UUID versionTextUUID, boolean editable, EditTabs tabs) {
 		// Swing stuff
 		setLayout(null);
-		scrolling = new JScrollPane(this);
+		scrolling = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		setBorder(FlowClient.EMPTY_BORDER);
 		setFont(PLAIN);
 		setForeground(PLAIN_COLOUR);
@@ -847,5 +848,11 @@ public class EditArea extends JTextPane {
 		public void run() {
 			doc.setCharacterAttributes(pos, nextToken, commentsStyle, true);
 		}
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return getUI().getPreferredSize(this).width <= getParent()
+				.getSize().width;
 	}
 }

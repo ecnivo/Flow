@@ -1,12 +1,17 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import struct.User;
 import struct.VersionText;
 import util.FileSerializer;
-
-import java.io.*;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * Created by Netdex on 1/5/2016.
@@ -109,7 +114,8 @@ public class DataManagement {
 	 *            The text document
 	 * @return whether or not the addition was successful
 	 */
-	public boolean flushTextToDisk(UUID fileUUID, UUID versionUUID, VersionText textDoc) {
+	public boolean flushTextToDisk(UUID fileUUID, UUID versionUUID,
+			VersionText textDoc) {
 		L.info("adding text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -154,7 +160,8 @@ public class DataManagement {
 	 *            The bytes of the file
 	 * @return whether or not the addition was successful
 	 */
-	public boolean flushArbitraryDocumentToDisk(UUID fileUUID, UUID versionUUID, byte[] bytes) {
+	public boolean flushArbitraryDocumentToDisk(UUID fileUUID, UUID versionUUID,
+			byte[] bytes) {
 		L.info("adding arbitrary document of uuid " + fileUUID + " of length "
 				+ bytes.length);
 		File file = new File(new File(fileDir, fileUUID.toString()),
@@ -192,7 +199,8 @@ public class DataManagement {
 	 *            The UUID of the version
 	 * @return The text document
 	 */
-	public VersionText getTextDocumentFromFile(UUID fileUUID, UUID versionUUID) {
+	public VersionText getTextDocumentFromFile(UUID fileUUID,
+			UUID versionUUID) {
 		L.info("getting text document of uuid " + versionUUID + " of file "
 				+ fileUUID);
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
@@ -212,6 +220,10 @@ public class DataManagement {
 			return null;
 		}
 		return td;
+	}
+
+	public boolean fileExists(UUID fileUUID) {
+		return new File(fileDir, fileUUID.toString()).exists();
 	}
 
 	public byte[] getArbitraryFileFromFile(UUID fileUUID, UUID versionUUID) {
