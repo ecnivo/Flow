@@ -1,12 +1,20 @@
 
 package shared;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
+import editing.UserCaret;
+import gui.FlowClient;
+import message.Data;
+import util.Formatter;
+
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
@@ -15,26 +23,6 @@ import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
-
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
-import editing.UserCaret;
-import gui.FlowClient;
-import message.Data;
 
 /**
  * The area for the user to edit their documents
@@ -197,6 +185,31 @@ public class EditArea extends JTextPane {
 					System.out.println("switch right");
 					tabs.setSelectedComponent(
 							tabs.getComponentAt(tabs.getSelectedIndex() + 1));
+				}
+				if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F) {
+					String text = EditArea.this.getText();
+					Data fileModify = new Data("file_text_modify");
+					fileModify.put("file_uuid", fileUUID);
+					fileModify.put("session_id", Communicator.getSessionID());
+					fileModify.put("mod_type", "DELETE");
+					fileModify.put("idx", 0);
+					fileModify.put("len", text.length());
+
+					// Send message to server about what was inserted
+					Data response = Communicator.communicate(fileModify);
+
+					String form = Formatter.format(text);
+					fileModify = new Data("file_text_modify");
+					fileModify.put("file_uuid", fileUUID);
+					fileModify.put("session_id", Communicator.getSessionID());
+					fileModify.put("mod_type", "INSERT");
+					fileModify.put("idx", 0);
+					fileModify.put("str", form);
+
+					// Send message to server about what was inserted
+					response = Communicator.communicate(fileModify);
+					EditArea.this.setText(form);
+
 				}
 			}
 
