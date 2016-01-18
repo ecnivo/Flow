@@ -477,7 +477,7 @@ public class EditorToolbar extends JToolBar {
 						public boolean accept(File f) {
 							String name = f.getName();
 							return name.endsWith(".java")
-									|| name.endsWith(".txt");
+									|| name.endsWith(".txt") || f.isDirectory();
 						}
 					});
 					fileChooser.setDialogTitle("Select file to import...");
