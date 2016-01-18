@@ -8,78 +8,38 @@ public class Formatter {
     private static String TAB = "  ";
 
     public static String format(String str) {
-        str = str.replaceAll("\n", "");
-        String fstr = "";
-        boolean escapedStr = false;
-        boolean strFound = false;
-        boolean space = false;
-        for (char c : str.toCharArray()) {
-            if (c == '"') {
-                if (!escapedStr)
-                    strFound = !strFound;
-                else
-                    escapedStr = false;
-            } else if (c == '\\')
-                escapedStr = true;
-            else if (c == ' ')
-                space = true;
-            else {
-                if (space) {
-                    fstr += ' ';
-                    space = false;
-                }
-            }
-            if (c != ' ')
-                fstr += c;
-        }
-
+        String[] lines = str.replace("\t", TAB).split("\n");
+        String text = "";
         int tabIndex = 0;
-        String form = "";
-        int ignore = 0;
-        int escaped = 0;
-        int bracketDepth = 0;
-        for (char c : fstr.toCharArray()) {
-            int newLine = 0;
-            if (c == '{' || c == '}') {
-                if (ignore == 0) {
-                    tabIndex += c == '{' ? 1 : -1;
-                    newLine = c == '{' ? 1 : -1;
+        for (String line : lines) {
+            line = line.replaceFirst("^ +", "");
+            for (int i = 0; i < tabIndex; i++)
+                text += TAB;
+            boolean escape = false;
+            boolean inside = false;
+            boolean newEscape = false;
+            for (char c : line.toCharArray()) {
+                switch (c) {
+                    case '\\':
+                        escape = true;
+                        newEscape = true;
+                        break;
+                    case '{':
+                        if (!inside && !escape)
+                            tabIndex++;
+                        break;
+                    case '}':
+                        if (!inside && !escape)
+                            tabIndex--;
+                        break;
                 }
-            } else if (c == ';') {
-                newLine = 1;
-            } else if (c == '\'') {
-                if (escaped == 0)
-                    ignore = ignore == 0 ? 1 : ignore == 1 ? 0 : ignore;
-            } else if (c == '\"') {
-                if (escaped == 0)
-                    ignore = ignore == 2 ? 0 : 2;
-            } else if (c == '\\') {
-                escaped = 2;
-            } else if (c == '(') {
-                bracketDepth++;
-            } else if (c == ')') {
-                bracketDepth--;
+                if (escape && !newEscape)
+                    escape = false;
+                if (newEscape)
+                    newEscape = false;
             }
-            if (newLine != 0 && ignore == 0 && bracketDepth == 0) {
-                if (newLine == 1) {
-                    System.out.print(c);
-                    System.out.print('\n');
-                    for (int i = 0; i < tabIndex; i++) {
-                        System.out.print(TAB);
-                    }
-                } else if (newLine == -1) {
-                    System.out.print('\n');
-                    for (int i = 0; i < tabIndex; i++) {
-                        System.out.print(TAB);
-                    }
-                    System.out.print(c);
-                }
-            } else {
-                System.out.print(c);
-            }
-            if (escaped > 0)
-                escaped--;
+            text += line + '\n';
         }
-        return form;
+        return text;
     }
 }
