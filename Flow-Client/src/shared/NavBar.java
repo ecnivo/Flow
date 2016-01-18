@@ -23,21 +23,19 @@ import javax.swing.JToolBar;
  */
 public class NavBar extends JToolBar {
 
-	private final static boolean	HIDE		= true;
-
-	private PanelManager			manager;
+	private PanelManager		manager;
 
 	// Because why not.
-	public static final byte		EDIT		= 71;
-	public final static byte		DEBUG		= -18;
-	public static final byte		HISTORY		= 0;
-	public static final byte		SETTINGS	= -35;
+	public static final byte	EDIT		= 71;
+	public final static byte	DEBUG		= -18;
+	public static final byte	HISTORY		= 0;
+	public static final byte	SETTINGS	= -35;
 
 	// Various buttons.
-	private EditButton				editButton;
-	private DebugButton				debugButton;
-	private HistoryButton			historyButton;
-	private SettingsButton			settingsButton;
+	private EditButton			editButton;
+	private DebugButton			debugButton;
+	private HistoryButton		historyButton;
+	private SettingsButton		settingsButton;
 
 	/**
 	 * Creates a new NavBar
@@ -59,7 +57,7 @@ public class NavBar extends JToolBar {
 
 		// adds the buttons
 		add(editButton);
-		if (!HIDE) {
+		if (!FlowClient.HIDE) {
 			add(debugButton);
 			add(historyButton);
 		}
@@ -84,11 +82,11 @@ public class NavBar extends JToolBar {
 				editButton.setEnabled(false);
 				return;
 			case DEBUG:
-				if (!HIDE)
+				if (!FlowClient.HIDE)
 					debugButton.setEnabled(false);
 				return;
 			case HISTORY:
-				if (!HIDE)
+				if (!FlowClient.HIDE)
 					historyButton.setEnabled(false);
 				return;
 			case SETTINGS:

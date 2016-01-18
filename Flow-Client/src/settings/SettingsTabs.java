@@ -3,18 +3,32 @@ package settings;
 
 import gui.FlowClient;
 import gui.PanelManager;
-import message.Data;
-import shared.Communicator;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.SpringLayout;
+
+import message.Data;
+import shared.Communicator;
 
 /**
  * Some tabs to manage the many many settings we have
@@ -137,7 +151,8 @@ public class SettingsTabs extends JTabbedPane {
 					retypePass.setText("");
 					passField.setText("");
 					JOptionPane.showConfirmDialog(null, "Your Flow password has successfully been changed", "Password change success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-			}}
+				}
+			}
 		});
 		passChange.add(savePassword);
 
@@ -198,10 +213,32 @@ public class SettingsTabs extends JTabbedPane {
 			}
 		});
 		closeAccount.add(confirmButton);
+
+		SettingsTab hideMode = new SettingsTab("Hide mode");
+		hideMode.add(new JLabel("HIDE MODE"));
+		hideMode.add(new JLabel("Toggle hiding of unfinished elements. Flow will be restarted when toggled."));
+		JButton toggle = new JButton("SWITCH!");
+		toggle.setVisible(true);
+		toggle.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				FlowClient.HIDE = !FlowClient.HIDE;
+				// Creates an "end session" message to send to the server
+				Data endSession = new Data("end_session");
+				endSession.put("session_id", Communicator.getSessionID());
+				Communicator.communicate(endSession);
+				Communicator.setSessionID(null);
+				Communicator.killAsync();
+				panMan.resetUI();
+			}
+		});
+		hideMode.add(toggle);
 	}
 
 	/**
 	 * Custom Tab for the JTabbedPane
+	 * 
 	 * @author Vince Ou
 	 *
 	 */
@@ -214,7 +251,9 @@ public class SettingsTabs extends JTabbedPane {
 
 		/**
 		 * Creates a new SettingsTab
-		 * @param name the name of the tab header
+		 * 
+		 * @param name
+		 *        the name of the tab header
 		 */
 		private SettingsTab(String name) {
 			// Just a bunch of settings
