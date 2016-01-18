@@ -651,9 +651,10 @@ public class EditArea extends JTextPane {
 					i--;
 				} else if (c == '/') {
 					boolean done = false;
-					if (text.charAt(Math.min(i + 1, textLength)) == '/') {
-						int start = i;
-						i += 2;
+					i++;
+					if (i < textLength && text.charAt(i) == '/') {
+						int start = i - 1;
+						i++;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
 							if (c == 13)
@@ -665,20 +666,22 @@ public class EditArea extends JTextPane {
 						commentBlocks.add(new StyleBlock(i - start, start
 								- spaceCount));
 						i--;
-					} else if (text.charAt(i + 1) == '*') {
-						int start = i, internalSpaceCount = 0;
-						i += 2;
+					} else if (i < textLength && text.charAt(i) == '*') {
+						int start = i - 1, internalSpaceCount = 0;
+						i++;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
 							if (c == 13)
 								internalSpaceCount++;
 							else if (c == '*') {
 								i++;
-								c = text.charAt(i);
-								if (c == 13)
-									internalSpaceCount++;
-								else if (c == '/') {
-									done = true;
+								if (i < textLength) {
+									c = text.charAt(i);
+									if (c == 13)
+										internalSpaceCount++;
+									else if (c == '/') {
+										done = true;
+									}
 								}
 							}
 						}
