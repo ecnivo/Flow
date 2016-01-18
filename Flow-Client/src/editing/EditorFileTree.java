@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,6 +23,7 @@ import javax.swing.tree.TreePath;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
+import shared.EditArea;
 import shared.EditTabs;
 import shared.FileTree;
 
@@ -190,22 +192,34 @@ public class EditorFileTree extends FileTree {
 					switch (status) {
 					// Success case
 						case "OK":
+							EditTabs tabs = editPane.getEditTabs();
+							if (tabs == null) {
+								return;
+							}
+							int tabCount = tabs.getTabCount();
+							for (int i = 0; i < tabCount; i++) {
+								UUID tabFileUUID = ((EditArea) ((JScrollPane) tabs.getComponentAt(i)).getViewport().getView()).getFileUUID();
+								if (tabFileUUID.equals(selectedNode.getFileUUID())) {
+									tabs.remove(i);
+									break;
+								}
+							}
+							tabs.revalidate();
 							((DefaultTreeModel) getModel()).removeNodeFromParent(selectedNode);
-							break;
+							return;
 
 						case "ACCESS_DENIED":
 							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-							break;
+							return;
 
-						// Failure case
+							// Failure case
 						default:
 							JOptionPane.showConfirmDialog(null, "An error occurred during the deletion.\nTry refreshing the project list again.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-							break;
+							return;
 					}
 				} else {
 					JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
-				// reloadProjectFiles((ProjectNode) selectedNode.getPath()[1]);
 			}
 		});
 		filePopup.add(deleteFileButton);
@@ -583,7 +597,7 @@ public class EditorFileTree extends FileTree {
 						case "FILE_NAME_INVALID":
 							JOptionPane.showConfirmDialog(null, "The file name is invalid.\nThis is typically due to a conflict with another file name.\nTry a different document name.", "Document name invalid", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 							break;
-							
+
 						case "ACCESS_DENIED":
 							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 							break;
