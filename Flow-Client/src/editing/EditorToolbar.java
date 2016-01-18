@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -29,6 +30,8 @@ import javax.swing.tree.TreePath;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
+import shared.EditArea;
+import shared.EditTabs;
 import shared.FileTree;
 import shared.FileTree.DirectoryNode;
 import shared.FileTree.FileNode;
@@ -257,7 +260,7 @@ public class EditorToolbar extends JToolBar {
 		popup.add(deleteProjectButton);
 
 		// Adds buttons
-		add(new SearchButton());
+		// add(new SearchButton());
 		add(new ProjectManageButton());
 		add(new ImportButton());
 		add(new ExportButton());
@@ -288,6 +291,7 @@ public class EditorToolbar extends JToolBar {
 			}
 			setFocusable(false);
 			setBorder(FlowClient.EMPTY_BORDER);
+			setToolTipText("Search...");
 			addActionListener(new ActionListener() {
 
 				/**
@@ -315,6 +319,7 @@ public class EditorToolbar extends JToolBar {
 		 * Opens up the good ol' project management menu created up there
 		 */
 		private ProjectManageButton() {
+			setToolTipText("Project management");
 			// Sets an icon
 			try {
 				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/projectManage.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
@@ -348,6 +353,7 @@ public class EditorToolbar extends JToolBar {
 		 * Creates a new ImportButton
 		 */
 		private ImportButton() {
+			setToolTipText("Import a file");
 			// Sets an icon
 			try {
 				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/import.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
@@ -467,6 +473,7 @@ public class EditorToolbar extends JToolBar {
 	private class ExportButton extends JButton {
 
 		private ExportButton() {
+			setToolTipText("Export the current file");
 			// Sets the icon
 			try {
 				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/export.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
@@ -484,17 +491,30 @@ public class EditorToolbar extends JToolBar {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Gets the source for export
-					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getEditorFileTree().getSelectionPath().getLastPathComponent();
-					if (selected == null || !(selected instanceof FileNode)) {
-						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-						return;
+					UUID fileUUID;
+					EditTabs tabs = editPane.getEditTabs();
+					if (tabs == null) {
+						TreePath path = editPane.getEditorFileTree().getSelectionPath();
+						if (path == null) {
+							JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						Object[] pathArray = path.getPath();
+						if (pathArray.length < 2 || !(path.getLastPathComponent() instanceof FileNode)) {
+							JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+
+						FileNode node = (FileNode) path.getLastPathComponent();
+						fileUUID = node.getFileUUID();
+					} else {
+						fileUUID = ((EditArea) ((JScrollPane) tabs.getSelectedComponent()).getViewport().getView()).getFileUUID();
 					}
-					FileNode node = (FileNode) selected;
 
 					// Gets the export contents
 					Data getFileContents = new Data("file_request");
 					getFileContents.put("session_id", Communicator.getSessionID());
-					getFileContents.put("file_uuid", node.getFileUUID());
+					getFileContents.put("file_uuid", fileUUID);
 					Data reply = Communicator.communicate(getFileContents);
 					switch (reply.get("status", String.class)) {
 						case "OK":
@@ -512,7 +532,7 @@ public class EditorToolbar extends JToolBar {
 					// Gets the name of the export file
 					Data getFileName = new Data("file_info");
 					getFileName.put("session_id", Communicator.getSessionID());
-					getFileName.put("file_uuid", node.getFileUUID());
+					getFileName.put("file_uuid", fileUUID);
 					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
 
 					// Checks. Makes it a txt by default.
