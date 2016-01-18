@@ -576,10 +576,11 @@ public class EditArea extends JTextPane {
 			char c = text.charAt(i);
 			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
 				word += c;
-				if (i == textLength - 1)
+				if (i == textLength - 1 || i == textLength - 2 || text.charAt(i + 1) == 13)
 					if (Arrays.asList(JAVA_KEYWORDS).contains(word)) {
 						keywordBlocks.add(new StyleBlock(word.length(),
 								i + 1 - word.length() - spaceCount));
+						word = "";
 					}
 			} else {
 				int length = word.length(), no;
