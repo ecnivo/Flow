@@ -126,7 +126,7 @@ public class EditorToolbar extends JToolBar {
 					return;
 				}
 				Object[] pathArray = path.getPath();
-				if (pathArray == null) {
+				if (pathArray == null || pathArray.length < 2) {
 					return;
 				}
 				ProjectNode projectNode = (ProjectNode) pathArray[1];
