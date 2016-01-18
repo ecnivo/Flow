@@ -1,10 +1,16 @@
 
 package shared;
 
+import compiler.CompilableText;
+import compiler.FlowCompiler;
 import gui.FlowClient;
+import message.Data;
 
-import java.awt.FlowLayout;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -14,20 +20,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-
-import message.Data;
-
-import compiler.CompilableText;
-import compiler.FlowCompiler;
 
 /**
  * A toolbar with run and stop buttons
@@ -64,7 +56,7 @@ public class RunStopBar extends JToolBar {
 		dirInfoRequest.put("session_id", Communicator.getSessionID());
 		dirInfoRequest.put("directory_uuid", currentDirectoryUUID);
 		Data dirInfo = Communicator.communicate(dirInfoRequest);
-		String directoryName = dirInfo.get("directory_name");
+		String directoryName = dirInfo.get("directory_name", String.class);
 		if (ignoreFirst)
 			currentPath = Paths.get(currentPath, directoryName).toString();
 
@@ -74,7 +66,7 @@ public class RunStopBar extends JToolBar {
 			fileDataRequest.put("session_id", Communicator.getSessionID());
 			Data fileData = Communicator.communicate(fileDataRequest);
 
-			String fileName = fileData.get("file_name");
+			String fileName = fileData.get("file_name", String.class);
 			String extension = fileName.substring(Math.min(fileName.length(), fileName.lastIndexOf('.') + 1));
 			if (extension.equals("java")) {
 				Data fileRequest = new Data("file_request");
