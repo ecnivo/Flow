@@ -1,12 +1,20 @@
 
 package shared;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
+import editing.UserCaret;
+import gui.FlowClient;
+import message.Data;
+import util.Formatter;
+
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
@@ -16,29 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
-import editing.UserCaret;
-import gui.FlowClient;
-import message.Data;
-
 /**
  * The area for the user to edit their documents
- * 
+ *
  * @author Vince Ou
  *
  */
@@ -88,7 +76,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * Creates a new EditArea
-	 * 
+	 *
 	 * @param textDoc
 	 *            the text of the document to load on start
 	 * @param projectUUID
@@ -196,6 +184,31 @@ public class EditArea extends JTextPane {
 					System.out.println("switch right");
 					tabs.setSelectedComponent(
 							tabs.getComponentAt(tabs.getSelectedIndex() + 1));
+				}
+				if (e.isAltDown() && e.getKeyCode() == KeyEvent.VK_F) {
+					String text = EditArea.this.getText();
+					Data fileModify = new Data("file_text_modify");
+					fileModify.put("file_uuid", fileUUID);
+					fileModify.put("session_id", Communicator.getSessionID());
+					fileModify.put("mod_type", "DELETE");
+					fileModify.put("idx", 0);
+					fileModify.put("len", text.length());
+
+					// Send message to server about what was inserted
+					Data response = Communicator.communicate(fileModify);
+
+					String form = Formatter.format(text);
+					fileModify = new Data("file_text_modify");
+					fileModify.put("file_uuid", fileUUID);
+					fileModify.put("session_id", Communicator.getSessionID());
+					fileModify.put("mod_type", "INSERT");
+					fileModify.put("idx", 0);
+					fileModify.put("str", form);
+
+					// Send message to server about what was inserted
+					response = Communicator.communicate(fileModify);
+					EditArea.this.setText(form);
+
 				}
 			}
 
@@ -417,7 +430,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * Gets the VersionText's UUID
-	 * 
+	 *
 	 * @return the versiontext's UUID
 	 */
 	public UUID getVersionTextUUID() {
@@ -426,7 +439,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * Gets the scrolling pane
-	 * 
+	 *
 	 * @return the JScrollPane
 	 */
 	public JScrollPane getScrollPane() {
@@ -435,7 +448,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * gets the project's UUID
-	 * 
+	 *
 	 * @return the project's UUID
 	 */
 	public UUID getProjectUUID() {
@@ -444,7 +457,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * gets the file's UUID
-	 * 
+	 *
 	 * @return the file's UUID
 	 */
 	public UUID getFileUUID() {
@@ -453,7 +466,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * Gets a caret by its username
-	 * 
+	 *
 	 * @param name
 	 *            name of user
 	 * @return the caret that corresponds with the name. Returns null if not
@@ -483,7 +496,7 @@ public class EditArea extends JTextPane {
 
 	/**
 	 * A particular block of text that should be styled a certain way
-	 * 
+	 *
 	 * @author Vince Ou
 	 *
 	 */
@@ -494,7 +507,7 @@ public class EditArea extends JTextPane {
 
 		/**
 		 * Creates a new StyleBlock
-		 * 
+		 *
 		 * @param length
 		 *            the length of the block
 		 * @param firstIdx
@@ -508,7 +521,7 @@ public class EditArea extends JTextPane {
 
 		/**
 		 * Gets the length of the block
-		 * 
+		 *
 		 * @return the length of the block
 		 */
 		private int getLength() {
@@ -517,7 +530,7 @@ public class EditArea extends JTextPane {
 
 		/**
 		 * Gets the first index
-		 * 
+		 *
 		 * @return the first index
 		 */
 		private int getFirstIdx() {
@@ -525,9 +538,6 @@ public class EditArea extends JTextPane {
 		}
 	}
 
-	/**
-	 * WORKING syntax highlighting - <3 Bimesh
-	 */
 	private void highlightSyntax() {
 		// Creates new blocks
 		keywordBlocks = new ArrayList<StyleBlock>();
@@ -536,6 +546,7 @@ public class EditArea extends JTextPane {
 
 		String text = this.getText(), word = "";
 		int textLength = text.length();
+		boolean newWord = true;
 		for (int i = 0; i < textLength; i++) {
 			char c = text.charAt(i);
 			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
@@ -731,23 +742,20 @@ public class EditArea extends JTextPane {
 	// }
 	// }
 
-	// /**
-	// * Finds the next non-alphabetic letter in a string
-	// *
-	// * @param sourceCode
-	// * the string to search
-	// * @param idx
-	// * the index to start from
-	// * @return the index (-1 if none)
-	// */
-	// private int nextNonLetter(String sourceCode, int idx) {
-	// int sourceCodeLength = sourceCode.length();
-	// do {
-	// idx++;
-	// } while (idx < sourceCodeLength - 1
-	// && Character.isLetter(sourceCode.charAt(idx)));
-	// return idx;
-	// }
+	/**
+	 * Finds the next non-alphabetic letter in a string
+	 *
+	 * @param sourceCode the string to search
+	 * @param idx        the index to start from
+	 * @return the index (-1 if none)
+	 */
+	private int nextNonLetter(String sourceCode, int idx) {
+		int sourceCodeLength = sourceCode.length();
+		do {
+			idx++;
+		} while (idx < sourceCodeLength - 1 && Character.isLetter(sourceCode.charAt(idx)));
+		return idx;
+	}
 
 	/**
 	 * A runnable with data
