@@ -1,20 +1,15 @@
 
 package gui;
 
-import java.awt.Toolkit;
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
-
 import message.Data;
 import shared.Communicator;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * The Main/Client program
@@ -28,6 +23,7 @@ public class FlowClient extends JFrame {
 	// Bunch of important stuff
 	public static final Border	EMPTY_BORDER		= BorderFactory.createEmptyBorder(0, 0, 0, 0);
 	public static final int		BUTTON_ICON_SIZE	= 24;
+	public static boolean		HIDE				= true;
 	public static final int		SCROLL_SPEED		= 12;
 	private static final String	HOST				= "127.0.0.1";
 	private static final int	PORT				= 10244;

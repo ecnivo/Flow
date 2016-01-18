@@ -137,7 +137,8 @@ public class SettingsTabs extends JTabbedPane {
 					retypePass.setText("");
 					passField.setText("");
 					JOptionPane.showConfirmDialog(null, "Your Flow password has successfully been changed", "Password change success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-			}}
+				}
+			}
 		});
 		passChange.add(savePassword);
 
@@ -198,10 +199,36 @@ public class SettingsTabs extends JTabbedPane {
 			}
 		});
 		closeAccount.add(confirmButton);
+
+		SettingsTab hideMode = new SettingsTab("Experimental mode");
+		hideMode.add(new JLabel("HIDE/BETA TESTER MODE"));
+		hideMode.add(new JLabel("Toggle hiding of unfinished elements. Flow will be restarted when toggled."));
+		if (FlowClient.HIDE)
+			hideMode.add(new JLabel("Unfinished elements are currently turned off."));
+		else
+			hideMode.add(new JLabel("Unfinished elements are currently turned on."));
+		JButton toggle = new JButton("SWITCH!");
+		toggle.setVisible(true);
+		toggle.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				FlowClient.HIDE = !FlowClient.HIDE;
+				// Creates an "end session" message to send to the server
+				Data endSession = new Data("end_session");
+				endSession.put("session_id", Communicator.getSessionID());
+				Communicator.communicate(endSession);
+				Communicator.setSessionID(null);
+				Communicator.killAsync();
+				panMan.resetUI();
+			}
+		});
+		hideMode.add(toggle);
 	}
 
 	/**
 	 * Custom Tab for the JTabbedPane
+	 * 
 	 * @author Vince Ou
 	 *
 	 */
@@ -214,7 +241,9 @@ public class SettingsTabs extends JTabbedPane {
 
 		/**
 		 * Creates a new SettingsTab
-		 * @param name the name of the tab header
+		 * 
+		 * @param name
+		 *        the name of the tab header
 		 */
 		private SettingsTab(String name) {
 			// Just a bunch of settings

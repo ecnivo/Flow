@@ -1,24 +1,17 @@
 package database;
 
+import server.FlowServer;
+import util.DatabaseException;
+import util.Results;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
-
-import server.DataManagement;
-import server.FlowServer;
-import util.DatabaseException;
-import util.Results;
 
 public class SQLDatabase {
 
@@ -1430,28 +1423,28 @@ public class SQLDatabase {
 
 	public boolean checkAndRepairFileSystemCorruption(String databaseName,
 			String dataFolder) {
-//		try {
-//			ResultSet response = this.query("SELECT Username FROM Users;");
-//			while (response.next()) {
-//				String username = response.getString("Username");
-//				if (DataManagement.getInstance()
-//						.getUserByUsername(username) == null) {
-//					this.closeAccount(username);
-//				}
-//			}
-//
-//			response = this.query("SELECT DocumentID FROM Documents;");
-//			while (response.next()) {
-//				String fileUUID = response.getString("DocumentID");
-//				if (DataManagement.getInstance().fileExists(
-//						UUID.fromString(fileUUID)) == null) {
-//					this.closeAccount(username);
-//				}
-//			}
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		// try {
+		// ResultSet response = this.query("SELECT Username FROM Users;");
+		// while (response.next()) {
+		// String username = response.getString("Username");
+		// if (DataManagement.getInstance()
+		// .getUserByUsername(username) == null) {
+		// this.closeAccount(username);
+		// }
+		// }
+		//
+		// response = this.query("SELECT DocumentID FROM Documents;");
+		// while (response.next()) {
+		// String fileUUID = response.getString("DocumentID");
+		// if (DataManagement.getInstance().fileExists(
+		// UUID.fromString(fileUUID)) == null) {
+		// this.closeAccount(username);
+		// }
+		// }
+		// } catch (SQLException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		return true;
 	}
 

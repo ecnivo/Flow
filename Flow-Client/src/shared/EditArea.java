@@ -1,38 +1,25 @@
 
 package shared;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
+import editing.UserCaret;
+import gui.FlowClient;
+import message.Data;
+import util.Formatter;
+
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
-
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
-import message.Data;
-import util.Formatter;
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
-import editing.UserCaret;
-import gui.FlowClient;
 
 /**
  * The area for the user to edit their documents
@@ -44,54 +31,55 @@ import gui.FlowClient;
 public class EditArea extends JTextPane {
 
 	// Swing components
-	private JScrollPane				scrolling;
-	private StyledDocument			doc;
+	private JScrollPane scrolling;
+	private StyledDocument doc;
 
 	// UUID trackers
-	private UUID					versionTextUUID;
-	private UUID					fileUUID;
-	private UUID					projectUUID;
+	private UUID versionTextUUID;
+	private UUID fileUUID;
+	private UUID projectUUID;
 
 	// Styles
-	private Style					keywordStyle;
-	private Style					plainStyle;
-	private Style					stringStyle;
-	private Style					commentsStyle;
+	private Style keywordStyle;
+	private Style plainStyle;
+	private Style stringStyle;
+	private Style commentsStyle;
 
 	// "Blocks" of text to highlight
-	private ArrayList<StyleBlock>	keywordBlocks;
-	private ArrayList<StyleBlock>	stringBlocks;
-	private ArrayList<StyleBlock>	commentBlocks;
+	private ArrayList<StyleBlock> keywordBlocks;
+	private ArrayList<StyleBlock> stringBlocks;
+	private ArrayList<StyleBlock> commentBlocks;
 
 	// Different style constants
-	public static final Font		PLAIN			= new Font("Consolas", Font.PLAIN, 13);
-	public static final Color		PLAIN_COLOUR	= Color.BLACK;
-	public static final Color		KEYWORD_COLOUR	= new Color(0x38761D);
-	public static final Color		STRING_COLOUR	= new Color(0xA30BCF);
-	public static final Color		COMMENTS_COLOUR	= new Color(0xD13313);
+	public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
+	public static final Color PLAIN_COLOUR = Color.BLACK;
+	public static final Color KEYWORD_COLOUR = new Color(0x38761D);
+	public static final Color STRING_COLOUR = new Color(0xA30BCF);
+	public static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
 	// Java's keywords
-	private static final String[]	JAVA_KEYWORDS	= { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
-			"new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
+	private static final String[] JAVA_KEYWORDS = {
+			"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while"
+	};
 
-	private boolean					ignoreEvents	= false;
-	private ArrayList<UserCaret>	carets;
+	private boolean ignoreEvents = false;
+	private ArrayList<UserCaret> carets;
 
 	/**
 	 * Creates a new EditArea
 	 * 
 	 * @param textDoc
-	 *        the text of the document to load on start
+	 *            the text of the document to load on start
 	 * @param projectUUID
-	 *        the UUID of its parent project
+	 *            the UUID of its parent project
 	 * @param fileUUID
-	 *        the UUID of the specific file
+	 *            the UUID of the specific file
 	 * @param versionTextUUID
-	 *        the UUID of the version
+	 *            the UUID of the version
 	 * @param editable
-	 *        if this should be editable
+	 *            if this should be editable
 	 * @param tabs
-	 *        the parent EditTabs
+	 *            the parent EditTabs
 	 */
 	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable, EditTabs tabs) {
 		// Swing stuff
@@ -366,7 +354,7 @@ public class EditArea extends JTextPane {
 							@Override
 							public int getDot() {
 								return EditArea.this.getCaret().getDot();
-							}
+						}
 						});
 						break;
 
@@ -461,7 +449,7 @@ public class EditArea extends JTextPane {
 	 * Gets a caret by its username
 	 * 
 	 * @param name
-	 *        name of user
+	 *            name of user
 	 * @return the caret that corresponds with the name. Returns null if not
 	 *         found.
 	 */
@@ -494,16 +482,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class StyleBlock {
 
-		private int	length;
-		private int	premiereIdx;
+		private int length;
+		private int premiereIdx;
 
 		/**
 		 * Creates a new StyleBlock
 		 * 
 		 * @param length
-		 *        the length of the block
+		 *            the length of the block
 		 * @param firstIdx
-		 *        the index of the block
+		 *            the index of the block
 		 */
 		private StyleBlock(int length, int firstIdx) {
 			// Saves them
@@ -531,7 +519,7 @@ public class EditArea extends JTextPane {
 	}
 
 	/**
-	 * WORKING syntax highlighting - <3 Bimesh
+	 * WORKING syntax highlighting - Bimesh
 	 */
 	private void highlightSyntax() {
 		// Creates new blocks
@@ -540,22 +528,31 @@ public class EditArea extends JTextPane {
 		commentBlocks = new ArrayList<StyleBlock>();
 
 		String text = this.getText(), word = "";
-		int textLength = text.length();
+		printOut(text.toCharArray());
+		int textLength = text.length(), spaceCount = 0;
 		for (int i = 0; i < textLength; i++) {
 			char c = text.charAt(i);
 			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
 				word += c;
+				if (i == textLength - 1)
+					if (Arrays.asList(JAVA_KEYWORDS).contains(word)) {
+						keywordBlocks.add(new StyleBlock(word.length(), i + 1 - word.length() - spaceCount));
+					}
 			} else {
 				int length = word.length(), no;
-				if (Arrays.asList(JAVA_KEYWORDS).contains(word))
-					keywordBlocks.add(new StyleBlock(length, i - word.length()));
-				else if (c == '"') {
+				if (Arrays.asList(JAVA_KEYWORDS).contains(word)) {
+					keywordBlocks.add(new StyleBlock(length, i - word.length() - spaceCount));
+					if (c == 13)
+						spaceCount++;
+				} else if (c == '"') {
 					boolean done = false;
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == '\"') {
-							stringBlocks.add(new StyleBlock(i - start, start));
+						if (c == 13)
+							spaceCount++;
+						else if (c == '\"') {
+							stringBlocks.add(new StyleBlock(i - start, start - spaceCount));
 							done = true;
 						}
 					}
@@ -565,8 +562,10 @@ public class EditArea extends JTextPane {
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == '\'') {
-							stringBlocks.add(new StyleBlock(i - start, start));
+						if (c == 13)
+							spaceCount++;
+						else if (c == '\'') {
+							stringBlocks.add(new StyleBlock(i - start, start - spaceCount));
 							done = true;
 						}
 					}
@@ -578,28 +577,38 @@ public class EditArea extends JTextPane {
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
-							if (c == '\n') {
+							if (c == 13)
+								spaceCount++;
+							else if (c == '\n') {
 								done = true;
 							}
 						}
-						commentBlocks.add(new StyleBlock(i - start, start));
+						commentBlocks.add(new StyleBlock(i - start, start - spaceCount));
 						i--;
 					} else if (text.charAt(i + 1) == '*') {
-						int start = i;
+						int start = i, internalSpaceCount = 0;
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
-							if (c == '*') {
+							if (c == 13)
+								internalSpaceCount++;
+							else if (c == '*') {
 								i++;
-								if (text.charAt(i) == '/') {
+								c = text.charAt(i);
+								if (c == 13)
+									internalSpaceCount++;
+								else if (c == '/') {
 									done = true;
 								}
 							}
 						}
-						commentBlocks.add(new StyleBlock(i - start, start));
+						commentBlocks.add(new StyleBlock(i - start - internalSpaceCount, start - spaceCount));
+						spaceCount += internalSpaceCount;
 						i--;
 					}
 				}
+				if (c == 13)
+					spaceCount++;
 				word = "";
 			}
 		}
@@ -617,6 +626,11 @@ public class EditArea extends JTextPane {
 		for (StyleBlock styleBlock : commentBlocks) {
 			SwingUtilities.invokeLater(new FormatCommentsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
 		}
+	}
+
+	static void printOut(char[] chars) {
+		for (char c : chars)
+			System.out.print("'" + ((int) c) + "', ");
 	}
 
 	// /**
@@ -762,16 +776,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatKeywordsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		/**
 		 * Creates a new FormatKeywordsLater
 		 * 
 		 * @param pos
-		 *        the position
+		 *            the position
 		 * @param nextToken
-		 *        the length
+		 *            the length
 		 */
 		private FormatKeywordsLater(int pos, int nextToken) {
 
@@ -795,8 +809,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatPlainLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatPlainLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -818,8 +832,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatStringsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatStringsLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -840,8 +854,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatCommentsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatCommentsLater(int pos, int nextToken) {
 			this.pos = pos;

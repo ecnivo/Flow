@@ -1,17 +1,12 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.PrintStream;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import struct.User;
 import struct.VersionText;
 import util.FileSerializer;
+
+import java.io.*;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Created by Netdex on 1/5/2016.
@@ -123,6 +118,7 @@ public class DataManagement {
 		textFile.getParentFile().mkdirs();
 		try {
 			PrintStream ps = new PrintStream(textFile);
+			System.out.println(textDoc.getDocumentText());
 			ps.print(textDoc.getDocumentText());
 		} catch (Exception e) {
 			return false;
@@ -213,7 +209,7 @@ public class DataManagement {
 			String text = "";
 			String line;
 			while ((line = br.readLine()) != null) {
-				text += line;
+				text += (line + "\n");
 			}
 			td.setDocumentText(text);
 		} catch (Exception e) {
