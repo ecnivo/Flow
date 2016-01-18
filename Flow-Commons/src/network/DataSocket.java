@@ -31,11 +31,9 @@ public class DataSocket {
      * @param serializable The serializable to send
      * @throws IOException When something nasty happens
      */
-    public synchronized void send(Serializable serializable) throws IOException {
-        synchronized (oos) {
-            oos.writeObject(serializable);
-            oos.flush();
-        }
+    public void send(Serializable serializable) throws IOException {
+        oos.writeObject(serializable);
+        oos.flush();
     }
 
     /**
@@ -47,10 +45,8 @@ public class DataSocket {
      * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
-    public synchronized <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
-        synchronized (ois) {
-            return clazz.cast(ois.readObject());
-        }
+    public <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
+        return clazz.cast(ois.readObject());
     }
 
     /**
@@ -61,10 +57,9 @@ public class DataSocket {
      * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
-    public synchronized <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
-        synchronized (ois) {
-            return (T) ois.readObject();
-        }
+    public <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
+        return (T) ois.readObject();
+
     }
 
     public void close() throws IOException {
