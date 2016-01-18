@@ -326,7 +326,11 @@ public class EditArea extends JTextPane {
 							// current user's actions
 							ignoreEvents = true;
 							// Tries to insert the contents
-							doc.insertString(e.INDEX, addition, null);
+							try {
+								doc.insertString(e.INDEX, addition, null);
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
+							}
 							ignoreEvents = false;
 						} catch (BadLocationException e1) {
 							e1.printStackTrace();
@@ -338,7 +342,11 @@ public class EditArea extends JTextPane {
 						try {
 							ignoreEvents = true;
 							// Tries to remove the contents
-							doc.remove(e.INDEX, length);
+							try {
+								doc.remove(e.INDEX, length);
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
+							}
 							ignoreEvents = false;
 						} catch (BadLocationException e1) {
 							e1.printStackTrace();
@@ -359,20 +367,23 @@ public class EditArea extends JTextPane {
 						break;
 
 					case MOVE:
-						UserCaret caret = getCaretByUserName(e.USERNAME);
-						if (caret == null) {
-							System.out.println("caret not found");
-							return;
-						}
-						Rectangle rectangle = null;
-						try {
-							rectangle = modelToView(e.INDEX);
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
-							return;
-						}
-						caret.moveTo(rectangle.getLocation());
-						repaint();
+						//						UserCaret caret = getCaretByUserName(e.USERNAME);
+						//						if (caret == null) {
+						//							System.out.println("caret not found");
+						//							return;
+						//						}
+						//						Rectangle rectangle = null;
+						//						try {
+						//							rectangle = modelToView(e.INDEX);
+						//						} catch (BadLocationException e1) {
+						//							e1.printStackTrace();
+						//							return;
+						//						}catch(NullPointerException e1){
+						//							e1.printStackTrace();
+						//							return;
+						//						}
+						//						caret.moveTo(rectangle.getLocation());
+						//						repaint();
 
 						break;
 
@@ -465,7 +476,12 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		try {
+			super.paintComponent(g);
+			return;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 		Graphics2D g2d = (Graphics2D) g;
 		Point mouse = getMousePosition();
 		for (UserCaret userCaret : carets) {
