@@ -15,8 +15,8 @@ public class DataSocket {
 
     private Socket socket;
 
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    private final ObjectInputStream ois;
+    private final ObjectOutputStream oos;
 
     public DataSocket(Socket socket) throws IOException {
         this.socket = socket;
@@ -31,9 +31,13 @@ public class DataSocket {
      * @param serializable The serializable to send
      * @throws IOException When something nasty happens
      */
-    public void send(Serializable serializable) throws IOException {
-        oos.writeObject(serializable);
-        oos.flush();
+    public synchronized void send(Serializable serializable) throws IOException {
+        synchronized (oos) {
+            synchronized (ois) {
+                oos.writeObject(serializable);
+                oos.flush();
+            }
+        }
     }
 
     /**
@@ -45,8 +49,12 @@ public class DataSocket {
      * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
-    public <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
-        return clazz.cast(ois.readObject());
+    public synchronized <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
+        synchronized (ois) {
+            synchronized (oos) {
+                return clazz.cast(ois.readObject());
+            }
+        }
     }
 
     /**
@@ -57,8 +65,12 @@ public class DataSocket {
      * @throws IOException            When something nasty happens
      * @throws ClassNotFoundException When we don't have a copy of the class from remote
      */
-    public <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
-        return (T) ois.readObject();
+    public synchronized <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
+        synchronized (ois) {
+            synchronized (oos) {
+                return (T) ois.readObject();
+            }
+        }
     }
 
     public void close() throws IOException {
