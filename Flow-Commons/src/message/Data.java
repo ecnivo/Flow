@@ -54,17 +54,6 @@ public class Data implements Serializable {
     }
 
     /**
-     * Retrieves a property from this message with unchecked auto cast
-     *
-     * @param key The key of the message
-     * @param <T> The type of the value of the message
-     * @return The value of the property of type 'type'
-     */
-    public <T extends Serializable> T get(String key) {
-        return (T) stringObjectHashMap.get(key);
-    }
-
-    /**
      * Check if this data contains the key
      *
      * @param key The key to check
@@ -79,16 +68,12 @@ public class Data implements Serializable {
         String str = "";
         for (String key : stringObjectHashMap.keySet()) {
             if (stringObjectHashMap.get(key) instanceof Object[]) {
-                str += key + "=" + Arrays
-                        .toString((Object[]) stringObjectHashMap.get(key));
+                str += key + "=" + Arrays.toString((Object[]) stringObjectHashMap.get(key));
             } else {
-                str += key + "=" + (stringObjectHashMap.get(key) == null
-                                    ? "null" : stringObjectHashMap.get(key).toString());
+                str += key + "=" + (stringObjectHashMap.get(key) == null ? "null" : stringObjectHashMap.get(key).toString());
             }
             str += ", ";
         }
-        return "{"
-                + (str.length() < 2 ? "" : str.substring(0, str.length() - 2))
-                + "}";
+        return "{" + (str.length() < 2 ? "" : str.substring(0, str.length() - 2)) + "}";
     }
 }
