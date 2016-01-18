@@ -30,26 +30,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import message.Data;
-import callback.DocumentCallbackEvent;
-import callback.TextModificationListener;
-import editing.UserCaret;
-import gui.FlowClient;
-
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
 import callback.DocumentCallbackEvent;
 import callback.TextModificationListener;
 import editing.UserCaret;
@@ -66,57 +46,64 @@ import message.Data;
 public class EditArea extends JTextPane {
 
 	// Swing components
-	private JScrollPane				scrolling;
-	private StyledDocument			doc;
+	private JScrollPane scrolling;
+	private StyledDocument doc;
 
 	// UUID trackers
-	private UUID					versionTextUUID;
-	private UUID					fileUUID;
-	private UUID					projectUUID;
+	private UUID versionTextUUID;
+	private UUID fileUUID;
+	private UUID projectUUID;
 
 	// Styles
-	private Style					keywordStyle;
-	private Style					plainStyle;
-	private Style					stringStyle;
-	private Style					commentsStyle;
+	private Style keywordStyle;
+	private Style plainStyle;
+	private Style stringStyle;
+	private Style commentsStyle;
 
 	// "Blocks" of text to highlight
-	private ArrayList<StyleBlock>	keywordBlocks;
-	private ArrayList<StyleBlock>	stringBlocks;
-	private ArrayList<StyleBlock>	commentBlocks;
+	private ArrayList<StyleBlock> keywordBlocks;
+	private ArrayList<StyleBlock> stringBlocks;
+	private ArrayList<StyleBlock> commentBlocks;
 
 	// Different style constants
-	public static final Font		PLAIN			= new Font("Consolas", Font.PLAIN, 13);
-	public static final Color		PLAIN_COLOUR	= Color.BLACK;
-	public static final Color		KEYWORD_COLOUR	= new Color(0x38761D);
-	public static final Color		STRING_COLOUR	= new Color(0xA30BCF);
-	public static final Color		COMMENTS_COLOUR	= new Color(0xD13313);
-	private final static int		PASTE_LIMIT		= 1500;
+	public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
+	public static final Color PLAIN_COLOUR = Color.BLACK;
+	public static final Color KEYWORD_COLOUR = new Color(0x38761D);
+	public static final Color STRING_COLOUR = new Color(0xA30BCF);
+	public static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
 	// Java's keywords
-	private static final String[]	JAVA_KEYWORDS	= { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
-			"new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
+	private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
+			"boolean", "break", "byte", "case", "catch", "char", "class",
+			"const", "continue", "default", "do", "double", "else", "enum",
+			"extends", "false", "final", "finally", "float", "for", "goto",
+			"if", "implements", "import", "instanceof", "int", "interface",
+			"long", "native", "new", "package", "private", "protected",
+			"public", "return", "short", "static", "strictfp", "super",
+			"switch", "synchronized", "this", "throws", "throw", "transient",
+			"true", "try", "void", "volatile", "while" };
 
-	private boolean					ignoreEvents	= false;
-	private ArrayList<UserCaret>	carets;
+	private boolean ignoreEvents = false;
+	private ArrayList<UserCaret> carets;
 
 	/**
 	 * Creates a new EditArea
 	 * 
 	 * @param textDoc
-	 *        the text of the document to load on start
+	 *            the text of the document to load on start
 	 * @param projectUUID
-	 *        the UUID of its parent project
+	 *            the UUID of its parent project
 	 * @param fileUUID
-	 *        the UUID of the specific file
+	 *            the UUID of the specific file
 	 * @param versionTextUUID
-	 *        the UUID of the version
+	 *            the UUID of the version
 	 * @param editable
-	 *        if this should be editable
+	 *            if this should be editable
 	 * @param tabs
-	 *        the parent EditTabs
+	 *            the parent EditTabs
 	 */
-	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable, EditTabs tabs) {
+	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID,
+			UUID versionTextUUID, boolean editable, EditTabs tabs) {
 		// Swing stuff
 		setLayout(null);
 		scrolling = new JScrollPane(this);
@@ -139,8 +126,12 @@ public class EditArea extends JTextPane {
 		editorListRequest.put("project_uuid", projectUUID);
 		editorListRequest.put("session_id", Communicator.getSessionID());
 		Data editorListData = Communicator.communicate(editorListRequest);
-		if (editorListData.get("status", String.class).equals("ACCESS_DENIED")) {
-			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (editorListData.get("status", String.class)
+				.equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null,
+					"You do not have sufficient permissions complete this operation.",
+					"Access Denied", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE);
 			return;
 		} else if (!editorListData.get("status", String.class).equals("OK")) {
 			return;
@@ -195,12 +186,16 @@ public class EditArea extends JTextPane {
 				}
 				if (e.getKeyCode() == KeyEvent.VK_W) {
 					tabs.removeTabAt(tabs.getSelectedIndex());
-				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP && tabs.getSelectedIndex() > 0) {
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP
+						&& tabs.getSelectedIndex() > 0) {
 					System.out.println("switch left");
-					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() - 1));
-				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && tabs.getSelectedIndex() < tabs.getTabCount() - 1) {
+					tabs.setSelectedComponent(
+							tabs.getComponentAt(tabs.getSelectedIndex() - 1));
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
+						&& tabs.getSelectedIndex() < tabs.getTabCount() - 1) {
 					System.out.println("switch right");
-					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() + 1));
+					tabs.setSelectedComponent(
+							tabs.getComponentAt(tabs.getSelectedIndex() + 1));
 				}
 			}
 
@@ -244,49 +239,28 @@ public class EditArea extends JTextPane {
 				} catch (BadLocationException e1) {
 					e1.printStackTrace();
 				}
-
-//				if (strLen > PASTE_LIMIT) {
-//					int iterations = strLen / PASTE_LIMIT;
-//					for (int segment = 0; segment < iterations - 1; segment++) {
-//						String split = insertedString.substring(segment * PASTE_LIMIT, (segment + 1) * PASTE_LIMIT);
-//						if (!sendUpdate(fileUUID, caretPos + segment * PASTE_LIMIT, split)) {
-//							return;
-//						}
-//						sendUpdate(fileUUID, caretPos, insertedString.substring(iterations * PASTE_LIMIT));
-//					}
-//
-//				} else {
-					sendUpdate(fileUUID, caretPos, insertedString);
-//				}
-				// Updates syntax highlighting
-				highlightSyntax();
-			}
-
-			/**
-			 * Sends an update of file_text_modify
-			 * @param fileUUID the UUID of the file
-			 * @param caretPos the insertion point
-			 * @param insertString the String to insert
-			 * @return whether or not it was inserted successfully
-			 */
-			private boolean sendUpdate(UUID fileUUID, int caretPos, String insertString) {
 				// Prepare message for server to send text off
 				Data fileModify = new Data("file_text_modify");
 				fileModify.put("file_uuid", fileUUID);
 				fileModify.put("session_id", Communicator.getSessionID());
 				fileModify.put("mod_type", "INSERT");
 				fileModify.put("idx", caretPos);
-				fileModify.put("str", insertString);
+				fileModify.put("str", insertedString);
 
 				// Send message to server about what was inserted
 				Data response = Communicator.communicate(fileModify);
 				String status = response.get("status", String.class);
 				// Makes sure that things work
-				if (response == null || status == null || !status.equals("OK")) {
-					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-					return false;
+				if (response == null || status == null
+						|| !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null,
+							"Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.",
+							"Failed to edit file", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.ERROR_MESSAGE);
+					return;
 				}
-				return true;
+				// Updates syntax highlighting
+				highlightSyntax();
 			}
 
 			/**
@@ -311,8 +285,12 @@ public class EditArea extends JTextPane {
 				// Sends message to server
 				Data response = Communicator.communicate(metadataModify);
 				String status = response.get("status", String.class);
-				if (response == null || status == null || !status.equals("OK")) {
-					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+				if (response == null || status == null
+						|| !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null,
+							"Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.",
+							"Failed to edit file", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				// Highlights syntax
@@ -332,8 +310,12 @@ public class EditArea extends JTextPane {
 				caretPosChange.put("mod_type", "MOVE");
 				caretPosChange.put("idx", caretPos);
 				Data response = Communicator.communicate(caretPosChange);
-				if (response.get("status", String.class).equals("ACCESS_DENIED")) {
-					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (response.get("status", String.class)
+						.equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null,
+							"You do not have sufficient permissions complete this operation.",
+							"Access Denied", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 			}
@@ -349,69 +331,70 @@ public class EditArea extends JTextPane {
 				}
 
 				switch (e.TYPE) {
-					case INSERT:
-						String addition = e.ADDITION;
-						try {
-							// Uses boolean flags when inserting or deleting so that
-							// the
-							// insertions/deletions don't interpret the other users'
-							// inputs as the
-							// current user's actions
-							ignoreEvents = true;
-							// Tries to insert the contents
-							doc.insertString(e.INDEX, addition, null);
-							ignoreEvents = false;
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
+				case INSERT:
+					String addition = e.ADDITION;
+					try {
+						// Uses boolean flags when inserting or deleting so that
+						// the
+						// insertions/deletions don't interpret the other users'
+						// inputs as the
+						// current user's actions
+						ignoreEvents = true;
+						// Tries to insert the contents
+						doc.insertString(e.INDEX, addition, null);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+					break;
+
+				case DELETE:
+					int length = e.REMOVAL_LENGTH;
+					try {
+						ignoreEvents = true;
+						// Tries to remove the contents
+						doc.remove(e.INDEX, length);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+
+					fireCaretUpdate(new CaretEvent(EditArea.this) {
+
+						@Override
+						public int getMark() {
+							return EditArea.this.getCaret().getMark();
 						}
-						break;
 
-					case DELETE:
-						int length = e.REMOVAL_LENGTH;
-						try {
-							ignoreEvents = true;
-							// Tries to remove the contents
-							doc.remove(e.INDEX, length);
-							ignoreEvents = false;
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
+						@Override
+						public int getDot() {
+							return EditArea.this.getCaret().getDot();
 						}
+					});
+					break;
 
-						fireCaretUpdate(new CaretEvent(EditArea.this) {
+				case MOVE:
+					UserCaret caret = getCaretByUserName(e.USERNAME);
+					if (caret == null) {
+						System.out.println("caret not found");
+						return;
+					}
+					Rectangle rectangle = null;
+					try {
+						rectangle = modelToView(e.INDEX);
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+						return;
+					}
+					System.out.println(
+							caret + " was moved to " + rectangle.getLocation());
+					caret.moveTo(rectangle.getLocation());
+					repaint();
 
-							@Override
-							public int getMark() {
-								return EditArea.this.getCaret().getMark();
-							}
+					break;
 
-							@Override
-							public int getDot() {
-								return EditArea.this.getCaret().getDot();
-							}
-						});
-						break;
-
-					case MOVE:
-						UserCaret caret = getCaretByUserName(e.USERNAME);
-						if (caret == null) {
-							System.out.println("caret not found");
-							return;
-						}
-						Rectangle rectangle = null;
-						try {
-							rectangle = modelToView(e.INDEX);
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
-							return;
-						}
-						System.out.println(caret + " was moved to " + rectangle.getLocation());
-						caret.moveTo(rectangle.getLocation());
-						repaint();
-
-						break;
-
-					default:
-						break;
+				default:
+					break;
 				}
 				highlightSyntax();
 			}
@@ -421,10 +404,12 @@ public class EditArea extends JTextPane {
 		highlightSyntax();
 	}
 
-	private class VetoableDocumentChangeListener implements VetoableChangeListener {
+	private class VetoableDocumentChangeListener
+			implements VetoableChangeListener {
 
 		@Override
-		public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+		public void vetoableChange(PropertyChangeEvent evt)
+				throws PropertyVetoException {
 			// TODO
 		}
 
@@ -470,7 +455,7 @@ public class EditArea extends JTextPane {
 	 * Gets a caret by its username
 	 * 
 	 * @param name
-	 *        name of user
+	 *            name of user
 	 * @return the caret that corresponds with the name. Returns null if not
 	 *         found.
 	 */
@@ -491,7 +476,8 @@ public class EditArea extends JTextPane {
 		Point mouse = getMousePosition();
 		for (UserCaret userCaret : carets) {
 			g2d.setColor(userCaret.getColor());
-			g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret.getLocation().getY(), 3, 17);
+			g2d.fillRect((int) userCaret.getLocation().getX(),
+					(int) userCaret.getLocation().getY(), 3, 17);
 		}
 	}
 
@@ -503,16 +489,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class StyleBlock {
 
-		private int	length;
-		private int	premiereIdx;
+		private int length;
+		private int premiereIdx;
 
 		/**
 		 * Creates a new StyleBlock
 		 * 
 		 * @param length
-		 *        the length of the block
+		 *            the length of the block
 		 * @param firstIdx
-		 *        the index of the block
+		 *            the index of the block
 		 */
 		private StyleBlock(int length, int firstIdx) {
 			// Saves them
@@ -540,7 +526,7 @@ public class EditArea extends JTextPane {
 	}
 
 	/**
-	 * Highlights syntax, Java style.
+	 * WORKING syntax highlighting - <3 Bimesh
 	 */
 	private void highlightSyntax() {
 		// Creates new blocks
@@ -548,24 +534,6 @@ public class EditArea extends JTextPane {
 		stringBlocks = new ArrayList<StyleBlock>();
 		commentBlocks = new ArrayList<StyleBlock>();
 
-		// Goes through and does the key words first
-		String sourceCode = getText();
-		int sourceLength = sourceCode.length();
-		int lines = 0;
-		for (int pos = 0; pos < sourceLength; pos++) {
-			// First tries to find words
-			if (Character.isLetter(sourceCode.charAt(pos)) || pos == 0) {
-				int end = nextNonLetter(sourceCode, pos);
-				// if (end == -1) {
-				// end = sourceCode.length();
-				// }
-				if (end >= 0 || (pos == 0 && end == -1)) {
-					String candidate = sourceCode.substring(pos, end);
-					// If the word is in the array, then it's placed in a new
-					// StyleBlock
-					if (Arrays.asList(JAVA_KEYWORDS).contains(candidate.trim())) {
-						keywordBlocks.add(new StyleBlock(end - pos, pos - lines));
-						pos = end - 1;
 		String text = this.getText(), word = "";
 		int textLength = text.length();
 		for (int i = 0; i < textLength; i++) {
@@ -623,113 +591,29 @@ public class EditArea extends JTextPane {
 						}
 						commentBlocks.add(new StyleBlock(i - start, start));
 					}
-				} else {
-					break;
 				}
-			}
-			// Line counting, because the StyledDocumet counts \n differently
-			// compared to the string
-			if (sourceCode.charAt(pos) == '\n') {
-				lines++;
-			}
-		}
-
-		// Finds the strings
-		String sourceString = sourceCode.replace("\n", "");
-		for (int startQuote = 0; startQuote < sourceString.length(); startQuote++) {
-			if (sourceString.charAt(startQuote) == '"') {
-				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\') {
-					continue;
-				}
-
-				int endQuote = startQuote + 1;
-				// Searching for the next non-escaped, non-ending, matching
-				// quote
-				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '"' && sourceString.charAt(endQuote - 1) != '\\') {
-					endQuote++;
-				}
-				if (endQuote == sourceString.length()) {
-					continue;
-				}
-				stringBlocks.add(new StyleBlock(endQuote - startQuote, startQuote));
-				startQuote = endQuote;
-			} else if (sourceString.charAt(startQuote) == '\'') {
-				if (startQuote > 0 && sourceString.charAt(startQuote - 1) == '\\') {
-					// Means that the quote is escaped
-					continue;
-				}
-
-				int endQuote = startQuote + 1;
-				// Searching for the next non-escaped, non-ending, matching
-				// quote
-				while (endQuote < sourceString.length() && sourceString.charAt(endQuote) != '\'' && sourceString.charAt(endQuote - 1) != '\\') {
-					endQuote++;
-				}
-				if (endQuote == sourceString.length()) {
-					continue;
-				}
-				stringBlocks.add(new StyleBlock(endQuote - startQuote, startQuote));
-				startQuote = endQuote;
-			}
-		}
-
-		// Finds the asterisk-slash type comment
-		for (int pos = 0; pos < sourceString.length() - 2; pos++) {
-			// Tries to look for double-slash comments
-			String candidate = sourceString.substring(pos, pos + 2);
-			if (candidate.equals("/*")) {
-				int end = sourceString.indexOf("*/", pos);
-				if (end < 0) {
-					continue;
-				}
-				commentBlocks.add(new StyleBlock(end + 2 - pos, pos));
-				pos = end + 2;
-			}
-		}
-
-		for (int pos = 0; pos < sourceCode.length() - 1; pos++) {
-			String candidate = sourceCode.substring(pos, pos + 2);
-			if (candidate.equals("//")) {
-				int endIdx = sourceCode.indexOf('\n', pos);
-				if (endIdx == -1)
-					endIdx = sourceString.length();
-				int charsBefore = sourceCode.substring(0, pos).replace("\n", "").length();
-				commentBlocks.add(new StyleBlock(endIdx - pos, charsBefore));
-				pos = endIdx;
+				word = "";
 			}
 		}
 
 		// First paints everything "plain", then does key words, strings, then
 		// comments
-		SwingUtilities.invokeLater(new FormatPlainLater(0, sourceLength));
+		SwingUtilities.invokeLater(new FormatPlainLater(0, textLength));
 
 		for (StyleBlock styleBlock : keywordBlocks) {
-			SwingUtilities.invokeLater(new FormatKeywordsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+			SwingUtilities.invokeLater(new FormatKeywordsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength()));
 		}
 		for (StyleBlock styleBlock : stringBlocks) {
-			SwingUtilities.invokeLater(new FormatStringsLater(styleBlock.getFirstIdx(), styleBlock.getLength() + 1));
+			SwingUtilities.invokeLater(new FormatStringsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength() + 1));
 		}
 		for (StyleBlock styleBlock : commentBlocks) {
-			SwingUtilities.invokeLater(new FormatCommentsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+			SwingUtilities.invokeLater(new FormatCommentsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength()));
 		}
 	}
 
-	/**
-	 * Finds the next non-alphabetic letter in a string
-	 * 
-	 * @param sourceCode
-	 *        the string to search
-	 * @param idx
-	 *        the index to start from
-	 * @return the index (-1 if none)
-	 */
-	private int nextNonLetter(String sourceCode, int idx) {
-		int sourceCodeLength = sourceCode.length();
-		do {
-			idx++;
-		} while (idx < sourceCodeLength - 1 && Character.isLetter(sourceCode.charAt(idx)));
-		return idx;
-	}
 	// /**
 	// * Highlights syntax, Java style.
 	// */
@@ -873,16 +757,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatKeywordsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		/**
 		 * Creates a new FormatKeywordsLater
 		 * 
 		 * @param pos
-		 *        the position
+		 *            the position
 		 * @param nextToken
-		 *        the length
+		 *            the length
 		 */
 		private FormatKeywordsLater(int pos, int nextToken) {
 
@@ -906,8 +790,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatPlainLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatPlainLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -929,8 +813,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatStringsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatStringsLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -951,8 +835,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatCommentsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatCommentsLater(int pos, int nextToken) {
 			this.pos = pos;
