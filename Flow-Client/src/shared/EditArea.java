@@ -570,7 +570,6 @@ public class EditArea extends JTextPane {
 		commentBlocks = new ArrayList<StyleBlock>();
 
 		String text = this.getText(), word = "";
-		printOut(text.toCharArray());
 		int textLength = text.length(), spaceCount = 0;
 		for (int i = 0; i < textLength; i++) {
 			char c = text.charAt(i);
@@ -623,11 +622,11 @@ public class EditArea extends JTextPane {
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
-							if (c == 13)
-								spaceCount++;
-							else if (c == '\n') {
+							if (c == '\n') {
 								done = true;
 							}
+							if (c == 13)
+								spaceCount++;
 						}
 						commentBlocks.add(
 								new StyleBlock(i - start, start - spaceCount));
@@ -655,8 +654,7 @@ public class EditArea extends JTextPane {
 						spaceCount += internalSpaceCount;
 						i--;
 					}
-				}
-				if (c == 13)
+				} else if (c == 13)
 					spaceCount++;
 				word = "";
 			}

@@ -123,6 +123,7 @@ public class DataManagement {
 		textFile.getParentFile().mkdirs();
 		try {
 			PrintStream ps = new PrintStream(textFile);
+			System.out.println(textDoc.getDocumentText());
 			ps.print(textDoc.getDocumentText());
 		} catch (Exception e) {
 			return false;
@@ -213,7 +214,7 @@ public class DataManagement {
 			String text = "";
 			String line;
 			while ((line = br.readLine()) != null) {
-				text += line;
+				text += (line + "\n");
 			}
 			td.setDocumentText(text);
 		} catch (Exception e) {
