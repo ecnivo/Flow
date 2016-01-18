@@ -1,6 +1,8 @@
 
 package editing;
 
+import gui.FlowClient;
+
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -24,7 +26,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import gui.FlowClient;
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
@@ -43,16 +44,16 @@ import shared.FileTree.ProjectNode;
 public class EditorToolbar extends JToolBar {
 
 	// Keeps track of the buttons
-	private JPopupMenu popup;
-	private JMenuItem createProjectButton;
-	private JMenuItem renameProjectButton;
-	private EditPane editPane;
+	private JPopupMenu	popup;
+	private JMenuItem	createProjectButton;
+	private JMenuItem	renameProjectButton;
+	private EditPane	editPane;
 
 	/**
 	 * Creates a new EditorToolbar
 	 * 
 	 * @param pane
-	 *            the parent EditPane
+	 *        the parent EditPane
 	 */
 	public EditorToolbar(EditPane pane) {
 		// Swing setup
@@ -73,21 +74,13 @@ public class EditorToolbar extends JToolBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Asks user for new name
-				String projectName = JOptionPane.showInputDialog(null,
-						"Please enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
-								+ "\" < > . # & { } $ @ = ` + ",
-						"New Project", JOptionPane.QUESTION_MESSAGE);
+				String projectName = JOptionPane.showInputDialog(null, "Please enter a name for your new Project\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "New Project", JOptionPane.QUESTION_MESSAGE);
 				if (projectName == null) {
 					return;
 				}
 				projectName = projectName.trim();
-				while (CreateAccountPane.stringContains(projectName,
-						CreateAccountPane.INVALID_CHARS)
-						|| projectName.length() < 1) {
-					projectName = JOptionPane.showInputDialog(null,
-							"That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | "
-									+ "\" < > . # & { } $ @ = ` + ",
-							"Invalid name", JOptionPane.QUESTION_MESSAGE);
+				while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() < 1) {
+					projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
 					if (projectName == null) {
 						return;
 					}
@@ -97,29 +90,20 @@ public class EditorToolbar extends JToolBar {
 				// Sends request to server
 				Data createProjectRequest = new Data("new_project");
 				createProjectRequest.put("project_name", projectName);
-				createProjectRequest.put("session_id",
-						Communicator.getSessionID());
-				switch (Communicator.communicate(createProjectRequest)
-						.get("status", String.class)) {
+				createProjectRequest.put("session_id", Communicator.getSessionID());
+				switch (Communicator.communicate(createProjectRequest).get("status", String.class)) {
 				// Success case
-				case "OK":
-					break;
+					case "OK":
+						break;
 
-				case "ACCESS_DENIED":
-					JOptionPane.showConfirmDialog(null,
-							"You do not have sufficient permissions complete this operation.",
-							"Access Denied", JOptionPane.DEFAULT_OPTION,
-							JOptionPane.WARNING_MESSAGE);
-					break;
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
 
-				// Other cases
-				default:
-					JOptionPane.showConfirmDialog(null,
-							"Your project name is invalid. Please choose another one.\nThe most likely case is that your project name conflicts with another project name.",
-							"Project creation failure",
-							JOptionPane.DEFAULT_OPTION,
-							JOptionPane.ERROR_MESSAGE);
-					break;
+					// Other cases
+					default:
+						JOptionPane.showConfirmDialog(null, "Your project name is invalid. Please choose another one.\nThe most likely case is that your project name conflicts with another project name.", "Project creation failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
 				}
 				// Refreshes
 				pane.getFileTree().refreshProjectList();
@@ -148,24 +132,13 @@ public class EditorToolbar extends JToolBar {
 				ProjectNode selectedNode = (ProjectNode) pathArray[1];
 
 				// Asks user for new name
-				String modifiedProjectName = JOptionPane.showInputDialog(null,
-						"Please enter new name for the project "
-								+ selectedNode.getName()
-								+ "\nNo characters such as: \\ / ? % * : | "
-								+ "\" < > . # & { } $ @ = ` + ",
-						"Rename project", JOptionPane.QUESTION_MESSAGE);
+				String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + selectedNode.getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE);
 				if (modifiedProjectName == null) {
 					return;
 				}
 				modifiedProjectName = modifiedProjectName.trim();
-				while (CreateAccountPane.stringContains(modifiedProjectName,
-						CreateAccountPane.INVALID_CHARS)
-						|| modifiedProjectName.length() < 1) {
-					modifiedProjectName = JOptionPane.showInputDialog(null,
-							"That name is invalid.\nPlease enter an appropriate new name for this project."
-									+ "\nNo characters such as: \\ / ? % * : | "
-									+ "\" < > . # & { } $ @ = ` + ",
-							"Invalid name", JOptionPane.QUESTION_MESSAGE);
+				while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
+					modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
 					if (modifiedProjectName == null) {
 						return;
 					}
@@ -175,47 +148,25 @@ public class EditorToolbar extends JToolBar {
 				// Preps request to server
 				Data modifyRequest = new Data("project_modify");
 				modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-				modifyRequest.put("project_uuid",
-						selectedNode.getProjectUUID());
+				modifyRequest.put("project_uuid", selectedNode.getProjectUUID());
 				modifyRequest.put("session_id", Communicator.getSessionID());
 				modifyRequest.put("new_name", modifiedProjectName);
 				// Sends request to server
-				switch (Communicator.communicate(modifyRequest).get("status",
-						String.class)) {
+				switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 				// Success case
-				case "OK":
-					((ProjectNode) pane.getFileTree().getSelectionPath()
-							.getPath()[1]).setName(modifiedProjectName);
-					JOptionPane.showConfirmDialog(null,
-							"Your project has been succesfully renamed to "
-									+ modifiedProjectName + ".",
-							"Project renaming success",
-							JOptionPane.DEFAULT_OPTION,
-							JOptionPane.INFORMATION_MESSAGE);
-					break;
-				// Failure cases
-				case "PROJECT_NAME_INVALID":
-					JOptionPane.showConfirmDialog(null,
-							"Your project name is invalid.\nPlease choose another one.",
-							"Project renaming failure",
-							JOptionPane.DEFAULT_OPTION,
-							JOptionPane.ERROR_MESSAGE);
-					break;
-				case "ACCESS_DENIED":
-					JOptionPane.showConfirmDialog(null,
-							"You do not have sufficient permissions complete this operation.",
-							"Access Denied", JOptionPane.DEFAULT_OPTION,
-							JOptionPane.WARNING_MESSAGE);
-					break;
-				case "PROJECT_DOES_NOT_EXIST":
-					JOptionPane.showConfirmDialog(null,
-							"The project you are trying to rename does not exist.\n"
-									+ "Try refreshing the list of projects by moving your mouse cursor into,\n"
-									+ "then out of the project list.",
-							"Project renaming failure",
-							JOptionPane.DEFAULT_OPTION,
-							JOptionPane.ERROR_MESSAGE);
-					break;
+					case "OK":
+						((ProjectNode) pane.getFileTree().getSelectionPath().getPath()[1]).setName(modifiedProjectName);
+						break;
+					// Failure cases
+					case "PROJECT_NAME_INVALID":
+						JOptionPane.showConfirmDialog(null, "Your project name is invalid.\nPlease choose another one.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
+					case "ACCESS_DENIED":
+						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						break;
+					case "PROJECT_DOES_NOT_EXIST":
+						JOptionPane.showConfirmDialog(null, "The project you are trying to rename does not exist.\n" + "Try refreshing the list of projects by moving your mouse cursor into,\n" + "then out of the project list.", "Project renaming failure", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
 				}
 				// Forces a refresh
 				pane.getFileTree().refreshProjectList();
@@ -234,18 +185,12 @@ public class EditorToolbar extends JToolBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Gets the project
-				UUID projectUUID = ((ProjectNode) pane.getFileTree()
-						.getSelectionPath().getPath()[1]).getProjectUUID();
+				UUID projectUUID = ((ProjectNode) pane.getFileTree().getSelectionPath().getPath()[1]).getProjectUUID();
 				if (projectUUID == null) {
 					return;
 				}
 				// Confirmation dialog
-				String confirm = JOptionPane.showInputDialog(null,
-						"Please type the project name that you are intending\n"
-								+ "to delete EXACTLY AS IT IS in the following box.\n\n"
-								+ "Deleting a project means you will lose ALL data and\n"
-								+ "all collaborators will be removed. Back up code accordingly.",
-						"Confirm project deletion",
+				String confirm = JOptionPane.showInputDialog(null, "Please type the project name that you are intending\n" + "to delete EXACTLY AS IT IS in the following box.\n\n" + "Deleting a project means you will lose ALL data and\n" + "all collaborators will be removed. Back up code accordingly.", "Confirm project deletion",
 						JOptionPane.WARNING_MESSAGE);
 				if (confirm == null) {
 					return;
@@ -256,62 +201,44 @@ public class EditorToolbar extends JToolBar {
 				projectRequest.put("session_id", Communicator.getSessionID());
 				projectRequest.put("project_uuid", projectUUID);
 				Data project = Communicator.communicate(projectRequest);
-				if (project.get("status", String.class)
-						.equals("ACCESS_DENIED")) {
-					JOptionPane.showConfirmDialog(null,
-							"You do not have sufficient permissions complete this operation.",
-							"Access Denied", JOptionPane.DEFAULT_OPTION,
-							JOptionPane.WARNING_MESSAGE);
+				if (project.get("status", String.class).equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 				}
 				// Confirms that they match
 				if (confirm.equals(project.get("project_name", String.class))) {
 					// Secondary confirmation
-					int confirmation = JOptionPane.showConfirmDialog(null,
-							"Are you sure you want to delete "
-									+ project.get("project_name", String.class)
-									+ "?",
-							"Confirm project deletion",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
+					int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + project.get("project_name", String.class) + "?", "Confirm project deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if (confirmation == JOptionPane.YES_OPTION) {
 						// Creates deletion message
 						Data deleteProjectRequest = new Data("project_modify");
-						deleteProjectRequest.put("project_modify_type",
-								"DELETE_PROJECT");
+						deleteProjectRequest.put("project_modify_type", "DELETE_PROJECT");
 						deleteProjectRequest.put("project_uuid", projectUUID);
-						deleteProjectRequest.put("session_id",
-								Communicator.getSessionID());
+						deleteProjectRequest.put("session_id", Communicator.getSessionID());
 
 						// Sends deletion message
-						Data reply = Communicator
-								.communicate(deleteProjectRequest);
+						Data reply = Communicator.communicate(deleteProjectRequest);
 						String status = reply.get("status", String.class);
 						switch (status) {
 						// Success case
-						case "OK":
-							project = null;
-							pane.getFileTree().refreshProjectList();
-							break;
+							case "OK":
+								project = null;
+								pane.getFileTree().refreshProjectList();
+								pane.getFileTree().setSelectionRow(0);
+								break;
 
-						case "ACCESS_DENIED":
-							JOptionPane.showConfirmDialog(null,
-									"You do not have sufficient permissions complete this operation.",
-									"Access Denied", JOptionPane.DEFAULT_OPTION,
-									JOptionPane.WARNING_MESSAGE);
-							break;
+							case "ACCESS_DENIED":
+								JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+								break;
 
-						// Failure cases
-						default:
-							break;
+							// Failure cases
+							default:
+								break;
 						}
 					} else
 						return;
 				} else {
 					// Typo!
-					JOptionPane.showConfirmDialog(null,
-							"The project name is incorrect.\nNothing has been changed.",
-							"Deletion failed", JOptionPane.DEFAULT_OPTION,
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showConfirmDialog(null, "The project name is incorrect.\nNothing has been changed.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 			}
@@ -349,12 +276,7 @@ public class EditorToolbar extends JToolBar {
 		private SearchButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO
-						.read(ClassLoader
-								.getSystemResource("images/search.png"))
-						.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-								FlowClient.BUTTON_ICON_SIZE,
-								Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/search.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -389,12 +311,7 @@ public class EditorToolbar extends JToolBar {
 		private ProjectManageButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO
-						.read(ClassLoader
-								.getSystemResource("images/projectManage.png"))
-						.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-								FlowClient.BUTTON_ICON_SIZE,
-								Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/projectManage.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -407,9 +324,7 @@ public class EditorToolbar extends JToolBar {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					popup.show(EditorToolbar.this,
-							ProjectManageButton.this.getX(),
-							ProjectManageButton.this.getY());
+					popup.show(EditorToolbar.this, ProjectManageButton.this.getX(), ProjectManageButton.this.getY());
 				}
 			});
 		}
@@ -429,12 +344,7 @@ public class EditorToolbar extends JToolBar {
 		private ImportButton() {
 			// Sets an icon
 			try {
-				setIcon(new ImageIcon(ImageIO
-						.read(ClassLoader
-								.getSystemResource("images/import.png"))
-						.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-								FlowClient.BUTTON_ICON_SIZE,
-								Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/import.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -448,25 +358,16 @@ public class EditorToolbar extends JToolBar {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Gets the node to put the file under
-					DefaultMutableTreeNode selectedDir = (DefaultMutableTreeNode) editPane
-							.getFileTree().getSelectionPath()
-							.getLastPathComponent();
-					if (selectedDir == null
-							|| !(selectedDir instanceof DirectoryNode)) {
-						JOptionPane.showConfirmDialog(null,
-								"Please select a directory to place your imported file under",
-								"Select a directory first",
-								JOptionPane.DEFAULT_OPTION,
-								JOptionPane.ERROR_MESSAGE);
+					DefaultMutableTreeNode selectedDir = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					if (selectedDir == null || !(selectedDir instanceof DirectoryNode)) {
+						JOptionPane.showConfirmDialog(null, "Please select a directory to place your imported file under", "Select a directory first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					UUID dirUUID = ((DirectoryNode) selectedDir)
-							.getDirectoryUUID();
+					UUID dirUUID = ((DirectoryNode) selectedDir).getDirectoryUUID();
 
 					// Opens a file chooser to get new file
 					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setFileFilter(
-							new javax.swing.filechooser.FileFilter() {
+					fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
 						@Override
 						public String getDescription() {
@@ -476,14 +377,12 @@ public class EditorToolbar extends JToolBar {
 						@Override
 						public boolean accept(File f) {
 							String name = f.getName();
-							return name.endsWith(".java")
-									|| name.endsWith(".txt") || f.isDirectory();
+							return name.endsWith(".java") || name.endsWith(".txt") || f.isDirectory();
 						}
 					});
 					fileChooser.setDialogTitle("Select file to import...");
 					File importFile;
-					if (fileChooser.showOpenDialog(
-							EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
+					if (fileChooser.showOpenDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
 						importFile = fileChooser.getSelectedFile();
 					} else {
 						return;
@@ -491,31 +390,23 @@ public class EditorToolbar extends JToolBar {
 
 					// Asks server to create new file
 					Data createFileRequest = new Data("new_text_file");
-					createFileRequest.put("session_id",
-							Communicator.getSessionID());
+					createFileRequest.put("session_id", Communicator.getSessionID());
 					createFileRequest.put("file_name", importFile.getName());
-					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1])
-							.getProjectUUID();
+					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 					createFileRequest.put("project_uuid", projectUUID);
 					createFileRequest.put("directory_uuid", dirUUID);
 					Data response = Communicator.communicate(createFileRequest);
 					switch (response.get("status", String.class)) {
-					case "ACCESS_DENIED":
-						JOptionPane.showConfirmDialog(null,
-								"You do not have sufficient permissions complete this operation.",
-								"Access Denied", JOptionPane.DEFAULT_OPTION,
-								JOptionPane.WARNING_MESSAGE);
-						return;
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
 
-					case "OK":
-						break;
+						case "OK":
+							break;
 
-					default:
-						JOptionPane.showConfirmDialog(null,
-								"There was an error importing your file.\nTry a force refresh on the documents tree by Alt + clicking it.",
-								"Import error", JOptionPane.DEFAULT_OPTION,
-								JOptionPane.ERROR_MESSAGE);
-						return;
+						default:
+							JOptionPane.showConfirmDialog(null, "There was an error importing your file.\nTry a force refresh on the documents tree by Alt + clicking it.", "Import error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+							return;
 					}
 
 					// Gets the file contents into a String
@@ -535,35 +426,27 @@ public class EditorToolbar extends JToolBar {
 
 					// Writes file contents to server
 					Data modify = new Data("file_text_modify");
-					modify.put("file_uuid",
-							response.get("file_uuid", UUID.class));
+					modify.put("file_uuid", response.get("file_uuid", UUID.class));
 					modify.put("session_id", Communicator.getSessionID());
 					modify.put("mod_type", "INSERT");
 					modify.put("idx", 0);
 					modify.put("str", fileContents);
 					Data modifyResponse = Communicator.communicate(modify);
 					switch (modifyResponse.get("status", String.class)) {
-					case "OK":
-						break;
+						case "OK":
+							break;
 
-					case "ACCESS_DENIED":
-						JOptionPane.showConfirmDialog(null,
-								"You do not have sufficient permissions complete this operation.",
-								"Access Denied", JOptionPane.DEFAULT_OPTION,
-								JOptionPane.WARNING_MESSAGE);
-						return;
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
 
-					default:
-						return;
+						default:
+							return;
 					}
 
 					// Inserts a new child node
-					FileTree.FileNode child = editPane.getFileTree()
-							.generateFileNode(
-									response.get("file_uuid", UUID.class));
-					((DefaultTreeModel) editPane.getFileTree().getModel())
-							.insertNodeInto(child, selectedDir,
-									selectedDir.getChildCount());
+					FileTree.FileNode child = editPane.getFileTree().generateFileNode(response.get("file_uuid", UUID.class));
+					((DefaultTreeModel) editPane.getFileTree().getModel()).insertNodeInto(child, selectedDir, selectedDir.getChildCount());
 				}
 			});
 		}
@@ -580,12 +463,7 @@ public class EditorToolbar extends JToolBar {
 		private ExportButton() {
 			// Sets the icon
 			try {
-				setIcon(new ImageIcon(ImageIO
-						.read(ClassLoader
-								.getSystemResource("images/export.png"))
-						.getScaledInstance(FlowClient.BUTTON_ICON_SIZE,
-								FlowClient.BUTTON_ICON_SIZE,
-								Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/export.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -600,48 +478,36 @@ public class EditorToolbar extends JToolBar {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Gets the source for export
-					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane
-							.getFileTree().getSelectionPath()
-							.getLastPathComponent();
+					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
 					if (selected == null || !(selected instanceof FileNode)) {
-						JOptionPane.showConfirmDialog(null,
-								"Please select a file to export",
-								"Select a file first",
-								JOptionPane.DEFAULT_OPTION,
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					FileNode node = (FileNode) selected;
 
 					// Gets the export contents
 					Data getFileContents = new Data("file_request");
-					getFileContents.put("session_id",
-							Communicator.getSessionID());
+					getFileContents.put("session_id", Communicator.getSessionID());
 					getFileContents.put("file_uuid", node.getFileUUID());
 					Data reply = Communicator.communicate(getFileContents);
 					switch (reply.get("status", String.class)) {
-					case "OK":
-						break;
+						case "OK":
+							break;
 
-					case "ACCESS_DENIED":
-						JOptionPane.showConfirmDialog(null,
-								"You do not have sufficient permissions complete this operation.",
-								"Access Denied", JOptionPane.DEFAULT_OPTION,
-								JOptionPane.WARNING_MESSAGE);
-						return;
+						case "ACCESS_DENIED":
+							JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+							return;
 
-					default:
-						return;
+						default:
+							return;
 					}
-					String fileConts = new String(
-							reply.get("file_data", byte[].class));
+					String fileConts = new String(reply.get("file_data", byte[].class));
 
 					// Gets the name of the export file
 					Data getFileName = new Data("file_info");
 					getFileName.put("session_id", Communicator.getSessionID());
 					getFileName.put("file_uuid", node.getFileUUID());
-					String fileName = Communicator.communicate(getFileName)
-							.get("file_name", String.class);
+					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
 
 					// Checks. Makes it a txt by default.
 					boolean valid = true;
@@ -654,30 +520,23 @@ public class EditorToolbar extends JToolBar {
 
 					// Gets the user to choose the destination
 					JFileChooser destChooser = new JFileChooser();
-					destChooser.setFileSelectionMode(
-							JFileChooser.DIRECTORIES_ONLY);
-					destChooser.setCurrentDirectory(
-							new File(System.getProperty("user.home")));
+					destChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					destChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 					destChooser.setDialogTitle("Choose export destination");
 					String dest;
-					if (destChooser.showSaveDialog(
-							EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
-						dest = destChooser.getCurrentDirectory().getPath()
-								+ "\\" + fileName;
+					if (destChooser.showSaveDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
+						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
 					} else {
 						return;
 					}
+					JOptionPane.showConfirmDialog(null, "Confirm export destination to be " + dest + "?", "Confirm export", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
 					File outFile = new File(dest);
 
 					// Writes it into the destination TODO (this may be the
 					// cause of the errors)
 					try {
 						if (!outFile.createNewFile()) {
-							JOptionPane.showConfirmDialog(null,
-									"Could not export. Are you sure you have permissions to the destination folder?",
-									"Could not export",
-									JOptionPane.DEFAULT_OPTION,
-									JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showConfirmDialog(null, "Could not export. Are you sure you have permissions to the destination folder?", "Could not export", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 
@@ -692,11 +551,7 @@ public class EditorToolbar extends JToolBar {
 					}
 
 					// Shows confirmation
-					JOptionPane.showConfirmDialog(null,
-							"Finished exporting file " + fileName + " to "
-									+ dest,
-							"Done!", JOptionPane.DEFAULT_OPTION,
-							JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showConfirmDialog(null, "Finished exporting file " + fileName + " to " + dest, "Done!", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
