@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.SequenceInputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -143,11 +144,13 @@ public class RunStopBar extends JToolBar {
                                 activeProcess = flowCompiler.execute();
                                 new Thread() {
                                     public void run() {
+                                        console.addOutput("Running " + textFiles.get(0).getName() + "\n");
                                         try {
-                                            InputStreamReader isr = new InputStreamReader(activeProcess.getInputStream());
+                                            SequenceInputStream s = new SequenceInputStream(activeProcess.getInputStream(), activeProcess.getErrorStream());
+                                            InputStreamReader isr = new InputStreamReader(s);
                                             console.setActiveOutputStream(activeProcess.getOutputStream());
                                             int c;
-                                            while ((c = isr.read()) != -1) {
+                                            while ((c = isr.read()) != -1 && activeProcess != null) {
                                                 console.addOutput(((char) c) + "");
                                             }
                                             isr.close();
@@ -155,7 +158,7 @@ public class RunStopBar extends JToolBar {
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
-                                        console.addOutput("Process has stopped!\n");
+                                        console.addOutput("==================== STOPPED ====================\n");
                                         activeProcess = null;
                                     }
                                 }.start();
@@ -203,7 +206,7 @@ public class RunStopBar extends JToolBar {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (activeProcess != null) {
-                        activeProcess.destroy();
+                        activeProcess.destroyForcibly();
                         activeProcess = null;
                         console.setActiveOutputStream(null);
                     }
