@@ -1383,8 +1383,8 @@ public class SQLDatabase {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.err.println();
-				System.err.println(
-						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
+				System.err
+						.println("Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
 				System.exit(0);
 			}
 		}
