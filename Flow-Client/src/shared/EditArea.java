@@ -36,6 +36,26 @@ import callback.TextModificationListener;
 import editing.UserCaret;
 import gui.FlowClient;
 
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import callback.DocumentCallbackEvent;
+import callback.TextModificationListener;
+import editing.UserCaret;
+import gui.FlowClient;
+import message.Data;
+
 /**
  * The area for the user to edit their documents
  * 
@@ -546,6 +566,62 @@ public class EditArea extends JTextPane {
 					if (Arrays.asList(JAVA_KEYWORDS).contains(candidate.trim())) {
 						keywordBlocks.add(new StyleBlock(end - pos, pos - lines));
 						pos = end - 1;
+		String text = this.getText(), word = "";
+		int textLength = text.length();
+		for (int i = 0; i < textLength; i++) {
+			char c = text.charAt(i);
+			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
+				word += c;
+			} else {
+				int length = word.length(), no;
+				if (Arrays.asList(JAVA_KEYWORDS).contains(word))
+					keywordBlocks
+							.add(new StyleBlock(length, i - word.length()));
+				else if (c == '"') {
+					boolean done = false;
+					int start = i;
+					for (i = i + 1; !done && i < textLength; i++) {
+						c = text.charAt(i);
+						if (c == '\"') {
+							stringBlocks.add(new StyleBlock(i - start, start));
+							done = true;
+						}
+					}
+				} else if (c == '\'') {
+					boolean done = false;
+					int start = i;
+					for (i = i + 1; !done && i < textLength; i++) {
+						c = text.charAt(i);
+						if (c == '\'') {
+							stringBlocks.add(new StyleBlock(i - start, start));
+							done = true;
+						}
+					}
+				} else if (c == '/') {
+					boolean done = false;
+					if (text.charAt(i + 1) == '/') {
+						int start = i;
+						i += 2;
+						for (; !done && i < textLength; i++) {
+							c = text.charAt(i);
+							if (c == '\n') {
+								done = true;
+							}
+						}
+						commentBlocks.add(new StyleBlock(i - start, start));
+					} else if (text.charAt(i + 1) == '*') {
+						int start = i;
+						i += 2;
+						for (; !done && i < textLength; i++) {
+							c = text.charAt(i);
+							if (c == '*') {
+								i++;
+								if (text.charAt(i) == '/') {
+									done = true;
+								}
+							}
+						}
+						commentBlocks.add(new StyleBlock(i - start, start));
 					}
 				} else {
 					break;
@@ -654,6 +730,140 @@ public class EditArea extends JTextPane {
 		} while (idx < sourceCodeLength - 1 && Character.isLetter(sourceCode.charAt(idx)));
 		return idx;
 	}
+	// /**
+	// * Highlights syntax, Java style.
+	// */
+	// private void highlightSyntax2() {
+	// // Creates new blocks
+	// keywordBlocks = new ArrayList<StyleBlock>();
+	// stringBlocks = new ArrayList<StyleBlock>();
+	// commentBlocks = new ArrayList<StyleBlock>();
+	//
+	// // Goes through and does the key words first
+	// String sourceCode = getText();
+	// int sourceLength = sourceCode.length();
+	// int lines = 0;
+	// for (int pos = 0; pos < sourceLength; pos++) {
+	// // First tries to find words
+	// if (Character.isLetter(sourceCode.charAt(pos)) || pos == 0) {
+	// int end = nextNonLetter(sourceCode, pos);
+	// // if (end == -1) {
+	// // end = sourceCode.length();
+	// // }
+	// if (end >= 0 || (pos == 0 && end == -1)) {
+	// String candidate = sourceCode.substring(pos, end);
+	// // If the word is in the array, then it's placed in a new
+	// // StyleBlock
+	// if (Arrays.asList(JAVA_KEYWORDS)
+	// .contains(candidate.trim())) {
+	// keywordBlocks
+	// .add(new StyleBlock(end - pos, pos - lines));
+	// pos = end - 1;
+	// }
+	// } else {
+	// break;
+	// }
+	// }
+	// // Line counting, because the StyledDocumet counts \n differently
+	// // compared to the string
+	// if (sourceCode.charAt(pos) == '\n') {
+	// lines++;
+	// }
+	// }
+	//
+	// // Finds the strings
+	// String sourceString = sourceCode.replace("\n", "");
+	// for (int startQuote = 0; startQuote < sourceString
+	// .length(); startQuote++) {
+	// if (sourceString.charAt(startQuote) == '"') {
+	// if (startQuote > 0
+	// && sourceString.charAt(startQuote - 1) == '\\') {
+	// continue;
+	// }
+	//
+	// int endQuote = startQuote + 1;
+	// // Searching for the next non-escaped, non-ending, matching
+	// // quote
+	// while (endQuote < sourceString.length()
+	// && sourceString.charAt(endQuote) != '"'
+	// && sourceString.charAt(endQuote - 1) != '\\') {
+	// endQuote++;
+	// }
+	// if (endQuote == sourceString.length()) {
+	// continue;
+	// }
+	// stringBlocks
+	// .add(new StyleBlock(endQuote - startQuote, startQuote));
+	// startQuote = endQuote;
+	// } else if (sourceString.charAt(startQuote) == '\'') {
+	// if (startQuote > 0
+	// && sourceString.charAt(startQuote - 1) == '\\') {
+	// // Means that the quote is escaped
+	// continue;
+	// }
+	//
+	// int endQuote = startQuote + 1;
+	// // Searching for the next non-escaped, non-ending, matching
+	// // quote
+	// while (endQuote < sourceString.length()
+	// && sourceString.charAt(endQuote) != '\''
+	// && sourceString.charAt(endQuote - 1) != '\\') {
+	// endQuote++;
+	// }
+	// if (endQuote == sourceString.length()) {
+	// continue;
+	// }
+	// stringBlocks
+	// .add(new StyleBlock(endQuote - startQuote, startQuote));
+	// startQuote = endQuote;
+	// }
+	// }
+	//
+	// // Finds the asterisk-slash type comment
+	// for (int pos = 0; pos < sourceString.length() - 2; pos++) {
+	// // Tries to look for double-slash comments
+	// String candidate = sourceString.substring(pos, pos + 2);
+	// if (candidate.equals("/*")) {
+	// int end = sourceString.indexOf("*/", pos);
+	// if (end < 0) {
+	// continue;
+	// }
+	// commentBlocks.add(new StyleBlock(end + 2 - pos, pos));
+	// pos = end + 2;
+	// }
+	// }
+	//
+	// for (int pos = 0; pos < sourceCode.length() - 1; pos++) {
+	// String candidate = sourceCode.substring(pos, pos + 2);
+	// if (candidate.equals("//")) {
+	// int endIdx = sourceCode.indexOf('\n', pos);
+	// if (endIdx == -1)
+	// endIdx = sourceString.length();
+	// int charsBefore = sourceCode.substring(0, pos).replace("\n", "")
+	// .length();
+	// commentBlocks.add(new StyleBlock(endIdx - pos, charsBefore));
+	// pos = endIdx;
+	// }
+	// }
+	// }
+
+	// /**
+	// * Finds the next non-alphabetic letter in a string
+	// *
+	// * @param sourceCode
+	// * the string to search
+	// * @param idx
+	// * the index to start from
+	// * @return the index (-1 if none)
+	// */
+	// private int nextNonLetter(String sourceCode, int idx) {
+	// int sourceCodeLength = sourceCode.length();
+	// do {
+	// idx++;
+	// } while (idx < sourceCodeLength - 1
+	// && Character.isLetter(sourceCode.charAt(idx)));
+	// return idx;
+	// }
 
 	/**
 	 * A runnable with data
