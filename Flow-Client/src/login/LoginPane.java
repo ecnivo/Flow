@@ -205,16 +205,16 @@ public class LoginPane extends JPanel {
 					case "ACCESS_DENIED":
 						JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 						break;
-						// Success case
+					// Success case
 					case "OK":
 						// Switching, clearing, and resetting UI
 						LoginPane.this.panMan.switchToEditor();
 						UUID sessionID = reply.get("session_id", UUID.class);
 						Communicator.setSessionID(sessionID);
 						Communicator.initAsync(sessionID);
-						LoginPane.this.panMan.getEditPane().getFileTree().refreshProjectList();
+						LoginPane.this.panMan.getEditPane().getFileTree().refresh();
 						LoginPane.this.panMan.getEditPane().getFileTree().expandRow(0);
-						LoginPane.this.panMan.getHistoryPane().getTree().refreshProjectList();
+						LoginPane.this.panMan.getHistoryPane().getTree().refresh();
 						LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
 						Communicator.setUsername(usernameEntry.getText().trim());
 						return;

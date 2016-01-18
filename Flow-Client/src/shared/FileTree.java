@@ -40,9 +40,7 @@ import message.Data;
 public abstract class FileTree extends JTree {
 
 	private JScrollPane			scrollView;
-
 	private final static int	TREE_ICON_SIZE	= 16;
-
 	private UUID[]				usersProjectsUUIDs;
 
 	/**
@@ -64,12 +62,8 @@ public abstract class FileTree extends JTree {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.isAltDown()) {
-					refreshProjectList();
-					DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
-					for (int i = 0; i < root.getChildCount(); i++) {
-						reloadProjectFiles((ProjectNode) root.getChildAt(i));
-					}
+				if (e.isAltDown() || e.getButton() == MouseEvent.BUTTON3) {
+					refresh();
 				}
 			}
 		});
@@ -92,6 +86,18 @@ public abstract class FileTree extends JTree {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Refreshes the file tree
+	 */
+	public void refresh() {
+		System.out.println("Refreshing...");
+		refreshProjectList();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
+		for (int i = 0; i < root.getChildCount(); i++) {
+			reloadProjectFiles((ProjectNode) root.getChildAt(i));
+		}
 	}
 
 	/**
@@ -235,9 +241,9 @@ public abstract class FileTree extends JTree {
 		for (int i = 0; i < projectNode.getChildCount(); i++) {
 			children[i] = (DefaultMutableTreeNode) projectNode.getChildAt(i);
 		}
-		for (DefaultMutableTreeNode child : children) {
-			((DefaultTreeModel) getModel()).removeNodeFromParent(child);
-		}
+		// for (DefaultMutableTreeNode child : children) {
+		// ((DefaultTreeModel) getModel()).removeNodeFromParent(child);
+		// }
 
 		// Gets the project data from the server
 		Data projectReload = new Data("directory_info");
