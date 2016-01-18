@@ -21,6 +21,7 @@ import javax.swing.JToolBar;
  * @author Vince Ou
  *
  */
+@SuppressWarnings("serial")
 public class NavBar extends JToolBar {
 
 	private PanelManager		manager;
@@ -113,7 +114,6 @@ public class NavBar extends JToolBar {
 				e1.printStackTrace();
 			}
 			setFocusable(false);
-			setBorder(FlowClient.EMPTY_BORDER);
 			addActionListener(new ActionListener() {
 
 				@Override
@@ -142,7 +142,6 @@ public class NavBar extends JToolBar {
 				e1.printStackTrace();
 			}
 			setFocusable(false);
-			setBorder(FlowClient.EMPTY_BORDER);
 			addActionListener(new ActionListener() {
 
 				@Override
@@ -170,7 +169,6 @@ public class NavBar extends JToolBar {
 				e1.printStackTrace();
 			}
 			setFocusable(false);
-			setBorder(FlowClient.EMPTY_BORDER);
 			addActionListener(new ActionListener() {
 
 				@Override
@@ -201,12 +199,38 @@ public class NavBar extends JToolBar {
 				e1.printStackTrace();
 			}
 			setFocusable(false);
-			setBorder(FlowClient.EMPTY_BORDER);
 			addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					manager.switchToSettings();
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Button to navigate the user to the Help pane. Near identical copy of EditButton
+	 * 
+	 * @author Vince
+	 *
+	 */
+	private class HelpButton extends JButton {
+		
+		private HelpButton() {
+			setToolTipText("Help");
+			setBorder(FlowClient.EMPTY_BORDER);
+			try {
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/settingsWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			setFocusable(false);
+			addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					throw new UnsupportedOperationException();
 				}
 			});
 		}

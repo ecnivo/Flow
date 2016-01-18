@@ -146,6 +146,7 @@ public class CollabsList extends JPanel {
 
 		// Click-to-refresh or to search for + add new user
 		searchButton = new JButton();
+		searchButton.setToolTipText("Add a user and/or force a refresh");
 		searchButton.addActionListener(new ActionListener() {
 
 			@Override
