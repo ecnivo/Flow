@@ -848,6 +848,10 @@ public class SQLDatabase {
 			this.update(String.format(
 					"DELETE FROM Documents WHERE DocumentID = '%s';",
 					fileUUID));
+			
+			this.update(String.format(
+					"DELETE FROM Versions WHERE DocumentID = '%s';",
+					fileUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
