@@ -133,9 +133,11 @@ public class SettingsTabs extends JTabbedPane {
 				if (status.equals("PASSWORD_INVALID")) {
 					JOptionPane.showConfirmDialog(null, "The entered password is invalid. Typically, this is because\n" + "of the presence of special characters", "Invalid password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
-				} else if (status.equals("OK"))
+				} else if (status.equals("OK")) {
+					retypePass.setText("");
+					passField.setText("");
 					JOptionPane.showConfirmDialog(null, "Your Flow password has successfully been changed", "Password change success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-			}
+			}}
 		});
 		passChange.add(savePassword);
 
