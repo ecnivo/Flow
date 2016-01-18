@@ -3,10 +3,12 @@ package editing;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -76,7 +78,7 @@ public class EditorFileTree extends FileTree {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				editPane.getEditToolbar().renameProjectButtonDoClick();
-				EditorFileTree.this.refreshProjectList();
+				refresh();
 			}
 		});
 		projectPopup.add(renameProjectButton);
@@ -93,11 +95,64 @@ public class EditorFileTree extends FileTree {
 
 		dirPopup.add(new CreateFileOnDirectoryButton());
 
+		JMenuItem renameDirectoryButton = new JMenuItem();
+		renameDirectoryButton.setText("Rename");
+		renameDirectoryButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TreePath path = getSelectionPath();
+				if (path == null) {
+					JOptionPane.showConfirmDialog(null, "Please select a directory to rename first.", "No directory selected", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) path.getLastPathComponent();
+				if (!(selected instanceof DirectoryNode) || selected instanceof ProjectNode) {
+					JOptionPane.showConfirmDialog(null, "Please select a directory to rename first.\nThe selected is not a directory.", "No directory selected", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				DirectoryNode node = (DirectoryNode) selected;
+				String rename = JOptionPane.showInputDialog(null, "What do you want to rename " + node + " to?");
+				if (rename == null) {
+					return;
+				}
+				Data dirModRequest = new Data("directory_modify");
+				dirModRequest.put("directory_uuid", node.getDirectoryUUID());
+				dirModRequest.put("session_id", Communicator.getSessionID());
+				dirModRequest.put("mod_type", "RENAME");
+				dirModRequest.put("new_name", rename);
+				Data reply = Communicator.communicate(dirModRequest);
+				if (reply == null) {
+					return;
+				}
+				String status = reply.get("status", String.class);
+				if (status == null) {
+					return;
+				}
+				switch (status) {
+					case "OK":
+						node.setName(rename);
+						break;
+
+					case "DIRECTORY_NAME_INVALID":
+						JOptionPane.showConfirmDialog(null, "The directory name " + rename + " is not valid.\nTry with a better name.", "Invalid Name", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
+
+					default:
+						JOptionPane.showConfirmDialog(null, "The directory renaming failed. Nothing has been changed.", "Rename failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
+				}
+
+				refresh();
+			}
+		});
+		dirPopup.add(renameDirectoryButton);
+
 		// Since the "delete folder" is only used in one JPopupMenu, it can be
 		// declared here
-		JMenuItem deleteFolderButton = new JMenuItem();
-		deleteFolderButton.setText("Delete");
-		deleteFolderButton.addActionListener(new ActionListener() {
+		JMenuItem deleteDirectoryButton = new JMenuItem();
+		deleteDirectoryButton.setText("Delete");
+		deleteDirectoryButton.addActionListener(new ActionListener() {
 
 			/**
 			 * Asks the user for confirmation, then sends request to the server
@@ -106,7 +161,7 @@ public class EditorFileTree extends FileTree {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Asks the user for confirmation
-				int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + ((DirectoryNode) getSelectionPath().getLastPathComponent()).getName() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + ((DirectoryNode) getSelectionPath().getLastPathComponent()).toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				ProjectNode projectNode = null;
 				if (confirm == JOptionPane.YES_OPTION) {
 					// Prepares request for the server
@@ -140,7 +195,7 @@ public class EditorFileTree extends FileTree {
 					reloadProjectFiles(projectNode);
 			}
 		});
-		dirPopup.add(deleteFolderButton);
+		dirPopup.add(deleteDirectoryButton);
 
 		dirPopup.add(new PasteOnDirectoryButton());
 
@@ -168,6 +223,50 @@ public class EditorFileTree extends FileTree {
 
 		// Same case as "delete directory" in which it won't be used again, so
 		// it can be declared right here
+		JMenuItem renameFileButton = new JMenuItem();
+		renameFileButton.setText("Rename");
+		renameFileButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
+				if (selected == null) {
+					return;
+				}
+				FileNode node = (FileNode) selected;
+
+				String rename = JOptionPane.showInputDialog(null, "What do you want to rename " + node.toString() + " to?");
+				if (rename == null || rename.length() < 1) {
+					return;
+				}
+
+				Data renameFileRequest = new Data("file_metadata_modify");
+				renameFileRequest.put("session_id", Communicator.getSessionID());
+				renameFileRequest.put("file_uuid", node.getFileUUID());
+				renameFileRequest.put("mod_type", "RENAME");
+				renameFileRequest.put("name", rename);
+				Data response = Communicator.communicate(renameFileRequest);
+				if (response == null) {
+					return;
+				}
+				String status = response.get("status", String.class);
+				switch (status) {
+					case "OK":
+						node.setName(rename);
+						break;
+
+					case "NAME_INVALID":
+						JOptionPane.showConfirmDialog(null, "The new name for this file is invalid.\nTry a different name.", "Invalid name", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+						break;
+
+					default:
+						break;
+				}
+				refresh();
+			}
+		});
+		filePopup.add(renameFileButton);
+
 		JMenuItem deleteFileButton = new JMenuItem();
 		deleteFileButton.setText("Delete");
 		deleteFileButton.addActionListener(new ActionListener() {
@@ -225,27 +324,7 @@ public class EditorFileTree extends FileTree {
 		filePopup.add(deleteFileButton);
 
 		// Adds functionality when clicking
-		addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// nothing
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// nothing
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// nothing
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// nothing
-			}
+		addMouseListener(new MouseAdapter() {
 
 			/**
 			 * Gets the path, then decides as necessary what to do
@@ -327,6 +406,34 @@ public class EditorFileTree extends FileTree {
 				if (node.getPath().length > 1) {
 					editPane.getCollabsList().refreshUserList();
 				}
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.isAltDown() || e.getButton() == MouseEvent.BUTTON3) {
+					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
+					if (selected instanceof DirectoryNode || selected instanceof FileNode)
+						EditorFileTree.this.editPane.getCollabsList().refreshUserList();
+				}
+			}
+		});
+		addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// nothing
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				TreePath path = getSelectionPath();
+				if (path == null)
+					return;
+				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) path.getLastPathComponent();
+				if (selected instanceof DirectoryNode || selected instanceof FileNode)
+					EditorFileTree.this.editPane.getCollabsList().refreshUserList();
 			}
 		});
 	}
@@ -540,7 +647,7 @@ public class EditorFileTree extends FileTree {
 	private class CreateFileOnDirectoryButton extends JMenuItem {
 
 		/**
-		 * Creates a button which, when pressed, wil create a new file on that directory
+		 * Creates a button which, when pressed, will create a new file on that directory
 		 */
 		private CreateFileOnDirectoryButton() {
 			super("New (source code) file");
@@ -634,7 +741,7 @@ public class EditorFileTree extends FileTree {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO authorize with server to put these files here
-					EditorFileTree.this.refreshProjectList();
+					refresh();
 					throw new UnsupportedOperationException();
 				}
 			});

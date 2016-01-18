@@ -106,7 +106,7 @@ public class EditorToolbar extends JToolBar {
 						break;
 				}
 				// Refreshes
-				pane.getFileTree().refreshProjectList();
+				pane.getEditorFileTree().refresh();
 			}
 		});
 
@@ -121,7 +121,7 @@ public class EditorToolbar extends JToolBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Gets the path
-				TreePath path = pane.getFileTree().getSelectionPath();
+				TreePath path = pane.getEditorFileTree().getSelectionPath();
 				if (path == null) {
 					return;
 				}
@@ -129,33 +129,33 @@ public class EditorToolbar extends JToolBar {
 				if (pathArray == null) {
 					return;
 				}
-				ProjectNode selectedNode = (ProjectNode) pathArray[1];
+				ProjectNode projectNode = (ProjectNode) pathArray[1];
 
 				// Asks user for new name
-				String modifiedProjectName = JOptionPane.showInputDialog(null, "Please enter new name for the project " + selectedNode.getName() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE);
-				if (modifiedProjectName == null) {
+				String rename = JOptionPane.showInputDialog(null, "Please enter new name for the project " + projectNode.toString() + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Rename project", JOptionPane.QUESTION_MESSAGE);
+				if (rename == null) {
 					return;
 				}
-				modifiedProjectName = modifiedProjectName.trim();
-				while (CreateAccountPane.stringContains(modifiedProjectName, CreateAccountPane.INVALID_CHARS) || modifiedProjectName.length() < 1) {
-					modifiedProjectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
-					if (modifiedProjectName == null) {
+				rename = rename.trim();
+				while (CreateAccountPane.stringContains(rename, CreateAccountPane.INVALID_CHARS) || rename.length() < 1) {
+					rename = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
+					if (rename == null) {
 						return;
 					}
-					modifiedProjectName = modifiedProjectName.trim();
+					rename = rename.trim();
 				}
 
 				// Preps request to server
 				Data modifyRequest = new Data("project_modify");
 				modifyRequest.put("project_modify_type", "RENAME_PROJECT");
-				modifyRequest.put("project_uuid", selectedNode.getProjectUUID());
+				modifyRequest.put("project_uuid", projectNode.getProjectUUID());
 				modifyRequest.put("session_id", Communicator.getSessionID());
-				modifyRequest.put("new_name", modifiedProjectName);
+				modifyRequest.put("new_name", rename);
 				// Sends request to server
 				switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
 				// Success case
 					case "OK":
-						((ProjectNode) pane.getFileTree().getSelectionPath().getPath()[1]).setName(modifiedProjectName);
+						((ProjectNode) pane.getEditorFileTree().getSelectionPath().getPath()[1]).setName(rename);
 						break;
 					// Failure cases
 					case "PROJECT_NAME_INVALID":
@@ -169,7 +169,7 @@ public class EditorToolbar extends JToolBar {
 						break;
 				}
 				// Forces a refresh
-				pane.getFileTree().refreshProjectList();
+				pane.getEditorFileTree().refresh();
 			}
 		});
 
@@ -185,7 +185,13 @@ public class EditorToolbar extends JToolBar {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Gets the project
-				UUID projectUUID = ((ProjectNode) pane.getFileTree().getSelectionPath().getPath()[1]).getProjectUUID();
+				TreePath path = pane.getEditorFileTree().getSelectionPath();
+				if (path == null)
+					return;
+				Object[] pathArray = path.getPath();
+				if (pathArray == null || pathArray.length < 2)
+					return;
+				UUID projectUUID = ((ProjectNode) pathArray[1]).getProjectUUID();
 				if (projectUUID == null) {
 					return;
 				}
@@ -222,8 +228,8 @@ public class EditorToolbar extends JToolBar {
 						// Success case
 							case "OK":
 								project = null;
-								pane.getFileTree().refreshProjectList();
-								pane.getFileTree().setSelectionRow(0);
+								pane.getEditorFileTree().refreshProjectList();
+								pane.getEditorFileTree().setSelectionRow(0);
 								break;
 
 							case "ACCESS_DENIED":
@@ -358,7 +364,7 @@ public class EditorToolbar extends JToolBar {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Gets the node to put the file under
-					DefaultMutableTreeNode selectedDir = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					DefaultMutableTreeNode selectedDir = (DefaultMutableTreeNode) editPane.getEditorFileTree().getSelectionPath().getLastPathComponent();
 					if (selectedDir == null || !(selectedDir instanceof DirectoryNode)) {
 						JOptionPane.showConfirmDialog(null, "Please select a directory to place your imported file under", "Select a directory first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
@@ -445,8 +451,8 @@ public class EditorToolbar extends JToolBar {
 					}
 
 					// Inserts a new child node
-					FileTree.FileNode child = editPane.getFileTree().generateFileNode(response.get("file_uuid", UUID.class));
-					((DefaultTreeModel) editPane.getFileTree().getModel()).insertNodeInto(child, selectedDir, selectedDir.getChildCount());
+					FileTree.FileNode child = editPane.getEditorFileTree().generateFileNode(response.get("file_uuid", UUID.class));
+					((DefaultTreeModel) editPane.getEditorFileTree().getModel()).insertNodeInto(child, selectedDir, selectedDir.getChildCount());
 				}
 			});
 		}
@@ -478,7 +484,7 @@ public class EditorToolbar extends JToolBar {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// Gets the source for export
-					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getFileTree().getSelectionPath().getLastPathComponent();
+					DefaultMutableTreeNode selected = (DefaultMutableTreeNode) editPane.getEditorFileTree().getSelectionPath().getLastPathComponent();
 					if (selected == null || !(selected instanceof FileNode)) {
 						JOptionPane.showConfirmDialog(null, "Please select a file to export", "Select a file first", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;

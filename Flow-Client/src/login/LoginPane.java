@@ -212,8 +212,8 @@ public class LoginPane extends JPanel {
 						UUID sessionID = reply.get("session_id", UUID.class);
 						Communicator.setSessionID(sessionID);
 						Communicator.initAsync(sessionID);
-						LoginPane.this.panMan.getEditPane().getFileTree().refresh();
-						LoginPane.this.panMan.getEditPane().getFileTree().expandRow(0);
+						LoginPane.this.panMan.getEditPane().getEditorFileTree().refresh();
+						LoginPane.this.panMan.getEditPane().getEditorFileTree().expandRow(0);
 						LoginPane.this.panMan.getHistoryPane().getTree().refresh();
 						LoginPane.this.panMan.getHistoryPane().getTree().expandRow(0);
 						Communicator.setUsername(usernameEntry.getText().trim());

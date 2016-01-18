@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -112,6 +111,7 @@ public class EditTabs extends JTabbedPane {
 			addTab(tabName, new EditArea(text, projectUUID, fileUUID, versionTextUUID, editable, this).getScrollPane());
 			int idx = getTabCount() - 1;
 			setTabComponentAt(idx, new CustomTabHeader(tabName));
+			setSelectedIndex(idx);
 			// TODO tool tip should be the save date
 		} else {
 			JOptionPane.showConfirmDialog(null, "The limit on currently open tabs is 25.\nThe reason for doing so is to save processing power and reduce strain on your system.\nIf you need more than 25 tabs at a time, consider reorganizing your workflow.", "Too many tabs!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);

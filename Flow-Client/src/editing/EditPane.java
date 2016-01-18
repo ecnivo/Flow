@@ -147,7 +147,7 @@ public class EditPane extends JPanel {
 	 * Gets the documents tree
 	 * @return the editor's document tree
 	 */
-	public EditorFileTree getFileTree() {
+	public EditorFileTree getEditorFileTree() {
 		return tree;
 	}
 }

@@ -234,7 +234,7 @@ public class CollabsList extends JPanel {
 		try {
 			activeProjectUUID = getActiveProjectUUID();
 		} catch (NoActiveProjectException e) {
-			e.printStackTrace();
+			return;
 		}
 		getProject.put("project_uuid", activeProjectUUID);
 
@@ -253,6 +253,9 @@ public class CollabsList extends JPanel {
 		// client's user, then it will set the current permission (for use
 		// later)
 		String ownerName = activeProject.get("owner", String.class);
+		if (ownerName == null) {
+			return;
+		}
 		if (ownerName.equals(Communicator.getUsername())) {
 			myPermission = new FlowPermission(FlowPermission.OWNER);
 		}
@@ -300,7 +303,7 @@ public class CollabsList extends JPanel {
 		JScrollPane selectedScrollPane = (JScrollPane) editPane.getEditTabs().getSelectedComponent();
 		if (selectedScrollPane == null) {
 			// If there is no tab open, tries the doc-tree
-			TreePath treePath = editPane.getFileTree().getSelectionPath();
+			TreePath treePath = editPane.getEditorFileTree().getSelectionPath();
 			if (treePath == null || treePath.getPath().length <= 1)
 				// If neither of those apply, then throws a
 				// NoActiveProjectException

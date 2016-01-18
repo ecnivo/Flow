@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -56,7 +58,18 @@ public abstract class FileTree extends JTree {
 		scrollView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Workspace")));
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		addFocusListener(new FocusListener() {
 
+			@Override
+			public void focusLost(FocusEvent e) {
+				// nothing
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				refresh();
+			}
+		});
 		// Adds a refresh shortcut
 		addMouseListener(new MouseAdapter() {
 
@@ -98,6 +111,8 @@ public abstract class FileTree extends JTree {
 		for (int i = 0; i < root.getChildCount(); i++) {
 			reloadProjectFiles((ProjectNode) root.getChildAt(i));
 		}
+		revalidate();
+		repaint();
 	}
 
 	/**
@@ -234,17 +249,6 @@ public abstract class FileTree extends JTree {
 	 *        the node to reload from
 	 */
 	public void reloadProjectFiles(ProjectNode projectNode) {
-		// TODO see if you can combine these two into one loop
-
-		// Makes an array of its children nodes
-		DefaultMutableTreeNode[] children = new DefaultMutableTreeNode[projectNode.getChildCount()];
-		for (int i = 0; i < projectNode.getChildCount(); i++) {
-			children[i] = (DefaultMutableTreeNode) projectNode.getChildAt(i);
-		}
-		// for (DefaultMutableTreeNode child : children) {
-		// ((DefaultTreeModel) getModel()).removeNodeFromParent(child);
-		// }
-
 		// Gets the project data from the server
 		Data projectReload = new Data("directory_info");
 		projectReload.put("directory_uuid", projectNode.getProjectUUID());
@@ -253,11 +257,18 @@ public abstract class FileTree extends JTree {
 		if (reloadedProject == null) {
 			JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
-		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED"))
+		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED")) {
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+		} else {
+			return;
+		}
 
 		// Does the recursion one on the children
 		reloadProjectFilesRecursively(reloadedProject, projectNode);
+
+		if (getSelectionPath() == null) {
+			setSelectionRow(0);
+		}
 	}
 
 	/**
@@ -269,6 +280,11 @@ public abstract class FileTree extends JTree {
 	 *        the local DirectoryNode to add into
 	 */
 	private void reloadProjectFilesRecursively(Data remoteParentDir, DirectoryNode localNode) {
+		String remoteName = remoteParentDir.get("directory_name", String.class);
+		if (!remoteName.equals(localNode.toString())) {
+			localNode.setName(remoteName);
+		}
+
 		// Creates a list of the localNode's child directories and files
 		ArrayList<DirectoryNode> localDirs = new ArrayList<DirectoryNode>();
 		ArrayList<FileNode> localFiles = new ArrayList<FileNode>();
@@ -306,6 +322,13 @@ public abstract class FileTree extends JTree {
 		for (UUID remoteFileUUID : remoteChildFileUUIDs) {
 			for (FileNode fileNode : localFiles) {
 				if (fileNode.getFileUUID().equals(remoteFileUUID)) {
+					Data fileNameRequest = new Data("file_info");
+					fileNameRequest.put("file_uuid", remoteFileUUID);
+					fileNameRequest.put("session_id", Communicator.getSessionID());
+					String remoteFileName = Communicator.communicate(fileNameRequest).get("file_name", String.class);
+					if (!fileNode.toString().equals(remoteFileName)) {
+						fileNode.setName(remoteFileName);
+					}
 					continue remoteFiles;
 				}
 			}
@@ -345,8 +368,6 @@ public abstract class FileTree extends JTree {
 	 */
 	public class ProjectNode extends DirectoryNode {
 
-		private UUID	projectUUID;
-
 		/**
 		 * Creates a new ProjectNode
 		 * 
@@ -357,7 +378,6 @@ public abstract class FileTree extends JTree {
 		 */
 		public ProjectNode(UUID projectUUID, String name) {
 			super(projectUUID, name);
-			this.projectUUID = projectUUID;
 		}
 
 		/**
@@ -366,7 +386,7 @@ public abstract class FileTree extends JTree {
 		 * @return the projectUUID
 		 */
 		public UUID getProjectUUID() {
-			return projectUUID;
+			return getDirectoryUUID();
 		}
 	}
 
@@ -411,31 +431,22 @@ public abstract class FileTree extends JTree {
 		}
 
 		/**
-		 * Gets the name
-		 * 
-		 * @return the name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * Sets the name
-		 * 
-		 * @param name
-		 *        the new name
-		 */
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		/**
 		 * Gets the directory's UUID
 		 * 
 		 * @return the directory's UUID
 		 */
 		public UUID getDirectoryUUID() {
 			return directoryUUID;
+		}
+
+		/**
+		 * Changes directory node's name
+		 * 
+		 * @param modifiedDirectoryName
+		 *        new name
+		 */
+		public void setName(String modifiedDirectoryName) {
+			name = modifiedDirectoryName;
 		}
 
 		/**
@@ -504,6 +515,10 @@ public abstract class FileTree extends JTree {
 		public String getType() {
 			return type;
 		}
+
+		public void setName(String rename) {
+			name = rename;
+		}
 	}
 
 	public FileNode generateFileNode(UUID childUUID) {
@@ -554,13 +569,13 @@ public abstract class FileTree extends JTree {
 			// Projects
 			if (node instanceof ProjectNode) {
 				ProjectNode projectNode = (ProjectNode) node;
-				label.setText(projectNode.getName());
+				label.setText(projectNode.toString());
 				label.setIcon(projectIcon);
 			}
 			// Directories
 			else if (node instanceof DirectoryNode) {
 				DirectoryNode dirNode = (DirectoryNode) node;
-				label.setText(dirNode.getName());
+				label.setText(dirNode.toString());
 				label.setIcon(directoryIcon);
 			}
 			// Files
