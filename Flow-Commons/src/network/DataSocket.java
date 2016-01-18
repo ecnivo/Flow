@@ -33,10 +33,8 @@ public class DataSocket {
      */
     public synchronized void send(Serializable serializable) throws IOException {
         synchronized (oos) {
-            synchronized (ois) {
-                oos.writeObject(serializable);
-                oos.flush();
-            }
+            oos.writeObject(serializable);
+            oos.flush();
         }
     }
 
@@ -51,9 +49,7 @@ public class DataSocket {
      */
     public synchronized <T extends Serializable> T receive(Class<T> clazz) throws IOException, ClassNotFoundException {
         synchronized (ois) {
-            synchronized (oos) {
-                return clazz.cast(ois.readObject());
-            }
+            return clazz.cast(ois.readObject());
         }
     }
 
@@ -67,9 +63,7 @@ public class DataSocket {
      */
     public synchronized <T extends Serializable> T receive() throws IOException, ClassNotFoundException {
         synchronized (ois) {
-            synchronized (oos) {
-                return (T) ois.readObject();
-            }
+            return (T) ois.readObject();
         }
     }
 
