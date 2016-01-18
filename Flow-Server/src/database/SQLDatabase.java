@@ -1,17 +1,23 @@
 package database;
 
-import server.FlowServer;
-import util.DatabaseException;
-import util.Results;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+
+import server.FlowServer;
+import util.DatabaseException;
+import util.Results;
 
 public class SQLDatabase {
 

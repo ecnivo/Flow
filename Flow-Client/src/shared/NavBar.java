@@ -4,12 +4,16 @@ package shared;
 import gui.FlowClient;
 import gui.PanelManager;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
 
 /**
  * Navigation bar for edit/debug/version history/settings
@@ -19,19 +23,19 @@ import java.io.IOException;
  */
 public class NavBar extends JToolBar {
 
-	private PanelManager manager;
+	private PanelManager		manager;
 
 	// Because why not.
-	public static final byte EDIT = 71;
-	public final static byte DEBUG = -18;
-	public static final byte HISTORY = 0;
-	public static final byte SETTINGS = -35;
+	public static final byte	EDIT		= 71;
+	public final static byte	DEBUG		= -18;
+	public static final byte	HISTORY		= 0;
+	public static final byte	SETTINGS	= -35;
 
 	// Various buttons.
-	private EditButton editButton;
-	private DebugButton debugButton;
-	private HistoryButton historyButton;
-	private SettingsButton settingsButton;
+	private EditButton			editButton;
+	private DebugButton			debugButton;
+	private HistoryButton		historyButton;
+	private SettingsButton		settingsButton;
 
 	/**
 	 * Creates a new NavBar
