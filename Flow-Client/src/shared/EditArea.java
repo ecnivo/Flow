@@ -27,12 +27,12 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import message.Data;
-import util.Formatter;
 import callback.DocumentCallbackEvent;
 import callback.TextModificationListener;
 import editing.UserCaret;
 import gui.FlowClient;
+import message.Data;
+import util.Formatter;
 
 /**
  * The area for the user to edit their documents
@@ -44,59 +44,68 @@ import gui.FlowClient;
 public class EditArea extends JTextPane {
 
 	// Swing components
-	private JScrollPane				scrolling;
-	private StyledDocument			doc;
+	private JScrollPane scrolling;
+	private StyledDocument doc;
 
 	// UUID trackers
-	private UUID					versionTextUUID;
-	private UUID					fileUUID;
-	private UUID					projectUUID;
+	private UUID versionTextUUID;
+	private UUID fileUUID;
+	private UUID projectUUID;
 
 	// Styles
-	private Style					keywordStyle;
-	private Style					plainStyle;
-	private Style					stringStyle;
-	private Style					commentsStyle;
+	private Style keywordStyle;
+	private Style plainStyle;
+	private Style stringStyle;
+	private Style commentsStyle;
 
 	// "Blocks" of text to highlight
-	private ArrayList<StyleBlock>	keywordBlocks;
-	private ArrayList<StyleBlock>	stringBlocks;
-	private ArrayList<StyleBlock>	commentBlocks;
+	private ArrayList<StyleBlock> keywordBlocks;
+	private ArrayList<StyleBlock> stringBlocks;
+	private ArrayList<StyleBlock> commentBlocks;
 
 	// Different style constants
-	public static final Font		PLAIN			= new Font("Consolas", Font.PLAIN, 13);
-	public static final Color		PLAIN_COLOUR	= Color.BLACK;
-	public static final Color		KEYWORD_COLOUR	= new Color(0x38761D);
-	public static final Color		STRING_COLOUR	= new Color(0xA30BCF);
-	public static final Color		COMMENTS_COLOUR	= new Color(0xD13313);
+	public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
+	public static final Color PLAIN_COLOUR = Color.BLACK;
+	public static final Color KEYWORD_COLOUR = new Color(0x38761D);
+	public static final Color STRING_COLOUR = new Color(0xA30BCF);
+	public static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
 	// Java's keywords
-	private static final String[]	JAVA_KEYWORDS	= { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
-			"new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
+	private static final String[] JAVA_KEYWORDS = { "abstract", "assert",
+			"boolean", "break", "byte", "case", "catch", "char", "class",
+			"const", "continue", "default", "do", "double", "else", "enum",
+			"extends", "false", "final", "finally", "float", "for", "goto",
+			"if", "implements", "import", "instanceof", "int", "interface",
+			"long", "native", "new", "package", "private", "protected",
+			"public", "return", "short", "static", "strictfp", "super",
+			"switch", "synchronized", "this", "throws", "throw", "transient",
+			"true", "try", "void", "volatile", "while" };
 
-	private boolean					ignoreEvents	= false;
-	private ArrayList<UserCaret>	carets;
+	private boolean ignoreEvents = false;
+	private ArrayList<UserCaret> carets;
 
 	/**
 	 * Creates a new EditArea
 	 * 
 	 * @param textDoc
-	 *        the text of the document to load on start
+	 *            the text of the document to load on start
 	 * @param projectUUID
-	 *        the UUID of its parent project
+	 *            the UUID of its parent project
 	 * @param fileUUID
-	 *        the UUID of the specific file
+	 *            the UUID of the specific file
 	 * @param versionTextUUID
-	 *        the UUID of the version
+	 *            the UUID of the version
 	 * @param editable
-	 *        if this should be editable
+	 *            if this should be editable
 	 * @param tabs
-	 *        the parent EditTabs
+	 *            the parent EditTabs
 	 */
-	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID, UUID versionTextUUID, boolean editable, EditTabs tabs) {
+	public EditArea(String textDoc, UUID projectUUID, UUID fileUUID,
+			UUID versionTextUUID, boolean editable, EditTabs tabs) {
 		// Swing stuff
 		setLayout(null);
-		scrolling = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrolling = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		setBorder(FlowClient.EMPTY_BORDER);
 		setFont(PLAIN);
 		setForeground(PLAIN_COLOUR);
@@ -116,8 +125,12 @@ public class EditArea extends JTextPane {
 		editorListRequest.put("project_uuid", projectUUID);
 		editorListRequest.put("session_id", Communicator.getSessionID());
 		Data editorListData = Communicator.communicate(editorListRequest);
-		if (editorListData.get("status", String.class).equals("ACCESS_DENIED")) {
-			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (editorListData.get("status", String.class)
+				.equals("ACCESS_DENIED")) {
+			JOptionPane.showConfirmDialog(null,
+					"You do not have sufficient permissions complete this operation.",
+					"Access Denied", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE);
 			return;
 		} else if (!editorListData.get("status", String.class).equals("OK")) {
 			return;
@@ -172,12 +185,16 @@ public class EditArea extends JTextPane {
 				}
 				if (e.getKeyCode() == KeyEvent.VK_W) {
 					tabs.removeTabAt(tabs.getSelectedIndex());
-				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP && tabs.getSelectedIndex() > 0) {
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP
+						&& tabs.getSelectedIndex() > 0) {
 					System.out.println("switch left");
-					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() - 1));
-				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && tabs.getSelectedIndex() < tabs.getTabCount() - 1) {
+					tabs.setSelectedComponent(
+							tabs.getComponentAt(tabs.getSelectedIndex() - 1));
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
+						&& tabs.getSelectedIndex() < tabs.getTabCount() - 1) {
 					System.out.println("switch right");
-					tabs.setSelectedComponent(tabs.getComponentAt(tabs.getSelectedIndex() + 1));
+					tabs.setSelectedComponent(
+							tabs.getComponentAt(tabs.getSelectedIndex() + 1));
 				}
 				if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F) {
 					String text = EditArea.this.getText();
@@ -258,8 +275,12 @@ public class EditArea extends JTextPane {
 				Data response = Communicator.communicate(fileModify);
 				String status = response.get("status", String.class);
 				// Makes sure that things work
-				if (response == null || status == null || !status.equals("OK")) {
-					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+				if (response == null || status == null
+						|| !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null,
+							"Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.",
+							"Failed to edit file", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.ERROR_MESSAGE);
 					resetToServer();
 					return;
 				}
@@ -289,8 +310,12 @@ public class EditArea extends JTextPane {
 				// Sends message to server
 				Data response = Communicator.communicate(metadataModify);
 				String status = response.get("status", String.class);
-				if (response == null || status == null || !status.equals("OK")) {
-					JOptionPane.showConfirmDialog(null, "Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.", "Failed to edit file", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+				if (response == null || status == null
+						|| !status.equals("OK")) {
+					JOptionPane.showConfirmDialog(null,
+							"Your change to the file could not be processed.\nThis could be because the server is down, or your document is out of sync.\nTry closing this tab, opening it again, or restarting Flow.",
+							"Failed to edit file", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.ERROR_MESSAGE);
 					resetToServer();
 					return;
 				}
@@ -311,8 +336,12 @@ public class EditArea extends JTextPane {
 				caretPosChange.put("mod_type", "MOVE");
 				caretPosChange.put("idx", caretPos);
 				Data response = Communicator.communicate(caretPosChange);
-				if (response.get("status", String.class).equals("ACCESS_DENIED")) {
-					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (response.get("status", String.class)
+						.equals("ACCESS_DENIED")) {
+					JOptionPane.showConfirmDialog(null,
+							"You do not have sufficient permissions complete this operation.",
+							"Access Denied", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 			}
@@ -328,68 +357,68 @@ public class EditArea extends JTextPane {
 				}
 
 				switch (e.TYPE) {
-					case INSERT:
-						String addition = e.ADDITION;
-						try {
-							// Uses boolean flags when inserting or deleting so that
-							// the
-							// insertions/deletions don't interpret the other users'
-							// inputs as the
-							// current user's actions
-							ignoreEvents = true;
-							// Tries to insert the contents
-							doc.insertString(e.INDEX, addition, null);
-							ignoreEvents = false;
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
+				case INSERT:
+					String addition = e.ADDITION;
+					try {
+						// Uses boolean flags when inserting or deleting so that
+						// the
+						// insertions/deletions don't interpret the other users'
+						// inputs as the
+						// current user's actions
+						ignoreEvents = true;
+						// Tries to insert the contents
+						doc.insertString(e.INDEX, addition, null);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+					break;
+
+				case DELETE:
+					int length = e.REMOVAL_LENGTH;
+					try {
+						ignoreEvents = true;
+						// Tries to remove the contents
+						doc.remove(e.INDEX, length);
+						ignoreEvents = false;
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+
+					fireCaretUpdate(new CaretEvent(EditArea.this) {
+
+						@Override
+						public int getMark() {
+							return EditArea.this.getCaret().getMark();
 						}
-						break;
 
-					case DELETE:
-						int length = e.REMOVAL_LENGTH;
-						try {
-							ignoreEvents = true;
-							// Tries to remove the contents
-							doc.remove(e.INDEX, length);
-							ignoreEvents = false;
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
+						@Override
+						public int getDot() {
+							return EditArea.this.getCaret().getDot();
 						}
+					});
+					break;
 
-						fireCaretUpdate(new CaretEvent(EditArea.this) {
+				case MOVE:
+					UserCaret caret = getCaretByUserName(e.USERNAME);
+					if (caret == null) {
+						System.out.println("caret not found");
+						return;
+					}
+					Rectangle rectangle = null;
+					try {
+						rectangle = modelToView(e.INDEX);
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+						return;
+					}
+					caret.moveTo(rectangle.getLocation());
+					repaint();
 
-							@Override
-							public int getMark() {
-								return EditArea.this.getCaret().getMark();
-							}
+					break;
 
-							@Override
-							public int getDot() {
-								return EditArea.this.getCaret().getDot();
-							}
-						});
-						break;
-
-					case MOVE:
-						UserCaret caret = getCaretByUserName(e.USERNAME);
-						if (caret == null) {
-							System.out.println("caret not found");
-							return;
-						}
-						Rectangle rectangle = null;
-						try {
-							rectangle = modelToView(e.INDEX);
-						} catch (BadLocationException e1) {
-							e1.printStackTrace();
-							return;
-						}
-						caret.moveTo(rectangle.getLocation());
-						repaint();
-
-						break;
-
-					default:
-						break;
+				default:
+					break;
 				}
 				highlightSyntax();
 			}
@@ -461,7 +490,7 @@ public class EditArea extends JTextPane {
 	 * Gets a caret by its username
 	 * 
 	 * @param name
-	 *        name of user
+	 *            name of user
 	 * @return the caret that corresponds with the name. Returns null if not
 	 *         found.
 	 */
@@ -482,7 +511,8 @@ public class EditArea extends JTextPane {
 		Point mouse = getMousePosition();
 		for (UserCaret userCaret : carets) {
 			g2d.setColor(userCaret.getColor());
-			g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret.getLocation().getY(), 3, 17);
+			g2d.fillRect((int) userCaret.getLocation().getX(),
+					(int) userCaret.getLocation().getY(), 3, 17);
 		}
 	}
 
@@ -494,16 +524,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class StyleBlock {
 
-		private int	length;
-		private int	premiereIdx;
+		private int length;
+		private int premiereIdx;
 
 		/**
 		 * Creates a new StyleBlock
 		 * 
 		 * @param length
-		 *        the length of the block
+		 *            the length of the block
 		 * @param firstIdx
-		 *        the index of the block
+		 *            the index of the block
 		 */
 		private StyleBlock(int length, int firstIdx) {
 			// Saves them
@@ -540,22 +570,34 @@ public class EditArea extends JTextPane {
 		commentBlocks = new ArrayList<StyleBlock>();
 
 		String text = this.getText(), word = "";
-		int textLength = text.length();
+		printOut(text.toCharArray());
+		int textLength = text.length(), spaceCount = 0;
 		for (int i = 0; i < textLength; i++) {
 			char c = text.charAt(i);
 			if (Character.isAlphabetic(c) || (c + "").matches("[0-9]")) {
 				word += c;
+				if (i == textLength - 1)
+					if (Arrays.asList(JAVA_KEYWORDS).contains(word)) {
+						keywordBlocks.add(new StyleBlock(word.length(),
+								i + 1 - word.length() - spaceCount));
+					}
 			} else {
 				int length = word.length(), no;
-				if (Arrays.asList(JAVA_KEYWORDS).contains(word))
-					keywordBlocks.add(new StyleBlock(length, i - word.length()));
-				else if (c == '"') {
+				if (Arrays.asList(JAVA_KEYWORDS).contains(word)) {
+					keywordBlocks.add(new StyleBlock(length,
+							i - word.length() - spaceCount));
+					if (c == 13)
+						spaceCount++;
+				} else if (c == '"') {
 					boolean done = false;
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == '\"') {
-							stringBlocks.add(new StyleBlock(i - start, start));
+						if (c == 13)
+							spaceCount++;
+						else if (c == '\"') {
+							stringBlocks.add(new StyleBlock(i - start,
+									start - spaceCount));
 							done = true;
 						}
 					}
@@ -565,8 +607,11 @@ public class EditArea extends JTextPane {
 					int start = i;
 					for (i = i + 1; !done && i < textLength; i++) {
 						c = text.charAt(i);
-						if (c == '\'') {
-							stringBlocks.add(new StyleBlock(i - start, start));
+						if (c == 13)
+							spaceCount++;
+						else if (c == '\'') {
+							stringBlocks.add(new StyleBlock(i - start,
+									start - spaceCount));
 							done = true;
 						}
 					}
@@ -578,28 +623,36 @@ public class EditArea extends JTextPane {
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
-							if (c == '\n') {
+							if (c == 13)
+								spaceCount++;
+							else if (c == '\n') {
 								done = true;
 							}
 						}
-						commentBlocks.add(new StyleBlock(i - start, start));
+						commentBlocks.add(
+								new StyleBlock(i - start, start - spaceCount));
 						i--;
 					} else if (text.charAt(i + 1) == '*') {
 						int start = i;
 						i += 2;
 						for (; !done && i < textLength; i++) {
 							c = text.charAt(i);
-							if (c == '*') {
+							if (c == 13)
+								spaceCount++;
+							else if (c == '*') {
 								i++;
 								if (text.charAt(i) == '/') {
 									done = true;
 								}
 							}
 						}
-						commentBlocks.add(new StyleBlock(i - start, start));
+						commentBlocks.add(
+								new StyleBlock(i - start, start - spaceCount));
 						i--;
 					}
 				}
+				if (c == 13)
+					spaceCount++;
 				word = "";
 			}
 		}
@@ -609,14 +662,22 @@ public class EditArea extends JTextPane {
 		SwingUtilities.invokeLater(new FormatPlainLater(0, textLength));
 
 		for (StyleBlock styleBlock : keywordBlocks) {
-			SwingUtilities.invokeLater(new FormatKeywordsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+			SwingUtilities.invokeLater(new FormatKeywordsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength()));
 		}
 		for (StyleBlock styleBlock : stringBlocks) {
-			SwingUtilities.invokeLater(new FormatStringsLater(styleBlock.getFirstIdx(), styleBlock.getLength() + 1));
+			SwingUtilities.invokeLater(new FormatStringsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength() + 1));
 		}
 		for (StyleBlock styleBlock : commentBlocks) {
-			SwingUtilities.invokeLater(new FormatCommentsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
+			SwingUtilities.invokeLater(new FormatCommentsLater(
+					styleBlock.getFirstIdx(), styleBlock.getLength()));
 		}
+	}
+
+	static void printOut(char[] chars) {
+		for (char c : chars)
+			System.out.print("'" + ((int) c) + "', ");
 	}
 
 	// /**
@@ -762,16 +823,16 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatKeywordsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		/**
 		 * Creates a new FormatKeywordsLater
 		 * 
 		 * @param pos
-		 *        the position
+		 *            the position
 		 * @param nextToken
-		 *        the length
+		 *            the length
 		 */
 		private FormatKeywordsLater(int pos, int nextToken) {
 
@@ -795,8 +856,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatPlainLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatPlainLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -818,8 +879,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatStringsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatStringsLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -840,8 +901,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatCommentsLater implements Runnable {
 
-		private int	pos;
-		private int	nextToken;
+		private int pos;
+		private int nextToken;
 
 		private FormatCommentsLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -856,6 +917,7 @@ public class EditArea extends JTextPane {
 
 	@Override
 	public boolean getScrollableTracksViewportWidth() {
-		return getUI().getPreferredSize(this).width <= getParent().getSize().width;
+		return getUI().getPreferredSize(this).width <= getParent()
+				.getSize().width;
 	}
 }
