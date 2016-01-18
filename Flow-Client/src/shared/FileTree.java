@@ -62,7 +62,7 @@ public abstract class FileTree extends JTree {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.isAltDown() || e.getButton() == MouseEvent.BUTTON3) {
+				if (e.isAltDown() && e.getButton() == MouseEvent.BUTTON1) {
 					refresh();
 				}
 			}
@@ -75,11 +75,12 @@ public abstract class FileTree extends JTree {
 
 			@Override
 			public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-				// nothing
+				refresh();
 			}
 
 			@Override
 			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+				refresh();
 				// Prevents collapse of the "workspace" node
 				if (event.getPath().getPathCount() == 1) {
 					throw new ExpandVetoException(event);
@@ -92,7 +93,6 @@ public abstract class FileTree extends JTree {
 	 * Refreshes the file tree
 	 */
 	public void refresh() {
-		System.out.println("Refreshing...");
 		refreshProjectList();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
 		for (int i = 0; i < root.getChildCount(); i++) {
