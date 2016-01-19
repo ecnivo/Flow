@@ -1,4 +1,3 @@
-
 package settings;
 
 import gui.FlowClient;
@@ -38,7 +37,7 @@ import shared.Communicator;
 @SuppressWarnings("serial")
 public class SettingsTabs extends JTabbedPane {
 
-	private static final Dimension	TEXT_BOX_SIZE	= new Dimension(256, 24);
+	private static final Dimension TEXT_BOX_SIZE = new Dimension(256, 24);
 
 	/*
 	 * Change user avatar
@@ -57,52 +56,55 @@ public class SettingsTabs extends JTabbedPane {
 	 * Creates a new SettingsTabs
 	 * 
 	 * @param panMan
-	 *        the associated PanelManager
+	 *            the associated PanelManager
 	 */
 	public SettingsTabs(PanelManager panMan) {
 		// Sets up the tab
 		setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		setBorder(FlowClient.EMPTY_BORDER);
 
-		// Creates the "change avatar" tab
-		SettingsTab avatar = new SettingsTab("Avatar");
-		avatar.add(new JLabel("Personalize your avatar"));
-		JButton selectAvatar = new JButton("Select...");
-		selectAvatar.addActionListener(new ActionListener() {
+		if (!FlowClient.HIDE) {
+			// Creates the "change avatar" tab
+			SettingsTab avatar = new SettingsTab("Avatar");
+			avatar.add(new JLabel("Personalize your avatar"));
+			JButton selectAvatar = new JButton("Select...");
+			selectAvatar.addActionListener(new ActionListener() {
 
-			/**
-			 * Pops open a new file chooser for the user to pick their avatar
-			 */
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// Creates a new file chooser
-				JFileChooser avatarChooser = new JFileChooser();
-				avatarChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+				/**
+				 * Pops open a new file chooser for the user to pick their
+				 * avatar
+				 */
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// Creates a new file chooser
+					JFileChooser avatarChooser = new JFileChooser();
+					avatarChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
-					@Override
-					public String getDescription() {
-						return "Only PNG, JPG, GIF, BMP formats";
-					}
+						@Override
+						public String getDescription() {
+							return "Only PNG, JPG, GIF, BMP formats";
+						}
 
-					@Override
-					public boolean accept(File f) {
-						String name = f.getName();
-						return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".bmp");
+						@Override
+						public boolean accept(File f) {
+							String name = f.getName();
+							return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".bmp");
+						}
+					});
+					avatarChooser.setDialogTitle("Select Avatar Image");
+					// Tries to get the image from the HDD
+					if (avatarChooser.showOpenDialog(SettingsTabs.this) == JFileChooser.APPROVE_OPTION) {
+						try {
+							ImageIcon newAvatar = new ImageIcon(ImageIO.read(avatarChooser.getSelectedFile()).getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						// TODO send image to server, show joptionpane when done
 					}
-				});
-				avatarChooser.setDialogTitle("Select Avatar Image");
-				// Tries to get the image from the HDD
-				if (avatarChooser.showOpenDialog(SettingsTabs.this) == JFileChooser.APPROVE_OPTION) {
-					try {
-						ImageIcon newAvatar = new ImageIcon(ImageIO.read(avatarChooser.getSelectedFile()).getScaledInstance(32, 32, Image.SCALE_SMOOTH));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					// TODO send image to server, show joptionpane when done
 				}
-			}
-		});
-		avatar.add(selectAvatar);
+			});
+			avatar.add(selectAvatar);
+		}
 
 		// Creates the "change password" tab
 		SettingsTab passChange = new SettingsTab("Password");
@@ -127,7 +129,8 @@ public class SettingsTabs extends JTabbedPane {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// Checks the value inside the boxes to make sure they're valid and match
+				// Checks the value inside the boxes to make sure they're valid
+				// and match
 				if (String.copyValueOf(passField.getPassword()).length() < 1) {
 					JOptionPane.showConfirmDialog(null, "Please enter a password.", "Invalid password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
@@ -185,8 +188,7 @@ public class SettingsTabs extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Shows a daunting message box
-				String response = JOptionPane.showInputDialog(null, "WARNING: Deleting your account means that all of the projects that you created will be lost," + "\nand all projects that you have been invited to collaborate will lose you as a collaborator."
-						+ "\nBefore closing your account, please make sure to back up all data using the export function." + "\nIf you are sure that you want to close your account, type \"close my account\" into the text box below." + "\n\nTHIS IS YOUR LAST CHANCE TO CHANGE YOUR MIND.", "Confirm account deletion", JOptionPane.WARNING_MESSAGE);
+				String response = JOptionPane.showInputDialog(null, "WARNING: Deleting your account means that all of the projects that you created will be lost," + "\nand all projects that you have been invited to collaborate will lose you as a collaborator." + "\nBefore closing your account, please make sure to back up all data using the export function." + "\nIf you are sure that you want to close your account, type \"close my account\" into the text box below." + "\n\nTHIS IS YOUR LAST CHANCE TO CHANGE YOUR MIND.", "Confirm account deletion", JOptionPane.WARNING_MESSAGE);
 				if (response != null && response.equals("close my account")) {
 					// Prepares a new message to the server
 					Data closeAccountRequest = new Data("user");
@@ -243,16 +245,16 @@ public class SettingsTabs extends JTabbedPane {
 	 */
 	private class SettingsTab extends JPanel {
 
-		private JScrollPane				scrolling;
-		private ArrayList<Component>	children;
-		private SpringLayout			layout;
-		private final static int		SEP_GAP	= 25;
+		private JScrollPane scrolling;
+		private ArrayList<Component> children;
+		private SpringLayout layout;
+		private final static int SEP_GAP = 25;
 
 		/**
 		 * Creates a new SettingsTab
 		 * 
 		 * @param name
-		 *        the name of the tab header
+		 *            the name of the tab header
 		 */
 		private SettingsTab(String name) {
 			// Just a bunch of settings

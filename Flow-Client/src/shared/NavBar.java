@@ -1,4 +1,3 @@
-
 package shared;
 
 import gui.FlowClient;
@@ -13,6 +12,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
 /**
@@ -24,25 +24,25 @@ import javax.swing.JToolBar;
 @SuppressWarnings("serial")
 public class NavBar extends JToolBar {
 
-	private PanelManager		manager;
+	private PanelManager manager;
 
 	// Because why not.
-	public static final byte	EDIT		= 71;
-	public final static byte	DEBUG		= -18;
-	public static final byte	HISTORY		= 0;
-	public static final byte	SETTINGS	= -35;
+	public static final byte EDIT = 71;
+	public final static byte DEBUG = -18;
+	public static final byte HISTORY = 0;
+	public static final byte SETTINGS = -35;
 
 	// Various buttons.
-	private EditButton			editButton;
-	private DebugButton			debugButton;
-	private HistoryButton		historyButton;
-	private SettingsButton		settingsButton;
+	private EditButton editButton;
+	private DebugButton debugButton;
+	private HistoryButton historyButton;
+	private SettingsButton settingsButton;
 
 	/**
 	 * Creates a new NavBar
 	 * 
 	 * @param panMan
-	 *        the associated PanelManager
+	 *            the associated PanelManager
 	 */
 	public NavBar(PanelManager panMan) {
 		// Swing setup
@@ -63,6 +63,7 @@ public class NavBar extends JToolBar {
 			add(historyButton);
 		}
 		add(settingsButton);
+		add(new HelpButton());
 		addSeparator();
 
 		// More swing stuff
@@ -74,25 +75,25 @@ public class NavBar extends JToolBar {
 	 * Disable a button for a particular pane
 	 * 
 	 * @param button
-	 *        the button to disable
+	 *            the button to disable
 	 */
 	public void disableButton(byte button) {
 		// Set disables whichever button
 		switch (button) {
-			case EDIT:
-				editButton.setEnabled(false);
-				return;
-			case DEBUG:
-				if (!FlowClient.HIDE)
-					debugButton.setEnabled(false);
-				return;
-			case HISTORY:
-				if (!FlowClient.HIDE)
-					historyButton.setEnabled(false);
-				return;
-			case SETTINGS:
-				settingsButton.setEnabled(false);
-				return;
+		case EDIT:
+			editButton.setEnabled(false);
+			return;
+		case DEBUG:
+			if (!FlowClient.HIDE)
+				debugButton.setEnabled(false);
+			return;
+		case HISTORY:
+			if (!FlowClient.HIDE)
+				historyButton.setEnabled(false);
+			return;
+		case SETTINGS:
+			settingsButton.setEnabled(false);
+			return;
 		}
 	}
 
@@ -126,7 +127,8 @@ public class NavBar extends JToolBar {
 	}
 
 	/**
-	 * Button to navigate the user to the Debug pane. Near identical copy of EditButton
+	 * Button to navigate the user to the Debug pane. Near identical copy of
+	 * EditButton
 	 * 
 	 * @author Vince
 	 *
@@ -153,7 +155,8 @@ public class NavBar extends JToolBar {
 	}
 
 	/**
-	 * Button to navigate the user to the History pane. Near identical copy of EditButton
+	 * Button to navigate the user to the History pane. Near identical copy of
+	 * EditButton
 	 * 
 	 * @author Vince
 	 *
@@ -183,7 +186,8 @@ public class NavBar extends JToolBar {
 	}
 
 	/**
-	 * Button to navigate the user to the Settings pane. Near identical copy of EditButton
+	 * Button to navigate the user to the Settings pane. Near identical copy of
+	 * EditButton
 	 * 
 	 * @author Vince
 	 *
@@ -208,15 +212,16 @@ public class NavBar extends JToolBar {
 			});
 		}
 	}
-	
+
 	/**
-	 * Button to navigate the user to the Help pane. Near identical copy of EditButton
+	 * Button to navigate the user to the Help pane. Near identical copy of
+	 * EditButton
 	 * 
 	 * @author Vince
 	 *
 	 */
 	private class HelpButton extends JButton {
-		
+
 		private HelpButton() {
 			setToolTipText("Help");
 			setBorder(FlowClient.EMPTY_BORDER);
@@ -227,10 +232,10 @@ public class NavBar extends JToolBar {
 			}
 			setFocusable(false);
 			addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					throw new UnsupportedOperationException();
+					JOptionPane.showMessageDialog(null, new HelpPanel());
 				}
 			});
 		}
