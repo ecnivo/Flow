@@ -13,7 +13,7 @@ public class Validator {
 		// TODO update the regex
 		return str == null ? false
 				: str.matches(
-						"[A-Za-z0-9_\\-]{1,16}([\\.]{1}[A-Za-z0-9]{0,16})?");
+						"[A-Za-z0-9_\\- ]{1,192}([\\.]{1}[A-Za-z0-9]{0,16})?");
 	}
 
 	/**

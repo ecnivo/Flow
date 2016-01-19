@@ -49,7 +49,7 @@ public class FlowClient extends JFrame {
 		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP"), PORT);
 
 		// Creates a new PanelManager
-		manager = new PanelManager(this);
+		manager = PanelManager.createNewInstance(this);
 		this.add(manager);
 
 		// JFrame setup
@@ -92,7 +92,7 @@ public class FlowClient extends JFrame {
 
 	public void resetUI() {
 		this.remove(manager);
-		manager = new PanelManager(this);
+		manager = PanelManager.createNewInstance(this);
 		this.add(manager);
 		revalidate();
 		repaint();

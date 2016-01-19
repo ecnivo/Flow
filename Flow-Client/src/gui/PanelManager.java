@@ -1,14 +1,10 @@
-
 package gui;
 
 import history.HistoryPane;
 
 import java.awt.CardLayout;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import login.CreateAccountPane;
 import login.LoginPane;
@@ -30,25 +26,27 @@ import editing.EditPane;
 @SuppressWarnings("serial")
 public class PanelManager extends JPanel {
 
-	private CardLayout			layout;
-	private EditPane			editPane;
-	private SettingsPane		settingsTabs;
-	private LoginPane			loginPane;
-	private DebugPane			debugPane;
-	private CreateAccountPane	createAccountPane;
-	private HistoryPane			historyPane;
+	private static PanelManager instance;
 
-	private EditTabs			editTabs;
-	
-	private FlowClient			frame;
+	private CardLayout layout;
+	private EditPane editPane;
+	private SettingsPane settingsTabs;
+	private LoginPane loginPane;
+	private DebugPane debugPane;
+	private CreateAccountPane createAccountPane;
+	private HistoryPane historyPane;
+
+	private EditTabs editTabs;
+
+	private FlowClient frame;
 
 	/**
 	 * Creates a new PanelManager
 	 * 
 	 * @param frame
-	 *        the JFrame
+	 *            the JFrame
 	 */
-	public PanelManager(FlowClient frame) {
+	private PanelManager(FlowClient frame) {
 		// Swing necessities
 		layout = new CardLayout();
 		this.frame = frame;
@@ -75,6 +73,15 @@ public class PanelManager extends JPanel {
 
 		historyPane = new HistoryPane(this);
 		add(historyPane, "historyPane");
+	}
+
+	public static PanelManager getInstance() {
+		return instance;
+	}
+
+	public static PanelManager createNewInstance(FlowClient frame) {
+		instance = new PanelManager(frame);
+		return instance;
 	}
 
 	/**

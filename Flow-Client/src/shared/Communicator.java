@@ -1,5 +1,7 @@
 package shared;
 
+import gui.PanelManager;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -53,7 +55,12 @@ public class Communicator {
 		try {
 			// Try sending the data
 			data.put("session_id", sessionID);
-			return networker.send(data);
+			Data response = networker.send(data);
+			if (response.get("status", String.class).equals("INVALID_SESSION_ID")) {
+				JOptionPane.showConfirmDialog(null, "Suspicious connections have been detected attempting to hijack your connection to the server.\nDue to this breach in security, we will be logging you out.\nTo continue using Flow, please log in again.", "Authentication error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+				PanelManager.getInstance().resetUI();
+			}
+			return response;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
