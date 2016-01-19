@@ -156,8 +156,6 @@ public class RunStopBar extends JToolBar {
 								errors = flowCompiler.build();
 							} catch (NoJDKFoundException e1) {
 								// Can't find the JDK
-								JOptionPane.showConfirmDialog(null, "Could not find a compatible JDK directory on your system to compile your code.\nThe next window will let you choose a path to the JDK.\nIt can be like C:\\Program Files\\Java\\jdk1.8.0_25\nThen, try compiling the code again.", "Cannot compile", JOptionPane.DEFAULT_OPTION,
-										JOptionPane.ERROR_MESSAGE);
 								JFileChooser jdkChooser = new JFileChooser();
 								jdkChooser.setFileFilter(new FileFilter() {
 

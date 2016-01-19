@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -132,12 +133,12 @@ public class FlowCompiler {
 	public class NoJDKFoundException extends Exception {
 
 		public NoJDKFoundException() {
+			JOptionPane.showConfirmDialog(null, "Could not find a compatible JDK directory on your system to compile your code.\nThe next window will let you choose a path to the JDK.\nIt can be like C:\\Program Files\\Java\\jdk1.8.0_25\nThen, try compiling the code again.", "Cannot compile", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	public Process execute() throws IOException {
-		String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/")
-				+ removeExtension(versionTexts[0].getFullPath());
+		String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/") + removeExtension(versionTexts[0].getFullPath());
 		// YOU MUST USE A FORWARD SLASH OR ELSE IT WON'T WORK
 		L.info("assuming main class is " + remotePath);
 		ProcessBuilder pb = new ProcessBuilder("java", "-cp", "\"" + workingDirectory.getAbsolutePath() + "\"", remotePath);
