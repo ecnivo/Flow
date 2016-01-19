@@ -1,3 +1,4 @@
+
 package compiler;
 
 import java.io.BufferedReader;
@@ -11,9 +12,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -33,16 +31,16 @@ import struct.VersionText;
  */
 public class FlowCompiler {
 
-	private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
-	private CompilableText[] versionTexts;
-	private UUID dirUUID;
-	private File workingDirectory;
+	private static final Logger	L	= Logger.getLogger("Flow-Commons/Compiler");
+	private CompilableText[]	versionTexts;
+	private UUID				dirUUID;
+	private File				workingDirectory;
 
 	/**
 	 * Instantiates a compiler from the given textDocuments
 	 *
 	 * @param doc
-	 *            The textDocuments to compile
+	 *        The textDocuments to compile
 	 */
 	public FlowCompiler(CompilableText... doc) {
 		this.versionTexts = doc;
@@ -71,9 +69,9 @@ public class FlowCompiler {
 	 *
 	 * @return The diagnostics containing compilation errors and warnings
 	 * @throws IOException
-	 *             when files cannot be written
+	 *         when files cannot be written
 	 */
-	public List<Diagnostic<? extends JavaFileObject>> build() throws IOException {
+	public List<Diagnostic<? extends JavaFileObject>> build() throws IOException, NoJDKFoundException {
 		L.info("found working directory of " + workingDirectory.getAbsolutePath());
 		ArrayList<File> paths = new ArrayList<>();
 		if (!workingDirectory.exists()) {
@@ -98,27 +96,8 @@ public class FlowCompiler {
 			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 			if (compiler == null) {
-				// TODO Netdex Move this to somewhere appropriate!
 				L.severe("You do not have compatible JDK installed to compile your code.");
-				JOptionPane.showConfirmDialog(null, "Could not find a compatible JDK directory on your system to compile your code.\nThe next window will let you choose a path to the JDK.", "Cannot compile", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-				JFileChooser jdkChooser = new JFileChooser();
-				jdkChooser.setFileFilter(new FileFilter() {
-
-					@Override
-					public String getDescription() {
-						return "Directories only";
-					}
-
-					@Override
-					public boolean accept(File f) {
-						return f.isDirectory();
-					}
-				});
-				jdkChooser.setDialogTitle("Select a JDK folder");
-				if (jdkChooser.showDialog(null, "Choose") == JFileChooser.APPROVE_OPTION) {
-					System.setProperty("java.home", jdkChooser.getSelectedFile().toString());
-				}
-				return null;
+				throw new NoJDKFoundException();
 			}
 			StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 
@@ -150,20 +129,16 @@ public class FlowCompiler {
 		return null;
 	}
 
+	public class NoJDKFoundException extends Exception {
+
+		public NoJDKFoundException() {
+		}
+	}
+
 	public Process execute() throws IOException {
-		String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/") // YOU
-																										// MUST
-																										// USE
-																										// A
-																										// FORWARD
-																										// SLASH
-																										// HERE
-																										// OR
-																										// ELSE
-																										// IT
-																										// WON'T
-																										// WORK
+		String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/")
 				+ removeExtension(versionTexts[0].getFullPath());
+		// YOU MUST USE A FORWARD SLASH OR ELSE IT WON'T WORK
 		L.info("assuming main class is " + remotePath);
 		ProcessBuilder pb = new ProcessBuilder("java", "-cp", "\"" + workingDirectory.getAbsolutePath() + "\"", remotePath);
 		L.info("execution arguments are: " + pb.command().toString());

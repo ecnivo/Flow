@@ -252,7 +252,7 @@ public class EditorFileTree extends FileTree {
 						node.setName(rename);
 						break;
 
-					case "NAME_INVALID":
+					case "FILE_NAME_INVALID":
 						JOptionPane.showConfirmDialog(null, "The new name for this file is invalid.\nTry a different name.", "Invalid name", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						break;
 
