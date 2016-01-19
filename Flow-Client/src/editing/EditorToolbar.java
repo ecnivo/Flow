@@ -94,7 +94,6 @@ public class EditorToolbar extends JToolBar {
 				// Sends request to server
 				Data createProjectRequest = new Data("new_project");
 				createProjectRequest.put("project_name", projectName);
-				createProjectRequest.put("session_id", Communicator.getSessionID());
 				switch (Communicator.communicate(createProjectRequest).get("status", String.class)) {
 				// Success case
 					case "OK":
@@ -153,7 +152,6 @@ public class EditorToolbar extends JToolBar {
 				Data modifyRequest = new Data("project_modify");
 				modifyRequest.put("project_modify_type", "RENAME_PROJECT");
 				modifyRequest.put("project_uuid", projectNode.getProjectUUID());
-				modifyRequest.put("session_id", Communicator.getSessionID());
 				modifyRequest.put("new_name", rename);
 				// Sends request to server
 				switch (Communicator.communicate(modifyRequest).get("status", String.class)) {
@@ -208,7 +206,6 @@ public class EditorToolbar extends JToolBar {
 
 				// Gets project information (for project name)
 				Data projectRequest = new Data("project_info");
-				projectRequest.put("session_id", Communicator.getSessionID());
 				projectRequest.put("project_uuid", projectUUID);
 				Data project = Communicator.communicate(projectRequest);
 				if (project.get("status", String.class).equals("ACCESS_DENIED")) {
@@ -223,7 +220,6 @@ public class EditorToolbar extends JToolBar {
 						Data deleteProjectRequest = new Data("project_modify");
 						deleteProjectRequest.put("project_modify_type", "DELETE_PROJECT");
 						deleteProjectRequest.put("project_uuid", projectUUID);
-						deleteProjectRequest.put("session_id", Communicator.getSessionID());
 
 						// Sends deletion message
 						Data reply = Communicator.communicate(deleteProjectRequest);
@@ -403,7 +399,6 @@ public class EditorToolbar extends JToolBar {
 
 					// Asks server to create new file
 					Data createFileRequest = new Data("new_text_file");
-					createFileRequest.put("session_id", Communicator.getSessionID());
 					createFileRequest.put("file_name", importFile.getName());
 					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 					createFileRequest.put("project_uuid", projectUUID);
@@ -440,7 +435,6 @@ public class EditorToolbar extends JToolBar {
 					// Writes file contents to server
 					Data modify = new Data("file_text_modify");
 					modify.put("file_uuid", response.get("file_uuid", UUID.class));
-					modify.put("session_id", Communicator.getSessionID());
 					modify.put("mod_type", "INSERT");
 					modify.put("idx", 0);
 					modify.put("str", fileContents);
@@ -514,7 +508,6 @@ public class EditorToolbar extends JToolBar {
 
 					// Gets the export contents
 					Data getFileContents = new Data("file_request");
-					getFileContents.put("session_id", Communicator.getSessionID());
 					getFileContents.put("file_uuid", fileUUID);
 					Data reply = Communicator.communicate(getFileContents);
 					switch (reply.get("status", String.class)) {
@@ -532,7 +525,6 @@ public class EditorToolbar extends JToolBar {
 
 					// Gets the name of the export file
 					Data getFileName = new Data("file_info");
-					getFileName.put("session_id", Communicator.getSessionID());
 					getFileName.put("file_uuid", fileUUID);
 					String fileName = Communicator.communicate(getFileName).get("file_name", String.class);
 

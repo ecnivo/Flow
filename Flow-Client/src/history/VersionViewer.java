@@ -96,7 +96,6 @@ public class VersionViewer extends JPanel {
 		// Asks the server for the versions to update
 		Data fileInfoRequest = new Data("file_info");
 		fileInfoRequest.put("file_uuid", fileUUID);
-		fileInfoRequest.put("session_id", Communicator.getSessionID());
 		Data fileInfo = Communicator.communicate(fileInfoRequest);
 		if (fileInfo.get("status", String.class).equals("ACCESS_DENIED"))
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -120,7 +119,6 @@ public class VersionViewer extends JPanel {
 			Data versionDataRequest = new Data("version_request");
 			versionDataRequest.put("file_uuid", fileUUID);
 			versionDataRequest.put("version_uuid", versionUUID);
-			versionDataRequest.put("session_id", Communicator.getSessionID());
 			Data versionRequestResponse = Communicator.communicate(versionDataRequest);
 			if (versionRequestResponse.get("status", String.class).equals("ACCESS_DENIED"))
 				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -130,7 +128,6 @@ public class VersionViewer extends JPanel {
 			Data versionInfoRequest = new Data("version_info");
 			versionInfoRequest.put("version_uuid", versionUUID);
 			versionInfoRequest.put("file_uuid", fileUUID);
-			versionInfoRequest.put("session_id", Communicator.getSessionID());
 			// Gets the date from a millis value
 			Data versionInfo = Communicator.communicate(versionInfoRequest);
 			if (versionInfo.get("status", String.class).equals("ACCESS_DENIED"))

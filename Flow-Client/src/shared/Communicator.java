@@ -1,13 +1,13 @@
-
 package shared;
 
-import callback.TextModificationListener;
-import message.Data;
-import network.FMLNetworker;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.util.UUID;
+
+import javax.swing.JOptionPane;
+
+import message.Data;
+import network.FMLNetworker;
+import callback.TextModificationListener;
 
 /**
  * Central communications handler
@@ -17,9 +17,9 @@ import java.util.UUID;
  */
 public class Communicator {
 
-	private static UUID			sessionID;
-	private static String		username;
-	private static FMLNetworker	networker;
+	private static UUID sessionID;
+	private static String username;
+	private static FMLNetworker networker;
 
 	/**
 	 * Creates a new networker using FML
@@ -32,11 +32,12 @@ public class Communicator {
 	 * Sends a Data packet and the data that comes back from the server
 	 * 
 	 * @param data
-	 *        the data to be sent
+	 *            the data to be sent
 	 * @return the response
 	 */
 	public static Data communicate(Data data) {
-		// Starts a timer so that the client doesn't freeze because the server froze
+		// Starts a timer so that the client doesn't freeze because the server
+		// froze
 		Thread timer = new Thread(new Runnable() {
 
 			@Override
@@ -51,12 +52,14 @@ public class Communicator {
 		timer.start();
 		try {
 			// Try sending the data
-			return networker.send(data);
+			data.put("session_id", sessionID);
+			networker.send(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		try {
-			// But it must finish communicating within 30 seconds or else the communicator will stop
+			// But it must finish communicating within 30 seconds or else the
+			// communicator will stop
 			// because of time out
 			timer.join(30000);
 		} catch (InterruptedException e) {
@@ -79,7 +82,7 @@ public class Communicator {
 	 * Sets the session ID
 	 * 
 	 * @param sessionID
-	 *        the new session ID
+	 *            the new session ID
 	 */
 	public static void setSessionID(UUID sessionID) {
 		Communicator.sessionID = sessionID;
@@ -108,9 +111,9 @@ public class Communicator {
 	 * Adds a file change listener for file changes
 	 * 
 	 * @param listener
-	 *        the new change listener to register
+	 *            the new change listener to register
 	 * @param fileUUID
-	 *        the file to add the listener to
+	 *            the file to add the listener to
 	 */
 	public static void addFileChangeListener(TextModificationListener listener, UUID fileUUID) {
 		networker.registerCallbackListener(listener, fileUUID);
@@ -118,7 +121,7 @@ public class Communicator {
 
 	/**
 	 * @param fileUUID
-	 *        the file to remove the listener from
+	 *            the file to remove the listener from
 	 */
 	public static void removeFileChangeListener(UUID fileUUID) {
 		networker.unregisterCallbackListener(fileUUID);
@@ -137,7 +140,7 @@ public class Communicator {
 	 * Sets the username
 	 * 
 	 * @param username
-	 *        the username in use
+	 *            the username in use
 	 */
 	public static void setUsername(String username) {
 		Communicator.username = username;

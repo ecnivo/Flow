@@ -159,7 +159,6 @@ public class CollabsList extends JPanel {
 				if (query != null && !query.equals(SEARCHBOX_TEXT) && !query.trim().equals("")) {
 					// Creates the data package
 					Data collabMod = new Data("project_modify");
-					collabMod.put("session_id", Communicator.getSessionID());
 					collabMod.put("project_modify_type", "MODIFY_COLLABORATOR");
 					collabMod.put("project_uuid", activeProjectUUID);
 					collabMod.put("username", query);
@@ -230,7 +229,6 @@ public class CollabsList extends JPanel {
 		// Requests the server for the current list of collaborators
 		// (owner/viewers/editors)
 		Data getProject = new Data("project_info");
-		getProject.put("session_id", Communicator.getSessionID());
 		// Gets the "active project" (see getActiveProjectUUID())
 		try {
 			activeProjectUUID = getActiveProjectUUID();
@@ -461,7 +459,6 @@ public class CollabsList extends JPanel {
 					changePerm.put("project_modify_type", "MODIFY_COLLABORATOR");
 					UUID projectUUID = activeProjectUUID;
 					changePerm.put("project_uuid", projectUUID);
-					changePerm.put("session_id", Communicator.getSessionID());
 					changePerm.put("username", user);
 					changePerm.put("access_level", changePermission);
 					// If not cleared by the server, fail the changes

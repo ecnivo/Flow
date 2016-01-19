@@ -131,7 +131,6 @@ public abstract class FileTree extends JTree {
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
 		// Asks the server for list of projects
 		Data projectList = new Data("list_projects");
-		projectList.put("session_id", Communicator.getSessionID());
 		Data reply = Communicator.communicate(projectList);
 		if (reply == null) {
 			return;
@@ -156,7 +155,6 @@ public abstract class FileTree extends JTree {
 				// Asks server for project's info
 				Data fileListRequest = new Data("project_info");
 				fileListRequest.put("project_uuid", remoteProjectUUID);
-				fileListRequest.put("session_id", Communicator.getSessionID());
 				Data project = Communicator.communicate(fileListRequest);
 				if (project == null) {
 					return;
@@ -203,7 +201,6 @@ public abstract class FileTree extends JTree {
 	private void loadProjectFilesFirstTime(UUID remoteDirUUID, DirectoryNode localDir) {
 		// Asks the server for info about the directory
 		Data dirInfoRequest = new Data("directory_info");
-		dirInfoRequest.put("session_id", Communicator.getSessionID());
 		dirInfoRequest.put("directory_uuid", remoteDirUUID);
 		Data remoteDir = Communicator.communicate(dirInfoRequest);
 		if (remoteDir.get("status", String.class).equals("ACCESS_DENIED")) {
@@ -217,7 +214,6 @@ public abstract class FileTree extends JTree {
 			for (UUID childDirUUID : childDirs) {
 				// Creates children while asking for their info
 				Data childDirNameRequest = new Data("directory_info");
-				childDirNameRequest.put("session_id", Communicator.getSessionID());
 				childDirNameRequest.put("directory_uuid", childDirUUID);
 				String childDirName = Communicator.communicate(childDirNameRequest).get("directory_name", String.class);
 
@@ -252,7 +248,6 @@ public abstract class FileTree extends JTree {
 		// Gets the project data from the server
 		Data projectReload = new Data("directory_info");
 		projectReload.put("directory_uuid", projectNode.getProjectUUID());
-		projectReload.put("session_id", Communicator.getSessionID());
 		Data reloadedProject = Communicator.communicate(projectReload);
 		if (reloadedProject == null) {
 			JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -324,7 +319,6 @@ public abstract class FileTree extends JTree {
 				if (fileNode.getFileUUID().equals(remoteFileUUID)) {
 					Data fileNameRequest = new Data("file_info");
 					fileNameRequest.put("file_uuid", remoteFileUUID);
-					fileNameRequest.put("session_id", Communicator.getSessionID());
 					String remoteFileName = Communicator.communicate(fileNameRequest).get("file_name", String.class);
 					if (!fileNode.toString().equals(remoteFileName)) {
 						fileNode.setName(remoteFileName);
@@ -349,7 +343,6 @@ public abstract class FileTree extends JTree {
 			// Ask server for information about this new directory, and create it
 			Data remoteChildDirRequest = new Data("directory_info");
 			remoteChildDirRequest.put("directory_uuid", remoteChildDirUUID);
-			remoteChildDirRequest.put("session_id", Communicator.getSessionID());
 			Data remoteChildDir = Communicator.communicate(remoteChildDirRequest);
 			if (remoteChildDir.get("status", String.class).equals("ACCESS_DENIED")) {
 				JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -426,7 +419,6 @@ public abstract class FileTree extends JTree {
 			// Requeests the server for a name
 			Data requestName = new Data("directory_info");
 			requestName.put("directory_uuid", dirUUID);
-			requestName.put("session_id", Communicator.getSessionID());
 			this.name = Communicator.communicate(requestName).get("directory_name", String.class);
 		}
 
@@ -484,7 +476,6 @@ public abstract class FileTree extends JTree {
 			// Asks for the file's name
 			Data fileDataRequest = new Data("file_info");
 			fileDataRequest.put("file_uuid", fileUUID);
-			fileDataRequest.put("session_id", Communicator.getSessionID());
 			Data fileData = Communicator.communicate(fileDataRequest);
 
 			name = fileData.get("file_name", String.class);

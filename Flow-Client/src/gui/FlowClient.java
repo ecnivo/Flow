@@ -66,7 +66,6 @@ public class FlowClient extends JFrame {
 				if (sessionID == null)
 					return;
 				Communicator.killAsync();
-				logOff.put("session_id", sessionID);
 				Communicator.communicate(logOff);
 
 			}

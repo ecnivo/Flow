@@ -94,7 +94,6 @@ public class EditArea extends JTextPane {
         // carets
         Data editorListRequest = new Data("project_info");
         editorListRequest.put("project_uuid", projectUUID);
-        editorListRequest.put("session_id", Communicator.getSessionID());
         Data editorListData = Communicator.communicate(editorListRequest);
         if (editorListData.get("status", String.class).equals("ACCESS_DENIED")) {
             JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -163,7 +162,6 @@ public class EditArea extends JTextPane {
                     String text = EditArea.this.getText();
                     Data fileModify = new Data("file_text_modify");
                     fileModify.put("file_uuid", fileUUID);
-                    fileModify.put("session_id", Communicator.getSessionID());
                     fileModify.put("mod_type", "DELETE");
                     fileModify.put("idx", 0);
                     fileModify.put("len", text.length());
@@ -174,7 +172,6 @@ public class EditArea extends JTextPane {
                     String form = Formatter.format(text);
                     fileModify = new Data("file_text_modify");
                     fileModify.put("file_uuid", fileUUID);
-                    fileModify.put("session_id", Communicator.getSessionID());
                     fileModify.put("mod_type", "INSERT");
                     fileModify.put("idx", 0);
                     fileModify.put("str", form);
@@ -229,7 +226,6 @@ public class EditArea extends JTextPane {
                 // Prepare message for server to send text off
                 Data fileModify = new Data("file_text_modify");
                 fileModify.put("file_uuid", fileUUID);
-                fileModify.put("session_id", Communicator.getSessionID());
                 fileModify.put("mod_type", "INSERT");
                 fileModify.put("idx", caretPos);
                 fileModify.put("str", insertedString);
@@ -261,7 +257,6 @@ public class EditArea extends JTextPane {
                 // Creates message for server
                 Data metadataModify = new Data("file_text_modify");
                 metadataModify.put("file_uuid", fileUUID);
-                metadataModify.put("session_id", Communicator.getSessionID());
                 metadataModify.put("mod_type", "DELETE");
                 metadataModify.put("idx", caretPos);
                 metadataModify.put("len", removedLen);
@@ -286,7 +281,6 @@ public class EditArea extends JTextPane {
                 // Gets the caret position and sends to server
                 int caretPos = e.getDot();
                 Data caretPosChange = new Data("file_text_modify");
-                caretPosChange.put("session_id", Communicator.getSessionID());
                 caretPosChange.put("file_uuid", fileUUID);
                 caretPosChange.put("mod_type", "MOVE");
                 caretPosChange.put("idx", caretPos);
@@ -398,7 +392,6 @@ public class EditArea extends JTextPane {
 
     private void resetToServer() {
         Data requestData = new Data("file_request");
-        requestData.put("session_id", Communicator.getSessionID());
         requestData.put("file_uuid", fileUUID);
         Data response = Communicator.communicate(requestData);
         String status = response.get("status", String.class);

@@ -118,7 +118,6 @@ public class EditorFileTree extends FileTree {
 				}
 				Data dirModRequest = new Data("directory_modify");
 				dirModRequest.put("directory_uuid", node.getDirectoryUUID());
-				dirModRequest.put("session_id", Communicator.getSessionID());
 				dirModRequest.put("mod_type", "RENAME");
 				dirModRequest.put("new_name", rename);
 				Data reply = Communicator.communicate(dirModRequest);
@@ -169,7 +168,6 @@ public class EditorFileTree extends FileTree {
 					DirectoryNode selectedDir = (DirectoryNode) getSelectionPath().getLastPathComponent();
 					projectNode = (ProjectNode) selectedDir.getPath()[1];
 					directoryModifyRequest.put("directory_uuid", selectedDir.getDirectoryUUID());
-					directoryModifyRequest.put("session_id", Communicator.getSessionID());
 					directoryModifyRequest.put("mod_type", "DELETE");
 
 					// Sends request to server
@@ -241,7 +239,6 @@ public class EditorFileTree extends FileTree {
 				}
 
 				Data renameFileRequest = new Data("file_metadata_modify");
-				renameFileRequest.put("session_id", Communicator.getSessionID());
 				renameFileRequest.put("file_uuid", node.getFileUUID());
 				renameFileRequest.put("mod_type", "RENAME");
 				renameFileRequest.put("name", rename);
@@ -283,7 +280,6 @@ public class EditorFileTree extends FileTree {
 					// Prepares request
 					Data delFileReq = new Data("file_metadata_modify");
 					delFileReq.put("file_uuid", selectedNode.getFileUUID());
-					delFileReq.put("session_id", Communicator.getSessionID());
 					delFileReq.put("mod_type", "DELETE");
 
 					// Sends request to server
@@ -449,7 +445,6 @@ public class EditorFileTree extends FileTree {
 		// Asks the server for the file's info
 		Data fileRequest = new Data("file_info");
 		fileRequest.put("file_uuid", fileToOpen);
-		fileRequest.put("session_id", Communicator.getSessionID());
 		Data fileData = Communicator.communicate(fileRequest);
 
 		if (fileData.get("status", String.class).equals("ACCESS_DENIED"))
@@ -457,7 +452,6 @@ public class EditorFileTree extends FileTree {
 
 		// Asks the server for the file's data
 		Data fileContentsRequest = new Data("file_request");
-		fileContentsRequest.put("session_id", Communicator.getSessionID());
 		fileContentsRequest.put("file_uuid", fileToOpen);
 		Data fileContents = Communicator.communicate(fileContentsRequest);
 
@@ -466,7 +460,6 @@ public class EditorFileTree extends FileTree {
 
 		// Asks the server for the project's info
 		Data permissionRequest = new Data("project_info");
-		permissionRequest.put("session_id", Communicator.getSessionID());
 		permissionRequest.put("project_uuid", projectUUID);
 		Data permissions = Communicator.communicate(permissionRequest);
 
@@ -608,7 +601,6 @@ public class EditorFileTree extends FileTree {
 
 					// Creates request to the server for a new directory
 					Data createDirReq = new Data("new_directory");
-					createDirReq.put("session_id", Communicator.getSessionID());
 					UUID parentDirUUID = selectedDir.getDirectoryUUID();
 					createDirReq.put("parent_directory_uuid", parentDirUUID);
 					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
@@ -683,7 +675,6 @@ public class EditorFileTree extends FileTree {
 					UUID projectUUID = ((ProjectNode) selectedDir.getPath()[1]).getProjectUUID();
 					createFileRequest.put("project_uuid", projectUUID);
 					createFileRequest.put("file_name", name);
-					createFileRequest.put("session_id", Communicator.getSessionID());
 					createFileRequest.put("directory_uuid", selectedDir.getDirectoryUUID());
 
 					// Sends request packet

@@ -139,7 +139,6 @@ public class SettingsTabs extends JTabbedPane {
 				// Creates a new message to send to the server
 				Data newPass = new Data("user");
 				newPass.put("user_type", "CHANGE_PASSWORD");
-				newPass.put("session_id", Communicator.getSessionID());
 				newPass.put("password", String.copyValueOf(passField.getPassword()));
 				String status = Communicator.communicate(newPass).get("status", String.class);
 
@@ -166,7 +165,6 @@ public class SettingsTabs extends JTabbedPane {
 			public void actionPerformed(ActionEvent e) {
 				// Creates an "end session" message to send to the server
 				Data endSession = new Data("end_session");
-				endSession.put("session_id", Communicator.getSessionID());
 				Communicator.communicate(endSession);
 				Communicator.setSessionID(null);
 				Communicator.killAsync();
@@ -193,7 +191,6 @@ public class SettingsTabs extends JTabbedPane {
 					// Prepares a new message to the server
 					Data closeAccountRequest = new Data("user");
 					closeAccountRequest.put("user_type", "CLOSE_ACCOUNT");
-					closeAccountRequest.put("session_id", Communicator.getSessionID());
 					if (Communicator.communicate(closeAccountRequest).get("status", String.class).startsWith("OK")) {
 						// Send the message, with confirmation box
 						JOptionPane.showConfirmDialog(null, "Your Flow account has been successfully deleted.", "Account deletion success", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -229,7 +226,6 @@ public class SettingsTabs extends JTabbedPane {
 				FlowClient.HIDE = !FlowClient.HIDE;
 				// Creates an "end session" message to send to the server
 				Data endSession = new Data("end_session");
-				endSession.put("session_id", Communicator.getSessionID());
 				Communicator.communicate(endSession);
 				Communicator.setSessionID(null);
 				Communicator.killAsync();
