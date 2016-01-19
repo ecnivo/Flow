@@ -40,6 +40,8 @@ public class FMLNetworker {
     public Data send(Data data) throws IOException {
         try {
             Socket socket = new Socket(ip, port);
+            socket.setPerformancePreferences(1, 0, 0);
+            socket.setTcpNoDelay(true);
             DataSocket ds = new DataSocket(socket);
 
             L.info("writing message: " + data.toString());

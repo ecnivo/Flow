@@ -1,5 +1,8 @@
 package server;
 
+import database.SQLDatabase;
+import util.DatabaseException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,9 +11,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
-import util.DatabaseException;
 
 public class FlowServer implements Runnable {
 
@@ -48,9 +48,13 @@ public class FlowServer implements Runnable {
 		try {
 			L.info("started listening");
 			ServerSocket serverSocket = new ServerSocket(PORT);
+			serverSocket.setReceiveBufferSize(64000);
+			serverSocket.setPerformancePreferences(1, 0, 0);
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
+				socket.setPerformancePreferences(1, 0, 0);
+				socket.setTcpNoDelay(true);
 				L.info("accepted connection from "
 						+ socket.getRemoteSocketAddress());
 				int i = 0;
