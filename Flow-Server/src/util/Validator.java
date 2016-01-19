@@ -11,7 +11,9 @@ public class Validator {
 
 	public static boolean validFileName(String str) {
 		// TODO update the regex
-		return str == null ? false : str.matches("[A-Za-z0-9_\\-\\.]{1,16}");
+		return str == null ? false
+				: str.matches(
+						"[A-Za-z0-9_\\-]{1,16}([\\.]{1}[A-Za-z0-9]{0,16})?");
 	}
 
 	/**
