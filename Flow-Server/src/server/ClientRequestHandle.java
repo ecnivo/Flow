@@ -1,13 +1,8 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.logging.Logger;
-
+import callback.DocumentCallbackEvent;
+import callback.PersistentHandleManager;
+import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
 import struct.User;
@@ -16,9 +11,13 @@ import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 import util.Validator;
-import callback.DocumentCallbackEvent;
-import callback.PersistentHandleManager;
-import database.SQLDatabase;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -75,7 +74,7 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "end_session":
 				// TODO Deregister all associated listeners
-				// TODO Call whatever code NETDEX has for this
+				// TODO Call whatever code Gordon Guan has for this
 				returnData.put(
 						"status",
 						this.database.removeSession(data.get("session_id",

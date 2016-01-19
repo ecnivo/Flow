@@ -5,7 +5,7 @@ import java.io.*;
 /**
  * Reads and writes serializables from files
  * <p>
- * Created by Netdex on 12/25/2015.
+ * Created by Gordon Guan on 12/25/2015.
  */
 public class FileSerializer {
 

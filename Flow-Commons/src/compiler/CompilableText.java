@@ -5,7 +5,8 @@ import struct.VersionText;
 import java.nio.file.Paths;
 
 /**
- * Created by Netdex on 1/17/2016.
+ * Represents a text document with information pertaining to compilation
+ * Created by Gordon Guan on 1/17/2016.
  */
 public class CompilableText extends VersionText {
     private String path;
@@ -17,14 +18,27 @@ public class CompilableText extends VersionText {
         this.name = name;
     }
 
+    /**
+     * The path to the file
+     *
+     * @return
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * The name of the file
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the full path of the file
+     * @return
+     */
     public String getFullPath() {
         return Paths.get(path, name).toString();
     }

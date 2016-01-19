@@ -3,9 +3,9 @@ package callback;
 import java.io.IOException;
 
 /**
- * Represents a handler that handles a callback event
+ * Represents a server handler that handles a callback event
  * <p>
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public class CallbackHandler {
 

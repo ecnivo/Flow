@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 /**
  * Manages all persistent handles to the server
  * <p>
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public class PersistentHandleManager {
     private static PersistentHandleManager instance;
@@ -38,6 +38,7 @@ public class PersistentHandleManager {
         if (events.get(callbackUUID) == null) {
             L.warning("no handles for callbackUUID " + callbackUUID + "!");
         } else {
+            // Loop through all handlers listening to this callback and activate their event
             Iterator<CallbackHandler> iterator = events.get(callbackUUID).iterator();
             while (iterator.hasNext()) {
                 CallbackHandler handler = iterator.next();
@@ -52,6 +53,12 @@ public class PersistentHandleManager {
         }
     }
 
+    /**
+     * Registers a server side handler for events
+     *
+     * @param assocUUID The UUID of the handler
+     * @param handler   The handler
+     */
     public void registerCallbackHandler(UUID assocUUID, CallbackHandler handler) {
         if (events.get(assocUUID) == null)
             events.put(assocUUID, new ArrayList<>());
@@ -59,6 +66,11 @@ public class PersistentHandleManager {
         L.info("registered callback handler associated with handle " + assocUUID);
     }
 
+    /**
+     * Unregisters a server side handler for events
+     * @param assocUUID The UUID of he handler
+     * @param handler The handler
+     */
     public void unregisterCallbackHandler(UUID assocUUID, CallbackHandler handler) {
         events.get(assocUUID).remove(handler);
         L.info("deregistered callback handler associated with handle " + assocUUID);

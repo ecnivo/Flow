@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * Represents a message with an unlimited amount of properties
  * <p>
- * Created by Netdex on 12/22/2015.
+ * Created by Gordon Guan on 12/22/2015.
  */
 public class Data implements Serializable {
 

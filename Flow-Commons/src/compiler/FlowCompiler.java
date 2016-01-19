@@ -1,32 +1,22 @@
 
 package compiler;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import struct.VersionText;
+
+import javax.swing.*;
+import javax.tools.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-
-import struct.VersionText;
-
 /**
  * Represents a wrapper around the javac compiler Attempts to compile a
  * document, then execute
  * <p>
- * Created by Netdex on 12/18/2015.
+ * Created by Gordon Guan on 12/18/2015.
  * <p>
  * TODO FIX COMPILER TO USE NEW FILE STRUCTURE
  */
@@ -73,6 +63,7 @@ public class FlowCompiler {
 	 *         when files cannot be written
 	 */
 	public List<Diagnostic<? extends JavaFileObject>> build() throws IOException, NoJDKFoundException {
+		// Find and create working directory
 		L.info("found working directory of " + workingDirectory.getAbsolutePath());
 		ArrayList<File> paths = new ArrayList<>();
 		if (!workingDirectory.exists()) {
@@ -80,6 +71,7 @@ public class FlowCompiler {
 			L.info("working directory did not exist, created it");
 		}
 		L.info(versionTexts.length + " textdocuments queued for compilation");
+		// Add all documents and their paths to compilation queue
 		for (CompilableText doc : versionTexts) {
 			File tempPath = new File(workingDirectory.getAbsolutePath(), doc.getFullPath());
 			if (tempPath.getParentFile().mkdirs()) {
@@ -93,6 +85,7 @@ public class FlowCompiler {
 		}
 		System.out.println(paths);
 		try {
+			// Set up the javac compiler
 			L.info("setting up compilation diagnostics and compiler");
 			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -112,6 +105,7 @@ public class FlowCompiler {
 			Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(paths);
 			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null, compilationUnit);
 
+			// Begin compilation
 			L.info("calling compilation task");
 			if (task.call()) {
 				L.info("compilation success!");
@@ -137,6 +131,12 @@ public class FlowCompiler {
 		}
 	}
 
+	/**
+	 * Executes compiled code
+	 *
+	 * @return The process of execution
+	 * @throws IOException
+	 */
 	public Process execute() throws IOException {
 		String remotePath = (versionTexts[0].getPath() == "" ? "" : versionTexts[0].getPath() + "/") + removeExtension(versionTexts[0].getFullPath());
 		// YOU MUST USE A FORWARD SLASH OR ELSE IT WON'T WORK
@@ -147,6 +147,11 @@ public class FlowCompiler {
 		return p;
 	}
 
+	/**
+	 * Executes the program and reads all output
+	 * @return The output
+	 * @throws IOException
+	 */
 	public String readAllOutput() throws IOException {
 		L.info("reading all output of execution");
 		String str = "";

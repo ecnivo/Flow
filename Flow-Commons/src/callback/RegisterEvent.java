@@ -3,7 +3,8 @@ package callback;
 import java.util.UUID;
 
 /**
- * Created by Netdex on 1/16/2016.
+ * An event called when registering a listener
+ * Created by Gordon Guan on 1/16/2016.
  */
 public class RegisterEvent {
     public final UUID UUID;

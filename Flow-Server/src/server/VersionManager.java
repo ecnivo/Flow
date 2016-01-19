@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * Manages versions of files
  * <p>
- * Created by Netdex on 1/16/2016.
+ * Created by Gordon Guan on 1/16/2016.
  */
 public class VersionManager {
     private static Logger L = Logger.getLogger("VersionManager");
@@ -72,7 +72,6 @@ public class VersionManager {
      * @return success or not
      */
     public boolean flushToDisk() {
-        // TODO doesn't remove versions that were deleted!
         for (UUID versionUUID : loadedDocuments.keySet()) {
             UUID parentFileUUID = parentFile.get(versionUUID);
             if (!DataManagement.getInstance().flushTextToDisk(parentFileUUID, versionUUID, loadedDocuments.get(versionUUID)))

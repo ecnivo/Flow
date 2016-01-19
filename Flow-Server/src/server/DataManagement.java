@@ -9,7 +9,9 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * Created by Netdex on 1/5/2016.
+ * Manages data saved to the disk
+ *
+ * Created by Gordon Guan on 1/5/2016.
  */
 public class DataManagement {
 
@@ -116,6 +118,7 @@ public class DataManagement {
 		File textFile = new File(new File(fileDir, fileUUID.toString()),
 				versionUUID + "." + TEXT_FILE_EXT);
 		textFile.getParentFile().mkdirs();
+		// Write the document to the disk
 		try {
 			PrintStream ps = new PrintStream(textFile);
 			System.out.println(textDoc.getDocumentText());
@@ -203,6 +206,7 @@ public class DataManagement {
 				versionUUID + "." + TEXT_FILE_EXT);
 		if (!textFile.exists())
 			return null;
+		// Read the document from the disk
 		VersionText td = new VersionText();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(textFile));

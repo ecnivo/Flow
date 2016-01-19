@@ -3,14 +3,14 @@ import util.Formatter;
 import java.io.IOException;
 
 /**
- * Created by Netdex on 1/17/2016.
+ * Created by Gordon Guan on 1/17/2016.
  */
 public class CommonsTest {
     public static void main(String[] args) throws IOException {
         String code = "package util;\n" +
                 "\n" +
                 "/**\n" +
-                " * Created by Netdex on 1/17/2016.\n" +
+                " * Created by Gordon Guan on 1/17/2016.\n" +
                 " */\n" +
                 "public class Formatter {\n" +
                 "\n" +

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Created by Netdex on 1/14/2016.
+ * Created by Gordon Guan on 1/14/2016.
  */
 public class ServerTest {
 

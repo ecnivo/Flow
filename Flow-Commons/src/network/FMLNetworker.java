@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Communication for the Client.
  * <p>
- * Created by Netdex on 12/27/2015.
+ * Created by Gordon Guan on 12/27/2015.
  */
 public class FMLNetworker {
 
@@ -61,6 +61,12 @@ public class FMLNetworker {
         }
     }
 
+    /**
+     * Initialize asynchronous listeners
+     *
+     * @param sessionUUID The sessionID of the user
+     * @throws IOException
+     */
     public void initAsync(UUID sessionUUID) throws IOException {
         Socket socket = new Socket(ip, arcport);
         this.asyncSocket = new DataSocket(socket);
@@ -68,18 +74,29 @@ public class FMLNetworker {
         new Thread(pusher).start();
     }
 
+    /**
+     * Kills asynchronous listeners
+     * @throws IOException
+     */
     public void killAsync() throws IOException {
         pusher.kill();
         asyncSocket.getSocket().close();
         asyncSocket.close();
     }
 
+    /**
+     * Register a client side listener
+     * @param chngListener The listener
+     * @param assocUUID UUID of the listener
+     * @return success or not
+     */
     public boolean registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
         if (asyncSocket == null) {
             L.severe("attempted to register callback when async is not initiated!");
             return false;
         }
         try {
+            // Send the server a message letting them know a listener was registered
             Data asyncCallbackRequest = new Data("async");
             if (chngListener instanceof TextModificationListener) {
                 asyncCallbackRequest.put("ltype", CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK);
@@ -96,12 +113,18 @@ public class FMLNetworker {
         }
     }
 
+    /**
+     * Unregister a client side listener
+     * @param assocUUID The UUID of the listener
+     * @return success or not
+     */
     public boolean unregisterCallbackListener(UUID assocUUID) {
         if (asyncSocket == null) {
             L.severe("attempted to deregister callback when async is not initiated!");
             return false;
         }
         try {
+            // Send the server a message letting them know a listener was unregistered
             Data cancelAsync = new Data("async");
             cancelAsync.put("rtype", RegisterEvent.RegisterType.UNREGISTER);
             cancelAsync.put("uuid", assocUUID);

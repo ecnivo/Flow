@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public class PersistentClientHandle implements Runnable {
     private static Logger L = Logger.getLogger("PersistentHandleManager");
@@ -42,16 +42,20 @@ public class PersistentClientHandle implements Runnable {
     @Override
     public void run() {
         try {
+            // Get the client side session ID
             sessionUUID = dataSocket.receive(UUID.class);
             while (socket.isConnected()) {
+                // Get the client side request data
                 Data data = dataSocket.receive(Data.class);
                 L.info("accepted async data " + data);
                 switch (data.get("type", String.class)) {
                     case "async":
+                        // Get the UUID of the listener
                         UUID uuid = data.get("uuid", UUID.class);
                         CallbackEvent.CallbackEventType ltype = data.get("ltype", CallbackEvent.CallbackEventType.class);
                         switch (data.get("rtype", RegisterEvent.RegisterType.class)) {
                             case REGISTER: {
+                                // Register the handler, and call register events
                                 CallbackHandler handler = null;
                                 if (ltype == CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK) {
                                     handler = new DocumentUpdateCallbackHandler(this, uuid);
@@ -63,6 +67,7 @@ public class PersistentClientHandle implements Runnable {
                             break;
 
                             case UNREGISTER: {
+                                // Unregister the handler, and call unregister events
                                 CallbackHandler handler = handlers.get(uuid);
                                 handler.onUnregister(new RegisterEvent(uuid, RegisterEvent.RegisterType.UNREGISTER));
                                 PersistentHandleManager.getInstance().unregisterCallbackHandler(uuid, handler);

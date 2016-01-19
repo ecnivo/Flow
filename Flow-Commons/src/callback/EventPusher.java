@@ -8,7 +8,8 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * Created by Netdex on 1/16/2016.
+ * Pushes events to client side event listeners
+ * Created by Gordon Guan on 1/16/2016.
  */
 public class EventPusher implements Runnable {
 
@@ -31,13 +32,16 @@ public class EventPusher implements Runnable {
     public void run() {
         L.info("event pusher started under session " + sessionID);
         try {
+            // Tell the server the sessionID
             arcSocket.send(sessionID);
             while (arcSocket.getSocket().isConnected() && running) {
+                // Receive the event
                 Data data = arcSocket.receive(Data.class);
                 if (running) {
                     CallbackEvent event = data.get("event", CallbackEvent.class);
                     L.info("received event " + event);
                     UUID assocUUID = event.getAssociatedUUID();
+                    // Notify the registered client side listener
                     CallbackListener listener = registeredEvents.get(assocUUID);
                     if (listener != null)
                         listener.onCallbackEvent(event);
@@ -52,13 +56,27 @@ public class EventPusher implements Runnable {
         L.info("event pusher dead");
     }
 
+    /**
+     * Kill the event pusher
+     */
     public void kill() {
         running = false;
     }
-    public void registerListener(UUID uuid, CallbackListener event) {
-        registeredEvents.put(uuid, event);
+
+    /**
+     * Register a listener
+     *
+     * @param uuid     The UUID of the listener
+     * @param listener The listener
+     */
+    public void registerListener(UUID uuid, CallbackListener listener) {
+        registeredEvents.put(uuid, listener);
     }
 
+    /**
+     * Unregister a listener
+     * @param uuid The UUID of the listener
+     */
     public void unregisterListener(UUID uuid) {
         registeredEvents.put(uuid, null);
     }

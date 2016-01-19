@@ -1,7 +1,8 @@
 package callback;
 
 /**
- * Created by Netdex on 1/16/2016.
+ * A specific listener for listening to text document modification
+ * Created by Gordon Guan on 1/16/2016.
  */
 public class TextModificationListener extends CallbackListener {
 
@@ -9,6 +10,11 @@ public class TextModificationListener extends CallbackListener {
 
     }
 
+    /**
+     * Called when a document being listened to is modified
+     *
+     * @param event The event metadata
+     */
     public void onDocumentUpdate(DocumentCallbackEvent event) {
 
     }

@@ -3,7 +3,7 @@ package struct;
 import java.io.Serializable;
 
 /**
- * Represents a editable text document Created by Netdex on 12/18/2015.
+ * Represents a editable text document Created by Gordon Guan on 12/18/2015.
  */
 public class VersionText implements Serializable {
 

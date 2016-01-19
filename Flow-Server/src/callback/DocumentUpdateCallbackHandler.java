@@ -12,7 +12,7 @@ import java.util.UUID;
 
 /**
  * A callback handler specifically handling document modification
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public class DocumentUpdateCallbackHandler extends CallbackHandler {
     private UUID documentUUID;
@@ -35,6 +35,7 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
             throw new IllegalArgumentException("event must be document callback event!");
         DocumentCallbackEvent event = (DocumentCallbackEvent) arg0;
         DataSocket dataSocket = this.getHandle().getDataSocket();
+        // Send the event to the client
         Data data = new Data("async_callback");
         data.put("event", event);
         dataSocket.send(data);
@@ -48,6 +49,7 @@ public class DocumentUpdateCallbackHandler extends CallbackHandler {
     @Override
     public void onUnregister(RegisterEvent event) {
         try {
+            // Save the file to disk when the listener is unregistered
             UUID latestVersionUUID = UUID.fromString(FlowServer.getInstance().getDatabase().getLatestVersionUUID(event.UUID.toString()));
             DataManagement.getInstance().flushTextToDisk(event.UUID, latestVersionUUID, VersionManager.getInstance().getTextByVersionUUID(latestVersionUUID));
         } catch (DatabaseException e) {

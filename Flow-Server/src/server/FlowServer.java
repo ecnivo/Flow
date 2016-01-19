@@ -53,10 +53,12 @@ public class FlowServer implements Runnable {
 
 			while (serverSocket.isBound()) {
 				Socket socket = serverSocket.accept();
+				// Make the socket favor short and latent connections
 				socket.setPerformancePreferences(1, 0, 0);
 				socket.setTcpNoDelay(true);
 				L.info("accepted connection from "
 						+ socket.getRemoteSocketAddress());
+				// Assign the client request a thread
 				int i = 0;
 				do {
 					i %= MAX_THREADS;

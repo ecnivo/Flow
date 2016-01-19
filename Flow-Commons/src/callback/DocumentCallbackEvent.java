@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Represents a specific callback event in which a document is modified, and clients need to know
  * <p>
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public class DocumentCallbackEvent extends CallbackEvent {
     public final DocumentCallbackType TYPE;
@@ -22,6 +22,9 @@ public class DocumentCallbackEvent extends CallbackEvent {
         this.REMOVAL_LENGTH = REMOVAL_LENGTH;
     }
 
+    /**
+     * Type of document callback
+     */
     public enum DocumentCallbackType {
         INSERT,
         DELETE,

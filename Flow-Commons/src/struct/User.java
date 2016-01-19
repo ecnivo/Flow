@@ -5,7 +5,8 @@ import java.awt.*;
 import java.io.Serializable;
 
 /**
- * Created by Netdex on 12/24/2015.
+ * Represents a user
+ * Created by Gordon Guan on 12/24/2015.
  */
 public class User implements Serializable {
 

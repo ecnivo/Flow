@@ -7,9 +7,9 @@ import java.io.Serializable;
 import java.net.Socket;
 
 /**
- * A wrapper around a socket which has the ability to send Parcelables over the network
+ * A wrapper around a socket which has the ability to send serialized over the network
  * <p>
- * Created by Netdex on 12/17/2015.
+ * Created by Gordon Guan on 12/17/2015.
  */
 public class DataSocket {
 
@@ -62,6 +62,11 @@ public class DataSocket {
 
     }
 
+    /**
+     * Closes the data socket streams, but not the underlying socket
+     *
+     * @throws IOException
+     */
     public void close() throws IOException {
         oos.close();
         ois.close();

@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * Represents an event that a callback can handle
  * <p>
- * Created by Netdex on 1/15/2016.
+ * Created by Gordon Guan on 1/15/2016.
  */
 public abstract class CallbackEvent implements Serializable {
     private UUID assocUUID;
@@ -17,14 +17,25 @@ public abstract class CallbackEvent implements Serializable {
         this.assocUUID = assocUUID;
     }
 
+    /**
+     * The type of this event
+     * @return
+     */
     public CallbackEventType getType() {
         return type;
     }
 
+    /**
+     * The UUID associated with this event
+     * @return
+     */
     public UUID getAssociatedUUID() {
         return assocUUID;
     }
 
+    /**
+     * The type of event
+     */
     public enum CallbackEventType {
         DOCUMENT_CALLBACK
     }
