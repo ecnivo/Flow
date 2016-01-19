@@ -53,7 +53,7 @@ public class Communicator {
 		try {
 			// Try sending the data
 			data.put("session_id", sessionID);
-			networker.send(data);
+			return networker.send(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

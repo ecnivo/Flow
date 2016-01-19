@@ -1125,6 +1125,7 @@ public class SQLDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Error connecting to database located at: " + backUpDatabase);
+			return false;
 		}
 		ArrayList<String> tableNames = new ArrayList<>();
 		ArrayList<ArrayList<String>> tableColumns = new ArrayList<>();
