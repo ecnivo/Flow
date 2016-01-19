@@ -141,7 +141,6 @@ public class ClientRequestHandle implements Runnable {
 					String[][] response = Results.toStringArray(
 							new String[] { "ProjectID" }, projects);
 					UUID[] projectUUIDs = new UUID[response.length];
-					System.out.println(Arrays.toString(response));
 					if (response == null || response[0] == null) {
 						returnData.put("projects", new UUID[0]);
 					} else {
