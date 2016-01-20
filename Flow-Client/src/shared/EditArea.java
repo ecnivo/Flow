@@ -173,7 +173,7 @@ public class EditArea extends JTextPane {
 					fileModify.put("len", -1);
 
 					// Send message to server about what was inserted
-//					Data response = Communicator.communicate(fileModify);
+					Data response = Communicator.communicate(fileModify);
 
 					String form = Formatter.format(text);
 					fileModify = new Data("file_text_modify");
@@ -183,7 +183,7 @@ public class EditArea extends JTextPane {
 					fileModify.put("str", form);
 
 					// Send message to server about what was inserted
-//					response = Communicator.communicate(fileModify);
+					response = Communicator.communicate(fileModify);
 					EditArea.this.setText(form);
 					ignoreEvents = false;
 					highlightSyntax();
