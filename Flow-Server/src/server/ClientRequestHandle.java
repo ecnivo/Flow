@@ -187,7 +187,7 @@ public class ClientRequestHandle implements Runnable {
 								.getProjects(username);
 						String[] response = Results.toStringArray("ProjectID",
 								projects);
-						if (response == null || response[0] == null) {
+						if (response == null || response.length == 0 || response[0] == null) {
 							returnData.put("projects", new UUID[0]);
 						} else {
 							returnData.put("projects", DataManipulation
