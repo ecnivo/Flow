@@ -1,14 +1,15 @@
 package server;
 
+import database.SQLDatabase;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
 
 /**
  * Main container for initiating database and dynamically dispatching clients to
@@ -22,7 +23,7 @@ public class FlowServer implements Runnable {
 
 	private static FlowServer instance;
 
-	private static Logger L = Logger.getLogger("FlowServer");
+	private static Logger L = Logger.getLogger("FLOW");
 
 	/**
 	 * Represents an error caused by the server, rather than client.
@@ -91,8 +92,9 @@ public class FlowServer implements Runnable {
 
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
-		System.setProperty("java.util.logging.SimpleFormatter.format",
-				"%4$s: %5$s%n");
+		//System.setProperty("java.util.logging.SimpleFormatter.format",
+		//		"%4$s: %5$s%n");
+		L.setLevel(Level.ALL);
 		FlowServer server = FlowServer.getInstance();
 		new Thread(server).start();
 		new Thread(new AsyncServer(ARC_PORT)).start();

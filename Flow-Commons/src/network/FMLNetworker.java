@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class FMLNetworker {
 
-    private static Logger L = Logger.getLogger("FMLNetworker");
+    private static Logger L = Logger.getLogger("FLOW");
     private String ip;
     private int port;
     private int arcport;
@@ -23,7 +23,7 @@ public class FMLNetworker {
     private EventPusher pusher;
 
     public FMLNetworker(String ip, int port, int arcport) {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
+        // System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
         this.ip = ip;
         this.port = port;
         this.arcport = arcport;

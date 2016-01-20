@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Created by Gordon Guan on 1/15/2016.
  */
 public class PersistentClientHandle implements Runnable {
-    private static Logger L = Logger.getLogger("PersistentHandleManager");
+    private static Logger L = Logger.getLogger("FLOW");
 
     private Socket socket;
 

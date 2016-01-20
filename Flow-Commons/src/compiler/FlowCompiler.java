@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class FlowCompiler {
 
-    private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
+    private static final Logger L = Logger.getLogger("FLOW");
     private CompilableText[] versionTexts;
     private File workingDirectory;
 

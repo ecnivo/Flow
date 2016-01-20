@@ -24,10 +24,7 @@ public class VersionText implements Serializable {
      * @return whether or not line count was affected by this operation
      */
     public boolean insert(char c, int idx) {
-        if (idx < 0 || idx > text.length())
-            throw new ArrayIndexOutOfBoundsException("index out of range");
-        text = text.substring(0, idx) + c + text.substring(idx);
-        return c == '\n';
+        return insert(c + "", idx);
     }
 
     public boolean insert(String s, int idx) {
@@ -44,9 +41,13 @@ public class VersionText implements Serializable {
      * @return whether or not line count was affected by this operation
      */
     public boolean delete(int idx) {
-        if (idx < 0 || idx >= text.length())
+        return delete(idx, 1);
+    }
+
+    public boolean delete(int idx, int len) {
+        if (idx < 0 || idx + len > text.length())
             throw new ArrayIndexOutOfBoundsException("index out of range");
-        text = text.substring(0, idx) + text.substring(idx + 1);
+        text = text.substring(0, idx) + text.substring(idx + len);
         return false;
     }
 

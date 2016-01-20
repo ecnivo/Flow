@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class PersistentHandleManager {
     private static PersistentHandleManager instance;
-    private static Logger L = Logger.getLogger("PersistentHandleManager");
+    private static Logger L = Logger.getLogger("FLOW");
 
     public static PersistentHandleManager getInstance() {
         if (instance == null)

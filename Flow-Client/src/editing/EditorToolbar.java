@@ -2,32 +2,6 @@
 package editing;
 
 import gui.FlowClient;
-
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
@@ -37,6 +11,18 @@ import shared.FileTree;
 import shared.FileTree.DirectoryNode;
 import shared.FileTree.FileNode;
 import shared.FileTree.ProjectNode;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.UUID;
 
 /**
  * Toolbar with Search/Import/Export/Project options buttons
@@ -377,19 +363,8 @@ public class EditorToolbar extends JToolBar {
 
 					// Opens a file chooser to get new file
 					JFileChooser fileChooser = new JFileChooser();
-					// fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-					//
-					// @Override
-					// public String getDescription() {
-					// return "Only .JAVA or .TXT files (for now)";
-					// }
-					//
-					// @Override
-					// public boolean accept(File f) {
-					// String name = f.getName();
-					// return f.isDirectory();
-					// }
-					// });
+//					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//					fileChooser.setAcceptAllFileFilterUsed(false);
 					fileChooser.setDialogTitle("Select file to import...");
 					File importFile;
 					if (fileChooser.showOpenDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
@@ -458,6 +433,17 @@ public class EditorToolbar extends JToolBar {
 				}
 			});
 		}
+//		public void addAllFiles(File root, File file){
+//			for(File f : file.listFiles()){
+//				if(f.isDirectory()){
+//					addAllFiles(root, f);
+//				}
+//				else{
+//					if(f.==)
+//					String rel = root.toPath().relativize(file.toPath()).toString();
+//				}
+//			}
+//		}
 	}
 
 	/**

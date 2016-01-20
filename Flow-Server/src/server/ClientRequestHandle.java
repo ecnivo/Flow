@@ -1,12 +1,5 @@
 package server;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.logging.Logger;
-
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -18,6 +11,13 @@ import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 import util.Validator;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Runnable that handles a single client request. Capable of dealing with a
@@ -43,7 +43,7 @@ public class ClientRequestHandle implements Runnable {
 	private FlowServer server;
 	private SQLDatabase database;
 
-	private static Logger LOGGER = Logger.getLogger("ClientRequestHandle");
+	private static Logger LOGGER = Logger.getLogger("FLOW");
 
 	public ClientRequestHandle(FlowServer server, Socket socket)
 			throws IOException {
@@ -743,9 +743,9 @@ public class ClientRequestHandle implements Runnable {
 							td.setDocumentText("");
 							LOGGER.info(
 									"clearing document because of negative length");
+						} else {
+							td.delete(index, length);
 						}
-						while (length-- > 0)
-							td.delete(index);
 					}
 						break;
 					// Move the user's cursor position

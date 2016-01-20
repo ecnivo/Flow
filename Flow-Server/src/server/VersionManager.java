@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Created by Gordon Guan on 1/16/2016.
  */
 public class VersionManager {
-    private static Logger L = Logger.getLogger("VersionManager");
+    private static Logger L = Logger.getLogger("FLOW");
     private static VersionManager instance;
 
     public static VersionManager getInstance() {

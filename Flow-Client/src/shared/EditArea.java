@@ -186,6 +186,7 @@ public class EditArea extends JTextPane {
 //					response = Communicator.communicate(fileModify);
 					EditArea.this.setText(form);
 					ignoreEvents = false;
+					highlightSyntax();
 				}
 			}
 
