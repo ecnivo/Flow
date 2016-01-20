@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Created by Gordon Guan on 1/16/2016.
  */
 public class VersionManager {
-    private static Logger L = Logger.getLogger("FLOW");
+    private static final Logger L = Logger.getLogger("FLOW");
     private static VersionManager instance;
 
     public static VersionManager getInstance() {
@@ -25,8 +25,8 @@ public class VersionManager {
         return instance;
     }
 
-    private HashMap<UUID, VersionText> loadedDocuments;
-    private HashMap<UUID, UUID> parentFile;
+    private final HashMap<UUID, VersionText> loadedDocuments;
+    private final HashMap<UUID, UUID> parentFile;
 
     private VersionManager() {
         this.loadedDocuments = new HashMap<>();
@@ -39,7 +39,7 @@ public class VersionManager {
      * @param fileDir Location of files
      * @return success or not
      */
-    public boolean loadAllDocuments(File fileDir) {
+    public void loadAllDocuments(File fileDir) {
         L.info("loading all document versions");
         try {
             for (File fileStateDirectory : fileDir.listFiles()) {
@@ -61,9 +61,8 @@ public class VersionManager {
                 }
             }
         } catch (IOException e) {
-            return false;
+            return;
         }
-        return true;
     }
 
     /**
@@ -88,14 +87,13 @@ public class VersionManager {
      * @param versionText Text data
      * @return success or not
      */
-    public boolean addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {
+    public void addTextVersion(UUID fileUUID, UUID versionUUID, VersionText versionText) {
         if (!loadedDocuments.containsKey(versionUUID)) {
             loadedDocuments.put(versionUUID, versionText);
             parentFile.put(versionUUID, fileUUID);
-            return true;
+            return;
         }
         L.warning("text version " + versionUUID + " was added but it already exists!");
-        return false;
     }
 
     /**
@@ -104,15 +102,14 @@ public class VersionManager {
      * @param versionUUID Version UUID
      * @return success or not
      */
-    public boolean removeTextVersion(UUID versionUUID) {
+    public void removeTextVersion(UUID versionUUID) {
         if (loadedDocuments.containsKey(versionUUID)) {
             L.info("removed text version " + versionUUID + " into memory map");
             loadedDocuments.put(versionUUID, null);
             parentFile.put(versionUUID, null);
-            return true;
+            return;
         }
         L.warning("text version " + versionUUID + " was removed but it doesn't exist!");
-        return false;
     }
 
     /**

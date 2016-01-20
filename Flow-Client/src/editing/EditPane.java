@@ -3,18 +3,13 @@ package editing;
 
 import gui.FlowClient;
 import gui.PanelManager;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
 import shared.EditTabs;
 import shared.GenericConsole;
 import shared.NavBar;
 import shared.RunStopBar;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * The panel that holds all of the edit view's components
@@ -26,11 +21,11 @@ import shared.RunStopBar;
 public class EditPane extends JPanel {
 
 	// Important ones that may be referenced using getters/setters
-	private CollabsList			collabsList;
-	private EditorFileTree		tree;
-	private JSplitPane			leftSide;
-	private EditorToolbar		editToolbar;
-	private RunStopBar			runStopBar;
+	private final CollabsList collabsList;
+	private final EditorFileTree tree;
+	private final JSplitPane leftSide;
+	private final EditorToolbar editToolbar;
+	private final RunStopBar runStopBar;
 
 	private static final int	RIGHT_SIDE_WIDTH	= 300;
 	private static final int	LEFT_SIDE_WIDTH		= 300;
@@ -125,8 +120,7 @@ public class EditPane extends JPanel {
 	}
 
 	/**
-	 * Gets the edit Tabs 
-	 * @param editTabs returns the editTabs if applicable
+	 * Gets the edit Tabs
 	 */
 	public EditTabs getEditTabs() {
 		if (leftSide.getRightComponent() instanceof EditTabs) {

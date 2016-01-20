@@ -28,8 +28,7 @@ public class Results {
 	 *             if their is an error retrieving data from the ResultSet
 	 *             object.
 	 */
-	public static String[][] toStringArray(String[] columnNames,
-			ResultSet results) throws SQLException {
+	private static String[][] toStringArray(String[] columnNames, ResultSet results) throws SQLException {
 		// Use a linked list because the number of results is unknown (not
 		// possible to find without iterating through the ResultSet)
 		LinkedList<String[]> list = new LinkedList<>();

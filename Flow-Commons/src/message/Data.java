@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class Data implements Serializable {
 
-    private HashMap<String, Object> stringObjectHashMap;
+    private final HashMap<String, Object> stringObjectHashMap;
 
     public Data() {
         this.stringObjectHashMap = new HashMap<>();

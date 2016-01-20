@@ -2,21 +2,12 @@ package shared;
 
 import gui.FlowClient;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.SpringLayout;
-
 @SuppressWarnings("serial")
-public class HelpPanel extends JTabbedPane {
+class HelpPanel extends JTabbedPane {
 
 	private final static Font CONTENT_FONT = new Font("Arial", Font.PLAIN, 14);
 	private final static Font TITLE_FONT = new Font("Tw Cen MT", Font.BOLD, 18);
@@ -44,16 +35,16 @@ public class HelpPanel extends JTabbedPane {
 
 	private class HelpTab extends JPanel {
 
-		private JScrollPane scrolling;
-		private ArrayList<Component> children;
-		private SpringLayout layout;
+		private final JScrollPane scrolling;
+		private final ArrayList<Component> children;
+		private final SpringLayout layout;
 		private final static int SEP_GAP = 25;
 
 		private HelpTab(String name) {
 			// Just a bunch of settings
 			setMinimumSize(new Dimension(150, 150));
 			setPreferredSize(new Dimension(300,300));
-			children = new ArrayList<Component>();
+			children = new ArrayList<>();
 			setBorder(FlowClient.EMPTY_BORDER);
 			layout = new SpringLayout();
 			setLayout(layout);

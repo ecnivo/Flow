@@ -3,18 +3,13 @@ package debug;
 
 import gui.FlowClient;
 import gui.PanelManager;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
 import shared.EditTabs;
 import shared.GenericConsole;
 import shared.NavBar;
 import shared.RunStopBar;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A panel that holds various debugging elements
@@ -25,12 +20,12 @@ import shared.RunStopBar;
 @SuppressWarnings("serial")
 public class DebugPane extends JPanel {
 
-	private RunStopBar	runStopBar;
+	private final RunStopBar	runStopBar;
 
 	// TODO if it looks so simple, things still need to be added, such as selecting break points,
 	// highlighting the line...
 
-	private JSplitPane	mainSplit;
+	private final JSplitPane	mainSplit;
 
 	/**
 	 * Creates a new DebugPane

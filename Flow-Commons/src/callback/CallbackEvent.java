@@ -9,17 +9,17 @@ import java.util.UUID;
  * Created by Gordon Guan on 1/15/2016.
  */
 public abstract class CallbackEvent implements Serializable {
-    private UUID assocUUID;
-    private CallbackEventType type;
+    private final UUID assocUUID;
+    private final CallbackEventType type;
 
-    protected CallbackEvent(CallbackEventType type, UUID assocUUID) {
-        this.type = type;
+    CallbackEvent(UUID assocUUID) {
+        this.type = CallbackEventType.DOCUMENT_CALLBACK;
         this.assocUUID = assocUUID;
     }
 
     /**
      * The type of this event
-     * @return
+     * @return the type of this event
      */
     public CallbackEventType getType() {
         return type;
@@ -27,7 +27,7 @@ public abstract class CallbackEvent implements Serializable {
 
     /**
      * The UUID associated with this event
-     * @return
+     * @return the UUID associated with this event
      */
     public UUID getAssociatedUUID() {
         return assocUUID;

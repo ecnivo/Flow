@@ -1,16 +1,12 @@
 
 package editing;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Point;
+import shared.EditArea;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
-import shared.EditArea;
 
 /**
  * Used to represent a remote user's cursor location on the client's screen
@@ -22,10 +18,10 @@ import shared.EditArea;
 public class UserCaret extends JComponent {
 
 	private Point				location;
-	private Color				userColor;
-	private JLabel				infoLabel;
-	private EditArea			editArea;
-	private String				name;
+	private final Color userColor;
+	private final JLabel infoLabel;
+	private final EditArea editArea;
+	private final String name;
 
 	private static final int	SHOW_INFO_DISTANCE	= 25;
 
@@ -96,11 +92,7 @@ public class UserCaret extends JComponent {
 
 	/**
 	 * Sets a new location for the caret
-	 * 
-	 * @param line
-	 *        the n'th line
-	 * @param charPos
-	 *        the n'th character in said line
+	 *
 	 */
 	public void moveTo(Point location) {
 		// TODO since we're not using lines, do something about line wrapping?

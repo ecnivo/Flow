@@ -34,11 +34,11 @@ import java.util.UUID;
 public class EditorToolbar extends JToolBar {
 
 	// Keeps track of the buttons
-	private JPopupMenu	popup;
-	private JMenuItem	createProjectButton;
-	private JMenuItem	renameProjectButton;
-	private JMenuItem	deleteProjectButton;
-	private EditPane	editPane;
+	private final JPopupMenu popup;
+	private final JMenuItem createProjectButton;
+	private final JMenuItem renameProjectButton;
+	private final JMenuItem deleteProjectButton;
+	private final EditPane editPane;
 
 	/**
 	 * Creates a new EditorToolbar
@@ -70,7 +70,7 @@ public class EditorToolbar extends JToolBar {
 					return;
 				}
 				projectName = projectName.trim();
-				while (CreateAccountPane.stringContains(projectName, CreateAccountPane.INVALID_CHARS) || projectName.length() < 1) {
+				while (CreateAccountPane.stringContains(projectName) || projectName.length() < 1) {
 					projectName = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter a name for your new Project\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
 					if (projectName == null) {
 						return;
@@ -127,7 +127,7 @@ public class EditorToolbar extends JToolBar {
 					return;
 				}
 				rename = rename.trim();
-				while (CreateAccountPane.stringContains(rename, CreateAccountPane.INVALID_CHARS) || rename.length() < 1) {
+				while (CreateAccountPane.stringContains(rename) || rename.length() < 1) {
 					rename = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this project." + "\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.QUESTION_MESSAGE);
 					if (rename == null) {
 						return;
@@ -214,7 +214,6 @@ public class EditorToolbar extends JToolBar {
 						switch (status) {
 						// Success case
 							case "OK":
-								project = null;
 								pane.getEditorFileTree().refreshProjectList();
 								pane.getEditorFileTree().setSelectionRow(0);
 								break;
@@ -227,12 +226,11 @@ public class EditorToolbar extends JToolBar {
 							default:
 								break;
 						}
-					} else
-						return;
+					} else {
+					}
 				} else {
 					// Typo!
 					JOptionPane.showConfirmDialog(null, "The project name is incorrect.\nNothing has been changed.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-					return;
 				}
 			}
 

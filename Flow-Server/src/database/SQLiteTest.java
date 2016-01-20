@@ -30,7 +30,7 @@ import java.sql.SQLException;
  * @author Bimesh De Silva
  *
  */
-public class SQLiteTest {
+class SQLiteTest {
 
 	public static void main(String[] args) throws SQLException, IOException {
 		SQLDatabase database = SQLDatabase.getInstance();

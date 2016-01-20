@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class PersistentHandleManager {
     private static PersistentHandleManager instance;
-    private static Logger L = Logger.getLogger("FLOW");
+    private static final Logger L = Logger.getLogger("FLOW");
 
     public static PersistentHandleManager getInstance() {
         if (instance == null)
@@ -21,7 +21,7 @@ public class PersistentHandleManager {
         return instance;
     }
 
-    private HashMap<UUID, ArrayList<CallbackHandler>> events;
+    private final HashMap<UUID, ArrayList<CallbackHandler>> events;
 
     private PersistentHandleManager() {
         this.events = new HashMap<>();

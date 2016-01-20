@@ -1,33 +1,22 @@
 
 package editing;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
-import java.util.UUID;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-
 import login.CreateAccountPane;
 import message.Data;
 import shared.Communicator;
 import shared.EditArea;
 import shared.EditTabs;
 import shared.FileTree;
+
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.event.*;
+import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Special documents tree for the editing view
@@ -38,14 +27,14 @@ import shared.FileTree;
 public class EditorFileTree extends FileTree {
 
 	// The parent pane
-	private EditPane	editPane;
+	private final EditPane editPane;
 	// private FlowFile clipboard;
 
 	// Each of the popup menus for right clicks
-	JPopupMenu			workspacePopup;
-	JPopupMenu			projectPopup;
-	JPopupMenu			dirPopup;
-	JPopupMenu			filePopup;
+	private final JPopupMenu workspacePopup;
+	private final JPopupMenu projectPopup;
+	private final JPopupMenu dirPopup;
+	private final JPopupMenu filePopup;
 
 	/**
 	 * Creates a new EditorDocTree
@@ -160,7 +149,7 @@ public class EditorFileTree extends FileTree {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Asks the user for confirmation
-				int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + ((DirectoryNode) getSelectionPath().getLastPathComponent()).toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + getSelectionPath().getLastPathComponent().toString() + "?", "Confirm directory deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				ProjectNode projectNode = null;
 				if (confirm == JOptionPane.YES_OPTION) {
 					// Prepares request for the server
@@ -310,7 +299,6 @@ public class EditorFileTree extends FileTree {
 							// Failure case
 						default:
 							JOptionPane.showConfirmDialog(null, "An error occurred during the deletion.\nTry refreshing the project list again.", "Deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-							return;
 					}
 				} else {
 					JOptionPane.showConfirmDialog(null, "Nothing was changed", "", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -520,12 +508,15 @@ public class EditorFileTree extends FileTree {
 				// "Arbitrary" files are those which are not source code (e.g.
 				// images, database files, etc.)
 				if (type.contains("ARBIT")) {
-					// try {
-					// //TODO write byte array to local directory
-					// Desktop.getDesktop().open();
-					// } catch (IOException e1) {
-					// e1.printStackTrace();
-					// }
+					EditTabs tabs = editPane.getEditTabs();
+					if (tabs != null) {
+						// Gets the data, then sends it to the tab to be opened
+						String fileName = fileData.get("file_name", String.class);
+						byte[] bytes = fileContents.get("file_data", byte[].class);
+						String fileContentsString = new String(bytes);
+						UUID versionUUID = fileContents.get("version_uuid", UUID.class);
+						tabs.openTab(fileName, fileContentsString, projectUUID, fileToOpen, versionUUID, canEdit);
+					}
 				}
 				// "Text" files are source code
 				else if (type.contains("TEXT")) {
@@ -547,7 +538,6 @@ public class EditorFileTree extends FileTree {
 				// File cannot be found inside the Project
 			case "FILE_NOT_FOUND":
 				JOptionPane.showConfirmDialog(null, "The file you are trying to open cannot be found.\n" + "Try refreshing the list of projects/files (move the mouse cursor into the console and back here)" + "\nand see if it is resolved.", "Project not found", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-				return;
 		}
 	}
 
@@ -621,7 +611,7 @@ public class EditorFileTree extends FileTree {
 						return;
 					}
 					// Checks for validity of name
-					while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
+					while (CreateAccountPane.stringContains(name) || name.length() < 1) {
 						name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE);
 						if (name == null) {
 							return;
@@ -692,7 +682,7 @@ public class EditorFileTree extends FileTree {
 					if (name == null) {
 						return;
 					}
-					while (CreateAccountPane.stringContains(name, CreateAccountPane.INVALID_CHARS) || name.length() < 1) {
+					while (CreateAccountPane.stringContains(name) || name.length() < 1) {
 						name = JOptionPane.showInputDialog(null, "That name is invalid.\nPlease enter an appropriate new name for this directory.\nNo characters such as: \\ / ? % * : | " + "\" < > . # & { } $ @ = ` + ", "Invalid name", JOptionPane.ERROR_MESSAGE);
 						if (name == null) {
 							return;

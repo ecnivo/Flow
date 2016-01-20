@@ -1,17 +1,15 @@
 package gui;
 
+import debug.DebugPane;
+import editing.EditPane;
 import history.HistoryPane;
-
-import java.awt.CardLayout;
-
-import javax.swing.JPanel;
-
 import login.CreateAccountPane;
 import login.LoginPane;
 import settings.SettingsPane;
 import shared.EditTabs;
-import debug.DebugPane;
-import editing.EditPane;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A panel with a CardLayout that manages the many different views of Flow
@@ -28,17 +26,15 @@ public class PanelManager extends JPanel {
 
 	private static PanelManager instance;
 
-	private CardLayout layout;
-	private EditPane editPane;
-	private SettingsPane settingsTabs;
-	private LoginPane loginPane;
-	private DebugPane debugPane;
-	private CreateAccountPane createAccountPane;
-	private HistoryPane historyPane;
+	private final CardLayout layout;
+	private final EditPane editPane;
+	private final LoginPane loginPane;
+	private final DebugPane debugPane;
+	private final HistoryPane historyPane;
 
-	private EditTabs editTabs;
+	private final EditTabs editTabs;
 
-	private FlowClient frame;
+	private final FlowClient frame;
 
 	/**
 	 * Creates a new PanelManager
@@ -59,7 +55,7 @@ public class PanelManager extends JPanel {
 		loginPane = new LoginPane(this);
 		add(loginPane, "loginPane");
 
-		createAccountPane = new CreateAccountPane(this);
+		CreateAccountPane createAccountPane = new CreateAccountPane(this);
 		add(createAccountPane, "createPane");
 
 		editPane = new EditPane(this);
@@ -68,7 +64,7 @@ public class PanelManager extends JPanel {
 		debugPane = new DebugPane(this);
 		add(debugPane, "debugPane");
 
-		settingsTabs = new SettingsPane(this);
+		SettingsPane settingsTabs = new SettingsPane(this);
 		add(settingsTabs, "settingsPane");
 
 		historyPane = new HistoryPane(this);

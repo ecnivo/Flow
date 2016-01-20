@@ -3,10 +3,8 @@ package debug;
 
 import gui.FlowClient;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A list of variables that can be used by the user during debugging
@@ -15,7 +13,7 @@ import javax.swing.JPanel;
  *
  */
 @SuppressWarnings("serial")
-public class VariablesList extends JPanel {
+class VariablesList extends JPanel {
 
 	/**
 	 * Creates a new VariablesList
@@ -35,7 +33,7 @@ public class VariablesList extends JPanel {
 	 * @author Vince Ou
 	 *
 	 */
-	class VariableTile extends JPanel {
+	private class VariableTile extends JPanel {
 
 		/**
 		 * Creates a new VariableTile

@@ -2,29 +2,18 @@
 package history;
 
 import gui.FlowClient;
+import message.Data;
+import shared.Communicator;
+import shared.EditTabs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import message.Data;
-import shared.Communicator;
-import shared.EditTabs;
 
 /**
  * A viewer for the many versions of one file
@@ -33,7 +22,7 @@ import shared.EditTabs;
  *
  */
 @SuppressWarnings("serial")
-public class VersionViewer extends JPanel {
+class VersionViewer extends JPanel {
 
 	private ImageIcon			middle;
 
@@ -43,8 +32,8 @@ public class VersionViewer extends JPanel {
 	private static final int	ICON_SIZE	= 42;
 
 	// private FlowFile file;
-	private HistoryPane			historyPane;
-	private JScrollPane			scrolling;
+	private final HistoryPane historyPane;
+	private final JScrollPane scrolling;
 
 	private boolean				isText;
 
@@ -161,8 +150,6 @@ public class VersionViewer extends JPanel {
 		 *        the date it was saved on
 		 * @param versionUUID
 		 *        the UUID of the version
-		 * @param isText
-		 *        if this file is text or not
 		 */
 		public VersionItem(byte[] data, Date date, UUID versionUUID) {
 			// Swing setup

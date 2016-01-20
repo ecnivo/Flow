@@ -10,11 +10,11 @@ import java.net.Socket;
  * Another server listening and dispatching asynchronous events to clients
  * Created by Gordon Guan on 1/16/2016.
  */
-public class AsyncServer implements Runnable {
-    private int arcport;
+class AsyncServer implements Runnable {
+    private final int arcport;
 
-    public AsyncServer(int arcport) {
-        this.arcport = arcport;
+    public AsyncServer() {
+        this.arcport = FlowServer.ARC_PORT;
     }
 
     @Override

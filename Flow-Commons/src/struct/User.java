@@ -13,19 +13,12 @@ public class User implements Serializable {
     private static final transient ImageIcon DEFAULT_AVATAR = new ImageIcon(
             new ImageIcon("images/icon.png").getImage().getScaledInstance(32,
                     32, Image.SCALE_SMOOTH));
-    private String username;
-    private transient String password;
-    private transient ImageIcon avatar; // TODO this breaks stuff right now
-
-    public User(String username, String password, ImageIcon avatar) {
-        this.username = username;
-        this.password = password;
-        this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
-                Image.SCALE_SMOOTH));
-    }
+    private final String username;
+    private final transient String password;
 
     public User(String username, String password) {
-        this(username, password, DEFAULT_AVATAR);
+        this.username = username;
+        this.password = password;
     }
 
     public User(String username) {
@@ -40,13 +33,4 @@ public class User implements Serializable {
         return password;
     }
 
-    public ImageIcon getAvatar() {
-        return avatar;
-    }
-
-    //    public void setAvatar(ImageIcon icon) {
-    //	this.avatar = new ImageIcon(avatar.getImage().getScaledInstance(32, 32,
-    //		Image.SCALE_SMOOTH));
-    //
-    //    }
 }

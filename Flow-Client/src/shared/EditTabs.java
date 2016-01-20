@@ -4,36 +4,18 @@ package shared;
 import editing.EditPane;
 import gui.FlowClient;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicButtonUI;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicButtonUI;
 
 /**
  * A framework to manage the many tabs open by the user
@@ -43,8 +25,8 @@ import javax.swing.plaf.basic.BasicButtonUI;
  */
 public class EditTabs extends JTabbedPane {
 
-	public static final int	TAB_LIMIT		= 25;
-	public static final int	TAB_ICON_SIZE	= 16;
+	private static final int TAB_LIMIT = 25;
+	private static final int TAB_ICON_SIZE = 16;
 
 	/**
 	 * Creates a new EditTabs
@@ -136,7 +118,7 @@ public class EditTabs extends JTabbedPane {
 	 */
 	class CustomTabHeader extends JPanel {
 
-		private JPopupMenu	rightClickMenu;
+		private final JPopupMenu rightClickMenu;
 
 		/**
 		 * Creates a new custom header

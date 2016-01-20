@@ -36,23 +36,27 @@ public class SQLDatabase {
     /**
      * Location where the SQLite JDBC drivers are stored
      */
-    public static final String DRIVER = "org.sqlite.JDBC";
+    private static final String DRIVER = "org.sqlite.JDBC";
 
     /**
      * Number of seconds to allow for searching before timeout (this is a safety
      * net, as the socket times out before this)
      */
-    public static final int TIMEOUT = 2;
+    private static final int TIMEOUT = 2;
 
     /**
      * Access levels used for projects
      */
-    public static final int NONE = 0, VIEW = 1, EDIT = 2, OWNER = 3;
+    private static final int NONE = 0;
+    public static final int VIEW = 1;
+    public static final int EDIT = 2;
+    public static final int OWNER = 3;
 
     /**
      * Used to signify the different types of possible documents.
      */
-    public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT", TEXT_DOCUMENT = "TEXT_DOCUMENT";
+    private static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT";
+    public static final String TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
     /**
      * Represents to location where all save data is stored relative to the
@@ -60,18 +64,21 @@ public class SQLDatabase {
      * file. The backup copy is for use by the {@link copyFileSystem()} method
      * is recovering a corrupted database.
      */
-    public static final String BACKUP_FOLDER = "backup", LIVE_FOLDER = "data";
+    public static final String BACKUP_FOLDER = "backup";
+    public static final String LIVE_FOLDER = "data";
 
     /**
      * Represents the location of the database file relative to the project
      * directory.
      */
-    public static final String BACKUP_DATABASE = BACKUP_FOLDER + File.separator + "FlowDatabse.db", LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
+    public static final String BACKUP_DATABASE = BACKUP_FOLDER + File.separator + "FlowDatabse.db";
+    public static final String LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
 
     /**
      * Folders for various stored data elements
      */
-    public static final String LIVE_USERS = LIVE_FOLDER + File.separator + "users", LIVE_FILES = LIVE_FOLDER + File.separator + "files";
+    public static final String LIVE_USERS = LIVE_FOLDER + File.separator + "users";
+    public static final String LIVE_FILES = LIVE_FOLDER + File.separator + "files";
 
     /**
      * Connection to the database.
@@ -83,7 +90,7 @@ public class SQLDatabase {
      */
     private static SQLDatabase instance;
 
-    private static Logger LOGGER = Logger.getLogger("FLOW");
+    private static final Logger LOGGER = Logger.getLogger("FLOW");
 
     /**
      * Verifies integrity of the database file, file system, and synchronization
@@ -101,9 +108,9 @@ public class SQLDatabase {
 
         // Check for corruption in the database and file system, try to repair,
         // if not possible, recover from backup.
-        if ((!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE)) || (!this.checkAndRepairFileSystemCorruption(LIVE_DATABASE, LIVE_FOLDER))) {
+        if ((!this.checkForDatabaseCorruption(BACKUP_DATABASE)) || (!this.checkAndRepairFileSystemCorruption(LIVE_FOLDER))) {
             try {
-                this.recoverFileSystem(LIVE_FOLDER, BACKUP_FOLDER);
+                this.recoverFileSystem(BACKUP_FOLDER);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -309,7 +316,7 @@ public class SQLDatabase {
      * @param projectName the name of the project.
      * @param username    username of the user who created the project.
      * @param projectUUID the string representation of the UUID of the project.
-     * @return
+     * @return the status of the operation.
      */
     public String newProject(String projectUUID, String projectName, String username) {
         try {
@@ -336,13 +343,13 @@ public class SQLDatabase {
      * @param projectUUID   the ID of the project which to place the file inside
      * @param directoryUUID the ID of the directory which to place the file inside
      */
-    public String newFile(String fileUUID, String fileName, String projectUUID, String directoryUUID, String fileType) {
+    public String newFile(String fileUUID, String fileName, String projectUUID, String directoryUUID) {
         try {
             if (this.query(String.format("SELECT * FROM Documents WHERE ParentDirectoryID = '%s' AND DocumentName = '%s';", directoryUUID, fileName)).next()) {
                 return "FILE_NAME_INVALID";
             }
-            if (fileType.equals(ARBITRARY_DOCUMENT) || fileType.equals(TEXT_DOCUMENT)) {
-                this.update(String.format("INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');", fileUUID, projectUUID, fileName, directoryUUID, fileType));
+            if ("TEXT_DOCUMENT".equals(ARBITRARY_DOCUMENT) || "TEXT_DOCUMENT".equals(TEXT_DOCUMENT)) {
+                this.update(String.format("INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');", fileUUID, projectUUID, fileName, directoryUUID, "TEXT_DOCUMENT"));
             } else {
                 // This cannot be the client's error as the type is determined
                 // by the request type (new_arbitrarydocument and
@@ -609,8 +616,6 @@ public class SQLDatabase {
      *
      * @param projectUUID the UUID of the project to rename.
      * @param newName     the name which to assign to the project.
-     * @throws DatabaseException if the specified project UUID doesn't exists in the database
-     *                           or the new name contains invalid characters.
      */
     public String renameProject(String projectUUID, String newName) {
         try {
@@ -686,7 +691,6 @@ public class SQLDatabase {
      *
      * @param projectId the string representation of the UUID of the project to
      *                  delete.
-     * @throws DatabaseException if the project doesn't exist.
      */
     public String deleteProject(String projectId) {
         try {
@@ -766,7 +770,6 @@ public class SQLDatabase {
      * developing.
      *
      * @param username the username associated with the account to close.
-     * @throws DatabaseException if the username does not exist in the database.
      */
     public String closeAccount(String username) {
         try {
@@ -796,8 +799,6 @@ public class SQLDatabase {
      * @param username    the username of the user (unique)
      * @param newPassword the new password which the user wants to associate with their
      *                    username
-     * @throws DatabaseException if the username does not exist in the system, or the entered
-     *                           password is invalid
      */
     public String changePassword(String username, String newPassword) {
         try {
@@ -813,7 +814,7 @@ public class SQLDatabase {
     }
 
     /**
-     * Internal method which calls the {@link Statement#ExecuteQuery} method
+     * Internal method which calls the  method
      * with the specified query.
      *
      * @param query the SQL statement to search the database with.
@@ -879,7 +880,7 @@ public class SQLDatabase {
      * <br>
      * *NOTE: this method is more efficient than, but yields the equivalent
      * result of calling
-     * {@link SQLDatabase#verifyPermissions(sessionID, projectUUID, accessLevel)}
+     *
      * and using {@link SQLDatabase#VIEW} for the accessLevel.
      *
      * @param sessionID   the UUID of the session, in String form.
@@ -962,7 +963,7 @@ public class SQLDatabase {
      * @throws DatabaseException if there is an error accessing the database or the version
      *                           doesn't exist.
      */
-    public ResultSet getVersionInfo(String versionUUID) throws DatabaseException {
+    private ResultSet getVersionInfo(String versionUUID) throws DatabaseException {
         try {
             ResultSet response = this.query(String.format("SELECT * FROM Versions WHERE VersionID = '%s';", versionUUID));
             if (response.next())
@@ -1111,13 +1112,13 @@ public class SQLDatabase {
      * database and return false, as it signifies that the database is
      * corrupted.
      */
-    private boolean checkForDatabaseCorruption(String databaseName, String backUpDatabase) {
+    private boolean checkForDatabaseCorruption(String backUpDatabase) {
         // Establish a connection to the backup database
         try {
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + backUpDatabase);
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + SQLDatabase.BACKUP_DATABASE);
         } catch (SQLException e) {
             e.printStackTrace();
-            LOGGER.warning("Error connecting to database located at: " + backUpDatabase);
+            LOGGER.warning("Error connecting to database located at: " + SQLDatabase.BACKUP_DATABASE);
             return false;
         }
 
@@ -1141,15 +1142,15 @@ public class SQLDatabase {
             this.connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            LOGGER.warning("Error loading database back up meta data: " + databaseName);
+            LOGGER.warning("Error loading database back up meta data: " + SQLDatabase.LIVE_DATABASE);
             return false;
         }
         // Establish a connection to the live database
         try {
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + SQLDatabase.LIVE_DATABASE);
         } catch (SQLException e) {
             e.printStackTrace();
-            LOGGER.warning("Error connecting to database located at: " + databaseName);
+            LOGGER.warning("Error connecting to database located at: " + SQLDatabase.LIVE_DATABASE);
             return false;
         }
 
@@ -1163,15 +1164,15 @@ public class SQLDatabase {
                 // Check if column names in each table match with back up
                 ResultSet tableInfo = databaseMetaData.getColumns(null, null, tableNames.get(i), null);
                 ArrayList<String> columnInfo = tableColumns.get(i);
-                for (int j = 0; j < columnInfo.size(); j++) {
+                for (String aColumnInfo : columnInfo) {
                     tableInfo.next();
-                    if (!columnInfo.get(j).equals(tableInfo.getString("COLUMN_NAME")))
+                    if (!aColumnInfo.equals(tableInfo.getString("COLUMN_NAME")))
                         return false;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            LOGGER.warning("Error accessing database: " + databaseName);
+            LOGGER.warning("Error accessing database: " + SQLDatabase.LIVE_DATABASE);
             return false;
         }
         return true;
@@ -1180,13 +1181,11 @@ public class SQLDatabase {
     /**
      * Wipes and restores the specified file system with the provided backup.
      *
-     * @param corruptFileSystem the path to the corrupt folder (or where you want the restored
-     *                          file system to go).
-     * @param backUpFileSystem  the path to the folder containing the backup which will be
-     *                          copied into the corruptFileSystem path.
+     * @param backUpFileSystem the path to the folder containing the backup which will be
+     *                         copied into the corruptFileSystem path.
      * @throws IOException
      */
-    private void recoverFileSystem(String corruptFileSystem, String backUpFileSystem) throws IOException {
+    private void recoverFileSystem(String backUpFileSystem) throws IOException {
         // Close the connection before starting the procedure
         try {
             this.connection.close();
@@ -1195,7 +1194,7 @@ public class SQLDatabase {
         }
 
         // Delete all data in the corrupt file system path
-        this.deleteFileSystemDirectory(new File(corruptFileSystem));
+        this.deleteFileSystemDirectory(new File(SQLDatabase.LIVE_FOLDER));
 
         // Copy over all directories and files from the back up folder to the
         // specified path
@@ -1209,7 +1208,7 @@ public class SQLDatabase {
             // Is an exception is thrown, restart the restoration process one
             // more time for a final try at recovery.
             try {
-                this.deleteFileSystemDirectory(new File(corruptFileSystem));
+                this.deleteFileSystemDirectory(new File(SQLDatabase.LIVE_FOLDER));
                 this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
             } catch (Exception e1) {
                 // If an exception is thrown again, likely even the backup files
@@ -1301,21 +1300,20 @@ public class SQLDatabase {
      * Scans through all documents and user accounts, deletes all corrupted
      * documents / users.
      *
-     * @param databaseName the name of the database to scan.
-     * @param dataFolder   the folder which contains all of the data (i.e. the user and
-     *                     files folders).
+     * @param dataFolder the folder which contains all of the data (i.e. the user and
+     *                   files folders).
      * @return Whether or not the corruption fixing process was successful. Only
      * returns false if the corruption was not able to be fixed by
      * removing select users / documents. otherwise, returns true.
      */
-    private boolean checkAndRepairFileSystemCorruption(String databaseName, String dataFolder) {
+    private boolean checkAndRepairFileSystemCorruption(String dataFolder) {
         try {
             LOGGER.warning("Scanning for database and file system corruption...");
             // Scans users for missing files and removes associates accounts
             ResultSet response = this.query("SELECT Username FROM Users;");
             while (response.next()) {
                 String username = response.getString("Username");
-                if (!DataManagement.getInstance().userExists(LIVE_USERS, username)) {
+                if (!DataManagement.getInstance().userExists(username)) {
                     LOGGER.warning("Deleting account '" + username + "' due to corruption.");
                     this.closeAccount(username);
                 }
@@ -1325,7 +1323,7 @@ public class SQLDatabase {
             response = this.query("SELECT DocumentID FROM Documents;");
             while (response.next()) {
                 String fileUUID = response.getString("DocumentID");
-                if (!DataManagement.getInstance().fileExists(LIVE_FILES, UUID.fromString(fileUUID))) {
+                if (!DataManagement.getInstance().fileExists(UUID.fromString(fileUUID))) {
                     LOGGER.warning("Deleting file '" + fileUUID + "' due to corruption.");
                     this.deleteFile(fileUUID);
                 }

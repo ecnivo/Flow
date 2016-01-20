@@ -1,19 +1,17 @@
 
 package login;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-
-import javax.swing.JTextField;
 
 /**
  * A box for the user to input their username
  * @author Vince
  *
  */
-public class UsernameBox extends JTextField {
+class UsernameBox extends JTextField {
 
 	private static final String	DEFAULT_TEXT	= "Username";
 	private static final Color	DESELECT		= Color.GRAY;

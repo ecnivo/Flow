@@ -13,7 +13,7 @@ import java.net.Socket;
  */
 public class DataSocket {
 
-    private Socket socket;
+    private final Socket socket;
 
     private final ObjectInputStream ois;
     private final ObjectOutputStream oos;

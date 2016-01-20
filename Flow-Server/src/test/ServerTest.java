@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * Created by Gordon Guan on 1/14/2016.
  */
-public class ServerTest {
+class ServerTest {
 
     public static void main(String[] args) throws Exception {
         /*

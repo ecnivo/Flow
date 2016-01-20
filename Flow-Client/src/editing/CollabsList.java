@@ -2,46 +2,20 @@
 package editing;
 
 import gui.FlowClient;
-
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.tree.TreePath;
-
 import message.Data;
 import shared.Communicator;
 import shared.EditArea;
 import shared.FileTree.ProjectNode;
 import shared.FlowPermission;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * The list of collaborators; appears on the right side during the editing view
@@ -51,12 +25,10 @@ import shared.FlowPermission;
 @SuppressWarnings("serial")
 public class CollabsList extends JPanel {
 
-	// Assorted fields for the Components needed
-	private JPanel				searchPane;
-	private JTextField			searchBox;
+	private final JTextField searchBox;
 	private JButton				searchButton;
-	private EditPane			editPane;
-	private JPanel				userList;
+	private final EditPane editPane;
+	private final JPanel userList;
 
 	// Currently-open-project tracking
 	private UUID				activeProjectUUID;
@@ -85,7 +57,7 @@ public class CollabsList extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 
 		// Creates the top half (searching for new users)
-		searchPane = new JPanel(new BorderLayout(0, 0));
+		JPanel searchPane = new JPanel(new BorderLayout(0, 0));
 		searchPane.add(new JLabel("Type a username to seach for them"), BorderLayout.NORTH);
 
 		// Entry for user name
@@ -311,8 +283,7 @@ public class CollabsList extends JPanel {
 			return ((ProjectNode) treePath.getPath()[1]).getProjectUUID();
 		}
 		// Returns the open tab
-		UUID activeProjectUUID = ((EditArea) selectedScrollPane.getViewport().getView()).getProjectUUID();
-		return activeProjectUUID;
+		return ((EditArea) selectedScrollPane.getViewport().getView()).getProjectUUID();
 	}
 
 	/**
@@ -339,16 +310,16 @@ public class CollabsList extends JPanel {
 	class UserInfo extends JPanel {
 
 		// This user's permission level
-		private FlowPermission	userPermission;
+		private final FlowPermission userPermission;
 
 		// The two different "views"
-		private JPanel			simpleView;
-		private JPanel			permissionsView;
+		private final JPanel simpleView;
+		private final JPanel permissionsView;
 
 		// Other swing Components
-		private JLabel			permissionLabel;
-		private ButtonGroup		permissionGroup;
-		private JRadioButton[]	permissionSelectors	= new JRadioButton[4];
+		private final JLabel permissionLabel;
+		private final ButtonGroup permissionGroup;
+		private final JRadioButton[] permissionSelectors = new JRadioButton[4];
 
 		/**
 		 * Creates a new UserInfo panel
@@ -536,7 +507,7 @@ public class CollabsList extends JPanel {
 		class PermissionRadioButtonListener implements ActionListener {
 
 			// The radio button's permission level
-			private byte	permLevel;
+			private final byte permLevel;
 
 			/**
 			 * Creates a new PermissionRadioButtonListener

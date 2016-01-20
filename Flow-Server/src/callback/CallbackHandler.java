@@ -7,14 +7,14 @@ import java.io.IOException;
  * <p>
  * Created by Gordon Guan on 1/15/2016.
  */
-public class CallbackHandler {
+class CallbackHandler {
 
-    private PersistentClientHandle handle;
-    private CallbackEvent.CallbackEventType type;
+    private final PersistentClientHandle handle;
+    private final CallbackEvent.CallbackEventType type;
 
-    public CallbackHandler(PersistentClientHandle handle, CallbackEvent.CallbackEventType type) {
+    CallbackHandler(PersistentClientHandle handle) {
         this.handle = handle;
-        this.type = type;
+        this.type = CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK;
     }
 
     public PersistentClientHandle getHandle() {

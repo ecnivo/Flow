@@ -1,5 +1,7 @@
 package server;
 
+import database.SQLDatabase;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,8 +10,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import database.SQLDatabase;
 
 /**
  * Main container for initiating database and dynamically dispatching clients to
@@ -29,12 +29,12 @@ public class FlowServer implements Runnable {
 	/**
 	 * Common logger for the entire project
 	 */
-	private static Logger LOGGER = Logger.getLogger("FLOW");
+	private static final Logger LOGGER = Logger.getLogger("FLOW");
 
 	/**
 	 * Represents an error caused by the server, rather than client.
 	 */
-	public static String ERROR = "INTERNAL_SERVER_ERROR";
+	public static final String ERROR = "INTERNAL_SERVER_ERROR";
 
 	/**
 	 * Port for all communication from client to server.
@@ -55,7 +55,7 @@ public class FlowServer implements Runnable {
 	/**
 	 * Array containing all active requests.
 	 */
-	private Thread[] threadPool = new Thread[MAX_THREADS];
+	private final Thread[] threadPool = new Thread[MAX_THREADS];
 
 	/**
 	 * Initiates the SQLDatabase class.
@@ -70,7 +70,7 @@ public class FlowServer implements Runnable {
 	 * @return the latest instance of the FlowServer, or a new FlowServer object
 	 *         if one has yet to be initialized.
 	 */
-	public static FlowServer getInstance() {
+	private static FlowServer getInstance() {
 		if (instance == null)
 			instance = new FlowServer();
 		return instance;
@@ -102,7 +102,7 @@ public class FlowServer implements Runnable {
 				} while (threadPool[i] != null);
 
 				LOGGER.info("Request assigned worker thread " + i);
-				Thread t = new Thread(new ClientRequestHandle(this, socket));
+				Thread t = new Thread(new ClientRequestHandle(socket));
 				t.start();
 				threadPool[i] = t;
 			}
@@ -117,6 +117,6 @@ public class FlowServer implements Runnable {
 		LOGGER.setLevel(Level.ALL);
 		FlowServer server = FlowServer.getInstance();
 		new Thread(server).start();
-		new Thread(new AsyncServer(ARC_PORT)).start();
+		new Thread(new AsyncServer()).start();
 	}
 }

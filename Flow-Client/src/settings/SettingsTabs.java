@@ -2,31 +2,18 @@ package settings;
 
 import gui.FlowClient;
 import gui.PanelManager;
+import message.Data;
+import shared.Communicator;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
-
-import message.Data;
-import shared.Communicator;
 
 /**
  * Some tabs to manage the many many settings we have
@@ -35,7 +22,7 @@ import shared.Communicator;
  *
  */
 @SuppressWarnings("serial")
-public class SettingsTabs extends JTabbedPane {
+class SettingsTabs extends JTabbedPane {
 
 	private static final Dimension TEXT_BOX_SIZE = new Dimension(256, 24);
 
@@ -147,7 +134,6 @@ public class SettingsTabs extends JTabbedPane {
 
 				if (status.equals("PASSWORD_INVALID")) {
 					JOptionPane.showConfirmDialog(null, "The entered password is invalid. Typically, this is because\n" + "of the presence of special characters", "Invalid password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-					return;
 				} else if (status.equals("OK")) {
 					retypePass.setText("");
 					passField.setText("");
@@ -173,7 +159,6 @@ public class SettingsTabs extends JTabbedPane {
 				Communicator.killAsync();
 				// Resets everything and everything
 				panMan.resetUI();
-				return;
 			}
 		});
 		logout.add(logoutButton);
@@ -199,7 +184,6 @@ public class SettingsTabs extends JTabbedPane {
 						// Clears things, and switches back to the login window
 						Communicator.setSessionID(null);
 						panMan.resetUI();
-						return;
 					} else {
 						// Error catching
 						JOptionPane.showConfirmDialog(null, "Your Flow account could not be closed for some reason.\nTry logging out, restarting Flow,\nand if the problem persists, please submit a bug report on Github.", "Account deletion failed.", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -245,9 +229,9 @@ public class SettingsTabs extends JTabbedPane {
 	 */
 	private class SettingsTab extends JPanel {
 
-		private JScrollPane scrolling;
-		private ArrayList<Component> children;
-		private SpringLayout layout;
+		private final JScrollPane scrolling;
+		private final ArrayList<Component> children;
+		private final SpringLayout layout;
 		private final static int SEP_GAP = 25;
 
 		/**
@@ -258,7 +242,7 @@ public class SettingsTabs extends JTabbedPane {
 		 */
 		private SettingsTab(String name) {
 			// Just a bunch of settings
-			children = new ArrayList<Component>();
+			children = new ArrayList<>();
 			setBorder(FlowClient.EMPTY_BORDER);
 			layout = new SpringLayout();
 			setLayout(layout);

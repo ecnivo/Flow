@@ -13,7 +13,7 @@ public class VersionText implements Serializable {
         this.text = "";
     }
 
-    public VersionText(String text) {
+    protected VersionText(String text) {
         this.text = text;
     }
     /**

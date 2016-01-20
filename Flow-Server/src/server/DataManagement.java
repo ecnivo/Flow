@@ -15,16 +15,16 @@ import java.util.logging.Logger;
  */
 public class DataManagement {
 
-	public static final String USER_FILE_EXT = "fusr";
-	public static final String TEXT_FILE_EXT = "ftd";
+	private static final String USER_FILE_EXT = "fusr";
+	private static final String TEXT_FILE_EXT = "ftd";
 
 	private static DataManagement instance;
-	private static Logger L = Logger.getLogger("FLOW");
-	private static FileSerializer fileSerializer = new FileSerializer();
+	private static final Logger L = Logger.getLogger("FLOW");
+	private static final FileSerializer fileSerializer = new FileSerializer();
 
-	public File dataDir;
-	public File userDir;
-	public File fileDir;
+	private File dataDir;
+	private File userDir;
+	private File fileDir;
 
 	public static DataManagement getInstance() {
 		if (instance == null)
@@ -65,11 +65,10 @@ public class DataManagement {
 	 *            The user
 	 * @return whether or not the operation succeeded
 	 */
-	public boolean addUser(User u) {
+	public void addUser(User u) {
 		L.info("adding user " + u);
 		fileSerializer.writeToFile(
 				new File(userDir, u.getUsername() + "." + USER_FILE_EXT), u);
-		return true;
 	}
 
 	/**
@@ -103,17 +102,13 @@ public class DataManagement {
 	/**
 	 * Checks if a user exists
 	 *
-	 * @param userDir
-	 *            the directory of the users folder
 	 * @param username
 	 *            The user's username
 	 * @return whether or not the user exists
 	 */
-	public boolean userExists(String userDir, String username) {
-		File userFile = new File(userDir, username + "." + USER_FILE_EXT);
-		if (!userFile.exists())
-			return false;
-		return true;
+	public boolean userExists(String username) {
+		File userFile = new File(database.SQLDatabase.LIVE_USERS, username + "." + USER_FILE_EXT);
+		return userFile.exists();
 	}
 
 	/**
@@ -199,10 +194,10 @@ public class DataManagement {
 	 *            The file's UUID
 	 * @return whether or not the removal was successful
 	 */
-	public boolean removeFileByUUID(UUID fileUUID) {
+	public void removeFileByUUID(UUID fileUUID) {
 		L.info("removing file of uuid " + fileUUID);
 		File file = new File(fileDir, fileUUID.toString());
-		return file.delete();
+		file.delete();
 	}
 
 	/**
@@ -238,8 +233,8 @@ public class DataManagement {
 		return td;
 	}
 
-	public boolean fileExists(String fileDir, UUID fileUUID) {
-		return new File(fileDir, fileUUID.toString()).exists();
+	public boolean fileExists(UUID fileUUID) {
+		return new File(database.SQLDatabase.LIVE_FILES, fileUUID.toString()).exists();
 	}
 
 	public byte[] getArbitraryFileFromFile(UUID fileUUID, UUID versionUUID) {

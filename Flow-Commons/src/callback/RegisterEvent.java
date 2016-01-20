@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 public class RegisterEvent {
     public final UUID UUID;
-    public final RegisterType TYPE;
+    private final RegisterType TYPE;
     public RegisterEvent(UUID UUID, RegisterType TYPE) {
         this.UUID = UUID;
         this.TYPE = TYPE;

@@ -3,17 +3,12 @@ package shared;
 import gui.FlowClient;
 import gui.PanelManager;
 
-import java.awt.FlowLayout;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
 
 /**
  * Navigation bar for edit/debug/version history/settings
@@ -24,7 +19,7 @@ import javax.swing.JToolBar;
 @SuppressWarnings("serial")
 public class NavBar extends JToolBar {
 
-	private PanelManager manager;
+	private final PanelManager manager;
 
 	// Because why not.
 	public static final byte EDIT = 71;
@@ -33,10 +28,10 @@ public class NavBar extends JToolBar {
 	public static final byte SETTINGS = -35;
 
 	// Various buttons.
-	private EditButton editButton;
-	private DebugButton debugButton;
-	private HistoryButton historyButton;
-	private SettingsButton settingsButton;
+	private final EditButton editButton;
+	private final DebugButton debugButton;
+	private final HistoryButton historyButton;
+	private final SettingsButton settingsButton;
 
 	/**
 	 * Creates a new NavBar
@@ -93,7 +88,6 @@ public class NavBar extends JToolBar {
 			return;
 		case SETTINGS:
 			settingsButton.setEnabled(false);
-			return;
 		}
 	}
 

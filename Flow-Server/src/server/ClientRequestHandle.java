@@ -36,20 +36,18 @@ import java.util.logging.Logger;
  * @author Bimesh De Silva
  *
  */
-public class ClientRequestHandle implements Runnable {
+class ClientRequestHandle implements Runnable {
 
-	private Socket socket;
+	private final Socket socket;
 	private DataSocket psocket;
-	private FlowServer server;
 	private SQLDatabase database;
 
-	private static Logger LOGGER = Logger.getLogger("FLOW");
+	private static final Logger LOGGER = Logger.getLogger("FLOW");
 
-	public ClientRequestHandle(FlowServer server, Socket socket)
+	public ClientRequestHandle(Socket socket)
 			throws IOException {
 		this.socket = socket;
 		this.psocket = new DataSocket(socket);
-		this.server = server;
 		this.database = SQLDatabase.getInstance();
 	}
 
@@ -254,8 +252,7 @@ public class ClientRequestHandle implements Runnable {
 							// successfully
 							String status = this.database.newFile(
 									fileUUID.toString(), documentName,
-									projectUUID.toString(),
-									directoryUUID.toString(), "TEXT_DOCUMENT");
+									projectUUID.toString(), directoryUUID.toString());
 							if (status.equals("OK")) {
 								status = this.database.newVersion(
 										fileUUID.toString(),
@@ -635,7 +632,7 @@ public class ClientRequestHandle implements Runnable {
 					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
-						byte[] bytes = null;
+						byte[] bytes;
 
 						// Retrieve the data of the file differently based on
 						// the file type (as arbitrary document versions are
@@ -677,7 +674,7 @@ public class ClientRequestHandle implements Runnable {
 						UUID versionUUID = UUID.fromString(this.database
 								.getLatestVersionUUID(fileUUID.toString()));
 						returnData.put("version_uuid", versionUUID);
-						byte[] bytes = null;
+						byte[] bytes;
 
 						// Retrieve the data of the file differently based on
 						// the file type (as arbitrary document versions are

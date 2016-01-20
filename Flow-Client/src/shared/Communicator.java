@@ -1,15 +1,13 @@
 package shared;
 
+import callback.TextModificationListener;
 import gui.PanelManager;
-
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.swing.JOptionPane;
-
 import message.Data;
 import network.FMLNetworker;
-import callback.TextModificationListener;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Central communications handler
@@ -26,8 +24,8 @@ public class Communicator {
 	/**
 	 * Creates a new networker using FML
 	 */
-	public static void initComms(String host, int port) {
-		networker = new FMLNetworker(host, port, 10225);// TODO hardcoded
+	public static void initComms(String host) {
+		networker = new FMLNetworker(host, gui.FlowClient.PORT, 10225);// TODO hardcoded
 	}
 
 	/**

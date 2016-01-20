@@ -29,13 +29,13 @@ import java.util.UUID;
 public class EditArea extends JTextPane {
 
 	// Swing components
-	private JScrollPane scrolling;
-	private StyledDocument doc;
+	private final JScrollPane scrolling;
+	private final StyledDocument doc;
 
 	// UUID trackers
-	private UUID versionTextUUID;
-	private UUID fileUUID;
-	private UUID projectUUID;
+	private final UUID versionTextUUID;
+	private final UUID fileUUID;
+	private final UUID projectUUID;
 
 	// Styles
 	private Style keywordStyle;
@@ -43,23 +43,17 @@ public class EditArea extends JTextPane {
 	private Style stringStyle;
 	private Style commentsStyle;
 
-	// "Blocks" of text to highlight
-	private ArrayList<StyleBlock> keywordBlocks;
-	private ArrayList<StyleBlock> stringBlocks;
-	private ArrayList<StyleBlock> commentBlocks;
-
 	// Different style constants
-	public static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
-	public static final Color PLAIN_COLOUR = Color.BLACK;
-	public static final Color KEYWORD_COLOUR = new Color(0x38761D);
-	public static final Color STRING_COLOUR = new Color(0xA30BCF);
-	public static final Color COMMENTS_COLOUR = new Color(0xD13313);
+	private static final Font PLAIN = new Font("Consolas", Font.PLAIN, 13);
+	private static final Color PLAIN_COLOUR = Color.BLACK;
+	private static final Color KEYWORD_COLOUR = new Color(0x38761D);
+	private static final Color STRING_COLOUR = new Color(0xA30BCF);
+	private static final Color COMMENTS_COLOUR = new Color(0xD13313);
 
 	// Java's keywords
 	private static final String[] JAVA_KEYWORDS = { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throws", "throw", "transient", "true", "try", "void", "volatile", "while" };
 
 	private boolean ignoreEvents = false;
-	private ArrayList<UserCaret> carets;
 
 	/**
 	 * Creates a new EditArea
@@ -106,7 +100,7 @@ public class EditArea extends JTextPane {
 		} else if (!editorListData.get("status", String.class).equals("OK")) {
 			return;
 		}
-		carets = new ArrayList<UserCaret>();
+		ArrayList<UserCaret> carets = new ArrayList<>();
 		String[] editors = editorListData.get("editors", String[].class);
 		for (String userName : editors) {
 			if (!userName.equals(Communicator.getUsername())) {
@@ -303,7 +297,6 @@ public class EditArea extends JTextPane {
 				Data response = Communicator.communicate(caretPosChange);
 				if (response.get("status", String.class).equals("ACCESS_DENIED")) {
 					JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-					return;
 				}
 			}
 		});
@@ -459,7 +452,6 @@ public class EditArea extends JTextPane {
 	public void paintComponent(Graphics g) {
 		try {
 			super.paintComponent(g);
-			return;
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
@@ -472,8 +464,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class StyleBlock {
 
-		private int length;
-		private int premiereIdx;
+		private final int length;
+		private final int premiereIdx;
 
 		/**
 		 * Creates a new StyleBlock
@@ -513,9 +505,9 @@ public class EditArea extends JTextPane {
 	 */
 	private void highlightSyntax() {
 		// Creates new blocks
-		keywordBlocks = new ArrayList<StyleBlock>();
-		stringBlocks = new ArrayList<StyleBlock>();
-		commentBlocks = new ArrayList<StyleBlock>();
+		ArrayList<StyleBlock> keywordBlocks = new ArrayList<>();
+		ArrayList<StyleBlock> stringBlocks = new ArrayList<>();
+		ArrayList<StyleBlock> commentBlocks = new ArrayList<>();
 
 		String text = this.getText().replace("\r", ""), word = "";
 		int textLength = text.length(), spaceCount = 0;
@@ -618,7 +610,7 @@ public class EditArea extends JTextPane {
 
 		// First paints everything "plain", then does key words, strings, then
 		// comments
-		SwingUtilities.invokeLater(new FormatPlainLater(0, textLength));
+		SwingUtilities.invokeLater(new FormatPlainLater(textLength));
 
 		for (StyleBlock styleBlock : keywordBlocks) {
 			SwingUtilities.invokeLater(new FormatKeywordsLater(styleBlock.getFirstIdx(), styleBlock.getLength()));
@@ -643,8 +635,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatKeywordsLater implements Runnable {
 
-		private int pos;
-		private int nextToken;
+		private final int pos;
+		private final int nextToken;
 
 		/**
 		 * Creates a new FormatKeywordsLater
@@ -675,11 +667,11 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatPlainLater implements Runnable {
 
-		private int pos;
-		private int nextToken;
+		private final int pos;
+		private final int nextToken;
 
-		private FormatPlainLater(int pos, int nextToken) {
-			this.pos = pos;
+		private FormatPlainLater(int nextToken) {
+			this.pos = 0;
 			this.nextToken = nextToken;
 		}
 
@@ -697,8 +689,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatStringsLater implements Runnable {
 
-		private int pos;
-		private int nextToken;
+		private final int pos;
+		private final int nextToken;
 
 		private FormatStringsLater(int pos, int nextToken) {
 			this.pos = pos;
@@ -718,8 +710,8 @@ public class EditArea extends JTextPane {
 	 */
 	private class FormatCommentsLater implements Runnable {
 
-		private int pos;
-		private int nextToken;
+		private final int pos;
+		private final int nextToken;
 
 		private FormatCommentsLater(int pos, int nextToken) {
 			this.pos = pos;

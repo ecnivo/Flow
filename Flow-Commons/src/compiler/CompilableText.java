@@ -10,9 +10,9 @@ import java.util.UUID;
  * Created by Gordon Guan on 1/17/2016.
  */
 public class CompilableText extends VersionText {
-    private UUID fileUUID;
-    private String path;
-    private String name;
+    private final UUID fileUUID;
+    private final String path;
+    private final String name;
 
     public CompilableText(String text, UUID fileUUID, String path, String name) {
         super(text);
@@ -24,7 +24,7 @@ public class CompilableText extends VersionText {
     /**
      * The path to the file
      *
-     * @return
+     * @return The path to the file
      */
     public String getPath() {
         return path;
@@ -32,7 +32,7 @@ public class CompilableText extends VersionText {
 
     /**
      * The name of the file
-     * @return
+     * @return the name of the file
      */
     public String getName() {
         return name;
@@ -40,12 +40,17 @@ public class CompilableText extends VersionText {
 
     /**
      * Gets the full path of the file
-     * @return
+     * @return the full path of the file
      */
     public String getFullPath() {
         return Paths.get(path, name).toString();
     }
 
+    /**
+     * Get the uuid this file is associated with
+     *
+     * @return the uuid this file is associated with
+     */
     public UUID getFileUUID() {
         return fileUUID;
     }

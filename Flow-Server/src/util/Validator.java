@@ -42,9 +42,7 @@ public class Validator {
 	 * @return whether or not the string fits the specified conditions.
 	 */
 	public static boolean validFileName(String str) {
-		return str == null ? false
-				: str.matches(
-						"[A-Za-z0-9_\\- ]{1,192}([\\.]{1}[A-Za-z0-9]{0,16})?");
+		return str != null && str.matches("[A-Za-z0-9_\\- ]{1,192}([\\.]{1}[A-Za-z0-9]{0,16})?");
 	}
 
 	/**
@@ -58,8 +56,8 @@ public class Validator {
 		int length = message.length();
 		for (int i = 0; i < length; i++) {
 			char c = message.charAt(i);
-			for (int j = 0; j < blacklist.length; j++) {
-				if (c == blacklist[j])
+			for (char aBlacklist : blacklist) {
+				if (c == aBlacklist)
 					return false;
 			}
 		}

@@ -3,15 +3,11 @@ package history;
 
 import gui.FlowClient;
 import gui.PanelManager;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
 import shared.EditTabs;
 import shared.NavBar;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * The panel that manages all of version history
@@ -22,10 +18,7 @@ import shared.NavBar;
 @SuppressWarnings("serial")
 public class HistoryPane extends JSplitPane {
 
-	// Keeping track of some important JComponents
-	private NavBar			navBar;
-	private VersionViewer	versionViewer;
-	private VersionFileTree	tree;
+	private final VersionFileTree tree;
 
 	/**
 	 * Creates a new HistoryPane
@@ -44,7 +37,7 @@ public class HistoryPane extends JSplitPane {
 		leftSide.setMinimumSize(leftSize);
 		leftSide.setPreferredSize(leftSize);
 		setLeftComponent(leftSide);
-		navBar = new NavBar(manager);
+		NavBar navBar = new NavBar(manager);
 		navBar.disableButton(NavBar.HISTORY);
 		leftSide.add(navBar, BorderLayout.NORTH);
 
@@ -55,7 +48,7 @@ public class HistoryPane extends JSplitPane {
 		treeAndVersion.setResizeWeight(0.4);
 		leftSide.add(treeAndVersion, BorderLayout.CENTER);
 
-		versionViewer = new VersionViewer(this);
+		VersionViewer versionViewer = new VersionViewer(this);
 		treeAndVersion.setRightComponent(versionViewer);
 
 		tree = new VersionFileTree(versionViewer);

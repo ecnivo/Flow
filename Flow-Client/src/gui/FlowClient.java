@@ -25,7 +25,7 @@ public class FlowClient extends JFrame {
 	public static final int		BUTTON_ICON_SIZE	= 24;
 	public static boolean		HIDE				= true;
 	public static final int		SCROLL_SPEED		= 12;
-	private static final int	PORT				= 10244;
+	public static final int PORT = 10244;
 	private PanelManager		manager;
 
 	/**
@@ -33,7 +33,7 @@ public class FlowClient extends JFrame {
 	 * 
 	 * @throws IOException
 	 */
-	public FlowClient() throws IOException {
+	private FlowClient() {
 		// loads things
 		super("Flow");
 
@@ -45,7 +45,7 @@ public class FlowClient extends JFrame {
 		}
 
 		// Sets up communications with the server
-		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP", "127.0.0.1"), PORT);
+		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP", "127.0.0.1"));
 
 		// Creates a new PanelManager
 		manager = PanelManager.createNewInstance(this);
@@ -74,16 +74,6 @@ public class FlowClient extends JFrame {
 		this.setVisible(true);
 	}
 
-	/**
-	 * Starts
-	 * 
-	 * @param args
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws UnsupportedLookAndFeelException
-	 * @throws IOException
-	 */
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		new FlowClient();

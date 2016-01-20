@@ -6,8 +6,6 @@ package util;
  */
 public class Formatter {
 
-    private static String TAB = "    ";
-
     /**
      * Weakly formats a string of code
      *
@@ -16,6 +14,7 @@ public class Formatter {
      */
     public static String format(String str) {
         // Remove tabs, split by newlines
+        String TAB = "    ";
         String[] lines = str.replace("\t", TAB).split("\n");
         String text = "";
         int tabIndex = 0;

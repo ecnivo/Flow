@@ -13,14 +13,14 @@ import java.util.logging.Logger;
  */
 public class EventPusher implements Runnable {
 
-    private static Logger L = Logger.getLogger("FLOW");
-    private DataSocket arcSocket;
+    private static final Logger L = Logger.getLogger("FLOW");
+    private final DataSocket arcSocket;
 
-    private HashMap<UUID, CallbackListener> registeredEvents;
+    private final HashMap<UUID, CallbackListener> registeredEvents;
 
     private boolean running = true;
 
-    private UUID sessionID;
+    private final UUID sessionID;
 
     public EventPusher(DataSocket arcSocket, UUID sessionID) {
         this.arcSocket = arcSocket;

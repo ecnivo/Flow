@@ -125,7 +125,7 @@ public class RunStopBar extends JToolBar {
                     if (editTabs == null) {
                         return;
                     }
-                    if (activeProcess != null || (activeProcess != null ? activeProcess.isAlive() : false)) {
+                    if (activeProcess != null || (activeProcess != null && activeProcess.isAlive())) {
                         console.addOutput("A process is still running!\n");
                     } else {
                         ArrayList<CompilableText> textFiles = new ArrayList<>();
@@ -153,7 +153,7 @@ public class RunStopBar extends JToolBar {
                                 return;
                             }
                         }
-                        FlowCompiler flowCompiler = new FlowCompiler(textFiles.toArray(new CompilableText[0]));
+                        FlowCompiler flowCompiler = new FlowCompiler(textFiles.toArray(new CompilableText[textFiles.size()]));
                         try {
                             java.util.List<Diagnostic<? extends JavaFileObject>> errors;
                             try {
@@ -205,7 +205,6 @@ public class RunStopBar extends JToolBar {
                             // Gordon's stuff
                             e1.printStackTrace();
                             JOptionPane.showConfirmDialog(null, "Code failed to compile or run for some reason. Make sure you have the appropriate JDK installed", "Compiling failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-                            return;
                         }
                     }
                 }

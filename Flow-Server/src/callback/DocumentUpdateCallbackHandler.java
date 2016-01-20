@@ -1,8 +1,5 @@
 package callback;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import database.SQLDatabase;
 import message.Data;
 import network.DataSocket;
@@ -10,16 +7,19 @@ import server.DataManagement;
 import server.VersionManager;
 import util.DatabaseException;
 
+import java.io.IOException;
+import java.util.UUID;
+
 /**
  * A callback handler specifically handling document modification Created by
  * Gordon Guan on 1/15/2016.
  */
 public class DocumentUpdateCallbackHandler extends CallbackHandler {
-	private UUID documentUUID;
+	private final UUID documentUUID;
 
 	public DocumentUpdateCallbackHandler(PersistentClientHandle handle,
 			UUID documentUUID) {
-		super(handle, CallbackEvent.CallbackEventType.DOCUMENT_CALLBACK);
+		super(handle);
 		this.documentUUID = documentUUID;
 	}
 

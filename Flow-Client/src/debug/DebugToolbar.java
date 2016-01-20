@@ -3,17 +3,12 @@ package debug;
 
 import gui.FlowClient;
 
-import java.awt.FlowLayout;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JToolBar;
 
 /**
  * A toolbar with buttons for start debug, step in/over/out
@@ -22,7 +17,7 @@ import javax.swing.JToolBar;
  *
  */
 @SuppressWarnings("serial")
-public class DebugToolbar extends JToolBar {
+class DebugToolbar extends JToolBar {
 
 	/**
 	 * Creates a new DebugToolbar

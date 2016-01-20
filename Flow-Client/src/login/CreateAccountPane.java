@@ -3,29 +3,16 @@ package login;
 
 import gui.BackButton;
 import gui.PanelManager;
+import message.Data;
+import shared.Communicator;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.SwingConstants;
-
-import message.Data;
-import shared.Communicator;
 
 /**
  * Panel for the user to create a new account
@@ -36,8 +23,8 @@ import shared.Communicator;
 @SuppressWarnings("serial")
 public class CreateAccountPane extends JPanel {
 
-	private PanelManager		manager;
-	private JPasswordField		passwordConfirm;
+	private final PanelManager manager;
+	private final JPasswordField passwordConfirm;
 
 	// characters not allowed in... everything, basically.
 	public final static char[]	INVALID_CHARS	= { '\\', '/', '?', '%', '*', ':', '|', '"', '<', '>', '#', '&', '{', '}', '$', '@', '=', '`', '+' };
@@ -167,7 +154,7 @@ public class CreateAccountPane extends JPanel {
 				} else if (passwordEntry.getPassword().length < 1) {
 					JOptionPane.showConfirmDialog(null, "Please enter a password", "No password", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
-				} else if (stringContains(usernameEntry.getText(), INVALID_CHARS)) {
+				} else if (stringContains(usernameEntry.getText())) {
 					JOptionPane.showConfirmDialog(null, "Username contains invalid characters.\nPlease reduce the use of symbols.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 					return;
 				} else if (!Arrays.equals(passwordEntry.getPassword(), passwordConfirm.getPassword())) {
@@ -218,14 +205,14 @@ public class CreateAccountPane extends JPanel {
 	/**
 	 * To see if a string contains any of the characters in the array
 	 * 
-	 * @param str
-	 *        string to check
 	 * @param array
 	 *        the array to reference
+	 * @param str
+	 *        string to check
 	 * @return boolean; true if contains, false if not.
 	 */
-	public static boolean stringContains(String str, char[] array) {
-		for (char c : array) {
+	public static boolean stringContains(String str) {
+		for (char c : CreateAccountPane.INVALID_CHARS) {
 			if (str.contains(c + ""))
 				return true;
 		}

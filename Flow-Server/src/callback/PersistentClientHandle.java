@@ -10,12 +10,14 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
+ * Represents a persistent handle to the client to send events
+ *
  * Created by Gordon Guan on 1/15/2016.
  */
 public class PersistentClientHandle implements Runnable {
-    private static Logger L = Logger.getLogger("FLOW");
+    private static final Logger L = Logger.getLogger("FLOW");
 
-    private Socket socket;
+    private final Socket socket;
 
     private DataSocket dataSocket;
     private HashMap<UUID, CallbackHandler> handlers;

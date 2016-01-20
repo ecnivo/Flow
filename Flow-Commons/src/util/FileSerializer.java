@@ -17,16 +17,16 @@ public class FileSerializer {
      *
      * @param file         The file to write it to
      * @param serializable The serializable to serialize
-     * @return
+     * @return serializable from file
      */
-    public boolean writeToFile(File file, Serializable serializable) {
+    public void writeToFile(File file, Serializable serializable) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
             oos.writeObject(serializable);
             oos.close();
-            return true;
+            return;
         } catch (Exception e) {
-            return false;
+            return;
         }
     }
 

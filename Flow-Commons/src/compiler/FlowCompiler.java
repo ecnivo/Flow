@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 public class FlowCompiler {
 
     private static final Logger L = Logger.getLogger("FLOW");
-    private CompilableText[] versionTexts;
-    private File workingDirectory;
+    private final CompilableText[] versionTexts;
+    private final File workingDirectory;
 
     /**
      * Instantiates a compiler from the given textDocuments
@@ -34,7 +34,7 @@ public class FlowCompiler {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
     }
 
-    protected static String removeExtension(String s) {
+    private static String removeExtension(String s) {
         String separator = System.getProperty("file.separator");
         String filename;
         int lastSeparatorIndex = s.lastIndexOf(separator);
@@ -121,6 +121,9 @@ public class FlowCompiler {
         return null;
     }
 
+    /**
+     * Thrown when the computer can't find the JDK
+     */
     public class NoJDKFoundException extends Exception {
 
         public NoJDKFoundException() {
@@ -140,8 +143,7 @@ public class FlowCompiler {
         L.info("assuming main class is " + remotePath);
         ProcessBuilder pb = new ProcessBuilder("java", "-cp", "\"" + workingDirectory.getAbsolutePath() + "\"", remotePath);
         L.info("execution arguments are: " + pb.command().toString());
-        Process p = pb.start();
-        return p;
+        return pb.start();
     }
 
     /**
@@ -154,6 +156,7 @@ public class FlowCompiler {
         L.info("reading all output of execution");
         String str = "";
         Process p = this.execute();
+        // Read in all stdout and stderr
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line;
         while ((line = br.readLine()) != null) {

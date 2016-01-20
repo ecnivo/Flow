@@ -3,11 +3,14 @@ package shared;
 
 import editing.EditPane;
 import gui.FlowClient;
+import message.Data;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.*;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -16,22 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeSelectionModel;
-
-import message.Data;
 
 /**
  * A tree for file management for a user
@@ -42,14 +29,13 @@ import message.Data;
 @SuppressWarnings("serial")
 public abstract class FileTree extends JTree {
 
-	private JScrollPane			scrollView;
+	private final JScrollPane scrollView;
 	private final static int	TREE_ICON_SIZE	= 16;
-	private UUID[]				usersProjectsUUIDs;
 
 	/**
 	 * Creates a new FileTree
 	 */
-	public FileTree() {
+	protected FileTree() {
 		// Swing things
 		setMinimumSize(new Dimension(100, 0));
 		setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -108,7 +94,7 @@ public abstract class FileTree extends JTree {
 	 */
 	public void refresh() {
 		refreshProjectList();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
 		for (int i = 0; i < root.getChildCount(); i++) {
 			reloadProjectFiles((ProjectNode) root.getChildAt(i));
 		}
@@ -139,7 +125,7 @@ public abstract class FileTree extends JTree {
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		usersProjectsUUIDs = reply.get("projects", UUID[].class);
+		UUID[] usersProjectsUUIDs = reply.get("projects", UUID[].class);
 		if (usersProjectsUUIDs == null) {
 			return;
 		}
@@ -166,7 +152,7 @@ public abstract class FileTree extends JTree {
 
 				// Creates new node and adds it
 				ProjectNode newProjectNode = new ProjectNode(remoteProjectUUID, project.get("project_name", String.class));
-				((DefaultTreeModel) getModel()).insertNodeInto(newProjectNode, (DefaultMutableTreeNode) ((DefaultTreeModel) getModel()).getRoot(), ((DefaultMutableTreeNode) getModel().getRoot()).getChildCount());
+				((DefaultTreeModel) getModel()).insertNodeInto(newProjectNode, (DefaultMutableTreeNode) getModel().getRoot(), ((DefaultMutableTreeNode) getModel().getRoot()).getChildCount());
 
 				// Loads the project files for that new project node
 				loadProjectFilesFirstTime(remoteProjectUUID, newProjectNode);
@@ -245,7 +231,7 @@ public abstract class FileTree extends JTree {
 	 * @param projectNode
 	 *        the node to reload from
 	 */
-	public void reloadProjectFiles(ProjectNode projectNode) {
+	protected void reloadProjectFiles(ProjectNode projectNode) {
 		if (projectNode == null) {
 			return;
 		}
@@ -255,7 +241,6 @@ public abstract class FileTree extends JTree {
 		Data reloadedProject = Communicator.communicate(projectReload);
 		if (reloadedProject == null) {
 			JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-			return;
 		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED")) {
 			// Removes the project's node, and removes all open tabs
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -278,7 +263,6 @@ public abstract class FileTree extends JTree {
 					tabs.removeTabAt(i);
 				}
 			}
-			return;
 		} else if (reloadedProject.get("status", String.class).equals("OK")) {
 			// Does the recursion one on the children
 			reloadProjectFilesRecursively(reloadedProject, projectNode);
@@ -286,9 +270,7 @@ public abstract class FileTree extends JTree {
 			if (getSelectionPath() == null) {
 				setSelectionRow(0);
 			}
-			return;
 		} else {
-			return;
 		}
 	}
 
@@ -307,8 +289,8 @@ public abstract class FileTree extends JTree {
 		}
 
 		// Creates a list of the localNode's child directories and files
-		ArrayList<DirectoryNode> localDirs = new ArrayList<DirectoryNode>();
-		ArrayList<FileNode> localFiles = new ArrayList<FileNode>();
+		ArrayList<DirectoryNode> localDirs = new ArrayList<>();
+		ArrayList<FileNode> localFiles = new ArrayList<>();
 
 		for (int i = 0; i < localNode.getChildCount(); i++) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode) localNode.getChildAt(i);
@@ -436,7 +418,7 @@ public abstract class FileTree extends JTree {
 	public class DirectoryNode extends DefaultMutableTreeNode {
 
 		// TODO something for directory updates?
-		private UUID	directoryUUID;
+		private final UUID directoryUUID;
 		private String	name;
 
 		/**
@@ -504,9 +486,9 @@ public abstract class FileTree extends JTree {
 
 		// TODO add a listener for file renaming changes
 
-		private UUID	file;
+		private final UUID file;
 		private String	name;
-		private String	type;
+		private final String type;
 
 		/**
 		 * Creates a new FileNode
@@ -575,7 +557,7 @@ public abstract class FileTree extends JTree {
 		private ImageIcon	textDocumentIcon;
 		private ImageIcon	arbitraryFileIcon;
 
-		private JLabel		label;
+		private final JLabel label;
 
 		/**
 		 * Creates a new FlowNodeRenderer

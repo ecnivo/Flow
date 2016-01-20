@@ -1,7 +1,7 @@
 
 package shared;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Represents a permission level for a user
@@ -67,8 +67,8 @@ public class FlowPermission {
 
 	/**
 	 * Gets the colour for this permission level
-	 * 
-	 * @return
+	 *
+	 * @return the color for this permission level
 	 */
 	public Color getPermissionColor() {
 		// Pretty self explanatoryS

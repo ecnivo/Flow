@@ -23,8 +23,8 @@ public class GenericConsole extends JTextArea {
 
 	private String		userInput;
 	private String		history	= "FLOW - CONSOLE\n";
-	private JPopupMenu	popUp;
-	private JScrollPane	scrolling;
+	private final JPopupMenu popUp;
+	private final JScrollPane scrolling;
 	private OutputStream activeOutputStream;
 
 	/**
@@ -83,11 +83,7 @@ public class GenericConsole extends JTextArea {
 					String clip = "";
 					try {
 						clip = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).toString();
-					} catch (HeadlessException e) {
-						e.printStackTrace();
-					} catch (UnsupportedFlavorException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
+					} catch (HeadlessException | IOException | UnsupportedFlavorException e) {
 						e.printStackTrace();
 					}
 					userInput += clip;
@@ -239,7 +235,7 @@ public class GenericConsole extends JTextArea {
 
 	/**
 	 * Adds output to the console
-	 * @param output
+	 * @param output the new output to add
 	 */
 	public void addOutput(String output) {
 		history += output;

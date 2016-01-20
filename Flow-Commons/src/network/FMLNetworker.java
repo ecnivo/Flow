@@ -15,15 +15,14 @@ import java.util.logging.Logger;
  */
 public class FMLNetworker {
 
-    private static Logger L = Logger.getLogger("FLOW");
-    private String ip;
-    private int port;
-    private int arcport;
+    private static final Logger L = Logger.getLogger("FLOW");
+    private final String ip;
+    private final int port;
+    private final int arcport;
     private DataSocket asyncSocket;
     private EventPusher pusher;
 
     public FMLNetworker(String ip, int port, int arcport) {
-        // System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s%n");
         this.ip = ip;
         this.port = port;
         this.arcport = arcport;
@@ -35,7 +34,6 @@ public class FMLNetworker {
      * @param data The data to send to the server
      * @return The response from the server
      * @throws IOException            When something nasty happens
-     * @throws ClassNotFoundException When a class is missing client-side
      */
     public Data send(Data data) throws IOException {
         try {
@@ -90,10 +88,10 @@ public class FMLNetworker {
      * @param assocUUID UUID of the listener
      * @return success or not
      */
-    public boolean registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
+    public void registerCallbackListener(CallbackListener chngListener, UUID assocUUID) {
         if (asyncSocket == null) {
             L.severe("attempted to register callback when async is not initiated!");
-            return false;
+            return;
         }
         try {
             // Send the server a message letting them know a listener was registered
@@ -106,10 +104,10 @@ public class FMLNetworker {
             asyncSocket.send(asyncCallbackRequest);
             pusher.registerListener(assocUUID, chngListener);
             L.info("registered callback!");
-            return true;
+            return;
         } catch (IOException e) {
             L.severe("ioexception when registering callback!");
-            return false;
+            return;
         }
     }
 
@@ -118,10 +116,10 @@ public class FMLNetworker {
      * @param assocUUID The UUID of the listener
      * @return success or not
      */
-    public boolean unregisterCallbackListener(UUID assocUUID) {
+    public void unregisterCallbackListener(UUID assocUUID) {
         if (asyncSocket == null) {
             L.severe("attempted to deregister callback when async is not initiated!");
-            return false;
+            return;
         }
         try {
             // Send the server a message letting them know a listener was unregistered
@@ -131,10 +129,10 @@ public class FMLNetworker {
             asyncSocket.send(cancelAsync);
             pusher.unregisterListener(assocUUID);
             L.info("unregistered callback!");
-            return true;
+            return;
         } catch (IOException e) {
             L.severe("io exception when deregistering callback!");
-            return false;
+            return;
         }
     }
 }
