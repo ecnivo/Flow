@@ -40,11 +40,7 @@ public class Results {
 			}
 			list.add(row);
 		}
-
-		// Check if the list is empty to prevent list.toArray from returning
-		// null as the array
-		return list.size() > 0 ? list.toArray(new String[][] { {} })
-				: new String[][] { {} };
+		return list.toArray(new String[][] { {} });
 	}
 
 	/**
