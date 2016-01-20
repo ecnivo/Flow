@@ -1587,7 +1587,7 @@ public class SQLDatabase {
 			String dataFolder) {
 		try {
 			System.err.println(
-					"Searching for database and file system corruption...");
+					"Scanning for database and file system corruption...");
 			// Scans users for missing files and removes associates accounts
 			ResultSet response = this.query("SELECT Username FROM Users;");
 			while (response.next()) {

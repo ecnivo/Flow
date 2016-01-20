@@ -598,7 +598,8 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-				// Retrieves the specified version of a file
+				break;
+			// Retrieves the specified version of a file
 			case "request_version":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class),
@@ -637,8 +638,8 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-
 				break;
+			// Retrieves the latest version of a file
 			case "file_request":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
@@ -655,6 +656,10 @@ public class ClientRequestHandle implements Runnable {
 								.getLatestVersionUUID(fileUUID.toString()));
 						returnData.put("version_uuid", versionUUID);
 						byte[] bytes = null;
+
+						// Retrieve the data of the file differently based on
+						// the file type (as arbitrary document versions are
+						// stored as full copies)
 						String fileType = this.database
 								.getFileType(fileUUID.toString());
 						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
@@ -666,18 +671,19 @@ public class ClientRequestHandle implements Runnable {
 									.getArbitraryFileFromFile(fileUUID,
 											versionUUID);
 						}
-						returnData.put("status", "OK");
 						returnData.put("file_data", bytes);
+						returnData.put("status", "OK");
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
 				break;
+			// Modify the contents of a text document
 			case "file_text_modify":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
-					int idx = data.get("idx", Integer.class);
+					int index = data.get("idx", Integer.class);
 					String username = this.database.getUsername(
 							data.get("session_id", UUID.class).toString());
 					UUID latestVersionUUID = UUID.fromString(this.database
@@ -685,36 +691,46 @@ public class ClientRequestHandle implements Runnable {
 					VersionText td = VersionManager.getInstance()
 							.getTextByVersionUUID(latestVersionUUID);
 					switch (data.get("mod_type", String.class)) {
+					// Insert characters into the file
 					case "INSERT": {
 						String str = data.get("str", String.class);
+
+						// Inform all other clients who are editing the file
+						// of the changes
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.INSERT,
-								fileUUID, username, idx, str, -1);
+								fileUUID, username, index, str, -1);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
-						td.insert(str, idx);
+						td.insert(str, index);
 
 					}
 						break;
+					// Remove characters from the file
 					case "DELETE": {
-						int len = data.get("len", Integer.class);
+						int length = data.get("len", Integer.class);
+
+						// Inform all other clients who are editing the file
+						// of the changes
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.DELETE,
-								fileUUID, username, idx, null, len);
+								fileUUID, username, index, null, length);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
-						if (len == -1) {
+						if (length == -1) {
 							td.setDocumentText("");
 							LOGGER.info(
 									"clearing document because of negative length");
 						}
-						while (len-- > 0)
-							td.delete(idx);
+						while (length-- > 0)
+							td.delete(index);
 					}
+						break;
+					// Move the user's cursor position
 					case "MOVE": {
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.MOVE,
-								fileUUID, username, idx, null, -1);
+								fileUUID, username, index, null, -1);
 						PersistentHandleManager.getInstance()
 								.doCallbackEvent(fileUUID, event);
 					}
