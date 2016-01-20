@@ -257,6 +257,7 @@ public abstract class FileTree extends JTree {
 			JOptionPane.showConfirmDialog(null, "The project couldn't be found.\nTry refreshing the project list by Alt + clicking.", "Project retrieval error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 			return;
 		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED")) {
+			// Removes the project's node, and removes all open tabs
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 			((DefaultTreeModel) getModel()).removeNodeFromParent(projectNode);
 
@@ -270,6 +271,7 @@ public abstract class FileTree extends JTree {
 			if (tabs == null) {
 				return;
 			}
+			// Actually does the removing tabs bit
 			for (int i = 0; i < tabs.getTabCount(); i++) {
 				EditArea editArea = (EditArea) ((JScrollPane) tabs.getComponentAt(i)).getViewport().getView();
 				if (editArea.getProjectUUID().equals(projectNode.getProjectUUID())) {
@@ -319,11 +321,13 @@ public abstract class FileTree extends JTree {
 
 		// Removes child nodes that don't exist anymore (from the node and from the arrayList)
 		UUID[] remoteChildFileUUIDs = remoteParentDir.get("child_files", UUID[].class);
+		fileNodes:
 		for (FileNode localFileNode : localFiles) {
 			int idx = Arrays.asList(remoteChildFileUUIDs).indexOf(localFileNode.getFileUUID());
 			if (idx == -1) {
 				((DefaultTreeModel) getModel()).removeNodeFromParent(localFileNode);
 				localFiles.remove(localFileNode);
+				// Gets the editing tabs
 				EditPane pane = (EditPane) getParent().getParent().getParent().getParent().getParent().getParent();
 				if (pane == null) {
 					return;
@@ -332,14 +336,13 @@ public abstract class FileTree extends JTree {
 				if (tabs == null) {
 					return;
 				}
-				ArrayList<UUID> tabUUIDs = new ArrayList<UUID>();
+				// Removes it
 				for (int i = 0; i < tabs.getTabCount(); i++) {
 					EditArea editArea = (EditArea) ((JScrollPane) tabs.getComponentAt(i)).getViewport().getView();
-					tabUUIDs.add(editArea.getFileUUID());
-				}
-				int targetIdx = tabUUIDs.indexOf(localFileNode.getFileUUID());
-				if (targetIdx > 0) {
-					tabs.removeTabAt(targetIdx);
+					if (editArea.getFileUUID().equals(localFileNode.getFileUUID())) {
+						tabs.removeTabAt(i);
+						continue fileNodes;
+					}
 				}
 			}
 		}
