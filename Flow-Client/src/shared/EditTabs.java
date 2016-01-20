@@ -126,6 +126,14 @@ public class EditTabs extends JTabbedPane {
 	}
 
 	/**
+	 * Gets the active editing area
+	 * @return The active editing area, null if none is open
+	 */
+	public EditArea getActiveEditArea() {
+		return (EditArea) ((JScrollPane) getSelectedComponent()).getViewport().getView();
+	}
+
+	/**
 	 * A custom tab header for the JTabbedPane
 	 * 
 	 * @author Vince Ou
