@@ -20,7 +20,7 @@ public class Results {
 	 * @param columnNames
 	 *            the names of the columns to retrieve data from.
 	 * @param results
-	 *            the ResultSet object recieved from querying the database.
+	 *            the ResultSet object received from querying the database.
 	 * @return two dimensional String array of the following dimensions: [Number
 	 *         of results in ResultSet][Number of columns in columnNames
 	 *         String[]]
