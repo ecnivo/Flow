@@ -116,7 +116,7 @@ public class FlowCompiler {
             fileManager.close();
         } catch (Exception e) {
             L.severe("exception occurred while compiling!");
-            L.severe(e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }

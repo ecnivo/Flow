@@ -30,6 +30,13 @@ public class VersionText implements Serializable {
         return c == '\n';
     }
 
+    public boolean insert(String s, int idx) {
+        if (idx < 0 || idx > text.length())
+            throw new ArrayIndexOutOfBoundsException("index out of range");
+        text = text.substring(0, idx) + s + text.substring(idx);
+        return s.contains("\n");
+    }
+
     /**
      * Remove a character at line number at index
      *
