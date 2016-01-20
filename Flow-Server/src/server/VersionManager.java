@@ -49,7 +49,7 @@ public class VersionManager {
                         String line;
                         String txt = "";
                         while ((line = br.readLine()) != null) {
-                            txt += line;
+                            txt += line + "\n";
                         }
                         VersionText loadedVersion = new VersionText();
                         loadedVersion.setDocumentText(txt);
