@@ -98,16 +98,6 @@ public class SQLDatabase {
 			}
 		}
 
-		// Reconnects to the database
-		try {
-			this.connection = DriverManager
-					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Error connecting to database located at: "
-					+ LIVE_DATABASE);
-		}
-
 		// Ends all sessions which may have not been properly ended when the
 		// server was last shut down
 		try {
@@ -1441,7 +1431,6 @@ public class SQLDatabase {
 		try {
 			this.connection.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.deleteFileSystemDirectory(new File(corruptFileSystem));
@@ -1449,7 +1438,6 @@ public class SQLDatabase {
 			this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
 			System.err.println("DATABASE WIPED AND RELOADED");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.err.println(
 					"Error recovering the database and file system from backup, restarting recovery proccess...");
@@ -1458,13 +1446,22 @@ public class SQLDatabase {
 				this.copyFileSystem(new File(BACKUP_FOLDER),
 						new File(LIVE_FOLDER));
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.err.println();
 				System.err.println(
-						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
+						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator or visit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
 				System.exit(0);
 			}
+		}
+
+		// Reconnects to the database
+		try {
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error connecting to database located at: "
+					+ LIVE_DATABASE);
 		}
 	}
 
@@ -1516,9 +1513,23 @@ public class SQLDatabase {
 		this.update("DELETE FROM Sessions;");
 	}
 
+	/**
+	 * Scans through all documents and user accounts, deletes all corrupted
+	 * documents / users.
+	 * 
+	 * @param databaseName
+	 *            the name of the database to scan.
+	 * @param dataFolder
+	 *            the folder which contains all of the data (i.e. the user and
+	 *            files folders).
+	 * @return Whether or not the corruption fixing process was successful. Only
+	 *         returns false if the corruption was not able to be fixed by
+	 *         removing select users / documents. otherwise, returns true.
+	 */
 	public boolean checkAndRepairFileSystemCorruption(String databaseName,
 			String dataFolder) {
 		try {
+			// Scans users for missing files and removes associates accounts
 			ResultSet response = this.query("SELECT Username FROM Users;");
 			while (response.next()) {
 				String username = response.getString("Username");
@@ -1528,33 +1539,31 @@ public class SQLDatabase {
 					this.closeAccount(username);
 				}
 			}
+
+			// Scans all documents for missing data and removes them
 			response = this.query("SELECT DocumentID FROM Documents;");
 			while (response.next()) {
 				String fileUUID = response.getString("DocumentID");
 				if (!DataManagement.getInstance()
 						.fileExists(UUID.fromString(fileUUID))) {
-					System.err.println("Deleting file ' " + fileUUID
+					System.err.println("Deleting file '" + fileUUID
 							+ "' due to corruption.");
 					this.deleteFile(fileUUID);
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// The repair process was not successful
+			// The repair process was not successful, thus must wipe database
+			// and entire file-system to ensure integrity of server.
 			try {
 				this.connection.close();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				return false;
 			}
 			return false;
 		}
-		try {
-			this.connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		return true;
 	}
 }

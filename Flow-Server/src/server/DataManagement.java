@@ -113,7 +113,6 @@ public class DataManagement {
 	 * @return whether or not the user exists
 	 */
 	public boolean userExists(String username) {
-		L.info("getting user " + username + " by username");
 		File userFile = new File(userDir, username + "." + USER_FILE_EXT);
 		if (!userFile.exists())
 			return false;
