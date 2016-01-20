@@ -34,15 +34,19 @@ public class DataManipulation {
 		String parentDirectoryId = directoryId;
 
 		StringBuilder path = new StringBuilder();
+		// Iteratively add the parent directories of the directory to the path
 		do {
 			directoryId = parentDirectoryId;
+
+			// Add a file separator character if there already a directory in
+			// the path
 			if (path.length() > 0)
 				path.insert(0, File.separator);
 			path.insert(0, directoryId);
 			try {
-				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
-						SQLDatabase.getInstance()
-								.getDirectoryInfo(directoryId))[0];
+				parentDirectoryId = Results
+						.toStringArray("ParentDirectoryID", SQLDatabase
+								.getInstance().getDirectoryInfo(directoryId))[0];
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());
@@ -73,15 +77,21 @@ public class DataManipulation {
 		}
 
 		StringBuilder path = new StringBuilder();
+
+		// Iteratively add the parent directories of the file to the path
 		do {
 			directoryId = parentDirectoryId;
+			// Add a file separator character if there already a file in
+			// the path
 			if (path.length() > 0)
 				path.insert(0, File.separator);
 			path.insert(0, directoryId);
+
+			// Get the parent directory of the current directory
 			try {
-				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
-						SQLDatabase.getInstance()
-								.getDirectoryInfo(directoryId))[0];
+				parentDirectoryId = Results
+						.toStringArray("ParentDirectoryID", SQLDatabase
+								.getInstance().getDirectoryInfo(directoryId))[0];
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());

@@ -1,7 +1,5 @@
 package server;
 
-import database.SQLDatabase;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,6 +8,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import database.SQLDatabase;
 
 /**
  * Main container for initiating database and dynamically dispatching clients to
@@ -21,24 +21,46 @@ import java.util.logging.Logger;
  */
 public class FlowServer implements Runnable {
 
+	/**
+	 * Single instance of the FlowServer class
+	 */
 	private static FlowServer instance;
 
-	private static Logger L = Logger.getLogger("FLOW");
+	/**
+	 * Common logger for the entire project
+	 */
+	private static Logger LOGGER = Logger.getLogger("FLOW");
 
 	/**
 	 * Represents an error caused by the server, rather than client.
 	 */
 	public static String ERROR = "INTERNAL_SERVER_ERROR";
 
+	/**
+	 * Port for all communication from client to server.
+	 */
 	public static final int PORT = 10244;
 
+	/**
+	 * Port for asynchronous communication to update clients of document
+	 * changes.
+	 */
 	public static final int ARC_PORT = 10225;
 
+	/**
+	 * Maximum amount of requests that can be handled at the same time.
+	 */
 	private static final int MAX_THREADS = 100;
+
+	/**
+	 * Array containing all active requests.
+	 */
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
+	/**
+	 * Initiates the SQLDatabase class.
+	 */
 	private FlowServer() {
-		// Load the SQLDatabase
 		SQLDatabase.getInstance();
 	}
 
@@ -58,7 +80,7 @@ public class FlowServer implements Runnable {
 	public void run() {
 		DataManagement.getInstance().init(new File("data"));
 		try {
-			L.info("started listening");
+			LOGGER.info("started listening");
 			ServerSocket serverSocket = new ServerSocket(PORT);
 			serverSocket.setReceiveBufferSize(64000);
 			serverSocket.setPerformancePreferences(1, 0, 0);
@@ -68,7 +90,7 @@ public class FlowServer implements Runnable {
 				// Make the socket favor short and latent connections
 				socket.setPerformancePreferences(1, 0, 0);
 				socket.setTcpNoDelay(true);
-				L.info("accepted connection from "
+				LOGGER.info("accepted connection from "
 						+ socket.getRemoteSocketAddress());
 				// Assign the client request a thread
 				int i = 0;
@@ -79,7 +101,7 @@ public class FlowServer implements Runnable {
 					++i;
 				} while (threadPool[i] != null);
 
-				L.info("Request assigned worker thread " + i);
+				LOGGER.info("Request assigned worker thread " + i);
 				Thread t = new Thread(new ClientRequestHandle(this, socket));
 				t.start();
 				threadPool[i] = t;
@@ -92,9 +114,7 @@ public class FlowServer implements Runnable {
 
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
-		//System.setProperty("java.util.logging.SimpleFormatter.format",
-		//		"%4$s: %5$s%n");
-		L.setLevel(Level.ALL);
+		LOGGER.setLevel(Level.ALL);
 		FlowServer server = FlowServer.getInstance();
 		new Thread(server).start();
 		new Thread(new AsyncServer(ARC_PORT)).start();
