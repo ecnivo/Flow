@@ -1349,20 +1349,30 @@ public class SQLDatabase {
 	}
 
 	/**
-	 *
-	 * @return
+	 * Check for any corruption in the specified database file using the backup
+	 * database as a look up.
+	 * 
+	 * @return whether or not any corruption was detected in the database. This
+	 *         method will return false if <b>any</b> table, table column name,
+	 *         or the table count is different than the backup database. Also,
+	 *         this method will catch any exceptions thrown when accessing the
+	 *         database and return false, as it signifies that the database is
+	 *         corrupted.
 	 */
-	public boolean checkForDatabaseCorruption(String databaseName,
+	private boolean checkForDatabaseCorruption(String databaseName,
 			String backUpDatabase) {
+		// Establish a connection to the backup database
 		try {
 			this.connection = DriverManager
 					.getConnection("jdbc:sqlite:" + backUpDatabase);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("Error connecting to database located at: "
+			System.err.println("Error connecting to database located at: "
 					+ backUpDatabase);
 			return false;
 		}
+
+		// Initialize the lists to carry data between the try / catch blocks
 		ArrayList<String> tableNames = new ArrayList<>();
 		ArrayList<ArrayList<String>> tableColumns = new ArrayList<>();
 		try {
@@ -1381,19 +1391,20 @@ public class SQLDatabase {
 				}
 				tableColumns.add(columnInfo);
 			}
+			this.connection.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Error loading database back up meta data: "
 					+ databaseName);
 			return false;
 		}
+		// Establish a connection to the live database
 		try {
 			this.connection = DriverManager
 					.getConnection("jdbc:sqlite:" + databaseName);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println(
+			System.err.println(
 					"Error connecting to database located at: " + databaseName);
 			return false;
 		}
@@ -1402,7 +1413,7 @@ public class SQLDatabase {
 			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
 			for (int i = 0; i < tableNames.size(); i++) {
 				// Test query for table corruption check
-				// SQLException will be thrown is corrupted
+				// SQLException will be thrown if corrupted
 				this.query(String.format("SELECT * FROM '%s';",
 						tableNames.get(i)));
 
@@ -1419,35 +1430,56 @@ public class SQLDatabase {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println(
-					"Error loading database meta data: " + databaseName);
+			System.err.println("Error accessing database: " + databaseName);
 			return false;
 		}
 		return true;
 	}
 
-	public void recoverFileSystem(String corruptFileSystem,
+	/**
+	 * Wipes and restores the specified file system with the provided backup.
+	 * 
+	 * @param corruptFileSystem
+	 *            the path to the corrupt folder (or where you want the restored
+	 *            file system to go).
+	 * @param backUpFileSystem
+	 *            the path to the folder containing the backup which will be
+	 *            copied into the corruptFileSystem path.
+	 * @throws IOException
+	 */
+	private void recoverFileSystem(String corruptFileSystem,
 			String backUpFileSystem) throws IOException {
+		// Close the connection before starting the procedure
 		try {
 			this.connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		// Delete all data in the corrupt file system path
 		this.deleteFileSystemDirectory(new File(corruptFileSystem));
+
+		// Copy over all directories and files from the back up folder to the
+		// specified path
 		try {
 			this.copyFileSystem(new File(BACKUP_FOLDER), new File(LIVE_FOLDER));
-			System.err.println("DATABASE WIPED AND RELOADED");
-		} catch (IOException e) {
+			System.err.println("Database recovery successful!");
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(
 					"Error recovering the database and file system from backup, restarting recovery proccess...");
+
+			// Is an exception is thrown, restart the restoration process one
+			// more time for a final try at recovery.
 			try {
 				this.deleteFileSystemDirectory(new File(corruptFileSystem));
 				this.copyFileSystem(new File(BACKUP_FOLDER),
 						new File(LIVE_FOLDER));
-			} catch (IOException e1) {
+			} catch (Exception e1) {
+				// If an exception is thrown again, likely even the backup files
+				// and corrupted / inaccessible / unusable. This means that
+				// recovery is unfortunately not possible.
 				e1.printStackTrace();
-				System.err.println();
 				System.err.println(
 						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator or visit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
 				System.exit(0);
@@ -1465,7 +1497,16 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Recursively deletes the specified file / directory and all of its
+	 * sub-directories files.
+	 * 
+	 * @param file
+	 *            the file or directory to delete.
+	 * @throws IOException
+	 */
 	private void deleteFileSystemDirectory(File file) throws IOException {
+		System.err.println("Deleting all user files and documents...");
 		File[] contents = file.listFiles();
 		if (contents != null) {
 			for (File tempFile : contents) {
@@ -1478,16 +1519,32 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Recursively copies all data from a backup folder to the specified folder.
+	 * 
+	 * @param backup
+	 *            the folder to copy data from.
+	 * @param live
+	 *            the path to copy data to.
+	 * @throws IOException
+	 *             if there is an error finding or reading from the files /
+	 *             directories.
+	 */
 	private void copyFileSystem(File backup, File live) throws IOException {
+		System.err.println("Restoring data from back up...");
 		if (backup.isDirectory()) {
+			// Create the folder at the specified path if it doesn't exist
 			if (!live.exists())
 				live.mkdirs();
+
+			// Recursively copy over all sub-directories and files
 			String[] files = backup.list();
 			for (String file : files) {
 				System.out.println(file);
 				copyFileSystem(new File(backup, file), new File(live, file));
 			}
 		} else {
+			// Copy the file data
 			FileInputStream in = new FileInputStream(backup);
 			System.out.println(live);
 			FileOutputStream out = new FileOutputStream(live);
@@ -1509,7 +1566,7 @@ public class SQLDatabase {
 	 * @throws SQLException
 	 *             if there is an error accessing the database.
 	 */
-	public void refreshSessions() throws SQLException {
+	private void refreshSessions() throws SQLException {
 		this.update("DELETE FROM Sessions;");
 	}
 
@@ -1526,9 +1583,11 @@ public class SQLDatabase {
 	 *         returns false if the corruption was not able to be fixed by
 	 *         removing select users / documents. otherwise, returns true.
 	 */
-	public boolean checkAndRepairFileSystemCorruption(String databaseName,
+	private boolean checkAndRepairFileSystemCorruption(String databaseName,
 			String dataFolder) {
 		try {
+			System.err.println(
+					"Searching for database and file system corruption...");
 			// Scans users for missing files and removes associates accounts
 			ResultSet response = this.query("SELECT Username FROM Users;");
 			while (response.next()) {
@@ -1563,7 +1622,6 @@ public class SQLDatabase {
 			}
 			return false;
 		}
-
 		return true;
 	}
 }
