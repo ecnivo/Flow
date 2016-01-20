@@ -27,16 +27,34 @@ public class SQLDatabase {
 	public static final String DRIVER = "org.sqlite.JDBC";
 
 	/**
-	 * Number of seconds to allow for searching before timeout
+	 * Number of seconds to allow for searching before timeout (this is a safety
+	 * net, as the socket times out before this)
 	 */
-	public static final int TIMEOUT = 5;
+	public static final int TIMEOUT = 1;
 
+	/**
+	 * Access levels used for projects
+	 */
 	public static final int NONE = 0, VIEW = 1, EDIT = 2, OWNER = 3;
 
+	/**
+	 * Used to signify the different types of possible documents.
+	 */
 	public static final String ARBITRARY_DOCUMENT = "ARBITRARY_DOCUMENT",
 			TEXT_DOCUMENT = "TEXT_DOCUMENT";
 
+	/**
+	 * Represents to location where all save data is stored relative to the
+	 * project directory, including the users, their documents, and the database
+	 * file. The backup copy is for use by the {@link copyFileSystem()} method
+	 * is recovering a corrupted database.
+	 */
 	public static final String BACKUP_FOLDER = "backup", LIVE_FOLDER = "data";
+
+	/**
+	 * Represents the location of the database file relative to the project
+	 * directory.
+	 */
 	public static final String BACKUP_DATABASE = BACKUP_FOLDER + File.separator
 			+ "FlowDatabse.db",
 			LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
@@ -54,9 +72,10 @@ public class SQLDatabase {
 	/**
 	 * Verifies integrity of the database file, file system, and synchronization
 	 * between the two. Tries to fix issues, but if not possible, reloads all
-	 * files from backup.
+	 * files from the backup.
 	 */
 	private SQLDatabase() {
+		// Load up the JDBC driver
 		try {
 			DriverManager.registerDriver(
 					(Driver) Class.forName(DRIVER).newInstance());
@@ -65,6 +84,9 @@ public class SQLDatabase {
 					.println("Error loading database driver: " + e.toString());
 			return;
 		}
+
+		// Check for corruption in the database and file system, try to repair,
+		// if not possible, recover from backup.
 		if ((!this.checkForDatabaseCorruption(LIVE_DATABASE, BACKUP_DATABASE))
 				|| (!this.checkAndRepairFileSystemCorruption(LIVE_DATABASE,
 						LIVE_FOLDER))) {
@@ -74,6 +96,8 @@ public class SQLDatabase {
 				e.printStackTrace();
 			}
 		}
+
+		// Reconnects to the database
 		try {
 			this.connection = DriverManager
 					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
@@ -82,6 +106,9 @@ public class SQLDatabase {
 			System.out.println("Error connecting to database located at: "
 					+ LIVE_DATABASE);
 		}
+
+		// Ends all sessions which may have not been properly ended when the
+		// server was last shut down
 		try {
 			this.refreshSessions();
 		} catch (SQLException e) {
@@ -146,15 +173,14 @@ public class SQLDatabase {
 	private String updateAccess(int accessLevel, String projectId,
 			String username) {
 		try {
-			if (this.query(String.format(
-					"SELECT Username FROM Users WHERE Username = '%s';",
-					username)).next()) {
+			// Check if user exists
+			if (this.userExists(username)) {
 
 				// Remove any old access status
 				this.update(String.format(
 						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
 						username, projectId));
-
+				//
 				if (accessLevel == EDIT || accessLevel == VIEW) {
 					this.update(String.format(
 							"INSERT INTO access values('%s', '%s', '%s');",
@@ -167,8 +193,8 @@ public class SQLDatabase {
 
 					// Change permissions of old owner
 					this.update(String.format(
-							"UPDATE Access SET AccessLevel = '2' WHERE ProjectID = '%s' AND AccessLevel = '%d';",
-							projectId, OWNER));
+							"UPDATE Access SET AccessLevel = '%d' WHERE ProjectID = '%s' AND AccessLevel = '%d';",
+							EDIT, projectId, OWNER));
 
 					// Changes the permissions of the user to be an owner
 					this.update("INSERT INTO access values('" + projectId
@@ -183,7 +209,10 @@ public class SQLDatabase {
 			} else {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
-		} catch (SQLException e) {
+		} catch (SQLException | DatabaseException e) {
+			// The only possible DatabaseException that could be thrown here is
+			// from userExists(), which could only use FlowServer#ERROR for the
+			// exception message
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
@@ -1018,9 +1047,8 @@ public class SQLDatabase {
 	 */
 	public boolean userExists(String username) throws DatabaseException {
 		try {
-			return this.query(
-					"SELECT * FROM users WHERE Username = '" + username + "';")
-					.next();
+			return this.query("SELECT Username FROM Users WHERE Username = '"
+					+ username + "';").next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
