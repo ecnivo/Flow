@@ -116,11 +116,6 @@ public class EditTabs extends JTabbedPane {
 		} else {
 			JOptionPane.showConfirmDialog(null, "The limit on currently open tabs is 25.\nThe reason for doing so is to save processing power and reduce strain on your system.\nIf you need more than 25 tabs at a time, consider reorganizing your workflow.", "Too many tabs!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 		}
-		// // Forces an update on the collaborators' list
-		// if (getParent().getParent().getParent() instanceof EditPane) {
-		// EditPane editPane = (EditPane) getParent().getParent().getParent();
-		// editPane.getCollabsList().refreshUserList();
-		// }
 		revalidate();
 		repaint();
 	}

@@ -392,29 +392,17 @@ public class EditArea extends JTextPane {
 		highlightSyntax();
 	}
 
-//	private Point findPoint(int index) {
-//		String text = getText();
-//		final int px = 5;
-//		final int py = 17;
-//		int y = 0, x = 0;
-//		for (int i = 0; i < index; i++) {
-//			char c = text.charAt(i);
-//			if (c == '\n') {
-//				x = 0;
-//				y++;
-//			} else {
-//				x++;
-//			}
-//		}
-//		System.out.println(x * px + " : " + y * py);
-//		return new Point(x * px, y * py);
-//	}
 
+	/**
+	 * Resets the current state of the file to the server
+	 */
 	private void resetToServer() {
+		// Gets the data
 		Data requestData = new Data("file_request");
 		requestData.put("file_uuid", fileUUID);
 		Data response = Communicator.communicate(requestData);
 		String status = response.get("status", String.class);
+		
 		if (response == null || status == null || !status.equals("OK")) {
 			EditTabs tabs = (EditTabs) scrolling.getParent();
 			if (tabs == null) {
@@ -425,7 +413,6 @@ public class EditArea extends JTextPane {
 		}
 
 		String text = new String(response.get("file_data", byte[].class)).replace("\r", "");
-//		System.out.println(text);
 		setText(text);
 		highlightSyntax();
 		revalidate();
@@ -468,24 +455,6 @@ public class EditArea extends JTextPane {
 		return fileUUID;
 	}
 
-//	/**
-//	 * Gets a caret by its username
-//	 *
-//	 * @param name
-//	 *            name of user
-//	 * @return the caret that corresponds with the name. Returns null if not
-//	 *         found.
-//	 */
-//	private UserCaret getCaretByUserName(String name) {
-//		name = name.trim();
-//		for (UserCaret userCaret : carets) {
-//			if (userCaret.toString().equals(name)) {
-//				return userCaret;
-//			}
-//		}
-//		return null;
-//	}
-
 	@Override
 	public void paintComponent(Graphics g) {
 		try {
@@ -494,15 +463,6 @@ public class EditArea extends JTextPane {
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		// Graphics2D g2d = (Graphics2D) g.create();
-		// for (UserCaret userCaret : carets) {
-		// g2d.setColor(Color.BLACK);
-		// g2d.fillRect((int) userCaret.getLocation().getX(), (int) userCaret
-		// .getLocation().getY(), 3, 17);
-		// }
-		// g2d.fillRect(0, 0, 100, 100);
-		// getUI().paint(g2d, this);
-		// g2d.dispose();
 	}
 
 	/**
