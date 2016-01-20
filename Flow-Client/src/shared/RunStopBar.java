@@ -1,10 +1,18 @@
 
 package shared;
 
+import compiler.CompilableText;
+import compiler.FlowCompiler;
+import compiler.FlowCompiler.NoJDKFoundException;
 import gui.FlowClient;
+import message.Data;
 
-import java.awt.FlowLayout;
-import java.awt.Image;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -15,23 +23,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.filechooser.FileFilter;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-
-import message.Data;
-
-import compiler.CompilableText;
-import compiler.FlowCompiler;
-import compiler.FlowCompiler.NoJDKFoundException;
 
 /**
  * A toolbar with run and stop buttons
@@ -155,6 +146,7 @@ public class RunStopBar extends JToolBar {
 							try {
 								errors = flowCompiler.build();
 							} catch (NoJDKFoundException e1) {
+								JOptionPane.showConfirmDialog(null, "Could not find a compatible JDK directory on your system to compile your code.\nThe next window will let you choose a path to the JDK.\nIt can be like C:\\Program Files\\Java\\jdk1.8.0_25\nThen, try compiling the code again.", "Cannot compile", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 								// Can't find the JDK
 								JFileChooser jdkChooser = new JFileChooser();
 								jdkChooser.setFileFilter(new FileFilter() {
