@@ -108,11 +108,13 @@ public class DataManagement {
 	/**
 	 * Checks if a user exists
 	 *
+	 * @param userDir
+	 *            the directory of the users folder
 	 * @param username
 	 *            The user's username
 	 * @return whether or not the user exists
 	 */
-	public boolean userExists(String username) {
+	public boolean userExists(String userDir, String username) {
 		File userFile = new File(userDir, username + "." + USER_FILE_EXT);
 		if (!userFile.exists())
 			return false;
@@ -241,7 +243,7 @@ public class DataManagement {
 		return td;
 	}
 
-	public boolean fileExists(UUID fileUUID) {
+	public boolean fileExists(String fileDir, UUID fileUUID) {
 		return new File(fileDir, fileUUID.toString()).exists();
 	}
 

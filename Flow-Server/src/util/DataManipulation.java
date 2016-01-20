@@ -1,11 +1,11 @@
 package util;
 
-import database.SQLDatabase;
-
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+
+import database.SQLDatabase;
 
 public class DataManipulation {
 
@@ -24,7 +24,6 @@ public class DataManipulation {
 			throws DatabaseException {
 		String parentDirectoryId = directoryId;
 
-		// TODO optimize for efficiency
 		StringBuilder path = new StringBuilder();
 		do {
 			directoryId = parentDirectoryId;
@@ -36,7 +35,6 @@ public class DataManipulation {
 						SQLDatabase.getInstance()
 								.getDirectoryInfo(directoryId))[0];
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());
 			}
@@ -62,11 +60,9 @@ public class DataManipulation {
 		try {
 			parentDirectoryId = fileData.getString("ParentDirectoryID");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		// TODO optimize for efficiency
 		StringBuilder path = new StringBuilder();
 		do {
 			directoryId = parentDirectoryId;
@@ -78,7 +74,6 @@ public class DataManipulation {
 						SQLDatabase.getInstance()
 								.getDirectoryInfo(directoryId))[0];
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new DatabaseException(e.getMessage());
 			}
@@ -92,7 +87,7 @@ public class DataManipulation {
 	 * to an array of UUID objects.
 	 * 
 	 * @param uuids
-	 *            Strings consisting of string representations of UUIDs.
+	 *            String objects consisting of string representations of UUIDs.
 	 * @return
 	 * @throws IllegalArgumentException
 	 *             If an on the Strings in the array do not conform to the

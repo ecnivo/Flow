@@ -60,6 +60,9 @@ public class SQLDatabase {
 			+ "FlowDatabse.db",
 			LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
 
+	public static final String LIVE_USERS = LIVE_FOLDER + File.separator
+			+ "users", LIVE_FILES = LIVE_FOLDER + File.separator + "files";
+
 	/**
 	 * Connection to the database.
 	 */
@@ -1589,7 +1592,8 @@ public class SQLDatabase {
 			ResultSet response = this.query("SELECT Username FROM Users;");
 			while (response.next()) {
 				String username = response.getString("Username");
-				if (!DataManagement.getInstance().userExists(username)) {
+				if (!DataManagement.getInstance().userExists(LIVE_USERS,
+						username)) {
 					System.err.println("Deleting account '" + username
 							+ "' due to corruption.");
 					this.closeAccount(username);
@@ -1600,8 +1604,8 @@ public class SQLDatabase {
 			response = this.query("SELECT DocumentID FROM Documents;");
 			while (response.next()) {
 				String fileUUID = response.getString("DocumentID");
-				if (!DataManagement.getInstance()
-						.fileExists(UUID.fromString(fileUUID))) {
+				if (!DataManagement.getInstance().fileExists(LIVE_FILES,
+						UUID.fromString(fileUUID))) {
 					System.err.println("Deleting file '" + fileUUID
 							+ "' due to corruption.");
 					this.deleteFile(fileUUID);

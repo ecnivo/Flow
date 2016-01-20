@@ -26,7 +26,7 @@ public class ClientRequestHandle implements Runnable {
 	private FlowServer server;
 	private SQLDatabase database;
 
-	private static Logger L = Logger.getLogger("ClientRequestHandle");
+	private static Logger LOGGER = Logger.getLogger("ClientRequestHandle");
 
 	public ClientRequestHandle(FlowServer server, Socket socket)
 			throws IOException {
@@ -47,7 +47,7 @@ public class ClientRequestHandle implements Runnable {
 			// Retrieve the request from the client
 			final Data data = psocket.receive();
 
-			L.info("receive: " + data.toString());
+			LOGGER.info("receive: " + data.toString());
 
 			// Create a Data object to send back to the client
 			final Data returnData = new Data();
@@ -86,13 +86,16 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", e.getMessage());
 				}
 				break;
+			// Allow the user to log in from another client
 			case "end_session":
 				returnData.put("status", this.database.removeSession(
 						data.get("session_id", UUID.class).toString()));
 				break;
+			// Modifications to a user account
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
+				// Creating a new account
 				case "REGISTER": {
 					String username = data.get("username", String.class),
 							password = data.get("password", String.class);
@@ -110,14 +113,18 @@ public class ClientRequestHandle implements Runnable {
 					}
 				}
 					break;
+				// Deleting an account and removing all associated data
 				case "CLOSE_ACCOUNT":
 					try {
 						String username = this.database.getUsername(
 								data.get("session_id", UUID.class).toString());
+
+						// Remove user from file system
 						if (!DataManagement.getInstance()
 								.removeUser(username)) {
 							returnData.put("status", FlowServer.ERROR);
 						} else {
+							// Remove user from database
 							returnData.put("status",
 									this.database.closeAccount(username));
 						}
@@ -126,17 +133,16 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", e.getMessage());
 					}
 					break;
+				// Associates a new password with the logged in user account
 				case "CHANGE_PASSWORD":
 					try {
-						returnData
-								.put("status",
-										this.database.changePassword(
-												this.database.getUsername(data
-														.get("session_id",
-																UUID.class)
-														.toString()),
-										data.get("new_password",
-												String.class)));
+						// Get the username from the session id
+						String username = this.database.getUsername(
+								data.get("session_id", UUID.class).toString()),
+								password = data.get("new_password",
+										String.class);
+						returnData.put("status", this.database
+								.changePassword(username, password));
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						returnData.put("status", e.getMessage());
@@ -144,8 +150,9 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				}
 				break;
+			// Retrieve the UUIDs of all projects which a user has at least view
+			// access to
 			case "list_projects":
-				// Initialized as null to prevent errors
 				try {
 					ResultSet temp = this.database.getSessionInfo(
 							data.get("session_id", UUID.class).toString());
@@ -156,17 +163,13 @@ public class ClientRequestHandle implements Runnable {
 					else {
 						ResultSet projects = this.database
 								.getProjects(username);
-						String[][] response = Results.toStringArray(
-								new String[] { "ProjectID" }, projects);
-						UUID[] projectUUIDs = new UUID[response.length];
+						String[] response = Results.toStringArray("ProjectID",
+								projects);
 						if (response == null || response[0] == null) {
 							returnData.put("projects", new UUID[0]);
 						} else {
-							for (int i = 0; i < response.length; i++) {
-								projectUUIDs[i] = UUID
-										.fromString(response[i][0]);
-							}
-							returnData.put("projects", projectUUIDs);
+							returnData.put("projects", DataManipulation
+									.getUUIDsFromArray(response));
 						}
 						returnData.put("status", "OK");
 					}
@@ -178,28 +181,40 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Creates a new project with the logged in user as the owner
 			case "new_project":
 				try {
 					String projectName = data.get("project_name", String.class);
 					String username = this.database.getUsername(
 							data.get("session_id", UUID.class).toString());
+					// Generate a random UUID
 					UUID uuid = UUID.randomUUID();
+
+					// Set the status equal to the result of creating the new
+					// project
 					String status = this.database.newProject(uuid.toString(),
 							projectName, username);
 					returnData.put("status", status);
+
+					// Only provide the user with the project UUID if and only
+					// if the project was created successfully
 					if (status != null && status.equals("OK")) {
 						returnData.put("project_uuid", uuid);
 					}
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
 				break;
+			// Creates a new text file inside the specified directory and
+			// project
 			case "new_text_file":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class),
 							sessionID = data.get("session_id", UUID.class);
+
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID directoryUUID = data.get("directory_uuid",
@@ -207,21 +222,35 @@ public class ClientRequestHandle implements Runnable {
 								versionUUID = UUID.randomUUID();
 						String documentName = data.get("file_name",
 								String.class);
+
+						// Validate that the file name meets the specified
+						// standards
 						if (Validator.validFileName(documentName)) {
-							// TODO add the version to the database
+							// Only create the directories and file in the file
+							// system, and provide the user with the file UUID
+							// if all the database operations were completed
+							// successfully
 							String status = this.database.newFile(
 									fileUUID.toString(), documentName,
 									projectUUID.toString(),
 									directoryUUID.toString(), "TEXT_DOCUMENT");
 							if (status.equals("OK")) {
-								this.database.newVersion(fileUUID.toString(),
+								status = this.database.newVersion(
+										fileUUID.toString(),
 										versionUUID.toString());
-								VersionText newTextDocument = new VersionText();
-								VersionManager.getInstance().addTextVersion(
-										fileUUID, versionUUID, newTextDocument);
-								DataManagement.getInstance().flushTextToDisk(
-										fileUUID, versionUUID, newTextDocument);
-								returnData.put("file_uuid", fileUUID);
+								if (status.equals("OK")) {
+									// Create the document
+									VersionText newTextDocument = new VersionText();
+									VersionManager.getInstance().addTextVersion(
+											fileUUID, versionUUID,
+											newTextDocument);
+									// Save the document to the disk
+									DataManagement.getInstance()
+											.flushTextToDisk(fileUUID,
+													versionUUID,
+													newTextDocument);
+									returnData.put("file_uuid", fileUUID);
+								}
 							}
 							returnData.put("status", status);
 						} else {
@@ -231,17 +260,21 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Creates a new directory inside the specified directory and
+			// project
 			case "new_directory":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
 					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
 							UUID.class);
 					UUID sessionID = data.get("session_id", UUID.class);
+
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID random = UUID.randomUUID();
@@ -257,7 +290,6 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					returnData.put("status", FlowServer.ERROR);
 				}
@@ -271,12 +303,17 @@ public class ClientRequestHandle implements Runnable {
 						String username = data.get("username", String.class);
 						int accessLevel = (int) data.get("access_level",
 								Byte.class);
+
+						// Verify if the user is the owner of the project
 						if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
 							returnData.put("status",
 									this.database.ownerUpdateAccess(accessLevel,
 											projectUUID.toString(), username));
+
+							// Otherwise, verify if the user has at least edit
+							// access to the project
 						} else if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.EDIT)) {
@@ -295,6 +332,7 @@ public class ClientRequestHandle implements Runnable {
 					}
 						break;
 					case "DELETE_PROJECT":
+						// Verify if the user is the owner of the project
 						if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
@@ -320,6 +358,8 @@ public class ClientRequestHandle implements Runnable {
 									.getProjectUUIDFromDirectory(
 											directoryUUID.toString());
 
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID, projectUUID,
 							SQLDatabase.EDIT)) {
 						String type = data.get("mod_type", String.class);
@@ -339,7 +379,6 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
@@ -352,6 +391,9 @@ public class ClientRequestHandle implements Runnable {
 							.toString(),
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
+
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID, projectUUID,
 							SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
@@ -376,8 +418,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status", "ACCESS_DENIED");
 					}
 				} catch (DatabaseException e) {
-					e.printStackTrace();
-					L.severe(e.getMessage());
+					LOGGER.severe(e.getMessage());
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
@@ -387,6 +428,8 @@ public class ClientRequestHandle implements Runnable {
 					String sessionID = data.get("session_id", UUID.class)
 							.toString();
 
+					// Verify if the user has at least view access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID.toString())) {
 						ResultSet databaseResponse = this.database
@@ -425,7 +468,8 @@ public class ClientRequestHandle implements Runnable {
 									.getProjectUUIDFromDirectory(
 											directoryUUID.toString());
 
-					// Verify is the user has at least view access
+					// Verify if the user has at least view access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						// Add information from the Directories table
@@ -463,11 +507,11 @@ public class ClientRequestHandle implements Runnable {
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
-					L.severe(e.getMessage());
+					LOGGER.severe(e.getMessage());
 					data.put("status", FlowServer.ERROR);
 				} catch (SQLException e) {
 					e.printStackTrace();
-					L.severe(e.getMessage());
+					LOGGER.severe(e.getMessage());
 					data.put("status", e.getMessage());
 				}
 				break;
@@ -481,7 +525,8 @@ public class ClientRequestHandle implements Runnable {
 							projectUUID = this.database
 									.getProjectUUIDFromFile(fileUUID);
 
-					// Verify is the user has at least view access
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						// Add information from the Documents table
@@ -499,11 +544,11 @@ public class ClientRequestHandle implements Runnable {
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
-					L.severe(e.getMessage());
+					LOGGER.severe(e.getMessage());
 					returnData.put("status", e.getMessage());
 				} catch (SQLException e) {
 					e.printStackTrace();
-					L.severe(e.getMessage());
+					LOGGER.severe(e.getMessage());
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
@@ -516,6 +561,8 @@ public class ClientRequestHandle implements Runnable {
 							projectUUID = this.database
 									.getProjectUUIDFromVersion(versionUUID);
 
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						returnData.put("date",
@@ -537,6 +584,9 @@ public class ClientRequestHandle implements Runnable {
 							.toString(),
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
+
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						byte[] bytes = null;
@@ -569,6 +619,9 @@ public class ClientRequestHandle implements Runnable {
 							.toString(),
 							projectUUID = this.database.getProjectUUIDFromFile(
 									fileUUID.toString());
+
+					// Verify if the user has at least edit access to the
+					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						UUID versionUUID = UUID.fromString(this.database
@@ -625,7 +678,8 @@ public class ClientRequestHandle implements Runnable {
 								.doCallbackEvent(fileUUID, event);
 						if (len == -1) {
 							td.setDocumentText("");
-							L.info("clearing document because of negative length");
+							LOGGER.info(
+									"clearing document because of negative length");
 						}
 						while (len-- > 0)
 							td.delete(idx);
@@ -646,34 +700,35 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			default:
-				// For completeness's sake
 				returnData.put("status", "INVALID_REQUEST_TYPE");
 				break;
 			}
 			this.psocket.send(returnData);
-			L.info("response: " + returnData.toString());
+			LOGGER.info("response: " + returnData.toString());
 		} catch (IOException e) {
-			L.warning("communication error: " + e.getMessage());
+			LOGGER.warning("communication error: " + e.getMessage());
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			L.warning("ClassNotFoundException error: " + e.getMessage());
+			LOGGER.warning("ClassNotFoundException error: " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			L.severe("Internal Server Error: " + e.getMessage());
+			// Catch all possible exceptions to prevent mallacious requests from
+			// crashing the server.
+			LOGGER.severe("Internal Server Error: " + e.getMessage());
 			e.printStackTrace();
 			Data data = new Data();
 			data.put("status", FlowServer.ERROR);
 			try {
-				psocket.send(data);
+				this.psocket.send(data);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
 
 		try {
-			socket.close();
+			this.socket.close();
 		} catch (IOException e) {
-			L.severe("failure to close socket");
+			LOGGER.severe("failure to close socket");
 		}
 	}
 }
