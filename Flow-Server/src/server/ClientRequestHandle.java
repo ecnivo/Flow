@@ -294,17 +294,20 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Modifies data associated with the specified project
 			case "project_modify": {
 				UUID projectUUID = data.get("project_uuid", UUID.class),
 						sessionID = data.get("session_id", UUID.class);
 				try {
 					switch (data.get("project_modify_type", String.class)) {
+					// Modify the access levels of users to the project
 					case "MODIFY_COLLABORATOR":
 						String username = data.get("username", String.class);
 						int accessLevel = (int) data.get("access_level",
 								Byte.class);
 
-						// Verify if the user is the owner of the project
+						// Verify if the user is the owner of the project and
+						// provide a more open access updating method
 						if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
@@ -313,7 +316,8 @@ public class ClientRequestHandle implements Runnable {
 											projectUUID.toString(), username));
 
 							// Otherwise, verify if the user has at least edit
-							// access to the project
+							// access to the project, and provide a more
+							// restricted update access method
 						} else if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.EDIT)) {
@@ -325,12 +329,14 @@ public class ClientRequestHandle implements Runnable {
 							returnData.put("status", "ACCESS_DENIED");
 						}
 						break;
+					// Change the name associated with the project
 					case "RENAME_PROJECT": {
 						String newName = data.get("new_name", String.class);
 						returnData.put("status", this.database.renameProject(
 								projectUUID.toString(), newName));
 					}
 						break;
+					// Completely delete the project and all associated files
 					case "DELETE_PROJECT":
 						// Verify if the user is the owner of the project
 						if (this.database.verifyPermissions(
@@ -349,6 +355,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
+			// Modify data associated with the specified directory
 			case "directory_modify": {
 				try {
 					UUID directoryUUID = data.get("directory_uuid", UUID.class);
@@ -364,12 +371,15 @@ public class ClientRequestHandle implements Runnable {
 							SQLDatabase.EDIT)) {
 						String type = data.get("mod_type", String.class);
 						switch (type) {
+						// Associate a new name with the directory
 						case "RENAME":
 							String newName = data.get("new_name", String.class);
 							returnData.put("status",
 									this.database.renameDirectory(
 											directoryUUID.toString(), newName));
 							break;
+						// Completely delete the directory and all associated
+						// files
 						case "DELETE":
 							returnData.put("status", this.database
 									.deleteDirectory(directoryUUID.toString()));
@@ -384,6 +394,7 @@ public class ClientRequestHandle implements Runnable {
 				}
 			}
 				break;
+			// Modify meta data associated with the specified file
 			case "file_metadata_modify":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
@@ -398,6 +409,7 @@ public class ClientRequestHandle implements Runnable {
 							SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
 						switch (modType) {
+						// Associate a new name with the directory
 						case "RENAME":
 							String name = data.get("name", String.class);
 							if (Validator.validFileName(name)) {
@@ -407,6 +419,8 @@ public class ClientRequestHandle implements Runnable {
 								returnData.put("status", "FILE_NAME_INVALID");
 							}
 							break;
+						// Completely delete the file and all associated
+						// versions
 						case "DELETE":
 							DataManagement.getInstance()
 									.removeFileByUUID(fileUUID);
@@ -422,29 +436,34 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Retrieves information about a specific project
 			case "project_info":
 				try {
-					UUID projectUUID = data.get("project_uuid", UUID.class);
+					String projectUUID = data.get("project_uuid", UUID.class)
+							.toString();
 					String sessionID = data.get("session_id", UUID.class)
 							.toString();
 
 					// Verify if the user has at least view access to the
 					// project
 					if (this.database.verifyPermissions(sessionID,
-							projectUUID.toString())) {
+							projectUUID)) {
 						ResultSet databaseResponse = this.database
-								.getProjectInfo(projectUUID.toString());
+								.getProjectInfo(projectUUID);
 						returnData.put("project_name",
 								databaseResponse.getString("ProjectName"));
-						returnData.put("editors", this.database.getUsers(
-								projectUUID.toString(), SQLDatabase.EDIT));
-						returnData.put("viewers", this.database.getUsers(
-								projectUUID.toString(), SQLDatabase.VIEW));
-						returnData
-								.put("owner",
-										this.database.getUsers(
-												projectUUID.toString(),
-												SQLDatabase.OWNER)[0]);
+						returnData.put("editors", this.database
+								.getUsers(projectUUID, SQLDatabase.EDIT));
+						returnData.put("viewers", this.database
+								.getUsers(projectUUID, SQLDatabase.VIEW));
+
+						// Get the first index of the array as their could only
+						// be one owner of the project
+						returnData.put("owner", this.database
+								.getUsers(projectUUID, SQLDatabase.OWNER)[0]);
+
+						// If no exceptions were thrown up to this point, no
+						// errors occurred in the data retrieval
 						returnData.put("status", "OK");
 					} else {
 						returnData.put("status", "ACCESS_DENIED");
@@ -457,6 +476,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Retrieves information about a specific directory
 			case "directory_info":
 				try {
 					// Load the required data from the data packet
@@ -489,8 +509,7 @@ public class ClientRequestHandle implements Runnable {
 										.toStringArray("DocumentID", results)));
 
 						// Add information from all sub directories located
-						// inside
-						// the specified directory
+						// inside the specified directory
 						results = this.database.getDirectoriesInDirectory(
 								directoryUUID.toString());
 						returnData.put("child_directories",
@@ -499,8 +518,7 @@ public class ClientRequestHandle implements Runnable {
 												results)));
 
 						// If no exceptions were thrown up to this point, no
-						// errors
-						// occurred in the data retrieval.
+						// errors occurred in the data retrieval.
 						returnData.put("status", "OK");
 					} else {
 						returnData.put("status", "ACCESS_DENIED");
@@ -515,6 +533,7 @@ public class ClientRequestHandle implements Runnable {
 					data.put("status", e.getMessage());
 				}
 				break;
+			// Retrieves information about a specific file
 			case "file_info":
 				try {
 					// Load the required data from the data packet
@@ -529,12 +548,14 @@ public class ClientRequestHandle implements Runnable {
 					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
-						// Add information from the Documents table
+						// And file meta data information
 						ResultSet results = this.database.getFileInfo(fileUUID);
 						returnData.put("file_name",
 								results.getString("DocumentName"));
 						returnData.put("file_type",
 								results.getString("FileType"));
+
+						// Add the UUIDs of all of the version of the file
 						returnData.put("file_versions",
 								DataManipulation.getUUIDsFromArray(this.database
 										.getFileVersions(fileUUID)));
@@ -552,6 +573,7 @@ public class ClientRequestHandle implements Runnable {
 					returnData.put("status", FlowServer.ERROR);
 				}
 				break;
+			// Retrieves information about a specific version
 			case "version_info":
 				try {
 					String versionUUID = data.get("version_uuid", UUID.class)
@@ -565,6 +587,7 @@ public class ClientRequestHandle implements Runnable {
 					// project
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
+
 						returnData.put("date",
 								this.database.getVersionDate(versionUUID));
 						returnData.put("status", "OK");
@@ -575,7 +598,7 @@ public class ClientRequestHandle implements Runnable {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
 				}
-
+				// Retrieves the specified version of a file
 			case "request_version":
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class),
@@ -590,6 +613,10 @@ public class ClientRequestHandle implements Runnable {
 					if (this.database.verifyPermissions(sessionID,
 							projectUUID)) {
 						byte[] bytes = null;
+
+						// Retrieve the data of the file differently based on
+						// the file type (as arbitrary document versions are
+						// stored as full copies)
 						String fileType = this.database
 								.getFileType(fileUUID.toString());
 						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
