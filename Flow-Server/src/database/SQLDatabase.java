@@ -39,8 +39,8 @@ public class SQLDatabase {
 
 	public static final String BACKUP_FOLDER = "backup", LIVE_FOLDER = "data";
 	public static final String BACKUP_DATABASE = BACKUP_FOLDER + File.separator
-			+ "FlowDatabse.db", LIVE_DATABASE = LIVE_FOLDER + File.separator
-			+ "FlowDatabse.db";
+			+ "FlowDatabse.db",
+			LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
 
 	/**
 	 * Connection to the database.
@@ -54,8 +54,8 @@ public class SQLDatabase {
 
 	public SQLDatabase() {
 		try {
-			DriverManager.registerDriver((Driver) Class.forName(DRIVER)
-					.newInstance());
+			DriverManager.registerDriver(
+					(Driver) Class.forName(DRIVER).newInstance());
 		} catch (Exception e) {
 			System.out
 					.println("Error loading database driver: " + e.toString());
@@ -71,8 +71,8 @@ public class SQLDatabase {
 			}
 		}
 		try {
-			this.connection = DriverManager.getConnection("jdbc:sqlite:"
-					+ LIVE_DATABASE);
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + LIVE_DATABASE);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Error connecting to database located at: "
@@ -81,6 +81,7 @@ public class SQLDatabase {
 		try {
 			this.refreshSessions();
 		} catch (SQLException e) {
+			e.printStackTrace();
 			System.out.println("Error refreshing sessions");
 		}
 		instance = this;
@@ -135,15 +136,14 @@ public class SQLDatabase {
 	public String updateAccess(int accessLevel, String projectId,
 			String username) {
 		try {
-			if (this.query(
-					String.format(
-							"SELECT Username FROM Users WHERE Username = '%s';",
-							username)).next()) {
+			if (this.query(String.format(
+					"SELECT Username FROM Users WHERE Username = '%s';",
+					username)).next()) {
 
 				// Remove any old access status
-				this.update(String
-						.format("DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-								username, projectId));
+				this.update(String.format(
+						"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+						username, projectId));
 
 				if (accessLevel == EDIT || accessLevel == VIEW) {
 					this.update(String.format(
@@ -151,22 +151,22 @@ public class SQLDatabase {
 							projectId, username, accessLevel));
 				} else if (accessLevel == OWNER) {
 					// Changes the owner of the project in the projects table
-					this.update(String
-							.format("UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
-									username, projectId));
+					this.update(String.format(
+							"UPDATE projects SET OwnerUsername = '%s' WHERE ProjectID = '%s';",
+							username, projectId));
 
 					// Change permissions of old owner
-					this.update(String
-							.format("UPDATE Access SET AccessLevel = '2' WHERE ProjectID = '%s' AND AccessLevel = '%d';",
-									projectId, OWNER));
+					this.update(String.format(
+							"UPDATE Access SET AccessLevel = '2' WHERE ProjectID = '%s' AND AccessLevel = '%d';",
+							projectId, OWNER));
 
 					// Changes the permissions of the user to be an owner
 					this.update("INSERT INTO access values('" + projectId
 							+ "', '" + username + "', '" + OWNER + "');");
 				} else if (accessLevel == NONE) {
-					this.update(String
-							.format("DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-									username, projectId));
+					this.update(String.format(
+							"DELETE FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+							username, projectId));
 				} else {
 					return "ACCESS_LEVEL_INVALID";
 				}
@@ -183,10 +183,9 @@ public class SQLDatabase {
 	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
 			String username) throws DatabaseException {
 		try {
-			ResultSet data = this
-					.query(String
-							.format("SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
-									projectUUID));
+			ResultSet data = this.query(String.format(
+					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
 			if (data.next()) {
 				if (accessLevel == OWNER
 						|| username.equals(data.getString("OwnerUsername"))) {
@@ -218,10 +217,9 @@ public class SQLDatabase {
 	public String ownerUpdateAccess(int accessLevel, String projectUUID,
 			String username) throws DatabaseException {
 		try {
-			ResultSet data = this
-					.query(String
-							.format("SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
-									projectUUID));
+			ResultSet data = this.query(String.format(
+					"SELECT OwnerUsername FROM Projects WHERE ProjectID = '%s';",
+					projectUUID));
 			if (data.next()) {
 				if (username.equals(data.getString("OwnerUsername"))) {
 					return "ACCESS_DENIED";
@@ -289,10 +287,9 @@ public class SQLDatabase {
 			throws DatabaseException {
 		try {
 			// TODO Add check if for project is exists
-			return this
-					.query(String
-							.format("SELECT * FROM directories WHERE ParentDirectoryID = '%s';",
-									directoryUUID));
+			return this.query(String.format(
+					"SELECT * FROM directories WHERE ParentDirectoryID = '%s';",
+					directoryUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// TODO: this won't be called for the above reason, move this
@@ -313,15 +310,14 @@ public class SQLDatabase {
 	public String newProject(String projectId, String projectName,
 			String ownerId) {
 		try {
-			if (this.query(
-					String.format(
-							"SELECT * FROM Projects WHERE ProjectName = '%s' and OwnerUsername = '%s';",
-							projectName, ownerId)).next()) {
+			if (this.query(String.format(
+					"SELECT * FROM Projects WHERE ProjectName = '%s' and OwnerUsername = '%s';",
+					projectName, ownerId)).next()) {
 				return "PROJECT_NAME_INVALID";
 			}
 			this.update(String.format(
-					"INSERT INTO projects VALUES('%s', '%s', '%s');",
-					projectId, projectName, ownerId));
+					"INSERT INTO projects VALUES('%s', '%s', '%s');", projectId,
+					projectName, ownerId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -345,18 +341,17 @@ public class SQLDatabase {
 	public String newFile(String fileUUID, String fileName, String projectUUID,
 			String directoryUUID, String fileType) {
 		try {
-			if (this.query(
-					String.format(
-							"SELECT * FROM Documents WHERE ParentDirectoryID = '%s' AND DocumentName = '%s';",
-							directoryUUID, fileName)).next()) {
+			if (this.query(String.format(
+					"SELECT * FROM Documents WHERE ParentDirectoryID = '%s' AND DocumentName = '%s';",
+					directoryUUID, fileName)).next()) {
 				return "FILE_NAME_INVALID";
 			}
 			if (fileType.equals(ARBITRARY_DOCUMENT)
 					|| fileType.equals(TEXT_DOCUMENT)) {
-				this.update(String
-						.format("INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');",
-								fileUUID, projectUUID, fileName, directoryUUID,
-								fileType));
+				this.update(String.format(
+						"INSERT INTO documents VALUES('%s', '%s', '%s', '%s', '%s');",
+						fileUUID, projectUUID, fileName, directoryUUID,
+						fileType));
 			} else {
 				// This cannot be the client's error as the type is determined
 				// by the request type (new_arbitrarydocument and
@@ -386,17 +381,18 @@ public class SQLDatabase {
 	public String newDirectory(String directoryName, String directoryId,
 			String projectId, String parentDirectoryId) {
 		try {
-			if (this.query(
-					String.format(
-							"SELECT * FROM Directories WHERE ParentDirectoryID = '%s' AND DirectoryName = '%s';",
-							parentDirectoryId, directoryName)).next()) {
+			if (this.query(String.format(
+					"SELECT * FROM Directories WHERE ParentDirectoryID = '%s' AND DirectoryName = '%s';",
+					parentDirectoryId, directoryName)).next()) {
 				return "DIRECTORY_NAME_INVALID";
 			}
 			// TODO Change this to not require parentDirectoryId
-			this.update(String.format(
-					"INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
-					directoryId, parentDirectoryId.equals(directoryId) ? "null"
-							: parentDirectoryId, directoryName, projectId));
+			this.update(String
+					.format("INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
+							directoryId,
+							parentDirectoryId.equals(directoryId) ? "null"
+									: parentDirectoryId,
+							directoryName, projectId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -436,10 +432,9 @@ public class SQLDatabase {
 	 */
 	public ResultSet getUserNames(String projectId) throws DatabaseException {
 		try {
-			if (!this.query(
-					String.format(
-							"SELECT * from projects WHERE ProjectID = '%s';",
-							projectId)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectId)).next()) {
 				throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
 			}
 			return this.query(String.format(
@@ -494,14 +489,13 @@ public class SQLDatabase {
 	public boolean newSession(String username, String sessionId)
 			throws DatabaseException {
 		try {
-			if (this.query(
-					String.format(
-							"SELECT Username from Sessions WHERE Username = '%s';",
-							username)).next())
+			if (this.query(String.format(
+					"SELECT Username from Sessions WHERE Username = '%s';",
+					username)).next())
 				throw new DatabaseException("USER_ALREADY_LOGGED_IN");
-			this.update(String.format(
-					"INSERT INTO sessions VALUES ('%s', '%s');", username,
-					sessionId));
+			this.update(
+					String.format("INSERT INTO sessions VALUES ('%s', '%s');",
+							username, sessionId));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -543,9 +537,9 @@ public class SQLDatabase {
 	 */
 	public ResultSet getSessionInfo(String sessionId) throws DatabaseException {
 		try {
-			ResultSet temp = this.query(String
-					.format("SELECT * FROM sessions WHERE SessionID = '%s';",
-							sessionId));
+			ResultSet temp = this.query(String.format(
+					"SELECT * FROM sessions WHERE SessionID = '%s';",
+					sessionId));
 			if (temp.next()) {
 				// Duplicate query because SQLite doesn't support moving back in
 				// data (i.e. creating non 'TYPE_FORWARD_ONLY' ResultSets)
@@ -574,16 +568,16 @@ public class SQLDatabase {
 	 *         <li>The selected username already exists in the database.</li>
 	 *         <li>An error was thrown when searching the database for all
 	 *         current users.</li>
-	 *         <li>An error was thrown when inserting user into the database.</li>
+	 *         <li>An error was thrown when inserting user into the database.
+	 *         </li>
 	 *         </ul>
 	 */
 	public String addUser(String username, String password) {
 		try {
 			// Checks if a user with the specified username already exsists
-			if (this.query(
-					String.format(
-							"SELECT username FROM users WHERE Username = '%s';",
-							username)).next()) {
+			if (this.query(String.format(
+					"SELECT username FROM users WHERE Username = '%s';",
+					username)).next()) {
 				return "USERNAME_TAKEN";
 			}
 		} catch (SQLException e) {
@@ -614,10 +608,9 @@ public class SQLDatabase {
 	 */
 	public ResultSet getFileInfo(String fileId) throws DatabaseException {
 		try {
-			ResultSet temp = this
-					.query(String.format(
-							"SELECT * from documents WHERE DocumentID = '%s';",
-							fileId));
+			ResultSet temp = this.query(String.format(
+					"SELECT * from documents WHERE DocumentID = '%s';",
+					fileId));
 			if (temp.next()) {
 				return temp;
 			} else {
@@ -697,19 +690,18 @@ public class SQLDatabase {
 	public String renameProject(String projectUUID, String newName) {
 		// TODO Check if name is valid
 		try {
-			if (!this.query(
-					String.format(
-							"SELECT * from projects WHERE ProjectID = '%s';",
-							projectUUID)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectUUID)).next()) {
 				return "INVALID_PROJECT_UUID";
 			}
-			this.update(String
-					.format("UPDATE projects SET ProjectName = '%s' WHERE ProjectID = '%s';",
-							newName, projectUUID));
+			this.update(String.format(
+					"UPDATE projects SET ProjectName = '%s' WHERE ProjectID = '%s';",
+					newName, projectUUID));
 
-			this.update(String
-					.format("UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
-							newName, projectUUID));
+			this.update(String.format(
+					"UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
+					newName, projectUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -729,21 +721,19 @@ public class SQLDatabase {
 	 */
 	public String renameDirectory(String directoryUUID, String newName) {
 		try {
-			if (!this
-					.query(String
-							.format("SELECT * from directories WHERE DirectoryID = '%s';",
-									directoryUUID)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from directories WHERE DirectoryID = '%s';",
+					directoryUUID)).next()) {
 				return "INVALID_DIRECTORY_UUID";
 			}
-			if (this.query(
-					String.format(
-							"SELECT * FROM Directories WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Directories WHERE DirectoryID = '%s') AND DirectoryName = '%s';",
-							directoryUUID, newName)).next()) {
+			if (this.query(String.format(
+					"SELECT * FROM Directories WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Directories WHERE DirectoryID = '%s') AND DirectoryName = '%s';",
+					directoryUUID, newName)).next()) {
 				return "DIRECTORY_NAME_INVALID";
 			}
-			this.update(String
-					.format("UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
-							newName, directoryUUID));
+			this.update(String.format(
+					"UPDATE Directories SET DirectoryName = '%s' WHERE DirectoryID = '%s';",
+					newName, directoryUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -763,21 +753,19 @@ public class SQLDatabase {
 	 */
 	public String renameFile(String fileUUID, String newName) {
 		try {
-			if (!this.query(
-					String.format(
-							"SELECT * from Documents WHERE DocumentID = '%s';",
-							fileUUID)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from Documents WHERE DocumentID = '%s';",
+					fileUUID)).next()) {
 				return "INVALID_FILE_UUID";
 			}
-			if (this.query(
-					String.format(
-							"SELECT * FROM Documents WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Documents WHERE DocumentID = '%s') AND DocumentName = '%s';",
-							fileUUID, newName)).next()) {
+			if (this.query(String.format(
+					"SELECT * FROM Documents WHERE ParentDirectoryID = (SELECT ParentDirectoryID FROM Documents WHERE DocumentID = '%s') AND DocumentName = '%s';",
+					fileUUID, newName)).next()) {
 				return "FILE_NAME_INVALID";
 			}
-			this.update(String
-					.format("UPDATE Documents SET DocumentName = '%s' WHERE DocumentID = '%s';",
-							newName, fileUUID));
+			this.update(String.format(
+					"UPDATE Documents SET DocumentName = '%s' WHERE DocumentID = '%s';",
+					newName, fileUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
@@ -802,10 +790,9 @@ public class SQLDatabase {
 	 */
 	public String deleteProject(String projectId) {
 		try {
-			if (!this.query(
-					String.format(
-							"SELECT * from projects WHERE ProjectID = '%s';",
-							projectId)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from projects WHERE ProjectID = '%s';",
+					projectId)).next()) {
 				return "INVALID_PROJECT_UUID";
 			}
 			this.update(String.format(
@@ -813,7 +800,8 @@ public class SQLDatabase {
 			this.update(String.format(
 					"DELETE FROM access WHERE ProjectID = '%s';", projectId));
 			this.update(String.format(
-					"DELETE FROM documents WHERE ProjectID = '%s';", projectId));
+					"DELETE FROM documents WHERE ProjectID = '%s';",
+					projectId));
 			this.update(String.format(
 					"DELETE FROM directories WHERE ProjectID = '%s';",
 					projectId));
@@ -834,10 +822,9 @@ public class SQLDatabase {
 	 */
 	public String deleteDirectory(String directoryUUID) {
 		try {
-			if (!this
-					.query(String
-							.format("SELECT * from Directories WHERE DirectoryID = '%s';",
-									directoryUUID)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from Directories WHERE DirectoryID = '%s';",
+					directoryUUID)).next()) {
 				return "INVALID_DIRECTORY_UUID";
 			}
 			this.update(String.format(
@@ -852,8 +839,8 @@ public class SQLDatabase {
 
 				// Recursively delete all sub directories and files
 				while (subDirectories.next()) {
-					this.deleteDirectory(subDirectories
-							.getString("DirectoryID"));
+					this.deleteDirectory(
+							subDirectories.getString("DirectoryID"));
 				}
 			} catch (DatabaseException e) {
 				e.printStackTrace();
@@ -876,14 +863,14 @@ public class SQLDatabase {
 	 */
 	public String deleteFile(String fileUUID) {
 		try {
-			if (!this.query(
-					String.format(
-							"SELECT * from Documents WHERE DocumentID = '%s';",
-							fileUUID)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from Documents WHERE DocumentID = '%s';",
+					fileUUID)).next()) {
 				return "INVALID_FILE_UUID";
 			}
 			this.update(String.format(
-					"DELETE FROM Documents WHERE DocumentID = '%s';", fileUUID));
+					"DELETE FROM Documents WHERE DocumentID = '%s';",
+					fileUUID));
 
 			this.update(String.format(
 					"DELETE FROM Versions WHERE DocumentID = '%s';", fileUUID));
@@ -907,9 +894,9 @@ public class SQLDatabase {
 	 */
 	public String closeAccount(String username) {
 		try {
-			if (!this.query(
-					String.format("SELECT * from users WHERE Username = '%s';",
-							username)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from users WHERE Username = '%s';", username))
+					.next()) {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
 
@@ -945,9 +932,9 @@ public class SQLDatabase {
 	 */
 	public String changePassword(String username, String newPassword) {
 		try {
-			if (!this.query(
-					String.format("SELECT * from users WHERE Username = '%s';",
-							username)).next()) {
+			if (!this.query(String.format(
+					"SELECT * from users WHERE Username = '%s';", username))
+					.next()) {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
 			this.update(String.format(
@@ -1050,11 +1037,9 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID)
 			throws DatabaseException {
 		try {
-			return this
-					.query(String
-							.format("SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
-									this.getUsername(sessionID), projectUUID))
-					.next();
+			return this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s';",
+					this.getUsername(sessionID), projectUUID)).next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1079,11 +1064,10 @@ public class SQLDatabase {
 	public boolean verifyPermissions(String sessionID, String projectUUID,
 			int accessLevel) throws DatabaseException {
 		try {
-			return this
-					.query(String
-							.format("SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
-									this.getUsername(sessionID), projectUUID,
-									accessLevel - 1)).next();
+			return this.query(String.format(
+					"SELECT * FROM access WHERE Username = '%s' AND ProjectID = '%s' AND AccessLevel > '%d';",
+					this.getUsername(sessionID), projectUUID, accessLevel - 1))
+					.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1104,12 +1088,10 @@ public class SQLDatabase {
 	public String[] getUsers(String projectUUID, int accessLevel)
 			throws DatabaseException {
 		try {
-			return Results
-					.toStringArray(
-							"Username",
-							this.query(String
-									.format("SELECT Username FROM Access WHERE ProjectID = '%s' AND AccessLevel = '%d';",
-											projectUUID, accessLevel)));
+			return Results.toStringArray("Username",
+					this.query(String.format(
+							"SELECT Username FROM Access WHERE ProjectID = '%s' AND AccessLevel = '%d';",
+							projectUUID, accessLevel)));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseException(FlowServer.ERROR);
@@ -1221,10 +1203,9 @@ public class SQLDatabase {
 			throws DatabaseException {
 		ResultSet response;
 		try {
-			response = this
-					.query(String
-							.format("SELECT VersionID from Versions WHERE Date IN (SELECT MAX(Date) FROM Versions WHERE DocumentID = '%s');",
-									fileUUID));
+			response = this.query(String.format(
+					"SELECT VersionID from Versions WHERE Date IN (SELECT MAX(Date) FROM Versions WHERE DocumentID = '%s');",
+					fileUUID));
 			if (response.next())
 				return response.getString("VersionID");
 			throw new DatabaseException("INVALID_FILE_UUID");
@@ -1248,10 +1229,9 @@ public class SQLDatabase {
 	public String getProjectUUIDFromDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
-			ResultSet response = this
-					.query(String
-							.format("SELECT ProjectID FROM Directories WHERE DirectoryID = '%s';",
-									directoryUUID));
+			ResultSet response = this.query(String.format(
+					"SELECT ProjectID FROM Directories WHERE DirectoryID = '%s';",
+					directoryUUID));
 			if (response.next()) {
 				return response.getString("ProjectID");
 			}
@@ -1303,10 +1283,9 @@ public class SQLDatabase {
 	public String getProjectUUIDFromVersion(String versionUUID)
 			throws DatabaseException {
 		try {
-			ResultSet response = this
-					.query(String
-							.format("SELECT ProjectID FROM Documents WHERE DocumentID IN (SELECT DocumentID FROM Versions WHERE VersionID = '%s');",
-									versionUUID));
+			ResultSet response = this.query(String.format(
+					"SELECT ProjectID FROM Documents WHERE DocumentID IN (SELECT DocumentID FROM Versions WHERE VersionID = '%s');",
+					versionUUID));
 			if (response.next()) {
 				return response.getString("ProjectID");
 			}
@@ -1324,8 +1303,8 @@ public class SQLDatabase {
 	public boolean checkForDatabaseCorruption(String databaseName,
 			String backUpDatabase) {
 		try {
-			this.connection = DriverManager.getConnection("jdbc:sqlite:"
-					+ backUpDatabase);
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + backUpDatabase);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Error connecting to database located at: "
@@ -1336,18 +1315,17 @@ public class SQLDatabase {
 		ArrayList<ArrayList<String>> tableColumns = new ArrayList<>();
 		try {
 			DatabaseMetaData databaseMetaData = this.connection.getMetaData();
-			ResultSet tables = databaseMetaData
-					.getTables(null, null, "%", null);
+			ResultSet tables = databaseMetaData.getTables(null, null, "%",
+					null);
 			while (tables.next()) {
-				tableNames.add(printAndReturn(tables.getString("TABLE_NAME")));
+				tableNames.add(tables.getString("TABLE_NAME"));
 			}
 			for (String table : tableNames) {
 				ResultSet tableInfo = databaseMetaData.getColumns(null, null,
 						table, null);
 				ArrayList<String> columnInfo = new ArrayList<>();
 				while (tableInfo.next()) {
-					columnInfo.add(printAndReturn(tableInfo
-							.getString("COLUMN_NAME")));
+					columnInfo.add(tableInfo.getString("COLUMN_NAME"));
 				}
 				tableColumns.add(columnInfo);
 			}
@@ -1359,12 +1337,12 @@ public class SQLDatabase {
 			return false;
 		}
 		try {
-			this.connection = DriverManager.getConnection("jdbc:sqlite:"
-					+ databaseName);
+			this.connection = DriverManager
+					.getConnection("jdbc:sqlite:" + databaseName);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("Error connecting to database located at: "
-					+ databaseName);
+			System.out.println(
+					"Error connecting to database located at: " + databaseName);
 			return false;
 		}
 
@@ -1382,16 +1360,15 @@ public class SQLDatabase {
 				ArrayList<String> columnInfo = tableColumns.get(i);
 				for (int j = 0; j < columnInfo.size(); j++) {
 					tableInfo.next();
-					if (!columnInfo.get(j).equals(
-							printAndReturn(tableInfo.getString("COLUMN_NAME"))))
+					if (!columnInfo.get(j)
+							.equals(tableInfo.getString("COLUMN_NAME")))
 						return false;
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Error loading database meta data: "
-					+ databaseName);
+			System.out.println(
+					"Error loading database meta data: " + databaseName);
 			return false;
 		}
 		try {
@@ -1418,18 +1395,18 @@ public class SQLDatabase {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err
-					.println("Error recovering the database and file system from backup, restarting recovery proccess...");
+			System.err.println(
+					"Error recovering the database and file system from backup, restarting recovery proccess...");
 			try {
 				this.deleteFileSystemDirectory(new File(corruptFileSystem));
-				this.copyFileSystem(new File(BACKUP_FOLDER), new File(
-						LIVE_FOLDER));
+				this.copyFileSystem(new File(BACKUP_FOLDER),
+						new File(LIVE_FOLDER));
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.err.println();
-				System.err
-						.println("Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
+				System.err.println(
+						"Error recovering the database and file system from backup, shutting down the server...\n Please contact your system administrator orvisit https://github.com/ecnivo/Flow/releases for a clean filesystem.");
 				System.exit(0);
 			}
 		}
@@ -1472,8 +1449,15 @@ public class SQLDatabase {
 		}
 	}
 
+	/**
+	 * Deletes all data in the session table to log out all previously logged in
+	 * users.
+	 * 
+	 * @throws SQLException
+	 *             if there is an error accessing the database.
+	 */
 	public void refreshSessions() throws SQLException {
-		this.query("DELETE FROM SESSIONS;");
+		this.update("DELETE FROM Sessions;");
 	}
 
 	public boolean checkAndRepairFileSystemCorruption(String databaseName,
@@ -1501,10 +1485,5 @@ public class SQLDatabase {
 		// e.printStackTrace();
 		// }
 		return true;
-	}
-
-	public static String printAndReturn(String word) {
-		System.out.println(word);
-		return word;
 	}
 }

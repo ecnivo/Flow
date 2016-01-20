@@ -87,27 +87,6 @@ public class DataManipulation {
 		return path.toString();
 	}
 
-	// TODO Decide if needed, if so, FIXME
-	public static void fileVisualizer(String directoryId)
-			throws DatabaseException {
-		String parentDirectoryId = directoryId;
-		do {
-			directoryId = parentDirectoryId;
-			System.out.println(directoryId + ": ");
-			// String[] data = SQLDatabase.getInstance().
-			try {
-				parentDirectoryId = Results.toStringArray("ParentDirectoryID",
-						SQLDatabase.getInstance()
-								.getDirectoryInfo(directoryId))[0];
-
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new DatabaseException(e.getMessage());
-			}
-		} while (!directoryId.equals(parentDirectoryId));
-	}
-
 	/**
 	 * Converts the given Strings containing the string representations of UUIDs
 	 * to an array of UUID objects.

@@ -1,5 +1,12 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -11,13 +18,6 @@ import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 import util.Validator;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -47,8 +47,8 @@ public class ClientRequestHandle implements Runnable {
 			switch (data.getType()) {
 			case "login":
 				try {
-					final String username = data.get("username", String.class), password = data
-							.get("password", String.class);
+					final String username = data.get("username", String.class),
+							password = data.get("password", String.class);
 					if (this.database.userExists(username)) {
 						if (this.server.getDatabase().authenticate(username,
 								password)) {
@@ -75,17 +75,15 @@ public class ClientRequestHandle implements Runnable {
 			case "end_session":
 				// TODO Deregister all associated listeners
 				// TODO Call whatever code Gordon Guan has for this
-				returnData.put(
-						"status",
-						this.database.removeSession(data.get("session_id",
-								UUID.class).toString()));
+				returnData.put("status", this.database.removeSession(
+						data.get("session_id", UUID.class).toString()));
 				break;
 			case "user":
 				String userCmdType = data.get("user_type", String.class);
 				switch (userCmdType) {
 				case "REGISTER": {
-					String username = data.get("username", String.class), password = data
-							.get("password", String.class);
+					String username = data.get("username", String.class),
+							password = data.get("password", String.class);
 					if (!Validator.validUserName(username))
 						returnData.put("status", "USERNAME_INVALID");
 					else if (!Validator.validUserName(username))
@@ -93,17 +91,19 @@ public class ClientRequestHandle implements Runnable {
 					else {
 						returnData.put("status",
 								this.database.addUser(username, password));
-						DataManagement.getInstance().addUser(
-								new User(data.get("username", String.class),
+						DataManagement.getInstance()
+								.addUser(new User(
+										data.get("username", String.class),
 										data.get("password", String.class)));
 					}
 				}
 					break;
 				case "CLOSE_ACCOUNT":
 					try {
-						String username = this.database.getUsername(data.get(
-								"session_id", UUID.class).toString());
-						if (!DataManagement.getInstance().removeUser(username)) {
+						String username = this.database.getUsername(
+								data.get("session_id", UUID.class).toString());
+						if (!DataManagement.getInstance()
+								.removeUser(username)) {
 							returnData.put("status", FlowServer.ERROR);
 						} else {
 							returnData.put("status",
@@ -116,10 +116,15 @@ public class ClientRequestHandle implements Runnable {
 					break;
 				case "CHANGE_PASSWORD":
 					try {
-						returnData.put("status", this.database.changePassword(
-								this.database.getUsername(data.get(
-										"session_id", UUID.class).toString()),
-								data.get("new_password", String.class)));
+						returnData
+								.put("status",
+										this.database.changePassword(
+												this.database.getUsername(data
+														.get("session_id",
+																UUID.class)
+														.toString()),
+										data.get("new_password",
+												String.class)));
 					} catch (DatabaseException e) {
 						e.printStackTrace();
 						returnData.put("status", e.getMessage());
@@ -130,8 +135,8 @@ public class ClientRequestHandle implements Runnable {
 			case "list_projects":
 				// Initialized as null to prevent errors
 				try {
-					ResultSet temp = this.database.getSessionInfo(data.get(
-							"session_id", UUID.class).toString());
+					ResultSet temp = this.database.getSessionInfo(
+							data.get("session_id", UUID.class).toString());
 					String username = temp.getString("Username");
 					if (DataManagement.getInstance()
 							.getUserByUsername(username) == null)
@@ -160,8 +165,8 @@ public class ClientRequestHandle implements Runnable {
 			case "new_project":
 				try {
 					String projectName = data.get("project_name", String.class);
-					String username = this.database.getUsername(data.get(
-							"session_id", UUID.class).toString());
+					String username = this.database.getUsername(
+							data.get("session_id", UUID.class).toString());
 					UUID uuid = UUID.randomUUID();
 					String status = this.database.newProject(uuid.toString(),
 							projectName, username);
@@ -180,13 +185,13 @@ public class ClientRequestHandle implements Runnable {
 				break;
 			case "new_text_file":
 				try {
-					UUID projectUUID = data.get("project_uuid", UUID.class), sessionID = data
-							.get("session_id", UUID.class);
+					UUID projectUUID = data.get("project_uuid", UUID.class),
+							sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString(), SQLDatabase.EDIT)) {
 						UUID directoryUUID = data.get("directory_uuid",
-								UUID.class), fileUUID = UUID.randomUUID(), versionUUID = UUID
-								.randomUUID();
+								UUID.class), fileUUID = UUID.randomUUID(),
+								versionUUID = UUID.randomUUID();
 						String documentName = data.get("file_name",
 								String.class);
 						if (Validator.validFileName(documentName)) {
@@ -221,8 +226,8 @@ public class ClientRequestHandle implements Runnable {
 			case "new_directory":
 				try {
 					UUID projectUUID = data.get("project_uuid", UUID.class);
-					UUID parentDirectoryUUID = data.get(
-							"parent_directory_uuid", UUID.class);
+					UUID parentDirectoryUUID = data.get("parent_directory_uuid",
+							UUID.class);
 					UUID sessionID = data.get("session_id", UUID.class);
 					if (this.database.verifyPermissions(sessionID.toString(),
 							projectUUID.toString(), SQLDatabase.EDIT)) {
@@ -245,8 +250,8 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "project_modify": {
-				UUID projectUUID = data.get("project_uuid", UUID.class), sessionID = data
-						.get("session_id", UUID.class);
+				UUID projectUUID = data.get("project_uuid", UUID.class),
+						sessionID = data.get("session_id", UUID.class);
 				try {
 					switch (data.get("project_modify_type", String.class)) {
 					case "MODIFY_COLLABORATOR":
@@ -256,25 +261,24 @@ public class ClientRequestHandle implements Runnable {
 						if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
-							returnData.put("status", this.database
-									.updateAccess(accessLevel,
+							returnData.put("status",
+									this.database.updateAccess(accessLevel,
 											projectUUID.toString(), username));
 						} else if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.EDIT)) {
-							returnData.put("status", this.database
-									.restrictedUpdateAccess(accessLevel,
-											projectUUID.toString(), username));
+							returnData.put("status",
+									this.database.restrictedUpdateAccess(
+											accessLevel, projectUUID.toString(),
+											username));
 						} else {
 							returnData.put("status", "ACCESS_DENIED");
 						}
 						break;
 					case "RENAME_PROJECT": {
 						String newName = data.get("new_name", String.class);
-						returnData.put(
-								"status",
-								this.database.renameProject(
-										projectUUID.toString(), newName));
+						returnData.put("status", this.database.renameProject(
+								projectUUID.toString(), newName));
 					}
 						break;
 					case "DELETE_PROJECT":
@@ -298,9 +302,10 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID directoryUUID = data.get("directory_uuid", UUID.class);
 					String sessionID = data.get("session_id", UUID.class)
-							.toString(), projectUUID = this.database
-							.getProjectUUIDFromDirectory(directoryUUID
-									.toString());
+							.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromDirectory(
+											directoryUUID.toString());
 
 					if (this.database.verifyPermissions(sessionID, projectUUID,
 							SQLDatabase.EDIT)) {
@@ -308,8 +313,7 @@ public class ClientRequestHandle implements Runnable {
 						switch (type) {
 						case "RENAME":
 							String newName = data.get("new_name", String.class);
-							returnData.put(
-									"status",
+							returnData.put("status",
 									this.database.renameDirectory(
 											directoryUUID.toString(), newName));
 							break;
@@ -332,21 +336,25 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
 					String sessionID = data.get("session_id", UUID.class)
-							.toString(), projectUUID = this.database
-							.getProjectUUIDFromFile(fileUUID.toString());
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
 					if (this.database.verifyPermissions(sessionID, projectUUID,
 							SQLDatabase.EDIT)) {
 						String modType = data.get("mod_type", String.class);
 						switch (modType) {
 						case "RENAME":
-							returnData
-									.put("status", this.database.renameFile(
-											fileUUID.toString(),
-											data.get("new_name", String.class)));
+							String name = data.get("name", String.class);
+							if (Validator.validFileName(name)) {
+								returnData.put("status", this.database
+										.renameFile(fileUUID.toString(), name));
+							} else {
+								returnData.put("status", "FILE_NAME_INVALID");
+							}
 							break;
 						case "DELETE":
-							DataManagement.getInstance().removeFileByUUID(
-									fileUUID);
+							DataManagement.getInstance()
+									.removeFileByUUID(fileUUID);
 							returnData.put("status", this.database
 									.deleteFile(fileUUID.toString()));
 							break;
@@ -376,8 +384,11 @@ public class ClientRequestHandle implements Runnable {
 								projectUUID.toString(), SQLDatabase.EDIT));
 						returnData.put("viewers", this.database.getUsers(
 								projectUUID.toString(), SQLDatabase.VIEW));
-						returnData.put("owner", this.database.getUsers(
-								projectUUID.toString(), SQLDatabase.OWNER)[0]);
+						returnData
+								.put("owner",
+										this.database.getUsers(
+												projectUUID.toString(),
+												SQLDatabase.OWNER)[0]);
 						returnData.put("status", "OK");
 					} else {
 						returnData.put("status", "ACCESS_DENIED");
@@ -396,12 +407,14 @@ public class ClientRequestHandle implements Runnable {
 					UUID directoryUUID = data.get("directory_uuid", UUID.class);
 
 					String sessionID = data.get("session_id", UUID.class)
-							.toString(), projectUUID = this.database
-							.getProjectUUIDFromDirectory(directoryUUID
-									.toString());
+							.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromDirectory(
+											directoryUUID.toString());
 
 					// Verify is the user has at least view access
-					if (this.database.verifyPermissions(sessionID, projectUUID)) {
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						// Add information from the Directories table
 						ResultSet results = this.database
 								.getDirectoryInfo(directoryUUID.toString());
@@ -414,19 +427,19 @@ public class ClientRequestHandle implements Runnable {
 						// specified directory
 						results = this.database
 								.getFilesInDirectory(directoryUUID.toString());
-						returnData.put("child_files", DataManipulation
-								.getUUIDsFromArray(Results.toStringArray(
-										"DocumentID", results)));
+						returnData.put("child_files",
+								DataManipulation.getUUIDsFromArray(Results
+										.toStringArray("DocumentID", results)));
 
 						// Add information from all sub directories located
 						// inside
 						// the specified directory
-						results = this.database
-								.getDirectoriesInDirectory(directoryUUID
-										.toString());
-						returnData.put("child_directories", DataManipulation
-								.getUUIDsFromArray(Results.toStringArray(
-										"DirectoryID", results)));
+						results = this.database.getDirectoriesInDirectory(
+								directoryUUID.toString());
+						returnData.put("child_directories",
+								DataManipulation.getUUIDsFromArray(
+										Results.toStringArray("DirectoryID",
+												results)));
 
 						// If no exceptions were thrown up to this point, no
 						// errors
@@ -449,20 +462,23 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					// Load the required data from the data packet
 					String fileUUID = data.get("file_uuid", UUID.class)
-							.toString(), sessionID = data.get("session_id",
-							UUID.class).toString(), projectUUID = this.database
-							.getProjectUUIDFromFile(fileUUID);
+							.toString(),
+							sessionID = data.get("session_id", UUID.class)
+									.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromFile(fileUUID);
 
 					// Verify is the user has at least view access
-					if (this.database.verifyPermissions(sessionID, projectUUID)) {
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						// Add information from the Documents table
 						ResultSet results = this.database.getFileInfo(fileUUID);
 						returnData.put("file_name",
 								results.getString("DocumentName"));
 						returnData.put("file_type",
 								results.getString("FileType"));
-						returnData.put("file_versions", DataManipulation
-								.getUUIDsFromArray(this.database
+						returnData.put("file_versions",
+								DataManipulation.getUUIDsFromArray(this.database
 										.getFileVersions(fileUUID)));
 						returnData.put("status", "OK");
 					} else {
@@ -481,11 +497,14 @@ public class ClientRequestHandle implements Runnable {
 			case "version_info":
 				try {
 					String versionUUID = data.get("version_uuid", UUID.class)
-							.toString(), sessionID = data.get("session_id",
-							UUID.class).toString(), projectUUID = this.database
-							.getProjectUUIDFromVersion(versionUUID);
+							.toString(),
+							sessionID = data.get("session_id", UUID.class)
+									.toString(),
+							projectUUID = this.database
+									.getProjectUUIDFromVersion(versionUUID);
 
-					if (this.database.verifyPermissions(sessionID, projectUUID)) {
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						returnData.put("date",
 								this.database.getVersionDate(versionUUID));
 						returnData.put("status", "OK");
@@ -499,15 +518,17 @@ public class ClientRequestHandle implements Runnable {
 
 			case "request_version":
 				try {
-					UUID fileUUID = data.get("file_uuid", UUID.class), versionUUID = data
-							.get("version_uuid", UUID.class);
+					UUID fileUUID = data.get("file_uuid", UUID.class),
+							versionUUID = data.get("version_uuid", UUID.class);
 					String sessionID = data.get("session_id", UUID.class)
-							.toString(), projectUUID = this.database
-							.getProjectUUIDFromFile(fileUUID.toString());
-					if (this.database.verifyPermissions(sessionID, projectUUID)) {
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						byte[] bytes = null;
-						String fileType = this.database.getFileType(fileUUID
-								.toString());
+						String fileType = this.database
+								.getFileType(fileUUID.toString());
 						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
 							VersionText doc = VersionManager.getInstance()
 									.getTextByVersionUUID(versionUUID);
@@ -532,15 +553,17 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
 					String sessionID = data.get("session_id", UUID.class)
-							.toString(), projectUUID = this.database
-							.getProjectUUIDFromFile(fileUUID.toString());
-					if (this.database.verifyPermissions(sessionID, projectUUID)) {
+							.toString(),
+							projectUUID = this.database.getProjectUUIDFromFile(
+									fileUUID.toString());
+					if (this.database.verifyPermissions(sessionID,
+							projectUUID)) {
 						UUID versionUUID = UUID.fromString(this.database
 								.getLatestVersionUUID(fileUUID.toString()));
 						returnData.put("version_uuid", versionUUID);
 						byte[] bytes = null;
-						String fileType = this.database.getFileType(fileUUID
-								.toString());
+						String fileType = this.database
+								.getFileType(fileUUID.toString());
 						if (fileType.equals(SQLDatabase.TEXT_DOCUMENT)) {
 							VersionText doc = VersionManager.getInstance()
 									.getTextByVersionUUID(versionUUID);
@@ -562,8 +585,8 @@ public class ClientRequestHandle implements Runnable {
 				try {
 					UUID fileUUID = data.get("file_uuid", UUID.class);
 					int idx = data.get("idx", Integer.class);
-					String username = this.database.getUsername(data.get(
-							"session_id", UUID.class).toString());
+					String username = this.database.getUsername(
+							data.get("session_id", UUID.class).toString());
 					UUID latestVersionUUID = UUID.fromString(this.database
 							.getLatestVersionUUID(fileUUID.toString()));
 					VersionText td = VersionManager.getInstance()
@@ -574,8 +597,8 @@ public class ClientRequestHandle implements Runnable {
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.INSERT,
 								fileUUID, username, idx, str, -1);
-						PersistentHandleManager.getInstance().doCallbackEvent(
-								fileUUID, event);
+						PersistentHandleManager.getInstance()
+								.doCallbackEvent(fileUUID, event);
 						for (char c : str.toCharArray()) {
 							// TODO GORDON STOP CHANGING THIS TO --
 							td.insert(c, idx++);
@@ -588,8 +611,8 @@ public class ClientRequestHandle implements Runnable {
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.DELETE,
 								fileUUID, username, idx, null, len);
-						PersistentHandleManager.getInstance().doCallbackEvent(
-								fileUUID, event);
+						PersistentHandleManager.getInstance()
+								.doCallbackEvent(fileUUID, event);
 						while (len-- > 0)
 							td.delete(idx);
 					}
@@ -597,8 +620,8 @@ public class ClientRequestHandle implements Runnable {
 						DocumentCallbackEvent event = new DocumentCallbackEvent(
 								DocumentCallbackEvent.DocumentCallbackType.MOVE,
 								fileUUID, username, idx, null, -1);
-						PersistentHandleManager.getInstance().doCallbackEvent(
-								fileUUID, event);
+						PersistentHandleManager.getInstance()
+								.doCallbackEvent(fileUUID, event);
 					}
 						break;
 					}
