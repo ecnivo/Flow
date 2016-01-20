@@ -1,5 +1,12 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import callback.DocumentCallbackEvent;
 import callback.PersistentHandleManager;
 import database.SQLDatabase;
@@ -11,13 +18,6 @@ import util.DataManipulation;
 import util.DatabaseException;
 import util.Results;
 import util.Validator;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 public class ClientRequestHandle implements Runnable {
 
@@ -65,6 +65,8 @@ public class ClientRequestHandle implements Runnable {
 					if (this.database.userExists(username)) {
 						if (this.database.authenticate(username, password)) {
 							try {
+								// Only provide a session id if all checks are
+								// passed.
 								UUID sessionID = this.server
 										.newSession(username);
 								returnData.put("session_id", sessionID);

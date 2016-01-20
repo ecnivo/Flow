@@ -239,7 +239,6 @@ public class SQLDatabase {
 			}
 			return "INVALID_PROJECT_UUID";
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(e.getMessage());
 		}
@@ -274,7 +273,6 @@ public class SQLDatabase {
 			}
 			return "INVALID_PROJECT_UUID";
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DatabaseException(e.getMessage());
 		}
@@ -332,17 +330,13 @@ public class SQLDatabase {
 	public ResultSet getDirectoriesInDirectory(String directoryUUID)
 			throws DatabaseException {
 		try {
-			// TODO Add check if for project is exists
 			return this.query(String.format(
 					"SELECT * FROM directories WHERE ParentDirectoryID = '%s';",
 					directoryUUID));
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// TODO: this won't be called for the above reason, move this
-			// exception to the check (Above)
-			throw new DatabaseException("PROJECT_DOES_NOT_EXIST");
+			throw new DatabaseException(FlowServer.ERROR);
 		}
-		// return null;
 	}
 
 	/**
@@ -434,12 +428,13 @@ public class SQLDatabase {
 	public String newDirectory(String directoryName, String directoryId,
 			String projectId, String parentDirectoryId) {
 		try {
+			// Prevent two directories from having the same same if they share
+			// the same parent directory
 			if (this.query(String.format(
 					"SELECT * FROM Directories WHERE ParentDirectoryID = '%s' AND DirectoryName = '%s';",
 					parentDirectoryId, directoryName)).next()) {
 				return "DIRECTORY_NAME_INVALID";
 			}
-			// TODO Change this to not require parentDirectoryId
 			this.update(String
 					.format("INSERT INTO directories VALUES('%s', '%s', '%s', '%s');",
 							directoryId,
@@ -515,11 +510,9 @@ public class SQLDatabase {
 					"SELECT Password FROM users WHERE Username = '%s';",
 					username));
 			if (pair.next()) {
-				// TODO Verify
 				return password.equals(pair.getString("password"));
 			}
 		} catch (SQLException e) {
-			// TODO Remove this debugging message
 			System.err.println("Error authenticating user: " + username
 					+ " with password: " + password);
 			e.printStackTrace();
@@ -565,7 +558,6 @@ public class SQLDatabase {
 	 */
 	public String removeSession(String sessionId) {
 		try {
-			// TODO Verify if the session actually exists prior to removal
 			this.update(String.format(
 					"DELETE FROM sessions WHERE SessionID = '%s';", sessionId));
 		} catch (SQLException e) {
@@ -741,7 +733,6 @@ public class SQLDatabase {
 	 *             or the new name contains invalid characters.
 	 */
 	public String renameProject(String projectUUID, String newName) {
-		// TODO Check if name is valid
 		try {
 			if (!this.query(String.format(
 					"SELECT * from projects WHERE ProjectID = '%s';",
@@ -936,9 +927,10 @@ public class SQLDatabase {
 
 	/**
 	 * Allows a user to remove their account and <b>all projects which they are
-	 * the owner</b> from the database. This means these projects will <b>no
-	 * longer be accessible</b>. Please change the owner of any projects that
-	 * other users wish to continue developing.
+	 * the owner</b> from the database (this includes all the documents of those
+	 * projects). This means these projects will <b>no longer be accessible</b>.
+	 * Please change the owner of any projects that other users wish to continue
+	 * developing.
 	 *
 	 * @param username
 	 *            the username associated with the account to close.
@@ -953,7 +945,12 @@ public class SQLDatabase {
 				return "USERNAME_DOES_NOT_EXIST";
 			}
 
-			// TODO Delete all documents using the deleted project IDs
+			// Delete all associated information and projects which they are the
+			// owner of (not projects which they only have edit or view access
+			// to)
+			this.update(String.format(
+					"DELETE FROM Documents WHERE ProjectID IN (SELECT ProjectID FROM Projects WHERE OwnerUsername = '%s');",
+					username));
 			this.update(String.format(
 					"DELETE FROM users WHERE Username = '%s';", username));
 			this.update(String.format(
