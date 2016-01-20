@@ -33,7 +33,7 @@ public class ClientRequestHandle implements Runnable {
 		this.socket = socket;
 		this.psocket = new DataSocket(socket);
 		this.server = server;
-		this.database = this.server.getDatabase();
+		this.database = SQLDatabase.getInstance();
 	}
 
 	@Override
@@ -63,8 +63,7 @@ public class ClientRequestHandle implements Runnable {
 					// Verify data in request and send back appropriate error
 					// message if needed, otherwise create a new session.
 					if (this.database.userExists(username)) {
-						if (this.server.getDatabase().authenticate(username,
-								password)) {
+						if (this.database.authenticate(username, password)) {
 							try {
 								UUID sessionID = this.server
 										.newSession(username);

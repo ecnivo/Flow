@@ -1,8 +1,5 @@
 package server;
 
-import database.SQLDatabase;
-import util.DatabaseException;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,13 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import database.SQLDatabase;
+import util.DatabaseException;
+
 public class FlowServer implements Runnable {
 
-	public static FlowServer instance;
-
-	public static FlowServer getInstance() {
-		return instance;
-	}
+	private static FlowServer instance;
 
 	private static Logger L = Logger.getLogger("FlowServer");
 
@@ -37,9 +33,20 @@ public class FlowServer implements Runnable {
 	private static final int MAX_THREADS = 100;
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
-	public FlowServer() {
-		this.database = new SQLDatabase();
-		instance = this;
+	private FlowServer() {
+		this.database = SQLDatabase.getInstance();
+	}
+
+	/**
+	 * Returns the latest instance of the FlowServer.
+	 *
+	 * @return the latest instance of the FlowServer, or a new FlowServer object
+	 *         if one has yet to be initialized.
+	 */
+	public static FlowServer getInstance() {
+		if (instance == null)
+			instance = new FlowServer();
+		return instance;
 	}
 
 	@Override
@@ -84,20 +91,11 @@ public class FlowServer implements Runnable {
 		return sessionId;
 	}
 
-	/**
-	 * Getter for the associated SQLDatabse instance.
-	 * 
-	 * @return the associated SQLDatabase instance.
-	 */
-	public SQLDatabase getDatabase() {
-		return this.database;
-	}
-
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
 		System.setProperty("java.util.logging.SimpleFormatter.format",
 				"%4$s: %5$s%n");
-		FlowServer server = new FlowServer();
+		FlowServer server = FlowServer.getInstance();
 		new Thread(server).start();
 		new Thread(new AsyncServer(ARC_PORT)).start();
 		// TEST CODE

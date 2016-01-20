@@ -49,9 +49,12 @@ public class SQLDatabase {
 	/**
 	 * Latest instance of the SQLDatabase
 	 */
-	public static SQLDatabase instance;
+	private static SQLDatabase instance;
 
-	public SQLDatabase() {
+	/**
+	 * Create
+	 */
+	private SQLDatabase() {
 		try {
 			DriverManager.registerDriver(
 					(Driver) Class.forName(DRIVER).newInstance());
@@ -89,10 +92,12 @@ public class SQLDatabase {
 	/**
 	 * Returns the latest instance of the SQLDatabase.
 	 *
-	 * @return the latest instance of the SQLDatabase or NULL if not yet
-	 *         initialized.
+	 * @return the latest instance of the SQLDatabase, or a new SQLDatabse
+	 *         object if one has yet to be initialized.
 	 */
 	public static SQLDatabase getInstance() {
+		if (instance == null)
+			instance = new SQLDatabase();
 		return instance;
 	}
 

@@ -29,7 +29,7 @@ import java.sql.SQLException;
 public class SQLiteTest {
 
 	public static void main(String[] args) throws SQLException, IOException {
-		SQLDatabase database = new SQLDatabase();
+		SQLDatabase database = SQLDatabase.getInstance();
 
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(System.in));
