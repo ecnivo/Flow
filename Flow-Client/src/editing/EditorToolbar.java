@@ -51,6 +51,7 @@ public class EditorToolbar extends JToolBar {
 	private JPopupMenu	popup;
 	private JMenuItem	createProjectButton;
 	private JMenuItem	renameProjectButton;
+	private JMenuItem	deleteProjectButton;
 	private EditPane	editPane;
 
 	/**
@@ -176,7 +177,7 @@ public class EditorToolbar extends JToolBar {
 		});
 
 		// Delete project button
-		JMenuItem deleteProjectButton = new JMenuItem();
+		deleteProjectButton = new JMenuItem();
 		deleteProjectButton.setText("Delete current project");
 		deleteProjectButton.addActionListener(new ActionListener() {
 
@@ -376,19 +377,19 @@ public class EditorToolbar extends JToolBar {
 
 					// Opens a file chooser to get new file
 					JFileChooser fileChooser = new JFileChooser();
-//					fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-//
-//						@Override
-//						public String getDescription() {
-//							return "Only .JAVA or .TXT files (for now)";
-//						}
-//
-//						@Override
-//						public boolean accept(File f) {
-//							String name = f.getName();
-//							return f.isDirectory();
-//						}
-//					});
+					// fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+					//
+					// @Override
+					// public String getDescription() {
+					// return "Only .JAVA or .TXT files (for now)";
+					// }
+					//
+					// @Override
+					// public boolean accept(File f) {
+					// String name = f.getName();
+					// return f.isDirectory();
+					// }
+					// });
 					fileChooser.setDialogTitle("Select file to import...");
 					File importFile;
 					if (fileChooser.showOpenDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
@@ -540,12 +541,12 @@ public class EditorToolbar extends JToolBar {
 					// Gets the user to choose the destination
 					JFileChooser destChooser = new JFileChooser();
 					destChooser.setFileFilter(new FileFilter() {
-						
+
 						@Override
 						public String getDescription() {
 							return "Only folders";
 						}
-						
+
 						@Override
 						public boolean accept(File f) {
 							return f.isDirectory();
@@ -556,7 +557,7 @@ public class EditorToolbar extends JToolBar {
 					destChooser.setDialogTitle("Choose export destination");
 					String dest;
 					if (destChooser.showSaveDialog(EditorToolbar.this) == JFileChooser.APPROVE_OPTION) {
-//						dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
+						// dest = destChooser.getCurrentDirectory().getPath() + "\\" + fileName;
 						dest = destChooser.getSelectedFile().getPath() + fileName;
 					} else {
 						return;
@@ -604,5 +605,12 @@ public class EditorToolbar extends JToolBar {
 	 */
 	public void renameProjectButtonDoClick() {
 		renameProjectButton.doClick();
+	}
+
+	/**
+	 * To avoid duplicate code. Will delete a project.
+	 */
+	public void deletProjectButtonDoClick() {
+		deleteProjectButton.doClick();
 	}
 }

@@ -432,6 +432,36 @@ public class EditorFileTree extends FileTree {
 					EditorFileTree.this.editPane.getCollabsList().refreshUserList();
 			}
 		});
+		addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+					TreePath path = getSelectionPath();
+					if (path == null) {
+						return;
+					}
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+					if (node instanceof ProjectNode) {
+						EditorFileTree.this.editPane.getEditToolbar().deletProjectButtonDoClick();
+					} else if (node instanceof DirectoryNode) {
+						deleteDirectoryButton.doClick();
+					} else if (node instanceof FileNode) {
+						deleteFileButton.doClick();
+					}
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// nothing
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// nothing
+			}
+		});
 	}
 
 	/**
