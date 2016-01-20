@@ -226,7 +226,7 @@ public class NavBar extends JToolBar {
 			setToolTipText("Help");
 			setBorder(FlowClient.EMPTY_BORDER);
 			try {
-				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/settingsWindow.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
+				setIcon(new ImageIcon(ImageIO.read(ClassLoader.getSystemResource("images/helpIcon.png")).getScaledInstance(FlowClient.BUTTON_ICON_SIZE, FlowClient.BUTTON_ICON_SIZE, Image.SCALE_SMOOTH)));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
