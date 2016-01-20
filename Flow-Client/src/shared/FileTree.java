@@ -1,6 +1,7 @@
 
 package shared;
 
+import editing.EditPane;
 import gui.FlowClient;
 
 import java.awt.Color;
@@ -245,6 +246,9 @@ public abstract class FileTree extends JTree {
 	 *        the node to reload from
 	 */
 	public void reloadProjectFiles(ProjectNode projectNode) {
+		if (projectNode == null) {
+			return;
+		}
 		// Gets the project data from the server
 		Data projectReload = new Data("directory_info");
 		projectReload.put("directory_uuid", projectNode.getProjectUUID());
@@ -254,15 +258,35 @@ public abstract class FileTree extends JTree {
 			return;
 		} else if (reloadedProject.get("status", String.class).equals("ACCESS_DENIED")) {
 			JOptionPane.showConfirmDialog(null, "You do not have sufficient permissions complete this operation.", "Access Denied", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+			((DefaultTreeModel) getModel()).removeNodeFromParent(projectNode);
+
+			setSelectionRow(0);
+
+			EditPane pane = (EditPane) getParent().getParent().getParent().getParent().getParent().getParent();
+			if (pane == null) {
+				return;
+			}
+			EditTabs tabs = pane.getEditTabs();
+			if (tabs == null) {
+				return;
+			}
+			for (int i = 0; i < tabs.getTabCount(); i++) {
+				EditArea editArea = (EditArea) ((JScrollPane) tabs.getComponentAt(i)).getViewport().getView();
+				if (editArea.getProjectUUID().equals(projectNode.getProjectUUID())) {
+					tabs.removeTabAt(i);
+				}
+			}
+			return;
+		} else if (reloadedProject.get("status", String.class).equals("OK")) {
+			// Does the recursion one on the children
+			reloadProjectFilesRecursively(reloadedProject, projectNode);
+
+			if (getSelectionPath() == null) {
+				setSelectionRow(0);
+			}
+			return;
 		} else {
 			return;
-		}
-
-		// Does the recursion one on the children
-		reloadProjectFilesRecursively(reloadedProject, projectNode);
-
-		if (getSelectionPath() == null) {
-			setSelectionRow(0);
 		}
 	}
 
@@ -300,6 +324,23 @@ public abstract class FileTree extends JTree {
 			if (idx == -1) {
 				((DefaultTreeModel) getModel()).removeNodeFromParent(localFileNode);
 				localFiles.remove(localFileNode);
+				EditPane pane = (EditPane) getParent().getParent().getParent().getParent().getParent().getParent();
+				if (pane == null) {
+					return;
+				}
+				EditTabs tabs = pane.getEditTabs();
+				if (tabs == null) {
+					return;
+				}
+				ArrayList<UUID> tabUUIDs = new ArrayList<UUID>();
+				for (int i = 0; i < tabs.getTabCount(); i++) {
+					EditArea editArea = (EditArea) ((JScrollPane) tabs.getComponentAt(i)).getViewport().getView();
+					tabUUIDs.add(editArea.getFileUUID());
+				}
+				int targetIdx = tabUUIDs.indexOf(localFileNode.getFileUUID());
+				if (targetIdx > 0) {
+					tabs.removeTabAt(targetIdx);
+				}
 			}
 		}
 
