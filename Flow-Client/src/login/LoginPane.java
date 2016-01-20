@@ -40,8 +40,6 @@ public class LoginPane extends JPanel {
 	private JPasswordField	passwordEntry;
 	private JButton			loginButton;
 
-	// Pan Man! https://i.imgur.com/19iZW9K.png
-
 	/**
 	 * Creates a new LoginPane
 	 * 
@@ -190,7 +188,7 @@ public class LoginPane extends JPanel {
 				String status = reply.get("status", String.class);
 				switch (status) {
 				// Failure cases
-					case "USER_DOES_NOT_EXIST":
+					case "USERNAME_DOES_NOT_EXIST":
 						JOptionPane.showConfirmDialog(null, "The username does not exist.\nPlease enter a username that is valid, or create a new account.", "Invalid username", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 						return;
 					case "PASSWORD_INCORRECT":
