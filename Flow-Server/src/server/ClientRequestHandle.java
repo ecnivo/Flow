@@ -184,12 +184,9 @@ public class ClientRequestHandle implements Runnable {
 					UUID uuid = UUID.randomUUID();
 					String status = this.database.newProject(uuid.toString(),
 							projectName, username);
+					returnData.put("status", status);
 					if (status != null && status.equals("OK")) {
-						returnData.put("status", this.database.updateAccess(
-								SQLDatabase.OWNER, uuid.toString(), username));
 						returnData.put("project_uuid", uuid);
-					} else {
-						returnData.put("status", status);
 					}
 				} catch (DatabaseException e) {
 					// TODO Auto-generated catch block
@@ -276,7 +273,7 @@ public class ClientRequestHandle implements Runnable {
 								sessionID.toString(), projectUUID.toString(),
 								SQLDatabase.OWNER)) {
 							returnData.put("status",
-									this.database.updateAccess(accessLevel,
+									this.database.ownerUpdateAccess(accessLevel,
 											projectUUID.toString(), username));
 						} else if (this.database.verifyPermissions(
 								sessionID.toString(), projectUUID.toString(),

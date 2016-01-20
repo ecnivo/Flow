@@ -52,7 +52,9 @@ public class SQLDatabase {
 	private static SQLDatabase instance;
 
 	/**
-	 * Create
+	 * Verifies integrity of the database file, file system, and synchronization
+	 * between the two. Tries to fix issues, but if not possible, reloads all
+	 * files from backup.
 	 */
 	private SQLDatabase() {
 		try {
@@ -86,7 +88,6 @@ public class SQLDatabase {
 			e.printStackTrace();
 			System.out.println("Error refreshing sessions");
 		}
-		instance = this;
 	}
 
 	/**
@@ -126,7 +127,12 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Specifies the access level to a specific project for a user.
+	 * Specifies the access level to a specific project for a user. <br>
+	 * <br>
+	 * <b>***WARNING***:</b> This method should only be used when creating a new
+	 * project, as if has no preventive measure that protect against rendering
+	 * projects owner-less (which is an illegal state for any project in the
+	 * SQLDatabase).
 	 *
 	 * @param accessLevel
 	 *            the level of access provided to the user, either {@link OWNER}
@@ -137,7 +143,7 @@ public class SQLDatabase {
 	 *            the username which to provide access to.
 	 * @return whether or not the access was successfully granted.
 	 */
-	public String updateAccess(int accessLevel, String projectId,
+	private String updateAccess(int accessLevel, String projectId,
 			String username) {
 		try {
 			if (this.query(String.format(
@@ -184,6 +190,20 @@ public class SQLDatabase {
 		return "OK";
 	}
 
+	/**
+	 * Less restrictive method for updating access to a project. Designed to be
+	 * used when changes are requested by the <b>owner</b> of a project.
+	 * 
+	 * @param accessLevel
+	 *            the access level.
+	 * @param projectUUID
+	 *            the string representation of the UUID of the project.
+	 * @param username
+	 *            the UUID of the user.
+	 * @return the status of the operation.
+	 * @throws DatabaseException
+	 *             if there is an error accessing the database.
+	 */
 	public String restrictedUpdateAccess(int accessLevel, String projectUUID,
 			String username) throws DatabaseException {
 		try {
@@ -206,10 +226,12 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Updates owner's access level.
+	 * Restrictive method for updating access to a project. Designed to prevent
+	 * changes that may have an effect on the ownership or the owner's access to
+	 * the project.
 	 * 
 	 * @param accessLevel
-	 *            the acces level.
+	 *            the access level.
 	 * @param projectUUID
 	 *            the string representation of the UUID of the project.
 	 * @param username
@@ -304,29 +326,36 @@ public class SQLDatabase {
 	}
 
 	/**
-	 * Creates a new project with the specified name and owner
+	 * Creates a new project with the specified name, owner, and UUID.
 	 *
 	 * @param projectName
-	 *            name of the project
-	 * @param ownerId
-	 *            ID of the user who creates the project
+	 *            the name of the project.
+	 * @param username
+	 *            username of the user who created the project.
+	 * @param projectUUID
+	 *            the string representation of the UUID of the project.
+	 * @return
 	 */
-	public String newProject(String projectId, String projectName,
-			String ownerId) {
+	public String newProject(String projectUUID, String projectName,
+			String username) {
 		try {
 			if (this.query(String.format(
 					"SELECT * FROM Projects WHERE ProjectName = '%s' and OwnerUsername = '%s';",
-					projectName, ownerId)).next()) {
+					projectName, username)).next()) {
 				return "PROJECT_NAME_INVALID";
 			}
 			this.update(String.format(
-					"INSERT INTO projects VALUES('%s', '%s', '%s');", projectId,
-					projectName, ownerId));
+					"INSERT INTO projects VALUES('%s', '%s', '%s');",
+					projectUUID, projectName, username));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return FlowServer.ERROR;
 		}
-		return this.newDirectory(projectName, projectId, projectId, projectId);
+		String status = this.newDirectory(projectName, projectUUID, projectUUID,
+				projectUUID);
+		if (status.equals("OK"))
+			return this.updateAccess(SQLDatabase.OWNER, projectUUID, username);
+		return status;
 	}
 
 	/**
