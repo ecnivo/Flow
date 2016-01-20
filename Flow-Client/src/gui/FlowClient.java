@@ -25,7 +25,6 @@ public class FlowClient extends JFrame {
 	public static final int		BUTTON_ICON_SIZE	= 24;
 	public static boolean		HIDE				= true;
 	public static final int		SCROLL_SPEED		= 12;
-	private static final String	HOST				= "127.0.0.1";
 	private static final int	PORT				= 10244;
 	private PanelManager		manager;
 
@@ -46,7 +45,7 @@ public class FlowClient extends JFrame {
 		}
 
 		// Sets up communications with the server
-		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP"), PORT);
+		Communicator.initComms(JOptionPane.showInputDialog(null, "TEMP: ENTER IP", "127.0.0.1"), PORT);
 
 		// Creates a new PanelManager
 		manager = PanelManager.createNewInstance(this);
