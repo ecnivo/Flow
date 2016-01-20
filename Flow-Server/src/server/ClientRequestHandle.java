@@ -140,20 +140,24 @@ public class ClientRequestHandle implements Runnable {
 					String username = temp.getString("Username");
 					if (DataManagement.getInstance()
 							.getUserByUsername(username) == null)
-						throw new RuntimeException("User does not exist");
-					ResultSet projects = this.database.getProjects(username);
-					String[][] response = Results.toStringArray(
-							new String[] { "ProjectID" }, projects);
-					UUID[] projectUUIDs = new UUID[response.length];
-					if (response == null || response[0] == null) {
-						returnData.put("projects", new UUID[0]);
-					} else {
-						for (int i = 0; i < response.length; i++) {
-							projectUUIDs[i] = UUID.fromString(response[i][0]);
+						returnData.put("status", "INVALID_SESSION_ID");
+					else {
+						ResultSet projects = this.database
+								.getProjects(username);
+						String[][] response = Results.toStringArray(
+								new String[] { "ProjectID" }, projects);
+						UUID[] projectUUIDs = new UUID[response.length];
+						if (response == null || response[0] == null) {
+							returnData.put("projects", new UUID[0]);
+						} else {
+							for (int i = 0; i < response.length; i++) {
+								projectUUIDs[i] = UUID
+										.fromString(response[i][0]);
+							}
+							returnData.put("projects", projectUUIDs);
 						}
-						returnData.put("projects", projectUUIDs);
+						returnData.put("status", "OK");
 					}
-					returnData.put("status", "OK");
 				} catch (DatabaseException e) {
 					e.printStackTrace();
 					returnData.put("status", e.getMessage());
