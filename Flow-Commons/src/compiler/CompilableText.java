@@ -3,19 +3,22 @@ package compiler;
 import struct.VersionText;
 
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * Represents a text document with information pertaining to compilation
  * Created by Gordon Guan on 1/17/2016.
  */
 public class CompilableText extends VersionText {
+    private UUID fileUUID;
     private String path;
     private String name;
 
-    public CompilableText(String text, String path, String name) {
+    public CompilableText(String text, UUID fileUUID, String path, String name) {
         super(text);
         this.path = path;
         this.name = name;
+        this.fileUUID = fileUUID;
     }
 
     /**
@@ -41,5 +44,9 @@ public class CompilableText extends VersionText {
      */
     public String getFullPath() {
         return Paths.get(path, name).toString();
+    }
+
+    public UUID getFileUUID() {
+        return fileUUID;
     }
 }

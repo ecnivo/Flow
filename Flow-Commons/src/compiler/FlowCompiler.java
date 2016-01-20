@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -22,7 +21,6 @@ public class FlowCompiler {
 
     private static final Logger L = Logger.getLogger("Flow-Commons/Compiler");
     private CompilableText[] versionTexts;
-    private UUID dirUUID;
     private File workingDirectory;
 
     /**
@@ -32,8 +30,7 @@ public class FlowCompiler {
      */
     public FlowCompiler(CompilableText... doc) {
         this.versionTexts = doc;
-        this.dirUUID = UUID.randomUUID();
-        this.workingDirectory = new File("flow" + File.separator + dirUUID.toString());
+        this.workingDirectory = new File("flow");
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s [%1$tc]%n");
     }
 
@@ -65,6 +62,9 @@ public class FlowCompiler {
         if (!workingDirectory.exists()) {
             workingDirectory.mkdir();
             L.info("working directory did not exist, created it");
+        } else {
+            for (File file : workingDirectory.listFiles())
+                file.delete();
         }
         L.info(versionTexts.length + " textdocuments queued for compilation");
         // Add all documents and their paths to compilation queue
@@ -116,7 +116,7 @@ public class FlowCompiler {
             fileManager.close();
         } catch (Exception e) {
             L.severe("exception occurred while compiling!");
-            L.severe(e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
