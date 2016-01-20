@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
+import server.DataManagement;
 import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
@@ -1432,12 +1433,6 @@ public class SQLDatabase {
 					"Error loading database meta data: " + databaseName);
 			return false;
 		}
-		try {
-			this.connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return true;
 	}
 
@@ -1523,28 +1518,43 @@ public class SQLDatabase {
 
 	public boolean checkAndRepairFileSystemCorruption(String databaseName,
 			String dataFolder) {
-		// try {
-		// ResultSet response = this.query("SELECT Username FROM Users;");
-		// while (response.next()) {
-		// String username = response.getString("Username");
-		// if (DataManagement.getInstance()
-		// .getUserByUsername(username) == null) {
-		// this.closeAccount(username);
-		// }
-		// }
-		//
-		// response = this.query("SELECT DocumentID FROM Documents;");
-		// while (response.next()) {
-		// String fileUUID = response.getString("DocumentID");
-		// if (DataManagement.getInstance().fileExists(
-		// UUID.fromString(fileUUID)) == null) {
-		// this.closeAccount(username);
-		// }
-		// }
-		// } catch (SQLException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
+		try {
+			ResultSet response = this.query("SELECT Username FROM Users;");
+			while (response.next()) {
+				String username = response.getString("Username");
+				if (!DataManagement.getInstance().userExists(username)) {
+					System.err.println("Deleting account '" + username
+							+ "' due to corruption.");
+					this.closeAccount(username);
+				}
+			}
+			response = this.query("SELECT DocumentID FROM Documents;");
+			while (response.next()) {
+				String fileUUID = response.getString("DocumentID");
+				if (!DataManagement.getInstance()
+						.fileExists(UUID.fromString(fileUUID))) {
+					System.err.println("Deleting file ' " + fileUUID
+							+ "' due to corruption.");
+					this.deleteFile(fileUUID);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// The repair process was not successful
+			try {
+				this.connection.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			return false;
+		}
+		try {
+			this.connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 }

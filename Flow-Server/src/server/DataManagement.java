@@ -1,12 +1,17 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import struct.User;
 import struct.VersionText;
 import util.FileSerializer;
-
-import java.io.*;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * Manages data saved to the disk
@@ -98,6 +103,21 @@ public class DataManagement {
 		if (!userFile.exists())
 			return null;
 		return fileSerializer.readFromFile(userFile, User.class);
+	}
+
+	/**
+	 * Checks if a user exists
+	 *
+	 * @param username
+	 *            The user's username
+	 * @return whether or not the user exists
+	 */
+	public boolean userExists(String username) {
+		L.info("getting user " + username + " by username");
+		File userFile = new File(userDir, username + "." + USER_FILE_EXT);
+		if (!userFile.exists())
+			return false;
+		return true;
 	}
 
 	/**
