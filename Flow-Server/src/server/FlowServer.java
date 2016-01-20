@@ -6,12 +6,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import database.SQLDatabase;
-import util.DatabaseException;
 
+/**
+ * Main container for initiating database and dynamically dispatching clients to
+ * new threads containing ClientRequestHandle runnable objects.
+ * 
+ * @version January 14th, 2016
+ * @author Bimesh De Silva
+ *
+ */
 public class FlowServer implements Runnable {
 
 	private static FlowServer instance;
@@ -27,14 +33,12 @@ public class FlowServer implements Runnable {
 
 	public static final int ARC_PORT = 10225;
 
-	private SQLDatabase database;
-
-	// TODO Verify capability when running at max threads
 	private static final int MAX_THREADS = 100;
 	private Thread[] threadPool = new Thread[MAX_THREADS];
 
 	private FlowServer() {
-		this.database = SQLDatabase.getInstance();
+		// Load the SQLDatabase
+		SQLDatabase.getInstance();
 	}
 
 	/**
@@ -85,12 +89,6 @@ public class FlowServer implements Runnable {
 		}
 	}
 
-	protected UUID newSession(String username) throws DatabaseException {
-		UUID sessionId = UUID.randomUUID();
-		this.database.newSession(username, sessionId.toString());
-		return sessionId;
-	}
-
 	public static void main(String[] args) throws IOException,
 			KeyManagementException, NoSuchAlgorithmException {
 		System.setProperty("java.util.logging.SimpleFormatter.format",
@@ -98,6 +96,5 @@ public class FlowServer implements Runnable {
 		FlowServer server = FlowServer.getInstance();
 		new Thread(server).start();
 		new Thread(new AsyncServer(ARC_PORT)).start();
-		// TEST CODE
 	}
 }

@@ -19,6 +19,23 @@ import util.DatabaseException;
 import util.Results;
 import util.Validator;
 
+/**
+ * Runnable that handles a single client request. Capable of dealing with a
+ * variety of request types, the key categories being:
+ * <ul>
+ * <li>User accounts creation / modification</li>
+ * <li>Creating / ending user sessions</li>
+ * <li>Project meta data and permissions modification</li>
+ * <li>Directory / file / version meta data modification</li>
+ * <li>New project / directory / file creation</li>
+ * <li>File / version data retrieval</li>
+ * <li>File data modification</li>
+ * </ul>
+ * 
+ * @version January 19th, 2016
+ * @author Bimesh De Silva
+ *
+ */
 public class ClientRequestHandle implements Runnable {
 
 	private Socket socket;
@@ -40,7 +57,7 @@ public class ClientRequestHandle implements Runnable {
 	public void run() {
 		try {
 
-			// Prevent mallacious / invalid requests from taking up too much
+			// Prevent malicious / invalid requests from taking up too much
 			// server time
 			this.socket.setSoTimeout(500);
 
@@ -67,10 +84,14 @@ public class ClientRequestHandle implements Runnable {
 							try {
 								// Only provide a session id if all checks are
 								// passed.
-								UUID sessionID = this.server
-										.newSession(username);
-								returnData.put("session_id", sessionID);
-								returnData.put("status", "OK");
+								UUID sessionID = UUID.randomUUID();
+								if (this.database.newSession(username,
+										sessionID.toString())) {
+									returnData.put("session_id", sessionID);
+									returnData.put("status", "OK");
+								} else {
+									returnData.put("status", FlowServer.ERROR);
+								}
 							} catch (DatabaseException e) {
 								e.printStackTrace();
 								returnData.put("status", e.getMessage());
@@ -99,6 +120,9 @@ public class ClientRequestHandle implements Runnable {
 				case "REGISTER": {
 					String username = data.get("username", String.class),
 							password = data.get("password", String.class);
+
+					// Verify that the username and password meet the specified
+					// standards
 					if (!Validator.validIdentification(username))
 						returnData.put("status", "USERNAME_INVALID");
 					else if (!Validator.validIdentification(username))
@@ -107,9 +131,7 @@ public class ClientRequestHandle implements Runnable {
 						returnData.put("status",
 								this.database.addUser(username, password));
 						DataManagement.getInstance()
-								.addUser(new User(
-										data.get("username", String.class),
-										data.get("password", String.class)));
+								.addUser(new User(username, password));
 					}
 				}
 					break;

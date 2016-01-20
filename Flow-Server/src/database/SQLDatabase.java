@@ -20,6 +20,23 @@ import server.FlowServer;
 import util.DatabaseException;
 import util.Results;
 
+/**
+ * Handles all interfacing with the SQLite Database. Includes various prepared
+ * SQL statements to allow for easy access to SQLite database functionality.<br>
+ * Duties include:
+ * <ul>
+ * <li>User accounts</li>
+ * <li>Sessions and logged in users</li>
+ * <li>Project meta data and permissions</li>
+ * <li>Name collision prevention</li>
+ * <li>Directory / file / version meta data</li>
+ * <li>Corruption prevention</li>
+ * </ul>
+ * 
+ * @version January 19th, 2016
+ * @author Bimesh De Silva
+ *
+ */
 public class SQLDatabase {
 
 	/**
@@ -31,7 +48,7 @@ public class SQLDatabase {
 	 * Number of seconds to allow for searching before timeout (this is a safety
 	 * net, as the socket times out before this)
 	 */
-	public static final int TIMEOUT = 1;
+	public static final int TIMEOUT = 2;
 
 	/**
 	 * Access levels used for projects
@@ -60,6 +77,9 @@ public class SQLDatabase {
 			+ "FlowDatabse.db",
 			LIVE_DATABASE = LIVE_FOLDER + File.separator + "FlowDatabse.db";
 
+	/**
+	 * Folders for various stored data elements
+	 */
 	public static final String LIVE_USERS = LIVE_FOLDER + File.separator
 			+ "users", LIVE_FILES = LIVE_FOLDER + File.separator + "files";
 

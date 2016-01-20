@@ -12,15 +12,15 @@ import java.sql.SQLException;
  * interface to perform changes onto the database.
  * 
  * Usage:
- * <ul>
+ * <ol>
  * <li>Decide what type of command you want to perform</li>
  * <li>Type 'a' for any commands which don't return a value (i.e. DELETE,
  * UPDATE, DROP, CREATE, etc.)</li>
  * <li>Type 'b' for any commands which do return values (typically a 'SELECT'
  * statement)</li>
  * <li>Type your statement and press enter</li>
- * <li>If applicable, view results of query in console.</li>
- * </ul>
+ * <li>If applicable, view results of your query in console.</li>
+ * </ol>
  * 
  * @version December 17th, 2015
  * @author Bimesh De Silva

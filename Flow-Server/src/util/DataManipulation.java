@@ -7,6 +7,14 @@ import java.util.UUID;
 
 import database.SQLDatabase;
 
+/**
+ * Consists of static methods used to performing repetitive tasks on various
+ * forms of data, usually in the form of data extraction.
+ * 
+ * @version January 19th, 2016
+ * @author Bimesh De Silva
+ *
+ */
 public class DataManipulation {
 
 	/**
@@ -15,7 +23,8 @@ public class DataManipulation {
 	 * @param directoryId
 	 *            the UUID, in String form, of the directory which to generate
 	 *            the path of.
-	 * @return the path to the specified directory.
+	 * @return the path to the specified directory, starting with a
+	 *         {@link File#separator file seperator} character.
 	 * @throws DatabaseException
 	 *             if the directory doesn't exist or there is an error accessing
 	 *             the database.
