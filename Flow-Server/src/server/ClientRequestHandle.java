@@ -39,16 +39,29 @@ public class ClientRequestHandle implements Runnable {
 	@Override
 	public void run() {
 		try {
+
+			// Prevent mallacious / invalid requests from taking up too much
+			// server time
 			this.socket.setSoTimeout(500);
+
+			// Retrieve the request from the client
 			final Data data = psocket.receive();
 
 			L.info("receive: " + data.toString());
+
+			// Create a Data object to send back to the client
 			final Data returnData = new Data();
+
+			// Deal with each message type separately
 			switch (data.getType()) {
+			// For when the user doesn't have an active session open already
 			case "login":
 				try {
 					final String username = data.get("username", String.class),
 							password = data.get("password", String.class);
+
+					// Verify data in request and send back appropriate error
+					// message if needed, otherwise create a new session.
 					if (this.database.userExists(username)) {
 						if (this.server.getDatabase().authenticate(username,
 								password)) {
@@ -73,8 +86,6 @@ public class ClientRequestHandle implements Runnable {
 				}
 				break;
 			case "end_session":
-				// TODO Deregister all associated listeners
-				// TODO Call whatever code Gordon Guan has for this
 				returnData.put("status", this.database.removeSession(
 						data.get("session_id", UUID.class).toString()));
 				break;
@@ -84,9 +95,9 @@ public class ClientRequestHandle implements Runnable {
 				case "REGISTER": {
 					String username = data.get("username", String.class),
 							password = data.get("password", String.class);
-					if (!Validator.validUserName(username))
+					if (!Validator.validIdentification(username))
 						returnData.put("status", "USERNAME_INVALID");
-					else if (!Validator.validUserName(username))
+					else if (!Validator.validIdentification(username))
 						returnData.put("status", "PASSWORD_INVALID");
 					else {
 						returnData.put("status",

@@ -4,8 +4,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+/**
+ * Class consisting of static methods to parse ResultSet objects into more
+ * usable data forms.
+ * 
+ * @author Bimesh De Silva
+ *
+ */
 public class Results {
 
+	/**
+	 * 
+	 * @param columnNames
+	 * @param results
+	 * @return
+	 * @throws SQLException
+	 */
 	public static String[][] toStringArray(String[] columnNames,
 			ResultSet results) throws SQLException {
 		LinkedList<String[]> list = new LinkedList<>();
@@ -19,6 +33,13 @@ public class Results {
 		return list.toArray(new String[][] { {} });
 	}
 
+	/**
+	 * 
+	 * @param columnName
+	 * @param results
+	 * @return
+	 * @throws SQLException
+	 */
 	public static String[] toStringArray(String columnName, ResultSet results)
 			throws SQLException {
 		String[][] arr = toStringArray(new String[] { columnName }, results);
@@ -30,44 +51,13 @@ public class Results {
 		}
 		return retarr;
 	}
-
-	public static int[][] toIntArray(String[] columnNames, ResultSet results)
-			throws SQLException {
-		LinkedList<int[]> list = new LinkedList<>();
-		while (results.next()) {
-			int[] row = new int[columnNames.length];
-			for (int i = 0; i < row.length; i++) {
-				row[i] = results.getInt(columnNames[i]);
-			}
-			list.add(row);
-		}
-		return list.size() > 0 ? (int[][]) list.toArray() : new int[][] { {} };
-	}
-
-	public static int[] toIntArray(String columnName, ResultSet results)
-			throws SQLException {
-		return toIntArray(new String[] { columnName }, results)[0];
-	}
-
-	public static String[][] toStringArray(int[] columnNumbers,
-			ResultSet results) throws SQLException {
-		LinkedList<String[]> list = new LinkedList<>();
-		while (results.next()) {
-			String[] row = new String[columnNumbers.length];
-			for (int i = 0; i < row.length; i++) {
-				row[i] = results.getString(columnNumbers[i]);
-			}
-			list.add(row);
-		}
-		return list.size() > 0 ? list.toArray(new String[][] { {} })
-				: new String[][] { {} };
-	}
-
-	public static String[] toStringArray(int columnNumber, ResultSet results)
-			throws SQLException {
-		return toStringArray(new int[] { columnNumber }, results)[0];
-	}
-
+	
+	/**
+	 * 
+	 * @param results
+	 * @return
+	 * @throws SQLException
+	 */
 	public static String[][] toStringArray(ResultSet results)
 			throws SQLException {
 		int noOfColumns = results.getMetaData().getColumnCount();

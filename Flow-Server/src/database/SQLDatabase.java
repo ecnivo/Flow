@@ -26,7 +26,6 @@ public class SQLDatabase {
 	 */
 	public static final String DRIVER = "org.sqlite.JDBC";
 
-	// TODO Properly implement the timeout
 	/**
 	 * Number of seconds to allow for searching before timeout
 	 */
